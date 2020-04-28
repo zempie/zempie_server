@@ -4,7 +4,7 @@ export default {
         username: 'loki',
         password: 'wjddnjs',
         conn: {
-            host: 'localhost',
+            host: '192.168.0.10',
             port: 3306,
             dialect: 'mysql',
             pool: {
