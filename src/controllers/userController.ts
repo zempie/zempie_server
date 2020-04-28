@@ -26,7 +26,7 @@ class UserController {
                     }, transaction);
 
                     profile = await dbs.Profile.create({
-                        user_id: user.id,
+                        user_uid: user.uid,
                     }, transaction);
                 }
             }

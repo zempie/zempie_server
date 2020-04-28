@@ -47,10 +47,10 @@ class SocialMediaController {
     }
 
 
-    async follwoing({user_uid}: ISocialMedia, user: IUser) {
+    async following({user_uid}: ISocialMedia, user: IUser) {
         const records = await dbs.Follow.following({user_uid: user_uid || user.uid});
         return {
-            follwoing: records.map((record: any) => {
+            following: records.map((record: any) => {
                 return {
                     uid: record.target.uid,
                     displayName: record.target.display_name,

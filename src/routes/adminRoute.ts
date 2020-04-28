@@ -15,6 +15,7 @@ export default (router: Router) => {
     router.get(`${apiVer}/admin/projects`,                  isAdmin,        convert(AdminController.getProjects));
     router.get(`${apiVer}/admin/tokens`,                    isAdmin,        convert(AdminController.getAccessTokens));
 
+    router.get(`${apiVer}/admin/users`,     convert(AdminController.getUsers));
     router.get(`${apiVer}/admin/games`,     convert(AdminController.getGames));
 
 }

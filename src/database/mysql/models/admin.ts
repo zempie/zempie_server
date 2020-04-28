@@ -21,7 +21,7 @@ class AdminModel extends Model {
             await this.model.create({
                 uid: uuid(),
                 name: 'admin',
-                password: makePassword('administrator'),
+                password,
                 level: 10,
             });
         }

@@ -18,7 +18,12 @@ export default {
 
     Url: {
         Host: 'http://localhost:8280',
-        Deploy: 'http://localhost:8088',
+        DeployApiV1: 'http://localhost:8288/api/v1',
+    },
+
+    Deploy: {
+        url_v1: 'http://localhost:8288/api/v1',
+        api_key: '5b94uen0k99mxn4t'
     },
 
     AWS: {

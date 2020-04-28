@@ -19,7 +19,7 @@ class UserModel extends Model {
             photo_url:          { type: DataTypes.STRING(250), allowNull: true },
             provider_id:        { type: DataTypes.STRING(20), allowNull: true, defaultValue: 'password' },
             email:              { type: DataTypes.STRING(50), allowNull: true },
-            emailVerified:      { type: DataTypes.BOOLEAN, defaultValue: false },
+            email_verified:     { type: DataTypes.BOOLEAN, defaultValue: false },
             fcm_token:          { type: DataTypes.STRING },
         };
     }
@@ -30,7 +30,7 @@ class UserModel extends Model {
 
 
     async getProfile({uid}: IUser, transaction?: Transaction) {
-        const profile = await this.model.findOne({
+        const user = await this.model.findOne({
             where: {
                 uid,
             },
@@ -42,7 +42,24 @@ class UserModel extends Model {
             }],
             transaction
         });
-        return profile.get({plain: true});
+        if( user ) {
+            return user.get({plain: true});
+        }
+    }
+
+
+    async getAllProfiles({}, transaction?: Transaction) {
+        const records = await this.model.findAll({
+            include: [{
+                model: dbs.Profile.model,
+                attributes: {
+                    exclude: ['createdAt', 'updatedAt', 'deleted_at'],
+                }
+            }],
+            transaction
+        });
+
+        return records.map((record: any) => record.get({plain: true}))
     }
 }
 

@@ -2,8 +2,8 @@ import * as _ from 'lodash';
 import { IGameParams, IUser } from './_interfaces';
 import { Sequelize, Transaction } from 'sequelize';
 import { dbs } from "../commons/globals";
-
-const api_key = '5b94uen0k99mxn4t';
+import Opt from '../../config/opt'
+const { Url, Deploy } = Opt;
 
 class GameController {
 
@@ -42,7 +42,7 @@ class GameController {
 
 
     async getList({}, user: IUser, transaction?: Transaction) {
-        const response = await fetch(`http://localhost:8288/api/v1/games?key=${api_key}`);
+        const response = await fetch(`${Url.DeployApiV1}/games?key=${Deploy.api_key}`);
         if( response.status === 200 ) {
             const json = await response.json();
             return json.data
