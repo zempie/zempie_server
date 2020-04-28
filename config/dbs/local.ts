@@ -17,13 +17,13 @@ export default {
                 multipleStatements: true
             },
             // underscored: true
-            // define: {
-            //     underscored: true,
-            //     freezeTableName: false,
-            //     createdAt: "created_at",
-            //     updatedAt: "updated_at",
-            //     deletedAt: "deleted_at"
-            // }
+            define: {
+                underscored: true,
+                freezeTableName: false,
+                createdAt: "created_at",
+                updatedAt: "updated_at",
+                deletedAt: "deleted_at"
+            }
         },
     },
     redis: {

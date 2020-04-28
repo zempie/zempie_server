@@ -1,8 +1,8 @@
 export default {
     mysql: {
         database: 'platform',
-        username: 'root',
-        password: '1324',
+        username: 'loki',
+        password: 'wjddnjs',
         conn: {
             host: 'localhost',
             port: 3306,
@@ -17,13 +17,13 @@ export default {
                 multipleStatements: true
             },
             // underscored: true
-            // define: {
-            //     underscored: true,
-            //     freezeTableName: false,
-            //     createdAt: "created_at",
-            //     updatedAt: "updated_at",
-            //     deletedAt: "deleted_at"
-            // }
+            define: {
+                underscored: true,
+                freezeTableName: false,
+                createdAt: "created_at",
+                updatedAt: "updated_at",
+                deletedAt: "deleted_at"
+            }
         },
     },
     redis: {
