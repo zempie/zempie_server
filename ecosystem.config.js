@@ -5,7 +5,7 @@
 module.exports = {
     apps: [
         {
-            name: 'deploy-servers',
+            name: 'platform-server',
             script: './dist/src/run.js',
             watch: false,
             ignore_watch : ["node_modules", "public"],
