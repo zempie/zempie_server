@@ -26,7 +26,7 @@ module.exports = {
             user: 'loki',
             host: [{host:'192.168.0.10', port:'2105'}],
             ref : 'origin/master',
-            repo: 'git@192.168.0.36:loki/platform-api-server.git',
+            repo: 'git@192.168.0.36:raptor/platform-api-server.git',
             path: '/home/loki/project/raptor/platform-server',
             ssh_options: '',
             'post-deploy': 'yarn install && pm2 startOrRestart ecosystem.config.js --env development'
@@ -35,7 +35,7 @@ module.exports = {
             user: 'loki',
             host: [{host:'192.168.0.10', port:'2105'}],
             ref : 'origin/master',
-            repo: 'git@192.168.0.36:loki/platform-api-server.git',
+            repo: 'git@192.168.0.36:raptor/platform-api-server.git',
             path: '/home/loki/project/raptor/platform-server',
             ssh_options: '',
             'post-deploy': 'yarn install && pm2 startOrRestart ecosystem.config.js --env staging && pm2 startOrRestart admin_ecosystem.config.js --env staging'
