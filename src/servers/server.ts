@@ -11,6 +11,8 @@ import * as admin from 'firebase-admin';
 import { firebase } from '../commons/globals';
 
 import MySql from '../database/mysql';
+import Redis from '../database/redis';
+
 import { IServerOptions } from '../commons/interfaces';
 import * as Pkg from '../../package.json';
 import deployApp from "../services/deployApp";
@@ -163,7 +165,10 @@ export default class Server {
 
     private static async setRDB() {
         await MySql.initialize();
-        console.log('completed rdb');
+        console.log('mysql is ready.'.cyan);
+
+        await Redis.initialize();
+        console.log('redis is ready.'.cyan);
     }
 
 

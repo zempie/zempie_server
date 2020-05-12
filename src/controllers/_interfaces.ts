@@ -1,3 +1,5 @@
+import { eNotice, eNotify } from "../commons/enums";
+
 export interface IDecoded {
     uid: string,
 }
@@ -49,4 +51,33 @@ export interface IGame {
     url_game: string,
     url_thumb: string,
     url_title: string,
+}
+
+export interface ITimelineParams {
+    uid: string,
+    user_uid: string,
+    game_uid: string,
+    limit: number,
+    skip: number,
+    type: number,
+    score: number,
+    follower_ids: Array<number>,
+    achievement_id: number,
+    battle_id: number,
+}
+
+export interface INotifyParams {
+    user_uid: string,
+    type: eNotify,
+    extra: Object
+}
+
+export interface INoticeParams {
+    id: number,
+    type: eNotice,
+    title: string,
+    content: string,
+    img_link: string,
+    start_at: Date,
+    end_at: Date,
 }

@@ -8,18 +8,11 @@ const apiVer = `/api/v1`;
 
 export default (router: Router) => {
 
+    router.post(`${apiVer}/user/sign-out`,      validateFirebaseIdToken,    convert(UserController.signOut));
+
     router.get(`${apiVer}/users/info`,              validateFirebaseIdToken,    convert(UserController.getInfo));
     router.get(`${apiVer}/users/info/:target_uid`,  validateFirebaseIdToken,    convert(UserController.getTargetInfo));
 
+    router.post(`${apiVer}/user/setting`,       validateFirebaseIdToken,    convert(UserController.updateSetting));
 
-    // social media - DM ( direct message )
-    router.post(`${apiVer}/dm/send`);
-    router.get(`${apiVer}/dm/list`);
-
-
-    // social media - follow
-    router.post(`${apiVer}/sm/follow`);
-    router.post(`${apiVer}/sm/un-follow`);
-    router.get(`${apiVer}/sm/following`);
-    router.get(`${apiVer}/sm/followers`);
 }

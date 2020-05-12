@@ -4,7 +4,24 @@ export const ErrorCodes = {
 
     INVALID_TOKEN: {
         code: 1100,
-        message: '잘 못 된 토큰입니다.'
+        message: '잘 못 된 토큰입니다'
+    },
+    INVALID_USER_UID: {
+        code: 1110,
+        message: '잘 못 된 유저 아이디입니다'
+    },
+    INVALID_FCM_TOKEN: {
+        code: 1121,
+        message: '사용자 FCM 토큰 오류'
+    },
+    INVALID_NOTICE_ID: {
+        code: 1141,
+        message: '공지사항 ID 오류'
+    },
+
+    INVALID_TIMELINE_USER_UID: {
+        code: 1210,
+        message: '타임라인 유저 아이디 오류'
     },
 
     ALREADY_FOLLOWING_TARGET: {

@@ -26,8 +26,31 @@ class UserModel extends Model {
 
     async afterSync(): Promise<void> {
         this.model.hasOne(dbs.Profile.model, {sourceKey: 'uid', foreignKey: 'user_uid'});
+        this.model.hasOne(dbs.UserSetting.model, {sourceKey: 'uid', foreignKey: 'user_uid', as: 'setting'});
     }
 
+
+    async getInfo({uid}: IUser, transaction?: Transaction) {
+        const user = await this.model.findOne({
+            where: { uid },
+            include: [{
+                model: dbs.Profile.model,
+                attributes: {
+                    exclude: ['created_at', 'updated_at', 'deleted_at'],
+                }
+            }, {
+                model: dbs.UserSetting.model,
+                as: 'setting',
+                attributes: {
+                    exclude: ['created_at', 'updated_at', 'deleted_at'],
+                }
+            }],
+            transaction
+        });
+        if( user ) {
+            return user.get({plain: true});
+        }
+    }
 
     async getProfile({uid}: IUser, transaction?: Transaction) {
         const user = await this.model.findOne({
@@ -36,6 +59,28 @@ class UserModel extends Model {
             },
             include: [{
                 model: dbs.Profile.model,
+                attributes: {
+                    exclude: ['created_at', 'updated_at', 'deleted_at'],
+                }
+            }, {
+                model: dbs.UserGame.model,
+                attributes: {
+                    exclude: ['created_at', 'updated_at', 'deleted_at'],
+                }
+            }],
+            transaction
+        });
+        if( user ) {
+            return user.get({plain: true});
+        }
+    }
+
+    async getSetting({uid}: IUser, transaction?: Transaction) {
+        const user = await this.model.findOne({
+            where: {uid},
+            include: [{
+                model: dbs.UserSetting.model,
+                as: 'setting',
                 attributes: {
                     exclude: ['created_at', 'updated_at', 'deleted_at'],
                 }

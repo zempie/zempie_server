@@ -27,10 +27,10 @@ export default {
         },
     },
     redis: {
-        host: 'localhost',
-        port: 6379,
+        host: '192.168.0.10',
+        port: 16379,
         family: 4,
-        password: null,
+        password: 'fromthered2020#!',
         db: 0,
     }
 }

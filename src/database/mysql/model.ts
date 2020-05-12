@@ -56,7 +56,7 @@ abstract class Model {
     public async update(values: object, where: object, transaction?: Transaction) { return this.model.update(values, { where, transaction }) }
     public async destroy(where: object, transaction?: Transaction) { return this.model.destroy({ where, transaction }) }
     public async findOne(where: object, transaction?: Transaction) { return this.model.findOne({ where, transaction }) }
-    public async findAll(where: object, transaction?: Transaction) { return this.model.findAll({ where, transaction }) }
+    public async findAll(where: object, options?: object, transaction?: Transaction) { return this.model.findAll({ where, ...options, transaction }) }
     public async findAndCountAll(where: object, transaction?: Transaction) { return this.model.findAndCountAll({ where, transaction }) }
     public async findOrCreate({findOption, createOption}: {findOption: object, createOption: object}, transaction?: Transaction) {
         let record = await this.model.findOne({

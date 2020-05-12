@@ -6,8 +6,8 @@ import { Sequelize } from 'sequelize';
 import { dbs } from "../../commons/globals";
 import Model from './model';
 import { capitalize } from '../../commons/utils';
-import cfgDbs from '../../../config/dbs';
-const DBCfg = cfgDbs.mysql;
+import db_options from '../../../config/dbs';
+const mysqlOpt = db_options.mysql;
 
 
 class MySql {
@@ -16,16 +16,16 @@ class MySql {
     public async initialize() {
         try {
             const connection = await MYSQL.createConnection({
-                host:       DBCfg.conn.host,
-                port:       DBCfg.conn.port,
-                user:       DBCfg.username,
-                password:   DBCfg.password,
+                host:       mysqlOpt.conn.host,
+                port:       mysqlOpt.conn.port,
+                user:       mysqlOpt.username,
+                password:   mysqlOpt.password,
             });
 
-            // await connection.query(`CREATE DATABASE IF NOT EXISTS ${DBCfg.database} CHARACTER SET utf8 COLLATE utf8_general_ci;`);
-            await connection.execute(`CREATE DATABASE IF NOT EXISTS ${DBCfg.database} CHARACTER SET utf8 COLLATE utf8_general_ci;`);
+            // await connection.query(`CREATE DATABASE IF NOT EXISTS ${mysqlOpt.database} CHARACTER SET utf8 COLLATE utf8_general_ci;`);
+            await connection.execute(`CREATE DATABASE IF NOT EXISTS ${mysqlOpt.database} CHARACTER SET utf8 COLLATE utf8_general_ci;`);
 
-            this.db = new Sequelize(DBCfg.database, DBCfg.username, DBCfg.password, DBCfg.conn);
+            this.db = new Sequelize(mysqlOpt.database, mysqlOpt.username, mysqlOpt.password, mysqlOpt.conn);
 
             await this.db.authenticate();
             await this.syncDefine();
@@ -64,8 +64,7 @@ class MySql {
             }
         }
 
-        // @ts-ignore
-        console.log(`[${DBCfg.conn.dialect}] connected.`.verbose);
+        console.log(`[${mysqlOpt.conn.dialect}] loading completed.`.cyan);
     }
 
 }

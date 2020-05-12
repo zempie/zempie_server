@@ -2,6 +2,8 @@ import { ISocialMedia, IUser } from './_interfaces';
 import { dbs } from '../commons/globals';
 import { Transaction } from 'sequelize';
 import { CreateError, ErrorCodes } from '../commons/errorCodes';
+import NotifyService from '../services/notifyService';
+import { eNotify } from "../commons/enums";
 
 class SocialMediaController {
     
@@ -22,6 +24,8 @@ class SocialMediaController {
             const target = await dbs.Profile.findOne({user_uid: target_uid}, transaction);
             target.followers_cnt += 1;
             await target.save({transaction});
+
+            await NotifyService.notify({user_uid, type: eNotify.Follow, extra: { target_uid }});
         });
     }
     
