@@ -27,6 +27,7 @@ class UserModel extends Model {
     async afterSync(): Promise<void> {
         this.model.hasOne(dbs.Profile.model, {sourceKey: 'uid', foreignKey: 'user_uid'});
         this.model.hasOne(dbs.UserSetting.model, {sourceKey: 'uid', foreignKey: 'user_uid', as: 'setting'});
+        this.model.hasMany(dbs.UserGame.model, {sourceKey: 'uid', foreignKey: 'user_uid', as: 'gameRecords'});
     }
 
 
@@ -41,6 +42,12 @@ class UserModel extends Model {
             }, {
                 model: dbs.UserSetting.model,
                 as: 'setting',
+                attributes: {
+                    exclude: ['id', 'created_at', 'updated_at', 'deleted_at'],
+                }
+            }, {
+                model: dbs.UserGame.model,
+                as: 'gameRecords',
                 attributes: {
                     exclude: ['created_at', 'updated_at', 'deleted_at'],
                 }
@@ -64,6 +71,7 @@ class UserModel extends Model {
                 }
             }, {
                 model: dbs.UserGame.model,
+                as: 'gameRecords',
                 attributes: {
                     exclude: ['created_at', 'updated_at', 'deleted_at'],
                 }

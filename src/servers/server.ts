@@ -167,8 +167,8 @@ export default class Server {
         await MySql.initialize();
         console.log('mysql is ready.'.cyan);
 
-        await Redis.initialize();
-        console.log('redis is ready.'.cyan);
+        // await Redis.initialize();
+        // console.log('redis is ready.'.cyan);
     }
 
 

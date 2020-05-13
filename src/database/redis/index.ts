@@ -22,6 +22,9 @@ class Redis {
             this.redis.hset('server:platform', 'status', 'running');
             this.setTimer();
         }
+        console.log('redis is ready.'.cyan);
+
+        return this;
     }
 
     private setTimer() {
@@ -34,6 +37,10 @@ class Redis {
             this.redis.expire('server:deploy', 30);
         }, 1000* time);
     }
+
+    public getRedis() {
+        return this.redis;
+    }
 }
 
-export default new Redis();
+export default new Redis().getRedis();
