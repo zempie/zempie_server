@@ -19,7 +19,7 @@ class Redis {
         }
         this.redis = new redis(db_options.redis);
         if( this.redis ) {
-            this.redis.hset('server:deploy', 'status', 'running');
+            this.redis.hset('server:platform', 'status', 'running');
             this.setTimer();
         }
     }
