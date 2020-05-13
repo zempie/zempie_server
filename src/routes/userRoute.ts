@@ -12,7 +12,6 @@ export default (router: Router) => {
 
     router.get(`${apiVer}/users/info`,              validateFirebaseIdToken,    convert(UserController.getInfo));
     router.get(`${apiVer}/users/info/:target_uid`,  validateFirebaseIdToken,    convert(UserController.getTargetInfo));
-    // router.get(`${apiVer}/users/game-records`,      validateFirebaseIdToken,    convert(UserController.getUserGameRecords));
 
     router.post(`${apiVer}/user/setting`,       validateFirebaseIdToken,    convert(UserController.updateSetting));
 
