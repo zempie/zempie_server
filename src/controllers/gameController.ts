@@ -8,7 +8,7 @@ const { Url, Deploy } = Opt;
 
 class GameController {
 
-    async gameStart({game_uid}: IGameParams, user: IUser) {
+    gameStart = async ({game_uid}: IGameParams, user: IUser) => {
         // const user_uid = user.uid;
         // await dbs.GameLog.create({
         //     user_uid: uid,
@@ -17,7 +17,7 @@ class GameController {
     }
 
 
-    async gameOver({game_uid, score}: IGameParams, user: IUser) {
+    gameOver = async ({game_uid, score}: IGameParams, user: IUser) => {
         const user_uid = user.uid;
         await dbs.GameLog.create({
             user_uid,
@@ -42,7 +42,7 @@ class GameController {
     }
 
 
-    async getList({}, user: IUser, transaction?: Transaction) {
+    getList = async ({}, user: IUser, transaction?: Transaction) => {
         const key = `zemini:games:`;
         let _games = await redis.hgetall(key);
         let games;
@@ -79,7 +79,7 @@ class GameController {
     }
 
 
-    async getRanking({game_uid, limit = 50, skip = 0}: IGameParams, user: IUser, transaction?: Transaction) {
+    getGlobalRanking = async ({game_uid, limit = 50, skip = 0}: IGameParams, user: IUser, transaction?: Transaction) => {
         const { count, rows } = await dbs.UserGame.model.findAndCountAll({
             where: {
                 game_uid
@@ -100,7 +100,54 @@ class GameController {
 
         return {
             list: _.map(rows, (record: any) => {
-                return record.get({plain: true});
+                const { user } = record;
+                return {
+                    rank: record.rank,
+                    user_uid: user.uid,
+                    displayName: user.display_name,
+                    photoURL: user.photo_url,
+                    score: record.score,
+                }
+            })
+        }
+    }
+
+
+    getFollowingRanking = async ({game_uid, limit = 50, skip = 0}: IGameParams, {uid}: IUser, transaction?: Transaction) => {
+        const { count, rows } = await dbs.Follow.model.findAndCountAll({
+            where: {
+                user_uid: uid,
+            },
+            include: [{
+                model: dbs.User.model,
+                as: 'target',
+            }, {
+                model: dbs.UserGame.model,
+                as: 'gameRecord',
+                where: {
+                    game_uid
+                }
+            }],
+            attributes: {
+                include: [
+                    [Sequelize.literal('(RANK() OVER (ORDER BY score DESC))'), 'rank'],
+                ],
+            },
+            limit,
+            skip,
+            transaction
+        });
+
+        return {
+            list: _.map(rows, (record: any) => {
+                const { target, gameRecord } = record;
+                return {
+                    rank: record.rank,
+                    user_uid: target.uid,
+                    displayName: target.display_name,
+                    photoURL: target.photo_url,
+                    score: gameRecord.score,
+                }
             })
         }
     }
