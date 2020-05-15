@@ -47,7 +47,7 @@ class GameController {
     }
 
 
-    getList = async ({}, user: IUser, transaction?: Transaction) => {
+    getGameList = async ({}, user: IUser, transaction?: Transaction) => {
         const key = `zemini:games:`;
         let _games = await redis.hgetall(key);
         let games;
