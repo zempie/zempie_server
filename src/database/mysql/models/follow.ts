@@ -36,8 +36,8 @@ class FollowModel extends Model {
                 }
             },
             include: [{
-                as: 'target',
                 model: dbs.User.model,
+                as: 'target',
             }],
             transaction
         });
@@ -54,8 +54,8 @@ class FollowModel extends Model {
                 },
             },
             include: [{
-                as: 'user',
                 model: dbs.User.model,
+                as: 'user',
             }],
             transaction
         })

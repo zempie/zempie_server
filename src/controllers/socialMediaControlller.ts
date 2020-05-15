@@ -10,11 +10,11 @@ class SocialMediaController {
     async follow({target_uid}: ISocialMedia, user: IUser) {
         return dbs.Follow.getTransaction(async (transaction: Transaction) => {
             const user_uid = user.uid;
-            if( user_uid !== target_uid ) {
+            if( user_uid === target_uid ) {
                 throw CreateError(ErrorCodes.INVALID_USER_UID);
             }
 
-            const record = await dbs.Follow.findOne({ where: {user_uid, target_uid}, transaction });
+            const record = await dbs.Follow.findOne({user_uid, target_uid}, transaction);
             if( record ) {
                 throw CreateError(ErrorCodes.ALREADY_FOLLOWING_TARGET);
             }
@@ -37,11 +37,11 @@ class SocialMediaController {
     async unfollow({target_uid}: ISocialMedia, user: IUser) {
         return dbs.Follow.getTransaction(async (transaction: Transaction) => {
             const user_uid = user.uid;
-            if( user_uid !== target_uid ) {
+            if( user_uid === target_uid ) {
                 throw CreateError(ErrorCodes.INVALID_USER_UID);
             }
 
-            const record = await dbs.Follow.findOne({ where: {user_uid, target_uid}, transaction });
+            const record = await dbs.Follow.findOne({user_uid, target_uid}, transaction);
             if( !record ) {
                 throw CreateError(ErrorCodes.ALREADY_UNFOLLOW_TARGET);
             }
@@ -73,7 +73,7 @@ class SocialMediaController {
     }
 
     async followers({user_uid}: ISocialMedia, user: IUser) {
-        const records = await dbs.Follow.following({user_uid: user_uid || user.uid});
+        const records = await dbs.Follow.followers({user_uid: user_uid || user.uid});
         return {
             followers: records.map((record: any) => {
                 return {

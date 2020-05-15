@@ -10,7 +10,8 @@ class NotifyService {
             throw CreateError(ErrorCodes.INVALID_USER_UID);
         }
         if( !user.fcm_token ) {
-             throw CreateError(ErrorCodes.INVALID_FCM_TOKEN);
+             // throw CreateError(ErrorCodes.INVALID_FCM_TOKEN);
+            return;
         }
 
         if( user.setting.notice ) {
