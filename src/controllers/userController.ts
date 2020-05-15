@@ -42,7 +42,10 @@ class UserController {
                 }
             }
 
-            return this.getUserDetailInfo(user, profile, setting);
+            const udi = await this.getUserDetailInfo(user, profile, setting);
+            return {
+                user: udi,
+            }
         });
     }
 
