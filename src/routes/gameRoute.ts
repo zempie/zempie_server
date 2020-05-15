@@ -12,8 +12,8 @@ const apiVer = `/api/v1`;
 export default (router: Router) => {
 
     router.get(`${apiVer}/games`,   convert(GameController.getList));
-    router.get(`${apiVer}/games/ranking/:game_path/g`,  validateFirebaseIdToken,    convert(GameController.getGlobalRanking));
-    router.get(`${apiVer}/games/ranking/:game_path/f`,  validateFirebaseIdToken,    convert(GameController.getFollowingRanking));
+    router.get(`${apiVer}/games/ranking/g`,             validateFirebaseIdToken,    convert(GameController.getGlobalRanking));
+    router.get(`${apiVer}/games/ranking/f`,             validateFirebaseIdToken,    convert(GameController.getFollowingRanking));
 
     router.post(`${apiVer}/game/:game_path/start`,      validateFirebaseIdToken,    convert(GameController.gameStart));
     router.post(`${apiVer}/game/:game_path/over`,       validateFirebaseIdToken,    convert(GameController.gameOver));

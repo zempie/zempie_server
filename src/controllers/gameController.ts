@@ -85,13 +85,22 @@ class GameController {
 
 
     getGlobalRanking = async ({game_uid, limit = 50, skip = 0}: IGameParams, {uid}: IUser, transaction?: Transaction) => {
-        const score = await dbs.UserGame.findOne({user_uid: uid}, transaction);
-        const rank = await dbs.UserGame.model.count({
-            score: {
-                [Op.gt]: score
-            },
-            transaction
-        });
+        let score, rank;
+        const gameRecord = await dbs.UserGame.findOne({game_uid, user_uid: uid}, transaction);
+        if( gameRecord ) {
+            score = gameRecord.score;
+            rank = await dbs.UserGame.model.count({
+                where: {
+                    game_uid,
+                    score: {
+                        [Op.gt]: score
+                    },
+                },
+                order: [['score', 'desc']],
+                transaction
+            });
+            rank += 1;
+        }
 
         const { count, rows } = await dbs.UserGame.model.findAndCountAll({
             where: {
@@ -104,7 +113,6 @@ class GameController {
             },
             include: [{
                 model: dbs.User.model,
-                attributes: ['uid', ['display_name', 'displayName'], ['photo_url', 'photoURL']]
             }],
             limit,
             skip,
@@ -114,14 +122,15 @@ class GameController {
         return {
             count,
             rank,
+            score,
             list: _.map(rows, (record: any) => {
-                const { user } = record;
+                const { rank, user, score } = record.get({plain: true});
                 return {
-                    rank: record.rank,
+                    rank,
                     user_uid: user.uid,
                     displayName: user.display_name,
                     photoURL: user.photo_url,
-                    score: record.score,
+                    score,
                 }
             })
         }
@@ -129,46 +138,52 @@ class GameController {
 
 
     getFollowingRanking = async ({game_uid, limit = 50, skip = 0}: IGameParams, {uid}: IUser, transaction?: Transaction) => {
-        const score = await dbs.UserGame.findOne({user_uid: uid}, transaction);
-        const rank = await dbs.UserGame.model.count({
-            score: {
-                [Op.gt]: score
-            },
-            transaction
-        });
-
-        const { count, rows } = await dbs.UserGame.model.findAndCountAll({
-            where: {
-                game_uid,
-            },
-            include: [{
-                model: dbs.Follow.model,
-                as: 'follow',
-                where: {
-                    user_uid: uid,
-                },
+        let score, rank;
+        const gameRecord = await dbs.UserGame.findOne({game_uid, user_uid: uid}, transaction);
+        if( gameRecord ) {
+            score = gameRecord.score;
+            rank = await dbs.Follow.model.count({
+                where: { user_uid: uid },
                 include: [{
-                    model: dbs.User.model,
-                    as: 'target',
-                }]
+                    model: dbs.UserGame.model,
+                    as: 'gameRecord',
+                    where: {
+                        game_uid,
+                        score: {
+                            [Op.gt]: score,
+                        }
+                    }
+                }],
+            })
+            rank += 1;
+        }
+
+        const { count, rows } = await dbs.Follow.model.findAndCountAll({
+            where: { user_uid: uid },
+            include: [{
+                model: dbs.UserGame.model,
+                as: 'gameRecord',
+                where: { game_uid },
+            }, {
+                model: dbs.User.model,
+                as: 'target',
             }],
             attributes: {
                 include: [
-                    [Sequelize.literal('(RANK() OVER (ORDER BY score DESC))'), 'rank'],
+                    [Sequelize.literal('(RANK() OVER (ORDER BY gameRecord.score DESC))'), 'rank'],
                 ]
             },
-            limit,
-            skip,
-            transaction
+            limit, skip, transaction
         });
 
         return {
             count,
             rank,
+            score,
             list: _.map(rows, (record: any) => {
-                const { target, gameRecord } = record;
+                const { rank, target, gameRecord } = record.get({plain: true});
                 return {
-                    rank: record.rank,
+                    rank,
                     user_uid: target.uid,
                     displayName: target.display_name,
                     photoURL: target.photo_url,

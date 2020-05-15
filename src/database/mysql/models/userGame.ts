@@ -21,6 +21,7 @@ class UserGameModel extends Model {
 
     async afterSync(): Promise<void> {
         this.model.belongsTo(dbs.User.model, {foreignKey: 'user_uid', targetKey: 'uid'});
+        this.model.belongsTo(dbs.Follow.model, {foreignKey: 'user_uid', target: 'target_uid'});
     }
 
 
