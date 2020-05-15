@@ -18,3 +18,11 @@ export enum eNotice {
     Once,
     Event,
 }
+
+export enum eRedis {
+    Geo,
+    Hashes,
+    Lists,
+    Sets,
+    Strings,
+}

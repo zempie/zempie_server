@@ -68,13 +68,13 @@ export const readyToPlay = async (req: Request, res: Response, next: Function) =
         // @ts-ignore
         req.data = {
             game: {
-                origin: 'http://rtoran.synology.me',
+                origin: '',
                 url: game.url_game,
                 title: game.title,
                 frame_type: game.control_type
             },
             server: {
-                url: 'http://localhost:8288/api/v1',
+                url: cfgOption.Url.DeployApiV1,
                 token: '',
                 shared_url: `${cfgOption.Url.Host}/game/${game.pathname}/`,
             },

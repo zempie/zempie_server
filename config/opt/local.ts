@@ -17,12 +17,12 @@ export default {
     },
 
     Url: {
-        Host: 'http://localhost:8280',
-        DeployApiV1: 'http://localhost:8288/api/v1',
+        Host: 'http://192.168.0.100:8280',
+        DeployApiV1: 'http://192.168.0.100:8288/api/v1',
     },
 
     Deploy: {
-        url_v1: 'http://localhost:8288/api/v1',
+        url_v1: 'http://192.168.0.100:8288/api/v1',
         api_key: '5b94uen0k99mxn4t'
     },
 

@@ -31,8 +31,13 @@ class GameController {
             const new_record = score > previous_score;
 
             if( new_record ) {
-                record.score = score;
-                await record.save({transaction});
+                if( record ) {
+                    record.score = score;
+                    await record.save({transaction});
+                }
+                else {
+                    await dbs.UserGame.create({user_uid, game_uid, score}, transaction);
+                }
             }
 
             return {
