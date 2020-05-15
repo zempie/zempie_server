@@ -1,5 +1,5 @@
 import Model from '../../../database/mysql/model';
-import { DataTypes, Sequelize, Transaction } from 'sequelize';
+import { DataTypes, Sequelize, Transaction, Op } from 'sequelize';
 import { dbs } from '../../../commons/globals';
 import { IUser } from '../../../controllers/_interfaces';
 import { CreateError, ErrorCodes } from '../../../commons/errorCodes';
@@ -25,10 +25,15 @@ class FollowModel extends Model {
     }
 
 
-    async following({user_uid, target_uid}: any, transaction?: Transaction) {
+    async following({user_uid}: any, transaction?: Transaction) {
         return this.model.findAll({
             where: {
-                user_uid,
+                user_uid: {
+                    [Op.eq]: user_uid,
+                },
+                target_uid: {
+                    [Op.ne]: user_uid,
+                }
             },
             include: [{
                 as: 'target',
@@ -38,6 +43,23 @@ class FollowModel extends Model {
         });
     }
 
+    async followers({user_uid}: any, transaction?: Transaction) {
+        return this.model.findAll({
+            where: {
+                target_uid: {
+                    [Op.eq]: user_uid,
+                },
+                user_uid: {
+                    [Op.ne]: user_uid,
+                },
+            },
+            include: [{
+                as: 'user',
+                model: dbs.User.model,
+            }],
+            transaction
+        })
+    }
 }
 
 export default (rdb: Sequelize) => new FollowModel(rdb);

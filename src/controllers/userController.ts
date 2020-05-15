@@ -30,6 +30,9 @@ class UserController {
 
                     profile = await dbs.Profile.create({ user_uid: user.uid }, transaction);
                     setting = await dbs.UserSetting.create({ user_uid: user.uid }, transaction);
+
+                    // following 에 자신 추가 - 나중을 위해...
+                    await dbs.Follow.create({ user_uid: uid, target_uid: uid }, transaction);
                 }
             }
             else {

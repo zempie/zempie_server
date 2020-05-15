@@ -1,6 +1,6 @@
 import * as _ from 'lodash';
 import { IGameParams, IUser } from './_interfaces';
-import { Sequelize, Transaction } from 'sequelize';
+import { Sequelize, Transaction, Op } from 'sequelize';
 import { dbs, caches } from "../commons/globals";
 import redis from '../database/redis';
 import Opt from '../../config/opt'
@@ -79,7 +79,15 @@ class GameController {
     }
 
 
-    getGlobalRanking = async ({game_uid, limit = 50, skip = 0}: IGameParams, user: IUser, transaction?: Transaction) => {
+    getGlobalRanking = async ({game_uid, limit = 50, skip = 0}: IGameParams, {uid}: IUser, transaction?: Transaction) => {
+        const score = await dbs.UserGame.findOne({user_uid: uid}, transaction);
+        const rank = await dbs.UserGame.model.count({
+            score: {
+                [Op.gt]: score
+            },
+            transaction
+        });
+
         const { count, rows } = await dbs.UserGame.model.findAndCountAll({
             where: {
                 game_uid
@@ -99,6 +107,8 @@ class GameController {
         });
 
         return {
+            count,
+            rank,
             list: _.map(rows, (record: any) => {
                 const { user } = record;
                 return {
@@ -114,24 +124,33 @@ class GameController {
 
 
     getFollowingRanking = async ({game_uid, limit = 50, skip = 0}: IGameParams, {uid}: IUser, transaction?: Transaction) => {
-        const { count, rows } = await dbs.Follow.model.findAndCountAll({
+        const score = await dbs.UserGame.findOne({user_uid: uid}, transaction);
+        const rank = await dbs.UserGame.model.count({
+            score: {
+                [Op.gt]: score
+            },
+            transaction
+        });
+
+        const { count, rows } = await dbs.UserGame.model.findAndCountAll({
             where: {
-                user_uid: uid,
+                game_uid,
             },
             include: [{
-                model: dbs.User.model,
-                as: 'target',
-            }, {
-                model: dbs.UserGame.model,
-                as: 'gameRecord',
+                model: dbs.Follow.model,
+                as: 'follow',
                 where: {
-                    game_uid
-                }
+                    user_uid: uid,
+                },
+                include: [{
+                    model: dbs.User.model,
+                    as: 'target',
+                }]
             }],
             attributes: {
                 include: [
                     [Sequelize.literal('(RANK() OVER (ORDER BY score DESC))'), 'rank'],
-                ],
+                ]
             },
             limit,
             skip,
@@ -139,6 +158,8 @@ class GameController {
         });
 
         return {
+            count,
+            rank,
             list: _.map(rows, (record: any) => {
                 const { target, gameRecord } = record;
                 return {
