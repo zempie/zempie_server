@@ -9,7 +9,7 @@ import { CreateError, ErrorCodes } from "../commons/errorCodes";
 class TimelineController {
 
     async getList({user_uid, limit = 50, skip = 0}: ITimelineParams, user: IUser) {
-        const timeline = await dbs.Transaction.model.findAll({
+        const timeline = await dbs.Timeline.model.findAll({
             where: {
                 user_uid,
             },
