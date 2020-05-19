@@ -14,6 +14,11 @@ class GameController {
         //     user_uid: uid,
         //     game_uid
         // });
+
+        console.log('game-start:', game_uid);
+        return {
+            value: 'okokoaksfojasdlkfjs'
+        }
     }
 
 

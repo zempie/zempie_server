@@ -3,6 +3,7 @@ import convert from '../controllers/_convert';
 import { validateFirebaseIdToken } from './_common';
 import UserController from '../controllers/userController';
 import AlarmController from "../controllers/alarmController";
+import RpcController from '../controllers/rpcController';
 
 
 const apiVer = `/api/v1`;
@@ -18,3 +19,9 @@ export default (router: Router) => {
     router.get(`${apiVer}/user/alarm`,          validateFirebaseIdToken,    convert(AlarmController.getList));
 
 }
+
+RpcController.generator('sign-out',         UserController.signOut, true);
+RpcController.generator('user-info',        UserController.getInfo, true);
+RpcController.generator('target-info',      UserController.getTargetInfo, true);
+RpcController.generator('user-setting',     UserController.updateSetting, true);
+RpcController.generator('get-user-alarms',  AlarmController.getList, true);

@@ -1,6 +1,7 @@
 import { Request, Response, Router } from 'express';
 import convert from '../controllers/_convert';
 import AdminController from '../controllers/adminController';
+import RpcController from '../controllers/rpcController';
 
 
 const apiVer = `/api/v1`;
@@ -19,3 +20,9 @@ export default (router: Router) => {
     router.get(`${apiVer}/admin/games`,     convert(AdminController.getGames));
 
 }
+
+RpcController.generator('admin-get-projects',   AdminController.getProjects);
+RpcController.generator('admin-get-tokens',     AdminController.getProjects);
+
+RpcController.generator('admin-get-users',      AdminController.getUsers);
+RpcController.generator('admin-get-games',      AdminController.getGames);

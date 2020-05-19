@@ -2,6 +2,10 @@ import { Runtime } from 'inspector';
 
 export const ErrorCodes = {
 
+    UNAUTHORIZED: {
+        code: 1001,
+        message: 'unauthorized'
+    },
     INVALID_TOKEN: {
         code: 1100,
         message: '잘 못 된 토큰입니다'

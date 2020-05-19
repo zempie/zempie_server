@@ -59,7 +59,7 @@ class UserController {
     }
 
 
-    async getUserDetailInfo(user: any, profile?: any, setting?: any) {
+    private getUserDetailInfo = async (user: any, profile?: any, setting?: any) => {
         profile = profile || user.profile;
         setting = setting || user.setting;
 
@@ -89,7 +89,7 @@ class UserController {
     }
 
 
-    async signOut({}, {uid}: IUser) {
+    signOut = async ({}, {uid}: IUser) => {
         return dbs.User.getTransaction(async (transaction: Transaction) => {
             const user = await dbs.User.getInfo({uid}, transaction);
             user.fcm_token = null;
@@ -98,7 +98,7 @@ class UserController {
     }
 
 
-    async updateSetting(params: any, {uid}: IUser) {
+    updateSetting = async (params: any, {uid}: IUser) => {
         return dbs.UserSetting.getTransaction(async (transaction: Transaction) => {
             const setting = await dbs.UserSetting.findOne({uid}, transaction);
 

@@ -1,24 +1,47 @@
 import { eNotice, eNotify } from "../commons/enums";
 
+/**
+ * json-rpc
+ */
+export interface IRpcError {
+    code: number,
+    message: string,
+    data: any
+}
+export interface IRpcMethod {
+    auth: boolean,
+    method: Function
+}
+export interface IRpcBody {
+    jsonrpc: string,
+    id: number,
+    method: string,
+    params: any,
+}
+
+
+/**
+ * decoded
+ */
 export interface IDecoded {
     uid: string,
 }
-
 export interface IAdmin extends IDecoded {
     name : string,
     level: number,
 }
-
-
 export interface IPublisher extends IDecoded {
     domain: string,
 }
-
 export interface IUser extends IDecoded {
     displayName: string,
     photoURL: string,
 }
 
+
+/**
+ * parameters
+ */
 export interface ISocialMedia {
     user_uid: string,
     target_uid: string,

@@ -3,7 +3,7 @@ import { dbs } from "../commons/globals";
 
 class AlarmController {
 
-    async getList({}, user: IUser) {
+    getList = async ({}, user: IUser) => {
         const notices = await dbs.Alarm.findAll(
             {
                 user_uid: user.uid
