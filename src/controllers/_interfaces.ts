@@ -14,9 +14,9 @@ export interface IRpcMethod {
 }
 export interface IRpcBody {
     jsonrpc: string,
-    id: number,
     method: string,
     params: any,
+    id: string,
 }
 
 

@@ -77,8 +77,14 @@ class RpcController {
     }
 
     private validateFirebaseIdToken = async (req: Request) => {
-        const params = JSON.parse(req.body.params);
-        const { authorization } = params;
+        let authorization;
+        if( typeof req.body.params === "object" ) {
+            authorization = req.body.params.authorization;
+        }
+        else {
+            authorization = JSON.parse(req.body.params).authorization;
+        }
+
         if ((!authorization || !authorization.startsWith('Bearer ')) && !(req.cookies && req.cookies.__session)) {
             console.error('No Firebase ID token was passed as a Bearer token in the Authorization header.',
                 'Make sure you authorize your request by providing the following HTTP header:',
@@ -89,7 +95,7 @@ class RpcController {
 
         let idToken;
         if (authorization && authorization.startsWith('Bearer ')) {
-            console.log('Found "Authorization" header');
+            // console.log('Found "Authorization" header');
             // Read the ID Token from the Authorization header.
             idToken = authorization.split('Bearer ')[1];
         } else if(req.cookies) {
@@ -103,7 +109,7 @@ class RpcController {
 
         try {
             const decodedIdToken = await admin.auth().verifyIdToken(idToken);
-            console.log('ID Token correctly decoded', decodedIdToken);
+            // console.log('ID Token correctly decoded', decodedIdToken);
             return decodedIdToken;
         } catch (error) {
             console.error('Error while verifying Firebase ID token:', error);

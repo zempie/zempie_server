@@ -15,7 +15,6 @@ class GameController {
         //     game_uid
         // });
 
-        console.log('game-start:', game_uid);
         return {
             value: 'okokoaksfojasdlkfjs'
         }
