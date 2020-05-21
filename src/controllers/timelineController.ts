@@ -1,3 +1,4 @@
+import * as _ from 'lodash'
 import * as uniqid from 'uniqid';
 import { v4 as uuid } from 'uuid';
 import { ITimelineParams, IUser } from "./_interfaces";
@@ -15,7 +16,7 @@ class TimelineController {
                 user_uid,
             },
             attributes: {
-                exclude: ['created_at', 'updated_at', 'deleted_at']
+                exclude: ['updated_at', 'deleted_at']
             },
             order: [['id', 'desc']],
             include: [{
@@ -27,7 +28,14 @@ class TimelineController {
         });
 
         return {
-            timeline
+            timeline: _.map(timeline, (t: any) => {
+                return {
+                    id: t.id,
+                    type: t.type,
+                    extra: JSON.parse(t.extra),
+                    created_at: t.created_at,
+                }
+            })
         }
     }
 

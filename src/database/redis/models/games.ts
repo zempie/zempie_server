@@ -14,7 +14,7 @@ class GamesCache {
         await redis.expire(this.key, time);
     }
 
-    get = async() => {
+    get = async () => {
         let _games = await redis.hgetall(this.key);
         let games;
         if( Object.keys(_games).length <= 0 ) {
