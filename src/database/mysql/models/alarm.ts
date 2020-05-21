@@ -37,10 +37,7 @@ class AlarmModel extends Model {
             include: [{
                 model: dbs.User.model,
                 as: 'target',
-                attributes: {
-                    include: ['uid', ['display_name', 'displayName'], ['photo_url', 'photoURL'],]
-                    // exclude: ['id', 'is_adm', 'created_at', 'updated_at', 'deleted_at']
-                }
+                attributes: ['uid', ['display_name', 'displayName'], ['photo_url', 'photoURL']]
             }],
             limit,
             skip,
