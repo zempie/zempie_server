@@ -102,7 +102,7 @@ class UserController {
 
     updateSetting = async (params: any, {uid}: IUser) => {
         return dbs.UserSetting.getTransaction(async (transaction: Transaction) => {
-            const setting = await dbs.UserSetting.findOne({uid}, transaction);
+            const setting = await dbs.UserSetting.findOne({user_uid: uid}, transaction);
 
             // 변경 사항 반영
 
