@@ -3,14 +3,21 @@ export enum eTimeline {
     PRW,
     Share,
     Achievement,
-    Battle_1st
+    Battle_1st,
 }
 
 export enum eNotify {
     Follow,
     Reply,
     Like,
-    Beaten
+    Beaten,
+}
+
+export enum eAlarm {
+    Follow,
+    Reply,
+    Like,
+    Beaten,
 }
 
 export enum eNotice {

@@ -4,7 +4,7 @@ import { dbs } from "../commons/globals";
 class AlarmController {
 
     getList = async ({}, user: IUser) => {
-        const notices = await dbs.Alarm.findAll(
+        const alarms = await dbs.Alarm.findAll(
             {
                 user_uid: user.uid
             },
@@ -13,7 +13,7 @@ class AlarmController {
             });
 
         return {
-            notices
+            alarms
         }
     }
 }

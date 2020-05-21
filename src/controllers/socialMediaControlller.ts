@@ -3,7 +3,7 @@ import { dbs } from '../commons/globals';
 import { Transaction } from 'sequelize';
 import { CreateError, ErrorCodes } from '../commons/errorCodes';
 import NotifyService from '../services/notifyService';
-import { eNotify } from "../commons/enums";
+import { eAlarm, eNotify } from "../commons/enums";
 
 class SocialMediaController {
     
@@ -29,7 +29,8 @@ class SocialMediaController {
             target.followers_cnt += 1;
             await target.save({transaction});
 
-            await NotifyService.notify({user_uid, type: eNotify.Follow, extra: { target_uid }});
+            await dbs.Alarm.create({user_uid: target_uid, type: eAlarm.Follow, extra: { target_uid }}, transaction);
+            await NotifyService.notify({user_uid: target_uid, type: eNotify.Follow, extra: { target_uid }});
         });
     }
     
