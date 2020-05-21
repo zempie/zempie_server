@@ -7,7 +7,7 @@ import Opt from '../../../../config/opt';
 const { Url, Deploy } = Opt;
 
 
-class GamesCache {
+class GameCache {
     private key: KeyType = 'zemini:games:';
 
     expire = async (time: number = 1000 * 60) => {
@@ -45,10 +45,10 @@ class GamesCache {
 
     getGame = async (game_uid: string) => {
         const games = await this.get();
-        return _.find(games, g => g.uid === game_uid);
+        return _.find(games, g => g.game_uid === game_uid);
     }
 }
-export const GameCache = new GamesCache();
+export const gameCache = new GameCache();
 
 class CacheModel {
     private readonly groupType: eRedis;

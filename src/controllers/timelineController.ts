@@ -6,7 +6,7 @@ import { dbs } from "../commons/globals";
 import { Transaction } from "sequelize";
 import { eTimeline } from "../commons/enums";
 import { CreateError, ErrorCodes } from "../commons/errorCodes";
-import { GameCache } from "../database/redis/models/games";
+import { gameCache } from "../database/redis/models/games";
 
 class TimelineController {
 
@@ -28,7 +28,7 @@ class TimelineController {
             skip,
         });
 
-        const games = await GameCache.get();
+        const games = await gameCache.get();
         return {
             timeline: _.map(timeline, (t: any) => {
                 return {
