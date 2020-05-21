@@ -1,4 +1,4 @@
-import { eNotice, eNotify, eTimeline } from "../commons/enums";
+import { eAlarm, eNotice, eNotify, eTimeline } from "../commons/enums";
 
 /**
  * json-rpc
@@ -103,4 +103,10 @@ export interface INoticeParams {
     img_link: string,
     start_at: Date,
     end_at: Date,
+}
+
+export interface IAlarmParams {
+    user_uid: string,
+    type: eAlarm,
+    extra: Object
 }

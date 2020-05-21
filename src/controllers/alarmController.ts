@@ -1,3 +1,4 @@
+import * as _ from 'lodash';
 import { IUser } from "./_interfaces";
 import { dbs } from "../commons/globals";
 
@@ -13,7 +14,14 @@ class AlarmController {
             });
 
         return {
-            alarms
+            alarms: _.map(alarms, (alarm: any) => {
+                return {
+                    id: alarm.id,
+                    type: alarm.type,
+                    extra: JSON.parse(alarm.extra),
+                    created_at: alarm.created_at,
+                }
+            })
         }
     }
 }

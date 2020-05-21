@@ -1,6 +1,7 @@
 import Model from '../../../database/mysql/model';
-import { DataTypes, Sequelize } from 'sequelize';
+import { DataTypes, Sequelize, Transaction } from 'sequelize';
 import { dbs } from '../../../commons/globals';
+import { IAlarmParams } from "../../../controllers/_interfaces";
 
 
 /**
@@ -22,6 +23,10 @@ class AlarmModel extends Model {
         this.model.belongsTo(dbs.User.model, {foreignKey: 'user_uid', targetKey: 'uid'});
     }
 
+
+    async create({user_uid, type, extra = {}}: IAlarmParams, transaction?: Transaction) {
+        return super.create({user_uid, type, extra: JSON.stringify(extra)}, transaction);
+    }
 
 
 }
