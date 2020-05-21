@@ -1,6 +1,7 @@
 import Model from '../../../database/mysql/model';
-import { DataTypes, Sequelize } from 'sequelize';
+import { DataTypes, Sequelize, Transaction } from 'sequelize';
 import { dbs } from '../../../commons/globals';
+import { ITimelineParams } from "../../../controllers/_interfaces";
 
 
 /**
@@ -25,6 +26,24 @@ class TimelineModel extends Model {
     }
 
 
+    async getList({user_uid, limit = 50, skip = 0}: ITimelineParams, transaction?: Transaction) {
+        return this.model.findAll({
+            where: {
+                user_uid,
+            },
+            attributes: {
+                exclude: ['updated_at', 'deleted_at']
+            },
+            order: [['id', 'desc']],
+            include: [{
+                model: dbs.User.model,
+                attributes: [['uid', 'user_uid'], ['display_name', 'displayName'], ['photo_url', 'photoURL']]
+            }],
+            limit,
+            skip,
+            transaction
+        })
+    }
 
 }
 

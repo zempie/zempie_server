@@ -12,21 +12,7 @@ class TimelineController {
 
     async getList({user_uid, limit = 50, skip = 0}: ITimelineParams, user: IUser) {
         user_uid = user_uid || user.uid;
-        const timeline = await dbs.Timeline.model.findAll({
-            where: {
-                user_uid,
-            },
-            attributes: {
-                exclude: ['updated_at', 'deleted_at']
-            },
-            order: [['id', 'desc']],
-            include: [{
-                model: dbs.User.model,
-                attributes: [['uid', 'user_uid'], ['display_name', 'displayName'], ['photo_url', 'photoURL']]
-            }],
-            limit,
-            skip,
-        });
+        const timeline = await dbs.Timeline.getList({user_uid, limit, skip});
 
         const games = await gameCache.get();
         return {

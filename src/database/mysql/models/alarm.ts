@@ -13,6 +13,7 @@ class AlarmModel extends Model {
         this.name = 'alarm';
         this.attributes = {
             user_uid:       { type: DataTypes.STRING(36), allowNull: false },
+            target_uid:     { type: DataTypes.STRING(36), allowNull: false },
             type:           { type: DataTypes.SMALLINT, allowNull: false },
             extra:          { type: DataTypes.STRING(200) },
         };
@@ -20,15 +21,32 @@ class AlarmModel extends Model {
 
 
     async afterSync(): Promise<void> {
-        this.model.belongsTo(dbs.User.model, {foreignKey: 'user_uid', targetKey: 'uid'});
+        this.model.belongsTo(dbs.User.model, {foreignKey: 'target_uid', targetKey: 'uid', as: 'target'});
     }
 
 
-    async create({user_uid, type, extra = {}}: IAlarmParams, transaction?: Transaction) {
-        return super.create({user_uid, type, extra: JSON.stringify(extra)}, transaction);
+    async create({user_uid, target_uid, game_uid, type, extra = {}}: IAlarmParams, transaction?: Transaction) {
+        return super.create({user_uid, target_uid, game_uid, type, extra: JSON.stringify(extra)}, transaction);
     }
 
 
+    async getList({user_uid, limit, skip}: IAlarmParams, transaction?: Transaction) {
+        return this.model.findAll({
+            where: { user_uid },
+            attributes: ['id', 'type', 'extra', 'created_at'],
+            include: [{
+                model: dbs.User.model,
+                as: 'target',
+                attributes: {
+                    include: ['uid', ['display_name', 'displayName'], ['photo_url', 'photoURL'],]
+                    // exclude: ['id', 'is_adm', 'created_at', 'updated_at', 'deleted_at']
+                }
+            }],
+            limit,
+            skip,
+            transaction
+        })
+    }
 }
 
 export default (rdb: Sequelize) => new AlarmModel(rdb);

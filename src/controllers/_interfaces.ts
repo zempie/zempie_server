@@ -106,7 +106,11 @@ export interface INoticeParams {
 }
 
 export interface IAlarmParams {
-    user_uid: string,
-    type: eAlarm,
-    extra: Object
+    user_uid?: string,
+    target_uid?: string,
+    game_uid?: string,
+    type?: eAlarm,
+    extra?: Object,
+    limit: number,
+    skip: number
 }
