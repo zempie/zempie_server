@@ -3,10 +3,12 @@ import { IGameParams, IUser } from './_interfaces';
 import { Sequelize, Transaction, Op } from 'sequelize';
 import { dbs, caches } from "../commons/globals";
 import redis from '../database/redis';
-import Opt from '../../config/opt';
 import TimelineController from './timelineController';
 import { eTimeline } from "../commons/enums";
+import { GameCache } from "../database/redis/models/games";
+import Opt from '../../config/opt';
 const { Url, Deploy } = Opt;
+
 
 class GameController {
 
@@ -57,36 +59,7 @@ class GameController {
 
 
     getGameList = async ({}, user: IUser, transaction?: Transaction) => {
-        const key = `zemini:games:`;
-        let _games = await redis.hgetall(key);
-        let games;
-        if( Object.keys(_games).length <= 0 ) {
-            const response = await fetch(`${Url.DeployApiV1}/games?key=${Deploy.api_key}`);
-            if( response.status !== 200 ) {
-                throw new Error(response.statusText);
-            }
-
-            const json = await response.json();
-            _games = json.data.games;
-            games = _.map(_games, (game: any) => {
-                // games[game.uid] = game;
-                redis.hset(key, game.game_uid, JSON.stringify(game));
-                return game;
-            });
-            await redis.expire(key, 1000 * 60 * 60 * 12); // 12시간
-
-            caches.games = games;
-        }
-        else {
-            games = _.map(_games, (game: any) => {
-                return JSON.parse(game);
-            });
-
-            if( !caches.games ) {
-                caches.games = games;
-            }
-        }
-
+        const games = await GameCache.get()
         return {
             games
         }
