@@ -82,7 +82,7 @@ class UserController {
             following_cnt: profile.following_cnt,
             followers_cnt: profile.followers_cnt,
             setting: setting? {
-                notice: setting.notice
+                notify: setting.notify
             } : undefined,
             game_records,
         }

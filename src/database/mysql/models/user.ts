@@ -54,9 +54,10 @@ class UserModel extends Model {
             }],
             transaction
         });
-        if( user ) {
-            return user.get({plain: true});
-        }
+        // if( user ) {
+        //     return user.get({plain: true});
+        // }
+        return user;
     }
 
     async getProfile({uid}: IUser, transaction?: Transaction) {

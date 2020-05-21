@@ -1,4 +1,4 @@
-import uniqid from 'uniqid';
+import * as uniqid from 'uniqid';
 import { v4 as uuid } from 'uuid';
 import { ITimelineParams, IUser } from "./_interfaces";
 import { dbs } from "../commons/globals";
@@ -9,6 +9,7 @@ import { CreateError, ErrorCodes } from "../commons/errorCodes";
 class TimelineController {
 
     async getList({user_uid, limit = 50, skip = 0}: ITimelineParams, user: IUser) {
+        user_uid = user_uid || user.uid;
         const timeline = await dbs.Timeline.model.findAll({
             where: {
                 user_uid,
@@ -19,7 +20,7 @@ class TimelineController {
             order: [['id', 'desc']],
             include: [{
                 model: dbs.User.model,
-                attributes: ['uid', ['display_name', 'displayName'], ['photo_url', 'photoURL']]
+                attributes: [['uid', 'user_uid'], ['display_name', 'displayName'], ['photo_url', 'photoURL']]
             }],
             limit,
             skip,
@@ -31,7 +32,7 @@ class TimelineController {
     }
 
 
-    async doPosting({type, score, follower_ids, game_uid, achievement_id, battle_id}: ITimelineParams, user: IUser) {
+    async doPosting({type, score, follower_ids, game_uid, achievement_id, battle_id}: ITimelineParams, user: IUser, transaction?: Transaction) {
         const uid = uniqid();
         let extra;
         switch( type ) {
@@ -47,7 +48,7 @@ class TimelineController {
             user_uid: user.uid,
             type,
             extra
-        });
+        }, transaction);
 
         return {
             posting: {

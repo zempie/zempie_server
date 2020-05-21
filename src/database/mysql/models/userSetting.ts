@@ -7,7 +7,7 @@ class UserSetting extends Model {
         this.name = 'userSetting';
         this.attributes = {
             user_uid:       { type: DataTypes.STRING(36), allowNull: false },
-            notice:         { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: true },
+            notify:         { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: true },
         }
     }
 

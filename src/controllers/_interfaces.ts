@@ -1,4 +1,4 @@
-import { eNotice, eNotify } from "../commons/enums";
+import { eNotice, eNotify, eTimeline } from "../commons/enums";
 
 /**
  * json-rpc
@@ -77,16 +77,16 @@ export interface IGame {
 }
 
 export interface ITimelineParams {
-    uid: string,
-    user_uid: string,
-    game_uid: string,
-    limit: number,
-    skip: number,
-    type: number,
-    score: number,
-    follower_ids: Array<number>,
-    achievement_id: number,
-    battle_id: number,
+    uid?: string,
+    user_uid?: string,
+    game_uid?: string,
+    limit?: number,
+    skip?: number,
+    type?: eTimeline,
+    score?: number,
+    follower_ids?: Array<number>,
+    achievement_id?: number,
+    battle_id?: number,
 }
 
 export interface INotifyParams {

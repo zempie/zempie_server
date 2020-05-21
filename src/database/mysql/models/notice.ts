@@ -21,12 +21,17 @@ class NoticeModel extends Model {
     }
 
     async getList({ date }: {date: Date}) {
-        await this.model.findAll({
-            start_at: {
-                [Op.lte]: date,
+        return await this.model.findAll({
+            where: {
+                start_at: {
+                    [Op.lte]: date,
+                },
+                end_at: {
+                    [Op.gte]: date,
+                }
             },
-            end_at: {
-                [Op.gte]: date,
+            attributes: {
+                exclude: ['id', 'deleted_at', 'updated_at']
             }
         })
     }

@@ -6,6 +6,7 @@ import userRoute from '../routes/userRoute';
 import { service } from '../commons/globals';
 import { fetchHelper } from '../services/fetchHelper';
 import gameRoute from "../routes/gameRoute";
+import scheduleService from "../services/scheduleService";
 
 class ApiServer extends Server {
     private timer: any;
@@ -17,6 +18,8 @@ class ApiServer extends Server {
         userRoute(app);
         contentRoute(app);
         gameRoute(app);
+
+        scheduleService.start()
     }
 
     protected async beforeStart(): Promise<any> {

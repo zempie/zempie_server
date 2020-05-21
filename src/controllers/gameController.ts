@@ -3,7 +3,9 @@ import { IGameParams, IUser } from './_interfaces';
 import { Sequelize, Transaction, Op } from 'sequelize';
 import { dbs, caches } from "../commons/globals";
 import redis from '../database/redis';
-import Opt from '../../config/opt'
+import Opt from '../../config/opt';
+import TimelineController from './timelineController';
+import { eTimeline } from "../commons/enums";
 const { Url, Deploy } = Opt;
 
 class GameController {
@@ -43,6 +45,9 @@ class GameController {
                     await dbs.UserGame.create({user_uid, game_uid, score}, transaction);
                 }
             }
+
+            // 임시
+            await TimelineController.doPosting({type: eTimeline.PR, score, game_uid}, user, transaction);
 
             return {
                 new_record
@@ -107,17 +112,15 @@ class GameController {
         }
 
         const { count, rows } = await dbs.UserGame.model.findAndCountAll({
-            where: {
-                game_uid
-            },
+            where: { game_uid },
+            include: [{
+                model: dbs.User.model,
+            }],
             attributes: {
                 include: [
                     [Sequelize.literal('(RANK() OVER (ORDER BY score DESC))'), 'rank'],
                 ],
             },
-            include: [{
-                model: dbs.User.model,
-            }],
             limit,
             skip,
             transaction

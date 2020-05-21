@@ -14,7 +14,7 @@ class NotifyService {
             return;
         }
 
-        if( user.setting.notice ) {
+        if( user.setting.notify ) {
             const msg = JSON.stringify(extra);
             this.sendMessage({user_uid, msg});
         }
