@@ -28,7 +28,7 @@ export default (router: Router) => {
     router.get(`${apiVer}/dm/list`);
 }
 
-RpcController.generator('get-timelines',    TimelineController.getList, true);
+RpcController.generator('get-timeline',     TimelineController.getList, true);
 RpcController.generator('get-notices',      NoticeController.getList, true);
 
 RpcController.generator('follow',           SocialMediaController.follow, true);

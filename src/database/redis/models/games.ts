@@ -42,6 +42,11 @@ class GamesCache {
 
         return games;
     }
+
+    getGame = async (game_uid: string) => {
+        const games = await this.get();
+        return _.find(games, g => g.uid === game_uid);
+    }
 }
 export const GameCache = new GamesCache();
 

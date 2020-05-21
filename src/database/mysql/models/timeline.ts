@@ -13,6 +13,7 @@ class TimelineModel extends Model {
         this.attributes = {
             uid:            { type: DataTypes.STRING(36), allowNull: false },
             user_uid:       { type: DataTypes.STRING(36), allowNull: false },
+            game_uid:       { type: DataTypes.STRING(36), allowNull: false },
             type:           { type: DataTypes.SMALLINT, allowNull: false },
             extra:          { type: DataTypes.STRING(200) },
         };

@@ -6,6 +6,7 @@ import { dbs } from "../commons/globals";
 import { Transaction } from "sequelize";
 import { eTimeline } from "../commons/enums";
 import { CreateError, ErrorCodes } from "../commons/errorCodes";
+import { GameCache } from "../database/redis/models/games";
 
 class TimelineController {
 
@@ -27,6 +28,7 @@ class TimelineController {
             skip,
         });
 
+        const games = await GameCache.get();
         return {
             timeline: _.map(timeline, (t: any) => {
                 return {
@@ -34,6 +36,8 @@ class TimelineController {
                     type: t.type,
                     extra: JSON.parse(t.extra),
                     created_at: t.created_at,
+                    user: t.user,
+                    game: _.find(games, (g: any) => g.game_uid === t.game_uid),
                 }
             })
         }
@@ -54,6 +58,7 @@ class TimelineController {
         const posting = await dbs.Timeline.create({
             uid,
             user_uid: user.uid,
+            game_uid,
             type,
             extra
         }, transaction);
