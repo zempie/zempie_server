@@ -4,7 +4,7 @@ import { dbs, caches } from '../commons/globals';
 import admin from 'firebase-admin';
 import { Transaction } from 'sequelize';
 import Opt from '../../config/opt'
-import { GameCache } from "../database/redis/models/games";
+import { gameCache } from "../database/redis/models/games";
 const { Url, Deploy } = Opt;
 
 class UserController {
@@ -64,7 +64,7 @@ class UserController {
         profile = profile || user.profile;
         setting = setting || user.setting;
 
-        const _games = await GameCache.get();
+        const _games = await gameCache.get();
         const game_records = _.map(user.gameRecords, (gr: any) => {
             const game = _.find(_games, (game: any) => game.game_uid === gr.game_uid);
             return {

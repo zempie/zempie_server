@@ -5,7 +5,7 @@ import { dbs, caches } from "../commons/globals";
 import redis from '../database/redis';
 import TimelineController from './timelineController';
 import { eTimeline } from "../commons/enums";
-import { GameCache } from "../database/redis/models/games";
+import { gameCache } from "../database/redis/models/games";
 import Opt from '../../config/opt';
 const { Url, Deploy } = Opt;
 
@@ -59,7 +59,7 @@ class GameController {
 
 
     getGameList = async ({}, user: IUser, transaction?: Transaction) => {
-        const games = await GameCache.get()
+        const games = await gameCache.get()
         return {
             games
         }
