@@ -9,7 +9,7 @@ import * as imageminWebp from 'imagemin-webp';
 import { IUser } from "../controllers/_interfaces";
 import { Fields, Files, IncomingForm } from "formidable";
 
-AWS.config.update({ region: 'asia-northeast-2' });
+// AWS.config.update({ region: 'asia-northeast-2' });
 const s3 = new AWS.S3({ apiVersion: '2006-03-01' });
 
 class FileManager {
