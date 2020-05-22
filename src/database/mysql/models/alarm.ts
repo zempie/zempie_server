@@ -39,6 +39,7 @@ class AlarmModel extends Model {
                 as: 'target',
                 attributes: ['uid', ['display_name', 'displayName'], ['photo_url', 'photoURL']]
             }],
+            order: [['id', 'desc']],
             limit,
             skip,
             transaction
