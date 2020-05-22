@@ -24,7 +24,7 @@ export default function convert(func: Function) {
         try {
             const params = _.assignIn({}, req.body, req.query, req.params);
             const user = _.assignIn({}, req.user);
-            const result = await func(params, user, req.openedFiles);
+            const result = await func(params, user, req.files);
             response(res, result);
         }
         catch(e) {

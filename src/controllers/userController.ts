@@ -91,6 +91,11 @@ class UserController {
     }
 
 
+    setInfo = async (params: any, {uid}: IUser, files: any) => {
+        console.log(params, files)
+    }
+
+
     signOut = async ({}, {uid}: IUser) => {
         return dbs.User.getTransaction(async (transaction: Transaction) => {
             const user = await dbs.User.getInfo({uid}, transaction);
