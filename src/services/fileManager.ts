@@ -32,10 +32,15 @@ class FileManager {
             const params = {
                 Bucket: `zemini/newz/${uid}/photo`,
                 Key: file.name,
+                ACL: 'public-read',
                 Body: fs.createReadStream(file.path),
             };
             const upload = new AWS.S3.ManagedUpload({ service: s3, params });
             upload.send((err, data) => {
+                fs.unlink(file.path, (err) => {
+                    console.log('삭제 완료')
+                });
+
                 if (err) {
                     console.error(err);
                     return reject(err);
