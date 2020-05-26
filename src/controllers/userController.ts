@@ -4,6 +4,7 @@ import { dbs, caches } from '../commons/globals';
 import admin from 'firebase-admin';
 import { Transaction } from 'sequelize';
 import FileManager from '../services/fileManager';
+const replaceExt = require('replace-ext');
 import { gameCache } from '../database/redis/models/games';
 import Opt from '../../config/opt'
 import { CreateError, ErrorCodes } from '../commons/errorCodes';
@@ -106,7 +107,9 @@ class UserController {
             }
 
             if ( file ) {
-                const data: any = await FileManager.s3upload(file, uid);
+                const webp = await FileManager.convertToWebp(file, 80);
+                const data: any = await FileManager.s3upload(replaceExt(file.name, '.webp'), webp[0].destinationPath, uid);
+                // const data: any = await FileManager.s3upload(file.name, file.path, uid);
                 user.photo_url = data.Location;
             }
 

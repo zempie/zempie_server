@@ -27,7 +27,7 @@ export default {
     },
 
     AWS: {
-        Bucket: 'zemini',
+        Bucket: 'zemini/newz',
     },
 
     password: {
