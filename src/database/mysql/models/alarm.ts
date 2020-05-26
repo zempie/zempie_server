@@ -1,7 +1,7 @@
 import Model from '../../../database/mysql/model';
 import { DataTypes, Sequelize, Transaction } from 'sequelize';
 import { dbs } from '../../../commons/globals';
-import { IAlarmParams } from "../../../controllers/_interfaces";
+import { IAlarmParams } from '../../../controllers/_interfaces';
 
 
 /**
@@ -30,7 +30,7 @@ class AlarmModel extends Model {
     }
 
 
-    async getList({user_uid, limit, skip}: IAlarmParams, transaction?: Transaction) {
+    async getList({ user_uid, limit, skip }: IAlarmParams, transaction?: Transaction) {
         return this.model.findAll({
             where: { user_uid },
             attributes: ['id', 'type', 'extra', 'created_at'],
@@ -42,7 +42,7 @@ class AlarmModel extends Model {
             limit,
             skip,
             transaction
-        })
+        });
     }
 }
 

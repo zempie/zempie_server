@@ -33,7 +33,7 @@ class TimelineController {
     async doPosting({type, score, follower_ids, game_uid, achievement_id, battle_id}: ITimelineParams, user: IUser, transaction?: Transaction) {
         const uid = uniqid();
         let extra;
-        switch( type ) {
+        switch ( type ) {
             case eTimeline.PR:          extra = JSON.stringify({ score }); break;
             case eTimeline.PRW:         extra = JSON.stringify({ score, follower_ids }); break;
             case eTimeline.Share:       extra = JSON.stringify({ game_uid }); break;
@@ -61,10 +61,10 @@ class TimelineController {
     async deletePosting({uid}: ITimelineParams, user: IUser) {
         return dbs.Timeline.getTransaction(async (transaction: Transaction) => {
             const posting = await dbs.Timeline.findOne({ uid }, transaction);
-            if( !posting ) {
+            if ( !posting ) {
                 throw CreateError(ErrorCodes.INVALID_TIMELINE_USER_UID);
             }
-            if( posting.user_uid !== user.uid ) {
+            if ( posting.user_uid !== user.uid ) {
                 throw CreateError(ErrorCodes.INVALID_TIMELINE_USER_UID);
             }
 

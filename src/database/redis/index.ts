@@ -14,11 +14,11 @@ class Redis {
     }
 
     public initialize() {
-        if( this.redis ) {
-
+        if ( this.redis ) {
+            //
         }
         this.redis = new redis(db_options.redis);
-        if( this.redis ) {
+        if ( this.redis ) {
             this.redis.hset('server:platform', 'status', 'running');
             this.setTimer();
         }
@@ -28,7 +28,7 @@ class Redis {
     }
 
     private setTimer() {
-        if( this.interval ) {
+        if ( this.interval ) {
             clearInterval(this.interval);
         }
 

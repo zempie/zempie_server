@@ -1,15 +1,15 @@
-import { Request, Response } from "express";
+import { Request, Response } from 'express';
 import * as _ from 'lodash';
-import * as path from "path";
-import * as fs from "fs";
-import AWS from 'aws-sdk';
+import * as path from 'path';
+import * as fs from 'fs';
+import * as AWS from 'aws-sdk';
 import * as formidable from 'formidable';
 import * as imagemin from 'imagemin';
 import * as imageminWebp from 'imagemin-webp';
-import { IUser } from "../controllers/_interfaces";
-import { Fields, Files, IncomingForm } from "formidable";
+import { IUser } from '../controllers/_interfaces';
+import { Fields, Files, IncomingForm } from 'formidable';
 
-AWS.config.update({ region: 'asia-northeast-2' });
+AWS.config.loadFromPath('config/aws/credentials.json');
 const s3 = new AWS.S3({ apiVersion: '2006-03-01' });
 
 class FileManager {
@@ -27,12 +27,12 @@ class FileManager {
     }
 
 
-    s3upload = (files: any, key: string) => {
+    s3upload = (file: any, uid: string) => {
         return new Promise((resolve, reject) => {
             const params = {
-                Bucket: 'zemini',
-                Key: key,
-                Body: fs.createReadStream(files[0].path),
+                Bucket: `zemini/newz/${uid}/photo`,
+                Key: file.name,
+                Body: fs.createReadStream(file.path),
             };
             const upload = new AWS.S3.ManagedUpload({ service: s3, params });
             upload.send((err, data) => {

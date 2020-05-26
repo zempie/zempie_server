@@ -3,8 +3,10 @@ import { IUser } from './_interfaces';
 import { dbs, caches } from '../commons/globals';
 import admin from 'firebase-admin';
 import { Transaction } from 'sequelize';
+import FileManager from '../services/fileManager';
+import { gameCache } from '../database/redis/models/games';
 import Opt from '../../config/opt'
-import { gameCache } from "../database/redis/models/games";
+import { CreateError, ErrorCodes } from '../commons/errorCodes';
 const { Url, Deploy } = Opt;
 
 class UserController {
@@ -16,9 +18,9 @@ class UserController {
         return dbs.User.getTransaction(async (transaction: Transaction) => {
             let profile, setting;
             let user = await dbs.User.getInfo({uid}, transaction);
-            if( !user ) {
+            if ( !user ) {
                 user = await admin.auth().getUser(uid);
-                if( user ) {
+                if ( user ) {
                     user = await dbs.User.create({
                         uid,
                         display_name: user.displayName,
@@ -37,7 +39,7 @@ class UserController {
                 }
             }
             else {
-                if( registration_token ) {
+                if ( registration_token ) {
                     user.fcm_token = registration_token;
                     await user.save({transaction});
                 }
@@ -91,8 +93,25 @@ class UserController {
     }
 
 
-    setInfo = async (params: any, {uid}: IUser, files: any) => {
-        console.log(params, files)
+    setInfo = async (params: any, {uid}: IUser, {file}: any) => {
+        return dbs.User.getTransaction(async (transaction: Transaction) => {
+            const user = await dbs.User.getInfo({ uid }, transaction);
+            if ( !user ) {
+                throw CreateError(ErrorCodes.INVALID_USER_UID);
+            }
+
+            if ( params.display_name ) {
+                // 이름 검사 해야함 - 불량 단어
+                user.display_name = params.display_name;
+            }
+
+            if ( file ) {
+                const data: any = await FileManager.s3upload(file, uid);
+                user.photo_url = data.Location;
+            }
+
+            await user.save({ transaction });
+        })
     }
 
 
