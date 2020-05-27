@@ -21,11 +21,11 @@ class SocialMediaController {
 
             await dbs.Follow.create({user_uid, target_uid}, transaction);
 
-            const profile = await dbs.Profile.findOne({user_uid}, transaction);
+            const profile = await dbs.UserProfile.findOne({user_uid}, transaction);
             profile.following_cnt += 1;
             await profile.save({transaction});
 
-            const target = await dbs.Profile.findOne({user_uid: target_uid}, transaction);
+            const target = await dbs.UserProfile.findOne({user_uid: target_uid}, transaction);
             target.followers_cnt += 1;
             await target.save({transaction});
 
@@ -49,11 +49,11 @@ class SocialMediaController {
 
             await dbs.Follow.destroy({user_uid, target_uid}, transaction);
 
-            const profile = await dbs.Profile.findOne({user_uid}, transaction);
+            const profile = await dbs.UserProfile.findOne({user_uid}, transaction);
             profile.following_cnt -= 1;
             await profile.save({transaction});
 
-            const target = await dbs.Profile.findOne({user_uid: target_uid}, transaction);
+            const target = await dbs.UserProfile.findOne({user_uid: target_uid}, transaction);
             target.followers_cnt -= 1;
             await target.save({transaction});
         })

@@ -15,6 +15,7 @@ export default (router: Router) => {
 
     router.get(`${apiVer}/users/info`,              validateFirebaseIdToken,    convert(UserController.getInfo));
     router.get(`${apiVer}/users/info/:target_uid`,  validateFirebaseIdToken,    convert(UserController.getTargetInfo));
+    router.get(`${apiVer}/users/s`,             validateFirebaseIdToken,    convert(UserController.searchUser));
     router.post(`${apiVer}/user/u`,             validateFirebaseIdToken,    FileManager.uploadImage, convert(UserController.setInfo));
 
     router.post(`${apiVer}/user/setting`,       validateFirebaseIdToken,    convert(UserController.updateSetting));
