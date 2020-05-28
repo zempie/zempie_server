@@ -5,8 +5,8 @@ import { gameCache } from "../database/redis/models/games";
 
 class AlarmController {
 
-    getList = async ({limit = 50, skip = 0}, user: IUser) => {
-        const alarms = await dbs.Alarm.getList({ user_uid: user.uid, limit, skip });
+    getList = async ({limit = 50, offset = 0}, user: IUser) => {
+        const alarms = await dbs.Alarm.getList({ user_uid: user.uid, limit, offset });
         const games = await gameCache.get();
 
         return {

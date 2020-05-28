@@ -2,6 +2,7 @@ import Model from '../../../database/mysql/model';
 import { DataTypes, Op, Sequelize, Transaction } from 'sequelize';
 import { dbs } from '../../../commons/globals';
 import { IUser } from '../../../controllers/_interfaces';
+import { eNotify } from '../../../commons/enums';
 
 
 /**
@@ -112,6 +113,13 @@ class UserModel extends Model {
             transaction
         });
         if( user ) {
+            user.setting.notify = {};
+            user.setting.notify[eNotify.Alarm] = user.setting.notify_alarm;
+            user.setting.notify[eNotify.Battle] = user.setting.notify_battle;
+            user.setting.notify[eNotify.Beat] = user.setting.notify_beat;
+            user.setting.notify[eNotify.Follow] = user.setting.notify_follow;
+            user.setting.notify[eNotify.Like] = user.setting.notify_like;
+            user.setting.notify[eNotify.Reply] = user.setting.notify_reply;
             return user.get({plain: true});
         }
     }
@@ -136,7 +144,7 @@ class UserModel extends Model {
         return records.map((record: any) => record.get({plain: true}))
     }
 
-    search = async ({ search_name, limit = 100, skip = 0 }: any, transaction?: Transaction) => {
+    search = async ({ search_name, limit = 100, offset = 0 }: any, transaction?: Transaction) => {
         return this.model.findAll({
             where: {
                 is_admin: {
@@ -154,7 +162,7 @@ class UserModel extends Model {
                 }
             }],
             limit,
-            skip,
+            offset,
             transaction
         })
     }

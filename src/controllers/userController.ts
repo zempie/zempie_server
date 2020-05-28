@@ -90,7 +90,15 @@ class UserController {
             following_cnt: profile.following_cnt,
             followers_cnt: profile.followers_cnt,
             setting: setting? {
-                notify: setting.notify
+                theme: setting.app_theme,
+                theme_extra: setting.app_theme_extra,
+                language: setting.app_language,
+                alarm: setting.notify_alarm,
+                battle: setting.notify_battle,
+                beat: setting.notify_beat,
+                follow: setting.notify_follow,
+                like: setting.notify_like,
+                reply: setting.notify_reply,
             } : undefined,
             game_records,
         }
@@ -144,15 +152,23 @@ class UserController {
         return dbs.UserSetting.getTransaction(async (transaction: Transaction) => {
             const setting = await dbs.UserSetting.findOne({user_uid: uid}, transaction);
 
-            // 변경 사항 반영
+            if ( params.theme )  setting.app_theme = params.theme;
+            if ( params.theme_extra) setting.app_theme_extra = params.theme_extra;
+            if ( params.lang )   setting.app_language = params.lang;
+            if ( params.alarm )  setting.notify_alarm = params.alarm;
+            if ( params.battle ) setting.notify_battle = params.battle;
+            if ( params.beat )   setting.notify.beat = params.beat;
+            if ( params.follow ) setting.notify_follow = params.follow;
+            if ( params.like )   setting.notify_like = params.like;
+            if ( params.reply )  setting.notify_reply = params.reply;
 
             await setting.save({transaction});
         });
     }
 
 
-    searchUser = async ({ search_name, limit = 100, skip = 0 }: any, {uid}: IUser) => {
-        const users = await dbs.User.search({ search_name, limit, skip });
+    searchUser = async ({ search_name, limit = 100, offset = 0 }: any, {uid}: IUser) => {
+        const users = await dbs.User.search({ search_name, limit, offset });
         return {
             users: _.map(users, (user: any) => {
                 return {

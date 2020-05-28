@@ -10,9 +10,9 @@ import { gameCache } from "../database/redis/models/games";
 
 class TimelineController {
 
-    async getList({user_uid, limit = 50, skip = 0}: ITimelineParams, user: IUser) {
+    async getList({user_uid, limit = 50, offset = 0}: ITimelineParams, user: IUser) {
         user_uid = user_uid || user.uid;
-        const timeline = await dbs.Timeline.getList({user_uid, limit, skip});
+        const timeline = await dbs.Timeline.getList({user_uid, limit, offset});
 
         const games = await gameCache.get();
         return {

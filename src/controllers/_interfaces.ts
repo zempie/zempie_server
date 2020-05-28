@@ -52,7 +52,7 @@ export interface IGameParams {
     user_uid: string,
     score: number,
     limit: number,
-    skip: number,
+    offset: number,
 }
 
 export interface IGame {
@@ -81,7 +81,7 @@ export interface ITimelineParams {
     user_uid?: string,
     game_uid?: string,
     limit?: number,
-    skip?: number,
+    offset?: number,
     type?: eTimeline,
     score?: number,
     follower_ids?: Array<number>,
@@ -112,5 +112,5 @@ export interface IAlarmParams {
     type?: eAlarm,
     extra?: Object,
     limit: number,
-    skip: number
+    offset: number
 }

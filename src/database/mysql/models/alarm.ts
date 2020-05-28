@@ -30,7 +30,7 @@ class AlarmModel extends Model {
     }
 
 
-    async getList({ user_uid, limit, skip }: IAlarmParams, transaction?: Transaction) {
+    async getList({ user_uid, limit, offset }: IAlarmParams, transaction?: Transaction) {
         return this.model.findAll({
             where: { user_uid },
             attributes: ['id', 'type', 'extra', 'created_at'],
@@ -40,7 +40,7 @@ class AlarmModel extends Model {
                 attributes: ['uid', ['display_name', 'displayName'], ['photo_url', 'photoURL']]
             }],
             limit,
-            skip,
+            offset,
             transaction
         });
     }
