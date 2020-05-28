@@ -24,7 +24,7 @@ export default (router: Router) => {
 
 
 
-RpcController.generator('games',        GameController.getGameList);
+RpcController.generator('get-games',        GameController.getGameList);
 RpcController.generator('game-start',   GameController.gameStart, true);
 RpcController.generator('game-over',    GameController.gameOver, true);
 RpcController.generator('get-ranking-global',   GameController.getGlobalRanking, true);
