@@ -27,5 +27,6 @@ RpcController.generator('sign-out',         UserController.signOut, true);
 RpcController.generator('set-user-info',    UserController.setInfo, true);
 RpcController.generator('get-user-info',    UserController.getInfo, true);
 RpcController.generator('get-target-info',  UserController.getTargetInfo, true);
-RpcController.generator('user-setting',     UserController.updateSetting, true);
+RpcController.generator('search-user',      UserController.searchUser, true);
+RpcController.generator('set-user-setting', UserController.updateSetting, true);
 RpcController.generator('get-alarms',       AlarmController.getList, true);
