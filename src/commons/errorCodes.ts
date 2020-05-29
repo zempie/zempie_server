@@ -4,7 +4,7 @@ export const ErrorCodes = {
 
     UNAUTHORIZED: {
         code: 1001,
-        message: 'unauthorized'
+        message: 'Unauthorized'
     },
     INVALID_TOKEN: {
         code: 1100,
