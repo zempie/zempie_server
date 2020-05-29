@@ -30,7 +30,7 @@ class GameCache {
                 redis.hset(this.key, game.game_uid, JSON.stringify(game));
                 return game;
             });
-            await redis.expire(this.key, 1000 * 60 * 60 * 12); // 12시간
+            await redis.expire(this.key, 1000 * 60 * 10); // 10분
 
             caches.games = games;
         }
