@@ -1,7 +1,8 @@
 import Model from '../../../database/mysql/model';
-import { DataTypes, Sequelize, Transaction } from 'sequelize';
+import { DataTypes, Op, Sequelize, Transaction } from 'sequelize';
 import { dbs } from '../../../commons/globals';
 import { IUser } from '../../../controllers/_interfaces';
+import { eNotify } from '../../../commons/enums';
 
 
 /**
@@ -25,7 +26,7 @@ class UserModel extends Model {
     }
 
     async afterSync(): Promise<void> {
-        this.model.hasOne(dbs.Profile.model, {sourceKey: 'uid', foreignKey: 'user_uid'});
+        this.model.hasOne(dbs.UserProfile.model, {sourceKey: 'uid', foreignKey: 'user_uid', as: 'profile'});
         this.model.hasOne(dbs.UserSetting.model, {sourceKey: 'uid', foreignKey: 'user_uid', as: 'setting'});
         this.model.hasMany(dbs.UserGame.model, {sourceKey: 'uid', foreignKey: 'user_uid', as: 'gameRecords'});
     }
@@ -33,9 +34,15 @@ class UserModel extends Model {
 
     async getInfo({uid}: IUser, transaction?: Transaction) {
         const user = await this.model.findOne({
-            where: { uid },
+            where: {
+                is_admin: {
+                    [Op.ne]: true
+                },
+                uid
+            },
             include: [{
-                model: dbs.Profile.model,
+                model: dbs.UserProfile.model,
+                as: 'profile',
                 attributes: {
                     exclude: ['created_at', 'updated_at', 'deleted_at'],
                 }
@@ -63,10 +70,14 @@ class UserModel extends Model {
     async getProfile({uid}: IUser, transaction?: Transaction) {
         const user = await this.model.findOne({
             where: {
-                uid,
+                is_admin: {
+                    [Op.ne]: true
+                },
+                uid
             },
             include: [{
-                model: dbs.Profile.model,
+                model: dbs.UserProfile.model,
+                as: 'profile',
                 attributes: {
                     exclude: ['created_at', 'updated_at', 'deleted_at'],
                 }
@@ -86,7 +97,12 @@ class UserModel extends Model {
 
     async getSetting({uid}: IUser, transaction?: Transaction) {
         const user = await this.model.findOne({
-            where: {uid},
+            where: {
+                is_admin: {
+                    [Op.ne]: true
+                },
+                uid
+            },
             include: [{
                 model: dbs.UserSetting.model,
                 as: 'setting',
@@ -97,6 +113,13 @@ class UserModel extends Model {
             transaction
         });
         if( user ) {
+            user.setting.notify = {};
+            user.setting.notify[eNotify.Alarm] = user.setting.notify_alarm;
+            user.setting.notify[eNotify.Battle] = user.setting.notify_battle;
+            user.setting.notify[eNotify.Beat] = user.setting.notify_beat;
+            user.setting.notify[eNotify.Follow] = user.setting.notify_follow;
+            user.setting.notify[eNotify.Like] = user.setting.notify_like;
+            user.setting.notify[eNotify.Reply] = user.setting.notify_reply;
             return user.get({plain: true});
         }
     }
@@ -104,8 +127,13 @@ class UserModel extends Model {
 
     async getAllProfiles({}, transaction?: Transaction) {
         const records = await this.model.findAll({
+            where: {
+                is_admin: {
+                    [Op.ne]: true
+                }
+            },
             include: [{
-                model: dbs.Profile.model,
+                model: dbs.UserProfile.model,
                 attributes: {
                     exclude: ['createdAt', 'updatedAt', 'deleted_at'],
                 }
@@ -114,6 +142,29 @@ class UserModel extends Model {
         });
 
         return records.map((record: any) => record.get({plain: true}))
+    }
+
+    search = async ({ search_name, limit = 100, offset = 0 }: any, transaction?: Transaction) => {
+        return this.model.findAll({
+            where: {
+                is_admin: {
+                    [Op.ne]: true
+                },
+                display_name: {
+                    [Op.substring]: `%${search_name}%`,
+                }
+            },
+            include: [{
+                model: dbs.UserProfile.model,
+                as: 'profile',
+                attributes: {
+                    exclude: ['created_at', 'updated_at', 'deleted_at'],
+                }
+            }],
+            limit,
+            offset,
+            transaction
+        })
     }
 }
 

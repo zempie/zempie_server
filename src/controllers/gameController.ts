@@ -66,7 +66,7 @@ class GameController {
     }
 
 
-    getGlobalRanking = async ({game_uid, limit = 50, skip = 0}: IGameParams, {uid}: IUser, transaction?: Transaction) => {
+    getGlobalRanking = async ({game_uid, limit = 50, offset = 0}: IGameParams, {uid}: IUser, transaction?: Transaction) => {
         let score, rank;
         const gameRecord = await dbs.UserGame.findOne({game_uid, user_uid: uid}, transaction);
         if( gameRecord ) {
@@ -95,7 +95,7 @@ class GameController {
                 ],
             },
             limit,
-            skip,
+            offset,
             transaction
         });
 
@@ -117,7 +117,7 @@ class GameController {
     }
 
 
-    getFollowingRanking = async ({game_uid, limit = 50, skip = 0}: IGameParams, {uid}: IUser, transaction?: Transaction) => {
+    getFollowingRanking = async ({game_uid, limit = 50, offset = 0}: IGameParams, {uid}: IUser, transaction?: Transaction) => {
         let score, rank;
         const gameRecord = await dbs.UserGame.findOne({game_uid, user_uid: uid}, transaction);
         if( gameRecord ) {
@@ -153,7 +153,7 @@ class GameController {
                     [Sequelize.literal('(RANK() OVER (ORDER BY gameRecord.score DESC))'), 'rank'],
                 ]
             },
-            limit, skip, transaction
+            limit, offset, transaction
         });
 
         return {

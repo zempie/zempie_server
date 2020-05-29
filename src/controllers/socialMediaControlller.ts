@@ -3,29 +3,29 @@ import { dbs } from '../commons/globals';
 import { Transaction } from 'sequelize';
 import { CreateError, ErrorCodes } from '../commons/errorCodes';
 import NotifyService from '../services/notifyService';
-import { eAlarm, eNotify } from "../commons/enums";
+import { eAlarm, eNotify } from '../commons/enums';
 
 class SocialMediaController {
     
     async follow({target_uid}: ISocialMedia, user: IUser) {
         return dbs.Follow.getTransaction(async (transaction: Transaction) => {
             const user_uid = user.uid;
-            if( user_uid === target_uid ) {
+            if ( user_uid === target_uid ) {
                 throw CreateError(ErrorCodes.INVALID_USER_UID);
             }
 
             const record = await dbs.Follow.findOne({user_uid, target_uid}, transaction);
-            if( record ) {
+            if ( record ) {
                 throw CreateError(ErrorCodes.ALREADY_FOLLOWING_TARGET);
             }
 
             await dbs.Follow.create({user_uid, target_uid}, transaction);
 
-            const profile = await dbs.Profile.findOne({user_uid}, transaction);
+            const profile = await dbs.UserProfile.findOne({user_uid}, transaction);
             profile.following_cnt += 1;
             await profile.save({transaction});
 
-            const target = await dbs.Profile.findOne({user_uid: target_uid}, transaction);
+            const target = await dbs.UserProfile.findOne({user_uid: target_uid}, transaction);
             target.followers_cnt += 1;
             await target.save({transaction});
 
@@ -38,22 +38,22 @@ class SocialMediaController {
     async unfollow({target_uid}: ISocialMedia, user: IUser) {
         return dbs.Follow.getTransaction(async (transaction: Transaction) => {
             const user_uid = user.uid;
-            if( user_uid === target_uid ) {
+            if ( user_uid === target_uid ) {
                 throw CreateError(ErrorCodes.INVALID_USER_UID);
             }
 
             const record = await dbs.Follow.findOne({user_uid, target_uid}, transaction);
-            if( !record ) {
+            if ( !record ) {
                 throw CreateError(ErrorCodes.ALREADY_UNFOLLOW_TARGET);
             }
 
             await dbs.Follow.destroy({user_uid, target_uid}, transaction);
 
-            const profile = await dbs.Profile.findOne({user_uid}, transaction);
+            const profile = await dbs.UserProfile.findOne({user_uid}, transaction);
             profile.following_cnt -= 1;
             await profile.save({transaction});
 
-            const target = await dbs.Profile.findOne({user_uid: target_uid}, transaction);
+            const target = await dbs.UserProfile.findOne({user_uid: target_uid}, transaction);
             target.followers_cnt -= 1;
             await target.save({transaction});
         })

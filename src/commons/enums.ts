@@ -7,10 +7,12 @@ export enum eTimeline {
 }
 
 export enum eNotify {
+    Alarm,
+    Battle,
+    Beat,
     Follow,
-    Reply,
     Like,
-    Beaten,
+    Reply,
 }
 
 export enum eAlarm {
@@ -32,4 +34,16 @@ export enum eRedis {
     Lists,
     Sets,
     Strings,
+}
+
+export enum eAppTheme {
+    Default,
+    Dark,
+    ColorWeakness,
+    Event,
+}
+
+export enum eAppLang {
+    KO,
+    EN,
 }

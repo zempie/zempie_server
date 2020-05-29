@@ -1,15 +1,16 @@
-import { Request, Response } from "express";
+import { Request, Response } from 'express';
 import * as _ from 'lodash';
-import * as path from "path";
-import * as fs from "fs";
-import AWS from 'aws-sdk';
+import * as path from 'path';
+import * as fs from 'fs';
+import * as AWS from 'aws-sdk';
 import * as formidable from 'formidable';
 import * as imagemin from 'imagemin';
 import * as imageminWebp from 'imagemin-webp';
-import { IUser } from "../controllers/_interfaces";
-import { Fields, Files, IncomingForm } from "formidable";
+import { IUser } from '../controllers/_interfaces';
+import { Fields, Files, IncomingForm } from 'formidable';
+import Opt from '../../config/opt';
 
-// AWS.config.update({ region: 'asia-northeast-2' });
+AWS.config.loadFromPath('config/aws/credentials.json');
 const s3 = new AWS.S3({ apiVersion: '2006-03-01' });
 
 class FileManager {
@@ -24,25 +25,6 @@ class FileManager {
         catch(e) {
             console.error(e);
         }
-    }
-
-
-    s3upload = (files: any, key: string) => {
-        return new Promise((resolve, reject) => {
-            const params = {
-                Bucket: 'zemini',
-                Key: key,
-                Body: fs.createReadStream(files[0].path),
-            };
-            const upload = new AWS.S3.ManagedUpload({ service: s3, params });
-            upload.send((err, data) => {
-                if (err) {
-                    console.error(err);
-                    return reject(err);
-                }
-                resolve(data);
-            })
-        })
     }
 
 
@@ -74,18 +56,47 @@ class FileManager {
         })
     }
 
-    convertToWebp = async (files: any, quality = 100) => {
-        const uploadDir = path.join(__dirname, '..', '..', 'upload', 'webp');
+    convertToWebp = async (file: any, quality = 100) => {
+        const uploadDir = path.join(__dirname, '..', '..', 'upload');
         if( !fs.existsSync(uploadDir) ) {
             fs.mkdirSync(uploadDir);
         }
-
-        return await imagemin(files, {
+        const _filePath = file.path.replace(/\\/gi, '/')
+        const webp = await imagemin([_filePath], {
             destination: uploadDir,
             plugins: [
                 imageminWebp({ quality })
             ]
         });
+        fs.unlink(file.path, (err) => {
+            console.log('.jpg 삭제')
+        })
+        return webp;
+    }
+
+
+    s3upload = (Key: string, filePath: string, uid: string) => {
+        return new Promise((resolve, reject) => {
+            const params = {
+                Bucket: `${Opt.AWS.Bucket}/${uid}/p`,
+                Key,
+                'ContentType': 'image/*',
+                ACL: 'public-read',
+                Body: fs.createReadStream(filePath),
+            };
+            const upload = new AWS.S3.ManagedUpload({ service: s3, params });
+            upload.send((err, data) => {
+                fs.unlink(filePath, (err) => {
+                    console.log('.webp 삭제')
+                });
+
+                if (err) {
+                    console.error(err);
+                    return reject(err);
+                }
+                resolve(data);
+            })
+        })
     }
 }
 

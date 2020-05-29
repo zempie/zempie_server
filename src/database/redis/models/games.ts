@@ -1,8 +1,8 @@
 import redis from '../';
-import { KeyType, ValueType } from "ioredis";
-import { eRedis } from "../../../commons/enums";
-import * as _ from "lodash";
-import { caches } from "../../../commons/globals";
+import { KeyType, ValueType } from 'ioredis';
+import { eRedis } from '../../../commons/enums';
+import * as _ from 'lodash';
+import { caches } from '../../../commons/globals';
 import Opt from '../../../../config/opt';
 const { Url, Deploy } = Opt;
 
@@ -17,9 +17,9 @@ class GameCache {
     get = async () => {
         let _games = await redis.hgetall(this.key);
         let games;
-        if( Object.keys(_games).length <= 0 ) {
+        if ( Object.keys(_games).length <= 0 ) {
             const response = await fetch(`${Url.DeployApiV1}/games?key=${Deploy.api_key}`);
-            if( response.status !== 200 ) {
+            if ( response.status !== 200 ) {
                 throw new Error(response.statusText);
             }
 
@@ -30,7 +30,7 @@ class GameCache {
                 redis.hset(this.key, game.game_uid, JSON.stringify(game));
                 return game;
             });
-            await redis.expire(this.key, 1000 * 60 * 60 * 12); // 12시간
+            await redis.expire(this.key, 1000 * 60 * 10); // 10분
 
             caches.games = games;
         }

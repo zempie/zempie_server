@@ -15,15 +15,17 @@ import Redis from '../database/redis';
 
 import { IServerOptions } from '../commons/interfaces';
 import * as Pkg from '../../package.json';
-import deployApp from "../services/deployApp";
+import deployApp from '../services/deployApp';
 
-// graph-ql
-import { GraphQLSchema } from 'graphql';
-import * as graphqlHTTP from 'express-graphql';
 import { Sequelize } from 'sequelize';
 import { dbs } from '../commons/globals';
 import { Response } from 'express';
 import cfgOption from '../../config/opt';
+
+// graph-ql
+import { GraphQLSchema } from 'graphql';
+import * as graphqlHTTP from 'express-graphql';
+// const { generateSchema } = require('sequelize-graphql-schema')();
 
 // swagger
 import * as swaggerUi from 'swagger-ui-express'
@@ -52,7 +54,7 @@ export default class Server {
 
 
 
-    public async initialize(options : IServerOptions) {
+    public initialize = async (options : IServerOptions) => {
 
         this.setFirebase();
         this.setDeployApp();
@@ -133,10 +135,10 @@ export default class Server {
 
     private setExpress(options : IServerOptions) : void {
         this.app = express();
-        if( this.app ) {
-            if( !!options.static_path && options.static_path instanceof Array ) {
+        if ( this.app ) {
+            if ( !!options.static_path && options.static_path instanceof Array ) {
                 options.static_path.forEach((obj: any) => {
-                    if( this.app ) {
+                    if ( this.app ) {
                         this.app.use(obj.path, express.static(obj.route));
                     }
                 })
@@ -186,18 +188,17 @@ export default class Server {
 
 
 
-    public async start(srvOpt : IServerOptions, _port : number = cfgOption.Server.http.port) : Promise<void> {
+    public start = async (srvOpt : IServerOptions, _port : number = cfgOption.Server.http.port) : Promise<void> => {
         await this.beforeStart();
 
         const port = await getPort({ port: getPort.makeRange(_port, _port+100)});
         const errorCallback: any = (err: Error) => {
-            if( err ) {
+            if ( err ) {
                 console.error(err.stack);
                 return
             }
 
-            // @ts-ignore
-            console.log(`Api Server [ver.${Pkg.version}] has started. (port: ${port})`.info.bold);
+            console.log(`Api Server [ver.${Pkg.version}] has started. (port: ${port})`.cyan.bold);
         };
 
         if ( !!this.app ) {
@@ -207,10 +208,10 @@ export default class Server {
         await this.afterStart();
     }
 
-    protected async beforeStart() {
-
+    protected beforeStart = async(): Promise<void> => {
+        //
     }
-    protected async afterStart() {
-
+    protected afterStart = async (): Promise<void> => {
+        //
     }
 }

@@ -26,7 +26,7 @@ class TimelineModel extends Model {
     }
 
 
-    async getList({user_uid, limit = 50, skip = 0}: ITimelineParams, transaction?: Transaction) {
+    async getList({user_uid, limit = 50, offset = 0}: ITimelineParams, transaction?: Transaction) {
         return this.model.findAll({
             where: {
                 user_uid,
@@ -40,7 +40,7 @@ class TimelineModel extends Model {
                 attributes: [['uid', 'user_uid'], ['display_name', 'displayName'], ['photo_url', 'photoURL']]
             }],
             limit,
-            skip,
+            offset,
             transaction
         })
     }

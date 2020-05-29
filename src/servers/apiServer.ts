@@ -22,7 +22,7 @@ class ApiServer extends Server {
         scheduleService.start()
     }
 
-    protected async beforeStart(): Promise<any> {
+    protected beforeStart = async (): Promise<any> => {
         // await this.updateGameList();
     }
 

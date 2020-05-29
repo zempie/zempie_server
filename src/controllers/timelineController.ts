@@ -10,9 +10,9 @@ import { gameCache } from "../database/redis/models/games";
 
 class TimelineController {
 
-    async getList({user_uid, limit = 50, skip = 0}: ITimelineParams, user: IUser) {
+    async getList({user_uid, limit = 50, offset = 0}: ITimelineParams, user: IUser) {
         user_uid = user_uid || user.uid;
-        const timeline = await dbs.Timeline.getList({user_uid, limit, skip});
+        const timeline = await dbs.Timeline.getList({user_uid, limit, offset});
 
         const games = await gameCache.get();
         return {
@@ -33,7 +33,7 @@ class TimelineController {
     async doPosting({type, score, follower_ids, game_uid, achievement_id, battle_id}: ITimelineParams, user: IUser, transaction?: Transaction) {
         const uid = uniqid();
         let extra;
-        switch( type ) {
+        switch ( type ) {
             case eTimeline.PR:          extra = JSON.stringify({ score }); break;
             case eTimeline.PRW:         extra = JSON.stringify({ score, follower_ids }); break;
             case eTimeline.Share:       extra = JSON.stringify({ game_uid }); break;
@@ -61,10 +61,10 @@ class TimelineController {
     async deletePosting({uid}: ITimelineParams, user: IUser) {
         return dbs.Timeline.getTransaction(async (transaction: Transaction) => {
             const posting = await dbs.Timeline.findOne({ uid }, transaction);
-            if( !posting ) {
+            if ( !posting ) {
                 throw CreateError(ErrorCodes.INVALID_TIMELINE_USER_UID);
             }
-            if( posting.user_uid !== user.uid ) {
+            if ( posting.user_uid !== user.uid ) {
                 throw CreateError(ErrorCodes.INVALID_TIMELINE_USER_UID);
             }
 
