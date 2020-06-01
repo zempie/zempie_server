@@ -113,14 +113,15 @@ class UserModel extends Model {
             transaction
         });
         if( user ) {
-            user.setting.notify = {};
-            user.setting.notify[eNotify.Alarm] = user.setting.notify_alarm;
-            user.setting.notify[eNotify.Battle] = user.setting.notify_battle;
-            user.setting.notify[eNotify.Beat] = user.setting.notify_beat;
-            user.setting.notify[eNotify.Follow] = user.setting.notify_follow;
-            user.setting.notify[eNotify.Like] = user.setting.notify_like;
-            user.setting.notify[eNotify.Reply] = user.setting.notify_reply;
-            return user.get({plain: true});
+            const _user = user.get({plain:true});
+            _user.notify = {};
+            _user.notify[eNotify.Alarm] = _user.setting.notify_alarm;
+            _user.notify[eNotify.Battle] = _user.setting.notify_battle;
+            _user.notify[eNotify.Beat] = _user.setting.notify_beat;
+            _user.notify[eNotify.Follow] = _user.setting.notify_follow;
+            _user.notify[eNotify.Like] = _user.setting.notify_like;
+            _user.notify[eNotify.Reply] = _user.setting.notify_reply;
+            return _user;
         }
     }
 

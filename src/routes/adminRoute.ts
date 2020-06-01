@@ -16,9 +16,11 @@ export default (router: Router) => {
     router.get(`${apiVer}/admin/projects`,                  isAdmin,        convert(AdminController.getProjects));
     router.get(`${apiVer}/admin/tokens`,                    isAdmin,        convert(AdminController.getAccessTokens));
 
-    router.get(`${apiVer}/admin/users`,     convert(AdminController.getUsers));
-    router.get(`${apiVer}/admin/games`,     convert(AdminController.getGames));
+    router.get(`${apiVer}/admin/users`,     isAdmin,    convert(AdminController.getUsers));
+    router.get(`${apiVer}/admin/games`,     isAdmin,    convert(AdminController.getGames));
 
+
+    router.post(`${apiVer}/admin/notify`,   isAdmin,    convert(AdminController.notify));
 }
 
 RpcController.generator('admin-get-projects',   AdminController.getProjects);
@@ -26,3 +28,5 @@ RpcController.generator('admin-get-tokens',     AdminController.getProjects);
 
 RpcController.generator('admin-get-users',      AdminController.getUsers);
 RpcController.generator('admin-get-games',      AdminController.getGames);
+
+RpcController.generator('admin-notify',         AdminController.notify);

@@ -14,7 +14,7 @@ class UserProfileModel extends Model {
             user_uid:       { type: DataTypes.STRING(36), allowNull: false },
             level:          { type: DataTypes.MEDIUMINT, allowNull: false, defaultValue: 1 },
             exp:            { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0 },
-            state_msg:      { type: DataTypes.STRING(200) },
+            state_msg:      { type: DataTypes.STRING(100) },
             following_cnt:  { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0 },
             followers_cnt:  { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0 },
         };

@@ -2,6 +2,7 @@ import { dbs } from '../commons/globals';
 import { CreateError, ErrorCodes } from '../commons/errorCodes';
 import { INotifyParams } from '../controllers/_interfaces';
 import { eNotify } from '../commons/enums';
+import admin from 'firebase-admin';
 
 class NotifyService {
 
@@ -15,15 +16,34 @@ class NotifyService {
             return;
         }
 
-        if ( user.setting.notify[type] ) {
-            const msg = JSON.stringify(extra);
-            this.sendMessage({user_uid, msg});
+        if ( user.notify[type] ) {
+            // const data = JSON.stringify(extra);
+            await this.sendMessage(user.fcm_token, type, extra);
         }
     }
 
 
-    sendMessage({user_uid, msg}: any) {
-
+    async sendMessage(token: string, type: eNotify, data: any) {
+        try {
+            await admin.messaging().send({
+                token,
+                notification: {
+                    title: 'notification-title',
+                    body: 'notification-body',
+                    imageUrl: 'https://zemini.s3.ap-northeast-2.amazonaws.com/companies/FTR_Symbol.png'
+                },
+                fcmOptions: {
+                    analyticsLabel: ''
+                },
+                data: {
+                    type,
+                    ...data
+                }
+            });
+        }
+        catch ( e ) {
+            console.error(e);
+        }
     }
 }
 

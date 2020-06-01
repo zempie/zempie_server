@@ -41,6 +41,7 @@ class UserController {
             }
             else {
                 if ( registration_token ) {
+                    await admin.messaging().subscribeToTopic(registration_token, 'test-topic');
                     user.fcm_token = registration_token;
                     await user.save({transaction});
                 }
@@ -142,6 +143,7 @@ class UserController {
     signOut = async ({}, {uid}: IUser) => {
         return dbs.User.getTransaction(async (transaction: Transaction) => {
             const user = await dbs.User.getInfo({uid}, transaction);
+            await admin.messaging().unsubscribeFromTopic(user.fcm_token, 'test-topic');
             user.fcm_token = null;
             await user.save({transaction});
         })
