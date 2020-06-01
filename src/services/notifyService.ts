@@ -36,7 +36,7 @@ class NotifyService {
                     analyticsLabel: ''
                 },
                 data: {
-                    type,
+                    type: type.toString(),
                     ...data
                 }
             });
