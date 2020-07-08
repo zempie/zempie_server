@@ -1,8 +1,8 @@
 import { IAdmin, IGame } from './_interfaces';
 import { dbs } from '../commons/globals';
+import NotifyService from '../services/notifyService';
 import Opt from '../../config/opt'
 const { Url, Deploy } = Opt;
-import firebase_admin from 'firebase-admin';
 
 class AdminController {
     async getProjects(params: any, admin: IAdmin) {
@@ -33,22 +33,13 @@ class AdminController {
     }
 
 
-    async notify(params: any, admin: IAdmin) {
-        try {
-            await firebase_admin.messaging().sendToTopic('test-topic', {
-                data: {
-                    v1: 'v111',
-                    v2: 'v222',
-                },
-                notification: {
-                    badge: '1',
-                    color: 'red',
-                }
-            }, {})
+    async notify({ title, body }: any, admin: IAdmin) {
+        const topic = 'test-topic';
+        const data = {
+            title,
+            body,
         }
-        catch ( e ) {
-            console.error(e);
-        }
+        await NotifyService.send({ topic, data });
     }
 }
 

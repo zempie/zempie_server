@@ -54,6 +54,10 @@ export interface IGameParams {
     limit: number,
     offset: number,
 }
+export interface IGamePlayParams {
+    game_key: string,
+    score: number,
+}
 
 export interface IGame {
     uid: string,
@@ -92,7 +96,15 @@ export interface ITimelineParams {
 export interface INotifyParams {
     user_uid: string,
     type: eNotify,
-    extra: Object
+    data?: { [key: string]: string };
+}
+export interface INotify {
+    topic?: string,
+    token?: string,
+    title?: string,
+    body?: string,
+    imageUrl?: string,
+    data?: { [key: string]: string };
 }
 
 export interface INoticeParams {
@@ -113,4 +125,22 @@ export interface IAlarmParams {
     extra?: Object,
     limit: number,
     offset: number
+}
+
+export interface IBattleParams {
+    battle_uid: string,
+    battle_key?: string,
+    period?: string,
+    is_infinity?: boolean,
+    score?: number,
+}
+export interface IBattlePlayParams {
+    battle_key: string,
+    score: number,
+}
+export interface IGameKey {
+    uid: string,
+    user_uid: string,
+    secret_id: number,
+    end_at?: Date
 }

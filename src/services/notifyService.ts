@@ -1,12 +1,11 @@
 import { dbs } from '../commons/globals';
 import { CreateError, ErrorCodes } from '../commons/errorCodes';
-import { INotifyParams } from '../controllers/_interfaces';
-import { eNotify } from '../commons/enums';
+import { INotifyParams, INotify } from '../controllers/_interfaces';
 import admin from 'firebase-admin';
 
 class NotifyService {
 
-    async notify({user_uid, type, extra}: INotifyParams) {
+    async notify({user_uid, type, data}: INotifyParams) {
         const user = await dbs.User.getSetting({uid: user_uid});
         if ( !user ) {
             throw CreateError(ErrorCodes.INVALID_USER_UID);
@@ -17,33 +16,43 @@ class NotifyService {
         }
 
         if ( user.notify[type] ) {
-            // const data = JSON.stringify(extra);
-            await this.sendMessage(user.fcm_token, type, extra);
-        }
-    }
-
-
-    async sendMessage(token: string, type: eNotify, data: any) {
-        try {
-            await admin.messaging().send({
-                token,
-                notification: {
-                    title: 'notification-title',
-                    body: 'notification-body',
-                    imageUrl: 'https://zemini.s3.ap-northeast-2.amazonaws.com/companies/FTR_Symbol.png'
-                },
-                fcmOptions: {
-                    analyticsLabel: ''
-                },
+            await this.send({
+                token: user.fcm_token,
                 data: {
                     type: type.toString(),
                     ...data
                 }
             });
         }
-        catch ( e ) {
-            console.error(e);
+    }
+
+
+    async send({ topic, token, data }: INotify) {
+        if ( topic && token ) {
+            throw CreateError(ErrorCodes.INVALID_PARAMS);
         }
+
+        const message: any = {
+            // notification: {
+            //     title,
+            //     body,
+            //     imageUrl: 'https://zemini.s3.ap-northeast-2.amazonaws.com/companies/FTR_Symbol.png'
+            // },
+            // webpush: {},
+            fcmOptions: {
+                analyticsLabel: ''
+            },
+            topic: topic? topic : undefined,
+            token: token? token : undefined,
+            data,
+        };
+
+        return await admin.messaging().send(message);
+    }
+
+
+    async broadcastMessage() {
+
     }
 }
 

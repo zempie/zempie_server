@@ -22,6 +22,8 @@ import { dbs } from '../commons/globals';
 import { Response } from 'express';
 import cfgOption from '../../config/opt';
 
+import RpcController from '../controllers/rpcController';
+
 // graph-ql
 import { GraphQLSchema } from 'graphql';
 import * as graphqlHTTP from 'express-graphql';
@@ -184,6 +186,9 @@ export default class Server {
         app.get('/test', (req, res) => {
             res.send('hi');
         });
+
+        const apiVer = '/api/v1';
+        app.post(`${apiVer}/rpc`, RpcController.routeRpc);
     }
 
 

@@ -58,6 +58,13 @@ class GameController {
     }
 
 
+    getGame = async ({pathname}: any, user: IUser, transaction?: Transaction) => {
+        const games = await gameCache.get();
+        const game = _.find(games, (obj:any) => obj.pathname === pathname)
+        return {
+            game
+        }
+    }
     getGameList = async ({}, user: IUser, transaction?: Transaction) => {
         const games = await gameCache.get()
         return {

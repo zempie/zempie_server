@@ -30,7 +30,7 @@ class SocialMediaController {
             await target.save({transaction});
 
             await dbs.Alarm.create({user_uid: target_uid, target_uid: user_uid, type: eAlarm.Follow, extra: { target_uid }}, transaction);
-            await NotifyService.notify({user_uid: target_uid, type: eNotify.Follow, extra: { target_uid }});
+            await NotifyService.notify({user_uid: target_uid, type: eNotify.Follow, data: { target_uid }});
         });
     }
     

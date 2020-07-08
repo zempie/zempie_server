@@ -39,7 +39,7 @@ export function signJWT(payload: object, expiresIn: string | undefined) {
 
     return jwt.sign(payload, secret, options);
 }
-export function verifyJWT(token: string) {
+export function verifyJWT(token: string): any {
     const { secret } = cfgOption.JWT.access;
     return jwt.verify(token, secret);
 }

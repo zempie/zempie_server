@@ -6,9 +6,17 @@ export const ErrorCodes = {
         code: 1001,
         message: 'Unauthorized'
     },
+    INVALID_PARAMS: {
+        code: 1030,
+        message: '파라미터 오류'
+    },
     INVALID_TOKEN: {
         code: 1100,
         message: '잘 못 된 토큰입니다'
+    },
+    INVALID_GAME_KEY: {
+        code: 1101,
+        message: '게임 키 오류'
     },
     INVALID_USER_UID: {
         code: 1110,
@@ -42,6 +50,10 @@ export const ErrorCodes = {
         message: '이미 존재하는 퍼블리셔 게임입니다'
     },
 
+    BATTLE_OVER: {
+        code: 1401,
+        message: '배틀 끝났다'
+    }
 };
 
 
