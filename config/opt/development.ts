@@ -23,7 +23,7 @@ export default {
 
     Deploy: {
         url_v1: 'http://gtest.fromthered.com:8288/api/v1',
-        api_key: '5b94uen0k99mxn4t'
+        api_key: 'xdo1lbgkc5xmxn2'
     },
 
     AWS: {
