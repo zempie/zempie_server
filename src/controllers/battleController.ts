@@ -74,7 +74,6 @@ class BattleController {
             const battle_user = await dbs.BattleUser.findOrCreate({
                 battle_uid,
                 user_uid,
-                user_name: user? user.name : 'noname'
             });
             decoded.best_score = battle_user.best_score;
 
@@ -123,11 +122,11 @@ class BattleController {
     }
 
 
-    updateUserName = async ({ battle_key, user_name }: any, user: IUser) => {
+    updateUserName = async ({ battle_key, name }: any, user: IUser) => {
         const decoded = verifyJWT(battle_key);
         const { uid: battle_uid, game_uid, user_uid, secret_id, best_score } = decoded;
 
-        await dbs.BattleUser.updateUserName({ battle_uid, user_uid, user_name})
+        await dbs.BattleUser.updateUserName({ battle_uid, user_uid, name})
     }
 
 

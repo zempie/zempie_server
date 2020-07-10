@@ -10,8 +10,6 @@ class BattleUserModel extends Model {
         this.attributes = {
             battle_uid:     { type: DataTypes.STRING(36), allowNull: false },
             user_uid:       { type: DataTypes.STRING(36), allowNull: false },
-            user_name:      { type: DataTypes.STRING(36), defaultValue: 'noname' },
-            // photo_url:      { type: DataTypes.STRING(250) },
             best_score:     { type: DataTypes.INTEGER, allowNull: false, defaultValue: -1 },
         };
     }
@@ -44,8 +42,8 @@ class BattleUserModel extends Model {
     }
 
 
-    async updateUserName({ battle_uid, user_uid, user_name }: any, transaction?: Transaction) {
-        return this.update({ user_name }, {
+    async updateUserName({ battle_uid, user_uid, name }: any, transaction?: Transaction) {
+        return this.update({ name }, {
             where: {
                 battle_uid,
                 user_uid,
@@ -65,13 +63,19 @@ class BattleUserModel extends Model {
             attributes: {
                 exclude: ['deleted_at']
             },
+            include: [{
+                model: dbs.User.model,
+            }],
             order: [['best_score', 'desc']],
         }, transaction);
+
         return _.map(records, (record: any, i: number) => {
+            const user = record.user;
             return {
                 ranking: i + 1,
                 user_uid: record.user_uid,
-                name: record.user_name,
+                name: user? user.name : 'noname',
+                picture: user? user.picture : null,
                 score: record.best_score,
             }
         })
