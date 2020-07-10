@@ -22,23 +22,21 @@ class UserController {
             let user = await dbs.User.getInfo({uid}, transaction);
             if ( !user ) {
                 // user = await admin.auth().getUser(uid);
-                if ( user ) {
-                    user = await dbs.User.create({
-                        uid,
-                        name: user.name,
-                        picture: user.picture,
-                        provider: user.firebase.sign_in_provider,
-                        email: user.email,
-                        email_verified: user.emailVerified,
-                        fcm_token: registration_token,
-                    }, transaction);
+                user = await dbs.User.create({
+                    uid,
+                    name: user.name,
+                    picture: user.picture,
+                    provider: user.firebase.sign_in_provider,
+                    email: user.email,
+                    email_verified: user.emailVerified,
+                    fcm_token: registration_token,
+                }, transaction);
 
-                    profile = await dbs.UserProfile.create({ user_uid: user.uid }, transaction);
-                    setting = await dbs.UserSetting.create({ user_uid: user.uid }, transaction);
+                profile = await dbs.UserProfile.create({ user_uid: user.uid }, transaction);
+                setting = await dbs.UserSetting.create({ user_uid: user.uid }, transaction);
 
-                    // following 에 자신 추가 - 나중을 위해...
-                    await dbs.Follow.create({ user_uid: uid, target_uid: uid }, transaction);
-                }
+                // following 에 자신 추가 - 나중을 위해...
+                await dbs.Follow.create({ user_uid: uid, target_uid: uid }, transaction);
             }
             else {
                 if ( registration_token ) {
