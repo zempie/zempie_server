@@ -38,21 +38,19 @@ class RpcController {
         }
 
         // if ok
-        try {
-            let user = null;
-            if( rpcMethod.auth ) {
-                user = await this.validateFirebaseIdToken(req);
-            }
-            const result = await rpcMethod.method(data.params, user);
-            return onSuccess(result);
-        }
-        catch(e) {
+        let user = await this.validateFirebaseIdToken(req);
+        if ( rpcMethod.auth && !user ) {
+            const e: any = CreateError(ErrorCodes.UNAUTHORIZED);
             return onFailure({
                 code: -32603,
                 message: e.message,
                 data: e
             });
         }
+
+        const result = await rpcMethod.method(data.params, user);
+        return onSuccess(result);
+
 
         function onSuccess(result: any) {
             res.status(200).send({
@@ -90,7 +88,8 @@ class RpcController {
                 'Make sure you authorize your request by providing the following HTTP header:',
                 'Authorization: Bearer <Firebase ID Token>',
                 'or by passing a "__session" cookie.');
-            throw CreateError(ErrorCodes.UNAUTHORIZED);
+            // throw CreateError(ErrorCodes.UNAUTHORIZED);
+            return null
         }
 
         let idToken;
@@ -104,7 +103,8 @@ class RpcController {
             idToken = req.cookies.__session;
         } else {
             // No cookie
-            throw CreateError(ErrorCodes.UNAUTHORIZED);
+            // throw CreateError(ErrorCodes.UNAUTHORIZED);
+            return null
         }
 
         try {
@@ -113,7 +113,8 @@ class RpcController {
             return decodedIdToken;
         } catch (error) {
             console.error('Error while verifying Firebase ID token:', error);
-            throw CreateError(ErrorCodes.UNAUTHORIZED);
+            // throw CreateError(ErrorCodes.UNAUTHORIZED);
+            return null
         }
     }
 }
