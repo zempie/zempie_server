@@ -1,6 +1,6 @@
 import * as _ from 'lodash';
 import Model from '../../../database/mysql/model';
-import { DataTypes, Sequelize, Transaction } from 'sequelize';
+import { DataTypes, Sequelize, Transaction, Op } from 'sequelize';
 import { dbs } from '../../../commons/globals';
 
 
@@ -57,7 +57,10 @@ class BattleUserModel extends Model {
 
     async getRanking({ battle_uid }: any, transaction?: Transaction) {
         const records = await this.findAll({
-            battle_uid
+            battle_uid,
+            best_score: {
+                [Op.gt]: 0,
+            }
         }, {
             attributes: {
                 exclude: ['deleted_at']
