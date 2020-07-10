@@ -115,8 +115,8 @@ class GameController {
                 return {
                     rank,
                     user_uid: user.uid,
-                    displayName: user.display_name,
-                    photoURL: user.photo_url,
+                    name: user.name,
+                    picture: user.picture,
                     score,
                 }
             })
@@ -172,8 +172,8 @@ class GameController {
                 return {
                     rank,
                     user_uid: target.uid,
-                    displayName: target.display_name,
-                    photoURL: target.photo_url,
+                    name: target.name,
+                    picture: target.picture,
                     score: gameRecord.score,
                 }
             })

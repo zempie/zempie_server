@@ -6,7 +6,7 @@ import NotifyService from '../services/notifyService';
 import { eAlarm, eNotify } from '../commons/enums';
 
 class SocialMediaController {
-    
+
     async follow({target_uid}: ISocialMedia, user: IUser) {
         return dbs.Follow.getTransaction(async (transaction: Transaction) => {
             const user_uid = user.uid;
@@ -33,8 +33,8 @@ class SocialMediaController {
             await NotifyService.notify({user_uid: target_uid, type: eNotify.Follow, data: { target_uid }});
         });
     }
-    
-    
+
+
     async unfollow({target_uid}: ISocialMedia, user: IUser) {
         return dbs.Follow.getTransaction(async (transaction: Transaction) => {
             const user_uid = user.uid;
@@ -66,8 +66,8 @@ class SocialMediaController {
             following: records.map((record: any) => {
                 return {
                     uid: record.target.uid,
-                    displayName: record.target.display_name,
-                    photoURL: record.target.photo_url
+                    name: record.target.name,
+                    picture: record.target.picture
                 }
             })
         }
@@ -79,8 +79,8 @@ class SocialMediaController {
             followers: records.map((record: any) => {
                 return {
                     uid: record.user.uid,
-                    displayName: record.user.display_name,
-                    photoURL: record.user.photo_url
+                    name: record.user.name,
+                    picture: record.user.picture
                 }
             })
         }

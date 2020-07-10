@@ -37,7 +37,7 @@ class TimelineModel extends Model {
             order: [['id', 'desc']],
             include: [{
                 model: dbs.User.model,
-                attributes: [['uid', 'user_uid'], ['display_name', 'displayName'], ['photo_url', 'photoURL']]
+                attributes: [['uid', 'user_uid'], 'name', 'picture']
             }],
             limit,
             offset,

@@ -34,8 +34,8 @@ export interface IPublisher extends IDecoded {
     domain: string,
 }
 export interface IUser extends IDecoded {
-    displayName: string,
-    photoURL: string,
+    name: string,
+    picture: string,
 }
 
 

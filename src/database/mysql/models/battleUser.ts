@@ -68,7 +68,7 @@ class BattleUserModel extends Model {
             return {
                 ranking: i + 1,
                 user_uid: record.user_uid,
-                displayName: record.user_name,
+                name: record.user_name,
                 score: record.best_score,
             }
         })

@@ -27,8 +27,8 @@ class BattleController {
         return {
             battle_uid: battle.uid,
             host: {
-                displayName: host.display_name,
-                photoURL: host.photo_url,
+                name: host.name,
+                picture: host.picture,
             },
             game,
             battle,
@@ -74,7 +74,7 @@ class BattleController {
             const battle_user = await dbs.BattleUser.findOrCreate({
                 battle_uid,
                 user_uid,
-                user_name: user? user.displayName : 'noname'
+                user_name: user? user.name : 'noname'
             });
             decoded.best_score = battle_user.best_score;
 

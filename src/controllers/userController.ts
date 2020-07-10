@@ -15,18 +15,19 @@ class UserController {
      * 사용자 정보 가져오기
      * - 정보가 없을 경우 firebase 에서 가져와서 저장
      */
-    getInfo = async ({registration_token}: any, {uid}: IUser) => {
+    getInfo = async ({registration_token}: any, _user: IUser) => {
         return dbs.User.getTransaction(async (transaction: Transaction) => {
             let profile, setting;
+            const { uid } = _user;
             let user = await dbs.User.getInfo({uid}, transaction);
             if ( !user ) {
-                user = await admin.auth().getUser(uid);
+                // user = await admin.auth().getUser(uid);
                 if ( user ) {
                     user = await dbs.User.create({
                         uid,
-                        display_name: user.displayName,
-                        photo_url: user.photoURL,
-                        provider_id: user.providerData[0].providerId,
+                        name: user.name,
+                        picture: user.picture,
+                        provider: user.firebase.sign_in_provider,
                         email: user.email,
                         email_verified: user.emailVerified,
                         fcm_token: registration_token,
@@ -83,8 +84,8 @@ class UserController {
 
         return {
             uid: user.uid,
-            displayName: user.display_name,
-            photoURL: user.photo_url,
+            name: user.name,
+            picture: user.picture,
             level: profile.level,
             exp: profile.exp,
             state_msg: profile.state_msg,
@@ -132,7 +133,7 @@ class UserController {
                 const webp = await FileManager.convertToWebp(file, 80);
                 const data: any = await FileManager.s3upload(replaceExt(file.name, '.webp'), webp[0].destinationPath, uid);
                 // const data: any = await FileManager.s3upload(file.name, file.path, uid);
-                user.photo_url = data.Location;
+                user.picture = data.Location;
             }
 
             await user.save({ transaction });
@@ -175,8 +176,8 @@ class UserController {
             users: _.map(users, (user: any) => {
                 return {
                     uid: user.uid,
-                    display_name: user.display_name,
-                    photo_url: user.photo_url,
+                    name: user.name,
+                    picture: user.picture,
                 }
             })
         }
