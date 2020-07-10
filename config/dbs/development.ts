@@ -31,6 +31,6 @@ export default {
         port: 16379,
         family: 4,
         password: 'fromthered2020#!',
-        db: 0,
+        db: 3,
     }
 }
