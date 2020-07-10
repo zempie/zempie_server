@@ -10,6 +10,7 @@ class BattleUserModel extends Model {
         this.attributes = {
             battle_uid:     { type: DataTypes.STRING(36), allowNull: false },
             user_uid:       { type: DataTypes.STRING(36), allowNull: false },
+            name:           { type: DataTypes.STRING(20), defaultValue: 'noname' },
             best_score:     { type: DataTypes.INTEGER, allowNull: false, defaultValue: -1 },
         };
     }
@@ -74,7 +75,7 @@ class BattleUserModel extends Model {
             return {
                 ranking: i + 1,
                 user_uid: record.user_uid,
-                name: user? user.name : 'noname',
+                name: user? user.name : record.name,
                 picture: user? user.picture : null,
                 score: record.best_score,
             }
