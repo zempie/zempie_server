@@ -8,7 +8,7 @@ const { Url, Deploy } = Opt;
 
 
 class GameCache {
-    private key: KeyType = 'zemini:games:';
+    private key: KeyType = 'zempie:games:';
 
     expire = async (time: number = 1000 * 60) => {
         await redis.expire(this.key, time);

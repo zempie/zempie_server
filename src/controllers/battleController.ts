@@ -132,9 +132,7 @@ class BattleController {
 
 
 
-    getRanking = async ({ battle_key }: any, user: IUser) => {
-        const decoded = verifyJWT(battle_key);
-        const { uid: battle_uid, game_uid, user_uid, secret_id, best_score } = decoded;
+    getRanking = async ({ battle_uid }: any, user: IUser) => {
         const ranking = await dbs.BattleUser.getRanking({ battle_uid });
         return {
             ranking
