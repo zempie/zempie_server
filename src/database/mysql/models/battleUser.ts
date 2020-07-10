@@ -31,17 +31,16 @@ class BattleUserModel extends Model {
         if ( !record ) {
             record = await this.model.create(where, {transaction});
         }
+
+        return record
     }
 
 
     async updateBestScore({ battle_uid, user_uid, best_score }: any, transaction?: Transaction) {
         return this.update({ best_score }, {
-            where: {
                 battle_uid,
                 user_uid,
-            },
-            transaction
-        })
+            }, transaction);
     }
 
 

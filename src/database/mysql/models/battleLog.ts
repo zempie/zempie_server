@@ -21,12 +21,7 @@ class BattleLogModel extends Model {
 
 
     async updateScore({ id, score }: any, transaction?: Transaction) {
-        return this.update({score}, {
-            where: {
-                id
-            },
-            transaction
-        })
+        return this.update({ score }, { id }, transaction);
     }
 
 }

@@ -15,7 +15,7 @@ class BattleController {
 
     getInfo = async ({ battle_uid }: any) => {
         const battle = await dbs.Battle.model.findOne({
-            where: { battle_uid },
+            where: { uid: battle_uid },
             include: [{
                 model: dbs.User.model,
             }]
@@ -26,12 +26,12 @@ class BattleController {
 
         return {
             battle_uid: battle.uid,
-            activated: battle.activated,
             host: {
                 displayName: host.display_name,
                 photoURL: host.photo_url,
             },
-            game
+            game,
+            battle,
         }
     }
 
@@ -57,7 +57,7 @@ class BattleController {
     gameStart = async ({ battle_uid, battle_key }: IBattleParams, user: IUser) => {
         return dbs.BattleLog.getTransaction(async (transaction: Transaction) => {
             const battle = await dbs.Battle.findOne({uid: battle_uid}, transaction);
-            if ( new Date(battle.end_at) >= new Date() ) {
+            if ( new Date(battle.end_at) < new Date() ) {
                 throw CreateError(ErrorCodes.BATTLE_OVER);
             }
             battle.user_count += 1;
@@ -74,7 +74,7 @@ class BattleController {
             const battle_user = await dbs.BattleUser.findOrCreate({
                 battle_uid,
                 user_uid,
-                user_name: user? user.displayName : undefined
+                user_name: user? user.displayName : 'noname'
             });
             decoded.best_score = battle_user.best_score;
 
@@ -89,7 +89,7 @@ class BattleController {
             const new_battle_key = signJWT({
                 uid: battle_uid,
                 game_uid: battle.game_uid,
-                user_uid: record.user_uid,
+                user_uid,
                 secret_id: record.id,
                 best_score: decoded.best_score,
             }, '10m');
