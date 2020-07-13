@@ -15,7 +15,7 @@ class UserController {
      * 사용자 정보 가져오기
      * - 정보가 없을 경우 firebase 에서 가져와서 저장
      */
-    getInfo = async ({registration_token}: any, _user: IUser) => {
+    getInfo = async ({registration_token}: any, _user: any) => {
         return dbs.User.getTransaction(async (transaction: Transaction) => {
             let profile, setting;
             const { uid } = _user;
