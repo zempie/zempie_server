@@ -65,7 +65,7 @@ class BattleController {
 
 
             let decoded = battle_key? verifyJWT(battle_key) : {
-                user_uid: battle_uid + '_' + uniqid(),
+                user_uid: uniqid(),
                 best_score: -1
             };
             let user_uid = user? user.uid : decoded.user_uid;
@@ -95,7 +95,8 @@ class BattleController {
 
 
             return {
-                battle_key: new_battle_key
+                battle_key: new_battle_key,
+                user_uid
             }
         })
     }
