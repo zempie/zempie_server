@@ -45,12 +45,9 @@ class BattleUserModel extends Model {
 
     async updateUserName({ battle_uid, user_uid, name }: any, transaction?: Transaction) {
         return this.update({ name }, {
-            where: {
                 battle_uid,
                 user_uid,
-            },
-            transaction
-        })
+            }, transaction);
     }
 
 
