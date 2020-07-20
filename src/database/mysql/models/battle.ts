@@ -1,5 +1,5 @@
 import Model from '../model';
-import { DataTypes, Sequelize } from 'sequelize';
+import { DataTypes, Sequelize, Transaction } from 'sequelize';
 import { dbs } from '../../../commons/globals';
 
 class BattleModel extends Model {
@@ -17,7 +17,27 @@ class BattleModel extends Model {
     }
 
     async afterSync(): Promise<void> {
-        this.model.belongsTo(dbs.User.model, {foreignKey: 'user_uid', targetKey: 'uid'});
+        this.model.belongsTo(dbs.User.model, { foreignKey: 'user_uid', targetKey: 'uid' });
+        this.model.belongsTo(dbs.Game.model, { foreignKey: 'game_uid', targetKey: 'uid' });
+    }
+
+
+    async get({ battle_uid }: { battle_uid: string }, transaction?: Transaction) {
+        const record = await this.model.findOne({
+            where: {
+                uid: battle_uid,
+            },
+            include: [{
+                model: dbs.User.model,
+                attributes: ['user_uid', 'name', 'picture'],
+            }, {
+                model: dbs.Game.model,
+                attributes: ['uid', 'pathname', 'title', 'version', 'main_ratio', 'control_type',
+                'genre_arcade', 'genre_puzzle', 'genre_sports', 'genre_racing', 'url_game', 'url_thumb', 'url_title']
+            }]
+        });
+
+        return record.get({ plain: true });
     }
 }
 

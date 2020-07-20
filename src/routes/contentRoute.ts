@@ -17,7 +17,7 @@ export default (router: Router) => {
 
     // social media - follow
     router.post(`${apiVer}/sm/follow`,      validateFirebaseIdToken,    convert(SocialMediaController.follow));
-    router.post(`${apiVer}/sm/un-follow`,   validateFirebaseIdToken,    convert(SocialMediaController.unfollow));
+    router.post(`${apiVer}/sm/un-follow`,   validateFirebaseIdToken,    convert(SocialMediaController.unFollow));
     router.get(`${apiVer}/sm/following`,    validateFirebaseIdToken,    convert(SocialMediaController.following));
     router.get(`${apiVer}/sm/followers`,    validateFirebaseIdToken,    convert(SocialMediaController.followers));
 
@@ -32,6 +32,6 @@ RpcController.generator('get-timeline',     TimelineController.getList, true);
 RpcController.generator('get-notices',      NoticeController.getList, true);
 
 RpcController.generator('follow',           SocialMediaController.follow, true);
-RpcController.generator('unfollow',         SocialMediaController.unfollow, true);
+RpcController.generator('unfollow',         SocialMediaController.unFollow, true);
 RpcController.generator('get-following',    SocialMediaController.following, true);
 RpcController.generator('get-followers',    SocialMediaController.followers, true);

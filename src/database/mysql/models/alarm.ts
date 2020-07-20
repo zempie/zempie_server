@@ -25,8 +25,8 @@ class AlarmModel extends Model {
     }
 
 
-    async create({user_uid, target_uid, game_uid, type, extra = {}}: IAlarmParams, transaction?: Transaction) {
-        return super.create({user_uid, target_uid, game_uid, type, extra: JSON.stringify(extra)}, transaction);
+    async create({user_uid, target_uid, type, extra = {}}: IAlarmParams, transaction?: Transaction) {
+        return super.create({user_uid, target_uid, type, extra: JSON.stringify(extra)}, transaction);
     }
 
 

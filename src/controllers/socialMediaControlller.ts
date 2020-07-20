@@ -1,33 +1,21 @@
 import { ISocialMedia, IUser } from './_interfaces';
 import { dbs } from '../commons/globals';
-import { Transaction } from 'sequelize';
+import { Sequelize, Transaction } from 'sequelize';
 import { CreateError, ErrorCodes } from '../commons/errorCodes';
 import NotifyService from '../services/notifyService';
 import { eAlarm, eNotify } from '../commons/enums';
 
 class SocialMediaController {
 
-    async follow({target_uid}: ISocialMedia, user: IUser) {
+    follow = async ({target_uid}: ISocialMedia, user: IUser) => {
         return dbs.Follow.getTransaction(async (transaction: Transaction) => {
             const user_uid = user.uid;
-            if ( user_uid === target_uid ) {
-                throw CreateError(ErrorCodes.INVALID_USER_UID);
-            }
+            const { user_id, target_id } = await this.getIds({ user_uid, target_uid }, transaction);
 
-            const record = await dbs.Follow.findOne({user_uid, target_uid}, transaction);
-            if ( record ) {
-                throw CreateError(ErrorCodes.ALREADY_FOLLOWING_TARGET);
-            }
+            await dbs.Follow.follow({ user_id, target_id }, transaction);
 
-            await dbs.Follow.create({user_uid, target_uid}, transaction);
-
-            const profile = await dbs.UserProfile.findOne({user_uid}, transaction);
-            profile.following_cnt += 1;
-            await profile.save({transaction});
-
-            const target = await dbs.UserProfile.findOne({user_uid: target_uid}, transaction);
-            target.followers_cnt += 1;
-            await target.save({transaction});
+            await dbs.UserProfile.update({ following_cnt: Sequelize.literal('following_cnt + 1') }, { user_id }, transaction);
+            await dbs.UserProfile.update({ followers_cnt: Sequelize.literal('followers_cnt + 1') }, { user_id: target_id }, transaction);
 
             await dbs.Alarm.create({user_uid: target_uid, target_uid: user_uid, type: eAlarm.Follow, extra: { target_uid }}, transaction);
             await NotifyService.notify({user_uid: target_uid, type: eNotify.Follow, data: { target_uid }});
@@ -35,33 +23,42 @@ class SocialMediaController {
     }
 
 
-    async unfollow({target_uid}: ISocialMedia, user: IUser) {
+    unFollow = ({target_uid}: ISocialMedia, user: IUser) => {
         return dbs.Follow.getTransaction(async (transaction: Transaction) => {
             const user_uid = user.uid;
-            if ( user_uid === target_uid ) {
-                throw CreateError(ErrorCodes.INVALID_USER_UID);
-            }
+            const { user_id, target_id } = await this.getIds({ user_uid, target_uid }, transaction);
 
-            const record = await dbs.Follow.findOne({user_uid, target_uid}, transaction);
-            if ( !record ) {
-                throw CreateError(ErrorCodes.ALREADY_UNFOLLOW_TARGET);
-            }
+            await dbs.Follow.unFollow({ user_id, target_id }, transaction);
 
-            await dbs.Follow.destroy({user_uid, target_uid}, transaction);
-
-            const profile = await dbs.UserProfile.findOne({user_uid}, transaction);
-            profile.following_cnt -= 1;
-            await profile.save({transaction});
-
-            const target = await dbs.UserProfile.findOne({user_uid: target_uid}, transaction);
-            target.followers_cnt -= 1;
-            await target.save({transaction});
+            await dbs.UserProfile.update({ following_cnt: Sequelize.literal('following_cnt - 1') }, { user_id }, transaction);
+            await dbs.UserProfile.update({ followers_cnt: Sequelize.literal('followers_cnt - 1') }, { user_id: target_id }, transaction);
         })
     }
 
 
+    private getIds = async ({ user_uid, target_uid }: ISocialMedia, transaction?: Transaction) => {
+        if ( user_uid === target_uid ) {
+            throw CreateError(ErrorCodes.INVALID_USER_UID);
+        }
+
+        const userRecord = await dbs.User.findOne({ uid: user_uid });
+        const targetRecord = await dbs.User.findOne({ uid: target_uid });
+        if ( !targetRecord ) {
+            throw CreateError(ErrorCodes.INVALID_USER_UID);
+        }
+
+        return {
+            user_id: userRecord.id,
+            target_id: targetRecord.id
+        }
+    }
+
+
     async following({user_uid}: ISocialMedia, user: IUser) {
-        const records = await dbs.Follow.following({user_uid: user_uid || user.uid});
+        user_uid = user_uid || user.uid;
+        const userRecord = await dbs.User.findOne({ uid: user_uid });
+        const user_id = userRecord.id;
+        const records = await dbs.Follow.following({ user_id });
         return {
             following: records.map((record: any) => {
                 return {
@@ -74,7 +71,10 @@ class SocialMediaController {
     }
 
     async followers({user_uid}: ISocialMedia, user: IUser) {
-        const records = await dbs.Follow.followers({user_uid: user_uid || user.uid});
+        user_uid = user_uid || user.uid;
+        const userRecord = await dbs.User.findOne({ uid: user_uid });
+        const user_id = userRecord.id;
+        const records = await dbs.Follow.followers({ user_id });
         return {
             followers: records.map((record: any) => {
                 return {

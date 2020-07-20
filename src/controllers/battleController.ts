@@ -14,24 +14,16 @@ class BattleController {
     }
 
     getInfo = async ({ battle_uid }: any) => {
-        const battle = await dbs.Battle.model.findOne({
-            where: { uid: battle_uid },
-            include: [{
-                model: dbs.User.model,
-            }]
-        });
-        const games = await gameCache.get();
-        const game = _.find(games, game => game.game_uid === battle.game_uid);
-        const host = battle.user;
+        const battle = await dbs.Battle.get({ battle_uid });
+        const { user: host, game } = battle;
 
         return {
             battle_uid: battle.uid,
-            host: {
-                name: host.name,
-                picture: host.picture,
-            },
+            host,
             game,
-            battle,
+            battle: {
+                end_at: battle.end_at,
+            },
         }
     }
 
@@ -74,7 +66,7 @@ class BattleController {
             const battle_user = await dbs.BattleUser.findOrCreate({
                 battle_uid,
                 user_uid,
-            });
+            }, transaction);
             decoded.best_score = battle_user.best_score;
 
 

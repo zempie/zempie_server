@@ -32,11 +32,12 @@ class UserController {
                     fcm_token: registration_token,
                 }, transaction);
 
-                profile = await dbs.UserProfile.create({ user_uid: uid }, transaction);
-                setting = await dbs.UserSetting.create({ user_uid: uid }, transaction);
+                const user_id = user.id;
+                profile = await dbs.UserProfile.create({ user_id }, transaction);
+                setting = await dbs.UserSetting.create({ user_id }, transaction);
 
                 // following 에 자신 추가 - 나중을 위해...
-                await dbs.Follow.create({ user_uid: uid, target_uid: uid }, transaction);
+                await dbs.Follow.create({ user_id, target_id: user_id }, transaction);
             }
             else {
                 if ( registration_token ) {
@@ -67,13 +68,11 @@ class UserController {
         profile = profile || user.profile;
         setting = setting || user.setting;
 
-        const _games = await gameCache.get();
+        // todo: 나중에 읽는 횟수 줄여야함
         const game_records = _.map(user.gameRecords, (gr: any) => {
-            const game = _.find(_games, (game: any) => {
-                return game.game_uid === gr.game_uid
-            });
+            const game = gr.game;
             return {
-                game_uid: game.game_uid,
+                game_uid: game.uid,
                 title: game.title,
                 url_thumb: game.url_thumb,
                 score: gr.score,

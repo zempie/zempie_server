@@ -12,15 +12,15 @@ class GameLogModel extends Model {
     protected initialize() {
         this.name = 'gameLog';
         this.attributes = {
-            user_uid:       { type: DataTypes.STRING(36), allowNull: false },
-            game_uid:       { type: DataTypes.STRING(36), allowNull: false },
+            user_id:        { type: DataTypes.INTEGER, allowNull: false },
+            game_id:        { type: DataTypes.INTEGER, allowNull: false },
             score:          { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0 },
         };
     }
 
 
     async afterSync(): Promise<void> {
-        this.model.belongsTo(dbs.User.model, {foreignKey: 'user_uid', targetKey: 'uid'});
+        this.model.belongsTo(dbs.User.model, {foreignKey: 'user_id', targetKey: 'id'});
     }
 
 

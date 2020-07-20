@@ -82,6 +82,8 @@ export interface IGame {
 
 export interface ITimelineParams {
     uid?: string,
+    user_id?: number,
+    game_id?: number,
     user_uid?: string,
     game_uid?: string,
     limit?: number,
@@ -120,7 +122,7 @@ export interface INoticeParams {
 export interface IAlarmParams {
     user_uid?: string,
     target_uid?: string,
-    game_uid?: string,
+    game_id?: number,
     type?: eAlarm,
     extra?: Object,
     limit: number,

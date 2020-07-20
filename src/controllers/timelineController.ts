@@ -12,9 +12,15 @@ class TimelineController {
 
     async getList({user_uid, limit = 50, offset = 0}: ITimelineParams, user: IUser) {
         user_uid = user_uid || user.uid;
-        const timeline = await dbs.Timeline.getList({user_uid, limit, offset});
 
-        const games = await gameCache.get();
+        const userRecord = await dbs.User.findOne({uid: user_uid});
+        if ( !userRecord ) {
+            throw CreateError(ErrorCodes.INVALID_USER_UID);
+        }
+        const user_id = userRecord.id;
+        const timeline = await dbs.Timeline.getList({user_id, limit, offset});
+
+        // const games = await gameCache.get();
         return {
             timeline: _.map(timeline, (t: any) => {
                 return {
@@ -23,14 +29,15 @@ class TimelineController {
                     extra: JSON.parse(t.extra),
                     created_at: t.created_at,
                     user: t.user,
-                    game: _.find(games, (g: any) => g.game_uid === t.game_uid),
+                    // game: _.find(games, (g: any) => g.game_uid === t.game_uid),
+                    game: t.game,
                 }
             })
         }
     }
 
 
-    async doPosting({type, score, follower_ids, game_uid, achievement_id, battle_id}: ITimelineParams, user: IUser, transaction?: Transaction) {
+    async doPosting({type, score, follower_ids, game_uid, game_id, user_id, achievement_id, battle_id}: ITimelineParams, user: IUser, transaction?: Transaction) {
         const uid = uniqid();
         let extra;
         switch ( type ) {
@@ -43,8 +50,8 @@ class TimelineController {
 
         const posting = await dbs.Timeline.create({
             uid,
-            user_uid: user.uid,
-            game_uid,
+            user_id,
+            game_id,
             type,
             extra
         }, transaction);

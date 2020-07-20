@@ -22,6 +22,10 @@ export const ErrorCodes = {
         code: 1110,
         message: '잘 못 된 유저 아이디입니다'
     },
+    INVALID_GAME_UID: {
+        code: 1111,
+        message: '게임 UID 오류'
+    },
     INVALID_FCM_TOKEN: {
         code: 1121,
         message: '사용자 FCM 토큰 오류'

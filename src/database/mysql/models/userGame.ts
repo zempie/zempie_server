@@ -12,16 +12,17 @@ class UserGameModel extends Model {
     protected initialize() {
         this.name = 'userGame';
         this.attributes = {
-            user_uid:       { type: DataTypes.STRING(36), allowNull: false },
-            game_uid:       { type: DataTypes.STRING(36), allowNull: false },
+            user_id:        { type: DataTypes.INTEGER, allowNull: false },
+            game_id:        { type: DataTypes.INTEGER, allowNull: false },
             score:          { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0 },
         };
     }
 
 
     async afterSync(): Promise<void> {
-        this.model.belongsTo(dbs.User.model, {foreignKey: 'user_uid', targetKey: 'uid'});
-        this.model.belongsTo(dbs.Follow.model, {foreignKey: 'user_uid', target: 'target_uid'});
+        this.model.belongsTo(dbs.User.model, { foreignKey: 'user_id', targetKey: 'id' });
+        this.model.belongsTo(dbs.Follow.model, { foreignKey: 'user_id', target: 'target_id' });
+        this.model.belongsTo(dbs.Game.model, { foreignKey: 'game_id', targetKey: 'id' });
     }
 
 

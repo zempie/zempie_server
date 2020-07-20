@@ -11,7 +11,7 @@ class UserProfileModel extends Model {
     protected initialize() {
         this.name = 'userProfile';
         this.attributes = {
-            user_uid:       { type: DataTypes.STRING(36), allowNull: false },
+            user_id:        { type: DataTypes.INTEGER, allowNull: false },
             level:          { type: DataTypes.MEDIUMINT, allowNull: false, defaultValue: 1 },
             exp:            { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0 },
             state_msg:      { type: DataTypes.STRING(100) },
@@ -22,7 +22,7 @@ class UserProfileModel extends Model {
 
 
     async afterSync(): Promise<void> {
-        this.model.belongsTo(dbs.User.model, {foreignKey: 'user_uid', targetKey: 'uid'});
+        this.model.belongsTo(dbs.User.model, { foreignKey: 'user_id', targetKey: 'id' });
     }
 
 }

@@ -26,14 +26,15 @@ class UserModel extends Model {
     }
 
     async afterSync(): Promise<void> {
-        this.model.hasOne(dbs.UserProfile.model, {sourceKey: 'uid', foreignKey: 'user_uid', as: 'profile'});
-        this.model.hasOne(dbs.UserSetting.model, {sourceKey: 'uid', foreignKey: 'user_uid', as: 'setting'});
-        this.model.hasMany(dbs.UserGame.model, {sourceKey: 'uid', foreignKey: 'user_uid', as: 'gameRecords'});
+        this.model.hasOne(dbs.UserProfile.model, { sourceKey: 'id', foreignKey: 'user_id', as: 'profile'});
+        this.model.hasOne(dbs.UserSetting.model, { sourceKey: 'id', foreignKey: 'user_id', as: 'setting'});
+        this.model.hasMany(dbs.UserGame.model, { sourceKey: 'id', foreignKey: 'user_id', as: 'gameRecords'});
+        this.model.hasMany(dbs.UserPublishing.model, { sourceKey: 'id', foreignKey: 'user_id', as: 'publishing' });
     }
 
 
     async getInfo({uid}: IUser, transaction?: Transaction) {
-        const user = await this.model.findOne({
+        return this.model.findOne({
             where: {
                 is_admin: {
                     [Op.ne]: true
@@ -50,21 +51,20 @@ class UserModel extends Model {
                 model: dbs.UserSetting.model,
                 as: 'setting',
                 attributes: {
-                    exclude: ['id', 'created_at', 'updated_at', 'deleted_at'],
+                    exclude: ['created_at', 'updated_at', 'deleted_at'],
                 }
             }, {
                 model: dbs.UserGame.model,
                 as: 'gameRecords',
                 attributes: {
                     exclude: ['created_at', 'updated_at', 'deleted_at'],
-                }
+                },
+                include: [{
+                    model: dbs.Game.model,
+                }]
             }],
             transaction
-        });
-        // if( user ) {
-        //     return user.get({plain: true});
-        // }
-        return user;
+        })
     }
 
     async getProfile({uid}: IUser, transaction?: Transaction) {
@@ -86,7 +86,10 @@ class UserModel extends Model {
                 as: 'gameRecords',
                 attributes: {
                     exclude: ['created_at', 'updated_at', 'deleted_at'],
-                }
+                },
+                include: [{
+                    model: dbs.Game.model,
+                }]
             }],
             transaction
         });

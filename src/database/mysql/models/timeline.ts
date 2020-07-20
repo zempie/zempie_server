@@ -1,3 +1,4 @@
+import * as _ from 'lodash';
 import Model from '../../../database/mysql/model';
 import { DataTypes, Sequelize, Transaction } from 'sequelize';
 import { dbs } from '../../../commons/globals';
@@ -13,8 +14,8 @@ class TimelineModel extends Model {
         this.name = 'timeline';
         this.attributes = {
             uid:            { type: DataTypes.STRING(36), allowNull: false },
-            user_uid:       { type: DataTypes.STRING(36), allowNull: false },
-            game_uid:       { type: DataTypes.STRING(36), allowNull: false },
+            user_id:        { type: DataTypes.INTEGER, allowNull: false },
+            game_id:        { type: DataTypes.INTEGER, allowNull: false },
             type:           { type: DataTypes.SMALLINT, allowNull: false },
             extra:          { type: DataTypes.STRING(200) },
         };
@@ -22,14 +23,15 @@ class TimelineModel extends Model {
 
 
     async afterSync(): Promise<void> {
-        this.model.belongsTo(dbs.User.model, {foreignKey: 'user_uid', targetKey: 'uid'});
+        this.model.belongsTo(dbs.User.model, { foreignKey: 'user_id', targetKey: 'id' });
+        this.model.belongsTo(dbs.Game.model, { foreignKey: 'game_id', targetKey: 'id' });
     }
 
 
-    async getList({user_uid, limit = 50, offset = 0}: ITimelineParams, transaction?: Transaction) {
-        return this.model.findAll({
+    async getList({user_id, limit = 50, offset = 0}: ITimelineParams, transaction?: Transaction) {
+        const records = await this.model.findAll({
             where: {
-                user_uid,
+                user_id,
             },
             attributes: {
                 exclude: ['updated_at', 'deleted_at']
@@ -38,11 +40,18 @@ class TimelineModel extends Model {
             include: [{
                 model: dbs.User.model,
                 attributes: [['uid', 'user_uid'], 'name', 'picture']
+            }, {
+                model: dbs.Game.model,
+                attributes: {
+                    exclude: ['id', 'created_at', 'updated_at', 'deleted_at']
+                }
             }],
             limit,
             offset,
             transaction
-        })
+        });
+
+        return _.map(records, (record: any) => record.get({ plain: true }));
     }
 
 }

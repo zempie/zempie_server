@@ -7,6 +7,7 @@ import TimelineController from './timelineController';
 import { eTimeline } from "../commons/enums";
 import { gameCache } from "../database/redis/models/games";
 import Opt from '../../config/opt';
+import { CreateError, ErrorCodes } from '../commons/errorCodes';
 const { Url, Deploy } = Opt;
 
 
@@ -25,16 +26,26 @@ class GameController {
     }
 
 
-    gameOver = async ({game_uid, score}: IGameParams, user: IUser) => {
+    gameOver = async (params: any, user: IUser) => {
+        const {game_uid, score}: IGameParams = params;
         const user_uid = user.uid;
+        const userRecord = await dbs.User.findOne({ uid: user_uid });
+        const game = await dbs.Game.findOne({ uid: game_uid });
+        if ( !game ) {
+            throw CreateError(ErrorCodes.INVALID_GAME_UID);
+        }
+
+        const user_id = userRecord.id;
+        const game_id = game.id;
+
         await dbs.GameLog.create({
-            user_uid,
-            game_uid,
+            user_id,
+            game_id,
             score
         });
 
         return await dbs.UserGame.getTransaction(async (transaction: Transaction) => {
-            const record = await dbs.UserGame.findOne({user_uid, game_uid}, transaction);
+            const record = await dbs.UserGame.findOne({user_id, game_id}, transaction);
             const previous_score = record? record.score : 0;
             const new_record = score > previous_score;
 
@@ -44,12 +55,12 @@ class GameController {
                     await record.save({transaction});
                 }
                 else {
-                    await dbs.UserGame.create({user_uid, game_uid, score}, transaction);
+                    await dbs.UserGame.create({user_id, game_id, score}, transaction);
                 }
             }
 
             // 임시
-            await TimelineController.doPosting({type: eTimeline.PR, score, game_uid}, user, transaction);
+            await TimelineController.doPosting({type: eTimeline.PR, score, game_uid, game_id, user_id}, user, transaction);
 
             return {
                 new_record
@@ -59,14 +70,16 @@ class GameController {
 
 
     getGame = async ({pathname}: any, user: IUser, transaction?: Transaction) => {
-        const games = await gameCache.get();
-        const game = _.find(games, (obj:any) => obj.pathname === pathname)
+        // const games = await gameCache.get();
+        // const game = _.find(games, (obj:any) => obj.pathname === pathname)
+        const game = await dbs.Game.findOne({ pathname }, transaction);
         return {
             game
         }
     }
     getGameList = async ({}, user: IUser, transaction?: Transaction) => {
-        const games = await gameCache.get()
+        // const games = await gameCache.get()
+        const games = await dbs.Game.getList();
         return {
             games
         }
@@ -75,12 +88,22 @@ class GameController {
 
     getGlobalRanking = async ({game_uid, limit = 50, offset = 0}: IGameParams, {uid}: IUser, transaction?: Transaction) => {
         let score, rank;
-        const gameRecord = await dbs.UserGame.findOne({game_uid, user_uid: uid}, transaction);
-        if( gameRecord ) {
+
+        const userRecord = await dbs.User.findOne({ uid });
+        const game = await dbs.Game.findOne({ uid: game_uid });
+        if ( !game ) {
+            throw CreateError(ErrorCodes.INVALID_GAME_UID);
+        }
+
+        const user_id = userRecord.id;
+        const game_id = game.id;
+
+        const gameRecord = await dbs.UserGame.findOne({game_id, user_id}, transaction);
+        if ( gameRecord ) {
             score = gameRecord.score;
             rank = await dbs.UserGame.model.count({
                 where: {
-                    game_uid,
+                    game_id,
                     score: {
                         [Op.gt]: score
                     },
@@ -92,7 +115,7 @@ class GameController {
         }
 
         const { count, rows } = await dbs.UserGame.model.findAndCountAll({
-            where: { game_uid },
+            where: { game_id },
             include: [{
                 model: dbs.User.model,
             }],
@@ -126,16 +149,26 @@ class GameController {
 
     getFollowingRanking = async ({game_uid, limit = 50, offset = 0}: IGameParams, {uid}: IUser, transaction?: Transaction) => {
         let score, rank;
-        const gameRecord = await dbs.UserGame.findOne({game_uid, user_uid: uid}, transaction);
+
+        const userRecord = await dbs.User.findOne({ uid });
+        const game = await dbs.Game.findOne({ uid: game_uid });
+        if ( !game ) {
+            throw CreateError(ErrorCodes.INVALID_GAME_UID);
+        }
+
+        const user_id = userRecord.id;
+        const game_id = game.id;
+
+        const gameRecord = await dbs.UserGame.findOne({game_id, user_id}, transaction);
         if( gameRecord ) {
             score = gameRecord.score;
             rank = await dbs.Follow.model.count({
-                where: { user_uid: uid },
+                where: { user_id },
                 include: [{
                     model: dbs.UserGame.model,
                     as: 'gameRecord',
                     where: {
-                        game_uid,
+                        game_id,
                         score: {
                             [Op.gt]: score,
                         }
@@ -146,11 +179,11 @@ class GameController {
         }
 
         const { count, rows } = await dbs.Follow.model.findAndCountAll({
-            where: { user_uid: uid },
+            where: { user_id },
             include: [{
                 model: dbs.UserGame.model,
                 as: 'gameRecord',
-                where: { game_uid },
+                where: { game_id },
             }, {
                 model: dbs.User.model,
                 as: 'target',
