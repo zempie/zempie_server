@@ -20,7 +20,7 @@ export default {
         Host: 'http://192.168.0.196:8280',
         DeployApiV1: 'http://192.168.0.196:8288/api/v1',
         GameClient: 'http://localhost:8080/#/play',
-        Redirect: 'http://localhost:8280/game/',
+        Redirect: 'http://localhost:8280/game',
     },
 
     Deploy: {

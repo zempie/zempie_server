@@ -1,7 +1,7 @@
-import Model from "../model";
+import Model from "../../model";
 import { DataTypes, Sequelize } from "sequelize";
-import { dbs } from "../../../commons/globals";
-import { eAppLang, eAppTheme } from '../../../commons/enums';
+import { dbs } from "../../../../commons/globals";
+import { eAppLang, eAppTheme } from '../../../../commons/enums';
 
 class UserSetting extends Model {
     protected initialize(): void {

@@ -47,6 +47,7 @@ class GameController {
         if ( pid ) {
             const pu = await dbs.User.findOne({ uid: pid });
             await dbs.UserPublishing.updateCount({ user_id: pu.id, game_id, type: 'play' });
+            await dbs.PublishingLog.create({ user_id: pu.id, game_id });
         }
 
         return await dbs.UserGame.getTransaction(async (transaction: Transaction) => {
@@ -82,7 +83,8 @@ class GameController {
             game
         }
     }
-    getGameList = async ({}, user: IUser, transaction?: Transaction) => {
+
+    getGameList = async ({}, user: IUser) => {
         // const games = await gameCache.get()
         const games = await dbs.Game.getList();
         return {
@@ -100,7 +102,7 @@ class GameController {
                     genre_sports: game.genre_sports,
                     url_game: game.url_game,
                     url_thumb: game.url_thumb,
-                    share_url: `${Url.Redirect}/${game.pathname}/${user? user.uid : undefined}`,
+                    share_url: user? `${Url.Redirect}/${game.pathname}/${user.uid}` : undefined,
                     developer: developer? {
                         uid: developer.uid,
                         name: developer.name,

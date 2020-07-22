@@ -1,8 +1,8 @@
-import Model from '../../../database/mysql/model';
+import Model from '../../model';
 import { DataTypes, Op, Sequelize, Transaction } from 'sequelize';
-import { dbs } from '../../../commons/globals';
-import { IUser } from '../../../controllers/_interfaces';
-import { eNotify } from '../../../commons/enums';
+import { dbs } from '../../../../commons/globals';
+import { IUser } from '../../../../controllers/_interfaces';
+import { eNotify } from '../../../../commons/enums';
 
 
 /**

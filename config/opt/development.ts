@@ -20,7 +20,7 @@ export default {
         Host: 'http://gtest.fromthered.com:8280',
         DeployApiV1: 'http://gtest.fromthered.com:8288/api/v1',
         GameClient: 'http://localhost:8080/#/play',
-        Redirect: 'http://localhost:8280/game/',
+        Redirect: 'http://localhost:8280/game',
     },
 
     Deploy: {
