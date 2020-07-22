@@ -53,6 +53,7 @@ export interface IGameParams {
     score: number,
     limit: number,
     offset: number,
+    pid?: string,
 }
 export interface IGamePlayParams {
     pathname: string,

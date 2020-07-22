@@ -27,8 +27,7 @@ class GameController {
     }
 
 
-    gameOver = async (params: any, user: IUser) => {
-        const {game_uid, score}: IGameParams = params;
+    gameOver = async ({ game_uid, score, pid }: IGameParams, user: IUser) => {
         const user_uid = user.uid;
         const userRecord = await dbs.User.findOne({ uid: user_uid });
         const game = await dbs.Game.findOne({ uid: game_uid });
@@ -44,6 +43,11 @@ class GameController {
             game_id,
             score
         });
+
+        if ( pid ) {
+            const pu = await dbs.User.findOne({ uid: pid });
+            await dbs.UserPublishing.updateCount({ user_id: pu.id, game_id, type: 'play' });
+        }
 
         return await dbs.UserGame.getTransaction(async (transaction: Transaction) => {
             const record = await dbs.UserGame.findOne({user_id, game_id}, transaction);
@@ -96,7 +100,7 @@ class GameController {
                     genre_sports: game.genre_sports,
                     url_game: game.url_game,
                     url_thumb: game.url_thumb,
-                    share_url: `http://api.zempie.com/game/game_path/${user? user.uid : undefined}`,
+                    share_url: `${Url.Redirect}/${game.pathname}/${user? user.uid : undefined}`,
                     developer: developer? {
                         uid: developer.uid,
                         name: developer.name,
@@ -129,7 +133,7 @@ class GameController {
 
     redirectGame = (req: Request, res: Response) => {
         const params = _.assignIn({}, req.body, req.query, req.params);
-        res.redirect(`http://localhost:8080/#/play/${params.pathname}`)
+        res.redirect(`${Url.GameClient}/${params.pathname}`)
     }
 
 
