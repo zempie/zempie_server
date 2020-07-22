@@ -87,6 +87,7 @@ class GameController {
                 return {
                     game_uid: game.uid,
                     title: game.title,
+                    pathname: game.pathname,
                     version: game.version,
                     control_type: game.control_type,
                     genre_arcade: game.genre_arcade,
@@ -118,7 +119,7 @@ class GameController {
 
         return dbs.User.getTransaction(async (transaction: Transaction) => {
             const user = await dbs.User.findOne({ uid: user_uid }, transaction);
-            if ( user ) {
+            if ( !user ) {
                 throw CreateError(ErrorCodes.INVALID_USER_UID);
             }
 
