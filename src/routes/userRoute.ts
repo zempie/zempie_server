@@ -29,4 +29,5 @@ RpcController.generator('get-user-info',    UserController.getInfo, true);
 RpcController.generator('get-target-info',  UserController.getTargetInfo, true);
 RpcController.generator('get-search-user',  UserController.searchUser, true);
 RpcController.generator('set-user-setting', UserController.updateSetting, true);
+RpcController.generator('get-publishing',   UserController.getPublishing, true);
 RpcController.generator('get-alarms',       AlarmController.getList, true);

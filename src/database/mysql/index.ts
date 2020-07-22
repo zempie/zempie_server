@@ -1,14 +1,12 @@
 import * as fs from "fs";
 import * as path from 'path';
-// import * as MYSQL from 'mysql';
-const MYSQL = require('mysql2/promise');
 import { Sequelize } from 'sequelize';
 import { dbs } from "../../commons/globals";
 import Model from './model';
 import { capitalize } from '../../commons/utils';
 import db_options from '../../../config/dbs';
 const mysqlOpt = db_options.mysql;
-
+const MYSQL = require('mysql2/promise');
 
 class MySql {
     private db: Sequelize | undefined;
@@ -20,9 +18,8 @@ class MySql {
                 port:       mysqlOpt.conn.port,
                 user:       mysqlOpt.username,
                 password:   mysqlOpt.password,
-            });
+            } as any);
 
-            // await connection.query(`CREATE DATABASE IF NOT EXISTS ${mysqlOpt.database} CHARACTER SET utf8 COLLATE utf8_general_ci;`);
             await connection.execute(`CREATE DATABASE IF NOT EXISTS ${mysqlOpt.database} CHARACTER SET utf8 COLLATE utf8_general_ci;`);
 
             this.db = new Sequelize(mysqlOpt.database, mysqlOpt.username, mysqlOpt.password, mysqlOpt.conn);

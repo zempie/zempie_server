@@ -44,17 +44,21 @@ class GameModel extends Model {
 
 
     async getList() {
-        const records = await this.model.findAll({
+        return this.model.findAll({
             where: {
                 activated: true,
                 enabled: true,
             },
             attributes: {
                 include: [['uid', 'game_uid']]
-            }
+            },
+            include: [{
+                model: dbs.User.model,
+                as: 'developer',
+            }]
         })
 
-        return _.map(records, (record: any) => record.get({ plain: true }))
+        // return _.map(records, (record: any) => record.get({ plain: true }))
     }
 }
 

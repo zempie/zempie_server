@@ -34,8 +34,8 @@ export interface IPublisher extends IDecoded {
     domain: string,
 }
 export interface IUser extends IDecoded {
-    name: string,
-    picture: string,
+    name?: string,
+    picture?: string,
 }
 
 
@@ -55,8 +55,9 @@ export interface IGameParams {
     offset: number,
 }
 export interface IGamePlayParams {
-    game_key: string,
-    score: number,
+    pathname: string,
+    user_uid: string,
+    score?: number,
 }
 
 export interface IGame {

@@ -4,7 +4,7 @@ import { IUser } from './_interfaces';
 
 
 
-export default function convert(func: Function) {
+export default function convert(func: Function, middleware: boolean = false) {
 
     function response(res: Response, result: any) {
         res.header('Last-Modified', (new Date()).toUTCString());
@@ -21,11 +21,14 @@ export default function convert(func: Function) {
         });
     }
 
-    return async (req: any, res: Response) => {
+    return async (req: any, res: Response, next: Function) => {
         try {
             const params = _.assignIn({}, req.body, req.query, req.params);
             const user: IUser = _.assignIn({}, req.user);
             const result = await func(params, user, req.files);
+            if ( middleware ) {
+                return next();
+            }
             response(res, result);
         }
         catch(e) {

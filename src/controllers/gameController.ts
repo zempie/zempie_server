@@ -1,5 +1,6 @@
 import * as _ from 'lodash';
-import { IGameParams, IUser } from './_interfaces';
+import { Request, Response } from 'express';
+import { IGame, IGameParams, IGamePlayParams, IUser } from './_interfaces';
 import { Sequelize, Transaction, Op } from 'sequelize';
 import { dbs, caches } from "../commons/globals";
 import redis from '../database/redis';
@@ -81,12 +82,60 @@ class GameController {
         // const games = await gameCache.get()
         const games = await dbs.Game.getList();
         return {
-            games
+            games: _.map(games, (game: any) => {
+                const { developer } = game;
+                return {
+                    game_uid: game.uid,
+                    title: game.title,
+                    version: game.version,
+                    control_type: game.control_type,
+                    genre_arcade: game.genre_arcade,
+                    genre_puzzle: game.genre_puzzle,
+                    genre_racing: game.genre_racing,
+                    genre_sports: game.genre_sports,
+                    url_game: game.url_game,
+                    url_thumb: game.url_thumb,
+                    share_url: `http://api.zempie.com/game/game_path/${user? user.uid : undefined}`,
+                    developer: developer? {
+                        uid: developer.uid,
+                        name: developer.name,
+                        picture: developer.picture,
+                    } : null
+                }
+            })
         }
     }
 
+    playGame = async ({ pathname, user_uid }: IGamePlayParams) => {
+        if ( !user_uid ) {
+            return;
+        }
 
-    getGlobalRanking = async ({game_uid, limit = 50, offset = 0}: IGameParams, {uid}: IUser, transaction?: Transaction) => {
+        const game = await dbs.Game.findOne({ title: pathname });
+        if ( !game ) {
+            throw CreateError(ErrorCodes.INVALID_GAME_UID);
+        }
+
+        return dbs.User.getTransaction(async (transaction: Transaction) => {
+            const user = await dbs.User.findOne({ uid: user_uid }, transaction);
+            if ( user ) {
+                throw CreateError(ErrorCodes.INVALID_USER_UID);
+            }
+
+            await dbs.UserPublishing.updateCount({ user_id: user.id, game_id: game.id, type: 'open' }, transaction);
+        })
+    }
+
+    redirectGame = (req: Request, res: Response) => {
+        const params = _.assignIn({}, req.body, req.query, req.params);
+        res.redirect(`http://localhost:8080/#/play/${params.pathname}`)
+    }
+
+
+    /**
+     * 랭킹
+     */
+    getGlobalRanking = async ({ game_uid, limit = 50, offset = 0 }: IGameParams, {uid}: IUser, transaction?: Transaction) => {
         let score, rank;
 
         const userRecord = await dbs.User.findOne({ uid });

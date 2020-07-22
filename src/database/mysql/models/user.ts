@@ -26,12 +26,11 @@ class UserModel extends Model {
     }
 
     async afterSync(): Promise<void> {
-        this.model.hasOne(dbs.UserProfile.model, { sourceKey: 'id', foreignKey: 'user_id', as: 'profile'});
-        this.model.hasOne(dbs.UserSetting.model, { sourceKey: 'id', foreignKey: 'user_id', as: 'setting'});
-        this.model.hasMany(dbs.UserGame.model, { sourceKey: 'id', foreignKey: 'user_id', as: 'gameRecords'});
+        this.model.hasOne(dbs.UserProfile.model, { sourceKey: 'id', foreignKey: 'user_id', as: 'profile' });
+        this.model.hasOne(dbs.UserSetting.model, { sourceKey: 'id', foreignKey: 'user_id', as: 'setting' });
+        this.model.hasMany(dbs.UserGame.model, { sourceKey: 'id', foreignKey: 'user_id', as: 'gameRecords' });
         this.model.hasMany(dbs.UserPublishing.model, { sourceKey: 'id', foreignKey: 'user_id', as: 'publishing' });
     }
-
 
     async getInfo({uid}: IUser, transaction?: Transaction) {
         return this.model.findOne({
@@ -126,6 +125,21 @@ class UserModel extends Model {
             _user.notify[eNotify.Reply] = _user.setting.notify_reply;
             return _user;
         }
+    }
+
+
+    async getPublishing({ uid }: IUser, transaction?: Transaction) {
+        return this.model.findOne({
+            where: { uid },
+            include: [{
+                model: dbs.UserPublishing.model,
+                as: 'publishing',
+                include: [{
+                    model: dbs.Game.model,
+                }]
+            }],
+            transaction
+        })
     }
 
 

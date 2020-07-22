@@ -181,6 +181,24 @@ class UserController {
     }
 
 
+    getPublishing = async ({}, { uid }: IUser ) => {
+        const user = await dbs.User.getPublishing({ uid });
+        if ( !user ) {
+            throw CreateError(ErrorCodes.INVALID_USER_UID)
+        }
+
+        const { publishing } = user;
+        return {
+            publishing: _.map(publishing, (obj: any) => {
+                const { game } = obj;
+                return {
+                    game_uid: game.uid,
+                    title: game.title,
+                    count_open: obj.count_open,
+                }
+            })
+        }
+    }
 }
 
 
