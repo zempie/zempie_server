@@ -35,6 +35,7 @@ import swaggerDef from './swaggerDef';
 
 // colors
 import * as colors from 'colors';
+import { logger } from '../commons/logger';
 colors.setTheme({
     silly: 'rainbow',
     input: 'grey',
@@ -68,7 +69,7 @@ export default class Server {
         // this.setEJS();
         this.setSwagger();
         this.setGraphQL();
-        
+
         if ( !!this.app ) {
             this.routes(this.app);
         }
@@ -169,7 +170,7 @@ export default class Server {
 
     private static async setRDB() {
         await MySql.initialize();
-        console.log('mysql is ready.'.cyan);
+        logger.info('mysql is ready.'.cyan)
 
         // await Redis.initialize();
         // console.log('redis is ready.'.cyan);
@@ -203,7 +204,8 @@ export default class Server {
                 return
             }
 
-            console.log(`Api Server [ver.${Pkg.version}] has started. (port: ${port})`.cyan.bold);
+            // console.log(`Api Server [ver.${Pkg.version}] has started. (port: ${port})`.cyan.bold);
+            logger.info(`Api Server [ver.${Pkg.version}] has started. (port: ${port})`.cyan.bold)
         };
 
         if ( !!this.app ) {

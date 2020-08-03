@@ -134,8 +134,12 @@ class GameController {
     }
 
     redirectGame = (req: Request, res: Response) => {
-        const params = _.assignIn({}, req.body, req.query, req.params);
-        res.redirect(`${Url.GameClient}/${params.pathname}`)
+        const { pathname, pid } = _.assignIn({}, req.body, req.query, req.params);
+        let url = `${Url.GameClient}/${pathname}`;
+        if ( pid ) {
+            url += `/${pid}`;
+        }
+        res.redirect(url);
     }
 
 

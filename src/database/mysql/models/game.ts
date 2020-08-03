@@ -21,7 +21,7 @@ class GameModel extends Model {
             description:        { type: DataTypes.STRING(200), defaultValue: '' },
             version:            { type: DataTypes.STRING(20), defaultValue: '0.0.1' },
 
-            min_ratio:          { type: DataTypes.SMALLINT, defaultValue: 1 },
+            // min_ratio:          { type: DataTypes.SMALLINT, defaultValue: 1 },
             control_type:       { type: DataTypes.SMALLINT, defaultValue: 0 },
 
             genre_arcade:       { type: DataTypes.BOOLEAN, defaultValue: false },

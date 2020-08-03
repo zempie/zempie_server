@@ -2,9 +2,10 @@ import { Request, Response, Router } from 'express';
 import convert from '../controllers/_convert';
 import { validateFirebaseIdToken } from './_common';
 import UserController from '../controllers/userController';
-import AlarmController from "../controllers/alarmController";
+import AlarmController from '../controllers/alarmController';
 import RpcController from '../controllers/rpcController';
 import FileManager from '../services/fileManager';
+import PublishingController from '../controllers/publishingController';
 
 
 const apiVer = `/api/v1`;
@@ -29,5 +30,7 @@ RpcController.generator('get-user-info',    UserController.getInfo, true);
 RpcController.generator('get-target-info',  UserController.getTargetInfo, true);
 RpcController.generator('get-search-user',  UserController.searchUser, true);
 RpcController.generator('set-user-setting', UserController.updateSetting, true);
-RpcController.generator('get-publishing',   UserController.getPublishing, true);
 RpcController.generator('get-alarms',       AlarmController.getList, true);
+
+
+RpcController.generator('get-publishing',   PublishingController.getList, true);

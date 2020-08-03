@@ -1,5 +1,6 @@
 import * as fs from "fs";
 import * as path from 'path';
+import { logger } from '../../commons/logger';
 import { Sequelize } from 'sequelize';
 import { dbs } from "../../commons/globals";
 import Model from './model';
@@ -22,7 +23,10 @@ class MySql {
 
             await connection.execute(`CREATE DATABASE IF NOT EXISTS ${mysqlOpt.database} CHARACTER SET utf8 COLLATE utf8_general_ci;`);
 
-            this.db = new Sequelize(mysqlOpt.database, mysqlOpt.username, mysqlOpt.password, mysqlOpt.conn);
+            this.db = new Sequelize(mysqlOpt.database, mysqlOpt.username, mysqlOpt.password, {
+                ...mysqlOpt.conn,
+                logging: msg => logger.debug(msg)
+            });
 
             await this.db.authenticate();
             await this.syncDefine();
@@ -61,7 +65,8 @@ class MySql {
             }
         }
 
-        console.log(`[${mysqlOpt.conn.dialect}] loading completed.`.cyan);
+        // console.log(`[${mysqlOpt.conn.dialect}] loading completed.`.cyan);
+        logger.info(`[${mysqlOpt.conn.dialect.toUpperCase()}] loading completed.`);
     }
 
 }
