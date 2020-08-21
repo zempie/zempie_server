@@ -56,7 +56,8 @@
     "swagger-jsdoc": "^4.0.0",
     "swagger-ui-express": "^4.1.4",
     "uniqid": "^5.2.0",
-    "uuid": "^7.0.2"
+    "uuid": "^7.0.2",
+    "winston": "^3.3.3"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^3.0.0",

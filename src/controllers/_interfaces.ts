@@ -69,7 +69,7 @@ export interface IGame {
     title: string,
     description: string,
     version: string,
-    min_ratio: string,
+    // min_ratio: string,
     control_type: string,
     genre_arcade: boolean,
     genre_puzzle: boolean,

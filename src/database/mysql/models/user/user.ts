@@ -26,6 +26,7 @@ class UserModel extends Model {
     }
 
     async afterSync(): Promise<void> {
+        await super.afterSync()
         this.model.hasOne(dbs.UserProfile.model, { sourceKey: 'id', foreignKey: 'user_id', as: 'profile' });
         this.model.hasOne(dbs.UserSetting.model, { sourceKey: 'id', foreignKey: 'user_id', as: 'setting' });
         this.model.hasMany(dbs.UserGame.model, { sourceKey: 'id', foreignKey: 'user_id', as: 'gameRecords' });

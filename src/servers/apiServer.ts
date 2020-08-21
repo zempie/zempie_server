@@ -19,7 +19,7 @@ class ApiServer extends Server {
         contentRoute(app);
         gameRoute(app);
 
-        scheduleService.start()
+        // scheduleService.start()
     }
 
     protected beforeStart = async (): Promise<any> => {

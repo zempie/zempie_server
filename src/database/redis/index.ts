@@ -1,5 +1,6 @@
 import * as redis from 'ioredis';
 import db_options from '../../../config/dbs';
+import { logger } from '../../commons/logger';
 
 /**
  * sudo docker run -v /home/loki/redis/redis.conf:/usr/local/etc/redis/redis.conf --name redis -d -p 6379:6379 redis redis-server /usr/local/etc/redis/redis.conf
@@ -22,7 +23,7 @@ class Redis {
             this.redis.hset('server:platform', 'status', 'running');
             this.setTimer();
         }
-        console.log('redis is ready.'.cyan);
+        logger.info('redis is ready.'.cyan);
 
         return this;
     }

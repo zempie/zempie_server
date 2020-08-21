@@ -1,5 +1,6 @@
 import { Sequelize, Transaction } from 'sequelize';
 import PQueue from 'p-queue';
+import { logger } from '../../commons/logger';
 
 
 abstract class Model {
@@ -29,23 +30,13 @@ abstract class Model {
 
     public getName() : string { return this.name }
 
-    public async afterSync() { console.log(this.name + ' db created.') }
+    public async afterSync() { logger.info(`[table] ${this.name} synced.`) }
 
     public async getTransaction(callback: Function) {
         if( !this.model ) {
             throw new Error('invalid model');
         }
-        return this.model.sequelize.transaction(async (transaction?: Transaction) => {
-            return await callback(transaction);
-        });
-        // return Model.queue.add(() => this.model.sequelize.transaction((transaction: Transaction) => callback(transaction)));
-    }
-
-    public async inTransaction(callback: Function) {
-        if( !this.model ) {
-            throw new Error('invalid model');
-        }
-        // return this.model.sequelize.transaction(async (transaction: Transaction) => {
+        // return this.model.sequelize.transaction(async (transaction?: Transaction) => {
         //     return await callback(transaction);
         // });
         return Model.queue.add(() => this.model.sequelize.transaction((transaction: Transaction) => callback(transaction)));
