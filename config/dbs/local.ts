@@ -1,6 +1,6 @@
 export default {
     mysql: {
-        database: 'platform',
+        database: 'zempie',
         username: 'root',
         password: '1324',
         conn: {
@@ -27,10 +27,10 @@ export default {
         },
     },
     redis: {
-        host: '192.168.0.10',
-        port: 16379,
+        host: 'localhost',
+        port: 6379,
         family: 4,
-        password: 'fromthered2020#!',
-        db: 11,
+        password: '',
+        db: 0,
     }
 }

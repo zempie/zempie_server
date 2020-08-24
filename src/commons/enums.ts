@@ -47,3 +47,16 @@ export enum eAppLang {
     KO,
     EN,
 }
+
+export enum ePubType {
+    GamePlay,     // game play
+    PubGamePlay,    // published game play
+    AD,     // AD
+}
+
+export enum eItemUsingType {
+    Permanent,
+    Once,
+    Period,
+    Accumulated,
+}

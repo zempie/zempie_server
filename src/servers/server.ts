@@ -204,7 +204,6 @@ export default class Server {
                 return
             }
 
-            // console.log(`Api Server [ver.${Pkg.version}] has started. (port: ${port})`.cyan.bold);
             logger.info(`Api Server [ver.${Pkg.version}] has started. (port: ${port})`.cyan.bold)
         };
 

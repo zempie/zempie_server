@@ -57,6 +57,19 @@ export const ErrorCodes = {
     BATTLE_OVER: {
         code: 1401,
         message: '배틀 끝났다'
+    },
+
+    INVALID_ITEM_ID: {
+        code: 2101,
+        message: '아이템 아이디 오류',
+    },
+    BUY_DUPLICATED_ITEM: {
+        code: 2102,
+        message: '아이템 중복 구매 오류',
+    },
+    REJECT_USE_ITEM: {
+        code: 2103,
+        message: '아이템 사용 오류',
     }
 };
 

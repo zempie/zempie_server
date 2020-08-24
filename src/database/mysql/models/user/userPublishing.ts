@@ -1,6 +1,7 @@
 import Model from '../../model';
 import { DataTypes, Sequelize, Transaction } from 'sequelize';
 import { dbs } from '../../../../commons/globals';
+import { ePubType } from '../../../../commons/enums';
 
 class UserPublishingModel extends Model {
     protected initialize(): void {
@@ -25,13 +26,24 @@ class UserPublishingModel extends Model {
     }
 
 
-    async updateCount({ user_id, game_id, type }: { user_id: number, game_id: number, type: string }, transaction?: Transaction) {
+    async updateCount({ user_id, game_id, pub_type }: { user_id: number, game_id: number, pub_type: ePubType }, transaction?: Transaction) {
         const publishing = await this.findOrCreate({
             findOption: {
                 user_id,
                 game_id,
             }}, transaction);
 
+        let type = ''
+        switch (pub_type) {
+            case ePubType.GamePlay:
+            case ePubType.PubGamePlay:
+                type = 'play';
+                break;
+
+            case ePubType.AD:
+                type = 'ad';
+                break;
+        }
         publishing[`count_${type}`] += 1;
         await publishing.save({ transaction });
     }

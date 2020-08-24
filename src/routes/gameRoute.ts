@@ -1,9 +1,10 @@
 import { Request, Response, Router } from 'express';
 import convert from '../controllers/_convert';
 import { validateFirebaseIdToken } from './_common';
-import GameController from '../controllers/gameController'
-import BattleController from '../controllers/battleController'
 import RpcController from '../controllers/rpcController';
+import GameController from '../controllers/gameController';
+import BattleController from '../controllers/battleController';
+import AdController from '../controllers/adController';
 
 
 const apiVer = `/api/v1`;
@@ -34,6 +35,7 @@ RpcController.generator('game-over',            GameController.gameOver, true);
 RpcController.generator('get-ranking-global',   GameController.getGlobalRanking, true);
 RpcController.generator('get-ranking-follow',   GameController.getFollowingRanking, true);
 
+RpcController.generator('ad-completed',         AdController.onRewardedVideoCompleted);
 
 RpcController.generator('get-battles',          BattleController.getBattleList);
 RpcController.generator('get-ranking-battle',   BattleController.getRanking);

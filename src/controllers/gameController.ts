@@ -1,14 +1,13 @@
 import * as _ from 'lodash';
 import { Request, Response } from 'express';
-import { IGame, IGameParams, IGamePlayParams, IUser } from './_interfaces';
-import { Sequelize, Transaction, Op } from 'sequelize';
-import { dbs, caches } from "../commons/globals";
-import redis from '../database/redis';
+import { IGameParams, IGamePlayParams, IUser } from './_interfaces';
+import { Op, Sequelize, Transaction } from 'sequelize';
+import { dbs } from '../commons/globals';
 import TimelineController from './timelineController';
-import { eTimeline } from "../commons/enums";
-import { gameCache } from "../database/redis/models/games";
+import { ePubType, eTimeline } from '../commons/enums';
 import Opt from '../../config/opt';
 import { CreateError, ErrorCodes } from '../commons/errorCodes';
+
 const { Url, Deploy } = Opt;
 
 
@@ -46,8 +45,8 @@ class GameController {
 
         if ( pid ) {
             const pu = await dbs.User.findOne({ uid: pid });
-            await dbs.UserPublishing.updateCount({ user_id: pu.id, game_id, type: 'play' });
-            await dbs.PublishingLog.create({ user_id: pu.id, game_id });
+            await dbs.UserPublishing.updateCount({ user_id: pu.id, game_id, pub_type: ePubType.PubGamePlay });
+            await dbs.GeneratedPointsLog.createPoints({ user_id: pu.id, game_id, pub_type: ePubType.PubGamePlay });
         }
 
         return await dbs.UserGame.getTransaction(async (transaction: Transaction) => {
@@ -55,12 +54,11 @@ class GameController {
             const previous_score = record? record.score : 0;
             const new_record = score > previous_score;
 
-            if( new_record ) {
-                if( record ) {
+            if ( new_record ) {
+                if ( record ) {
                     record.score = score;
                     await record.save({transaction});
-                }
-                else {
+                } else {
                     await dbs.UserGame.create({user_id, game_id, score}, transaction);
                 }
             }
