@@ -6,6 +6,7 @@ import userRoute from '../routes/userRoute';
 import { service } from '../commons/globals';
 import { fetchHelper } from '../services/fetchHelper';
 import gameRoute from "../routes/gameRoute";
+import ExchangeManager from '../services/exchangeManager';
 import scheduleService from "../services/scheduleService";
 
 class ApiServer extends Server {
@@ -20,6 +21,7 @@ class ApiServer extends Server {
         gameRoute(app);
 
         // scheduleService.start()
+        ExchangeManager.start()
     }
 
     protected beforeStart = async (): Promise<any> => {

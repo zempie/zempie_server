@@ -56,3 +56,16 @@ export function expiresIn(from: string, expires_in: string) {
         t = 1000 * 60 * 60* 24;
     }
 }
+
+
+/*
+    Date
+ */
+export function Today(hour = 0, minutes = 0, seconds = 0, milliseconds = 0) {
+    const now = new Date()
+    return new Date(now.getFullYear(), now.getMonth(), now.getDate(), hour, minutes, milliseconds)
+}
+export function Yesterday() {
+    const now = new Date()
+    return new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1)
+}
