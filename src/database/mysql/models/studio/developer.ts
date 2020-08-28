@@ -18,8 +18,8 @@ class DeveloperModel extends Model {
         this.model.hasMany(dbs.Project.model);
     }
 
-    async create({ user_id } : any, transaction?: Transaction) {
-        return super.create({ user_id }, transaction);
+    async create({ user_id, name } : any, transaction?: Transaction) {
+        return super.create({ user_id, name }, transaction);
     }
 
     async getDeveloper( { user_id } : any, transaction?: Transaction ) {

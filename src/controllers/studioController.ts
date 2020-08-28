@@ -5,6 +5,8 @@ import {CreateError, ErrorCodes} from "../commons/errorCodes";
 import FileManager from "../services/fileManager";
 import { v4 as uuid } from 'uuid';
 
+const replaceExt = require('replace-ext');
+
 class StudioController {
     getDeveloper = async (params: any, {uid}: IUser)=>{
         return dbs.Developer.getTransaction( async (transaction : Transaction)=>{
@@ -17,21 +19,30 @@ class StudioController {
         return dbs.Developer.getTransaction( async (transaction : Transaction)=>{
             const user = await dbs.User.findOne({ uid });
             const dev = dbs.Developer.getDeveloper( { user_id : user.id }, transaction );
-
             if( dev ) {
                 return dev;
             }
             else {
-                return await dbs.Developer.create( {user_id : user.id}, transaction );
+                return await dbs.Developer.create( {
+                    user_id : user.id,
+                    name : name,
+                }, transaction );
             }
         })
     }
 
-    updateDeveloper = async  (params: any, {uid, name}: IUser) =>{
+    updateDeveloper = async  (params: any, {uid, name}: IUser, {file} : any) =>{
         return dbs.Developer.getTransaction( async (transaction : Transaction)=>{
             const user = await dbs.User.findOne({ uid });
             params = params || {};
             params.user_id = user.id;
+
+            if ( file ) {
+                const webp = await FileManager.convertToWebp(file, 80);
+                const data: any = await FileManager.s3upload(replaceExt(file.name, '.webp'), webp[0].destinationPath, uid);
+                params.picture = data.Location;
+            }
+
             return await dbs.Developer.updateDeveloper( params, transaction ) ;
         })
     }
@@ -59,7 +70,12 @@ class StudioController {
         return dbs.Project.getTransaction( async (transaction : Transaction)=>{
             const user = await dbs.User.findOne({ uid });
             const dev = await dbs.Developer.getDeveloper( {user_id : user.id}, transaction );
-            return await dbs.Project.create( { name: params.name, developer_id : dev.id }, transaction );
+            return await dbs.Project.create( {
+                name: params.name,
+                control_type : params.control_type,
+                description : params.description,
+                developer_id : dev.id
+            }, transaction );
         })
     }
 
@@ -69,14 +85,29 @@ class StudioController {
         })
     }
 
-    updateProject = async  ( params : any, {uid}: IUser )=>{
+    updateProject = async  ( params : any, {uid}: IUser, {file}: any )=>{
+
+
         return dbs.Project.getTransaction( async (transaction : Transaction)=>{
+
 
             if( params.deploy_version_id ) {
                 const version = await dbs.ProjectVersion.findOne({ id : params.deploy_version_id });
                 const project = await dbs.Project.getProject( { id : params.id }, transaction );
                 let game_id = project.game_id;
                 if( !game_id ) {
+
+                    const path = await dbs.Game.findOne( {
+                        pathname : params.pathname
+                    }, transaction );
+
+                    if( path ) {
+                        throw CreateError({
+                            code: 2001,
+                            message: '이미 사용 중인 패스 입니다.'
+                        })
+                    }
+
                     const game = await dbs.Game.create( {
                         uid : uuid(),
                         activated : 1,
@@ -86,7 +117,8 @@ class StudioController {
                         title : project.title,
                         version : version.version,
                         url_game : version.url,
-                        control_type : project.control_type
+                        control_type : project.control_type,
+                        url_thumb : project.picture,
                     }, transaction );
                     params.game_id = game.id;
                 }
@@ -108,8 +140,20 @@ class StudioController {
                 await dbs.ProjectVersion.updateVersion( { id : params.deploy_version_id, state : 'deploy' }, transaction );
             }
 
-            await dbs.Project.updateProject( params, transaction );
+            if ( file ) {
+                const webp = await FileManager.convertToWebp(file, 80);
+                const data: any = await FileManager.s3upload(replaceExt(file.name, '.webp'), webp[0].destinationPath, uid);
+                params.picture = data.Location;
 
+                const project = await dbs.Project.getProject( { id : params.id }, transaction );
+                if( project.game_id ) {
+                    await dbs.Game.update({
+                        url_thumb : params.picture
+                    }, {id:project.game_id}, transaction);
+                }
+            }
+
+            await dbs.Project.updateProject( params, transaction );
 
             return await dbs.Project.findOne( { id : params.id }, transaction );
         })
@@ -121,6 +165,8 @@ class StudioController {
         const version = params.version;
         const versionPath = `${project_id}/${uuid()}`;
         const startFile = params.startFile;
+        const description = params.description;
+
         let url = '';
 
         for( let key in files ) {
@@ -147,7 +193,7 @@ class StudioController {
                 const lastVersion = result.rows[ result.rows.length - 1 ];
             }
 
-            return await dbs.ProjectVersion.create( { project_id, version, url, number : result.count + 1, state : 'process'  }, transaction );
+            return await dbs.ProjectVersion.create( { project_id, version, url, description, number : result.count + 1, state : 'process'  }, transaction );
         })
     }
 
@@ -169,6 +215,44 @@ class StudioController {
         })
     }
 
+    adminGetVersions = async  ( params : any, {uid}: IUser )=>{
+        return dbs.ProjectVersion.getTransaction( async (transaction : Transaction)=>{
+            return await dbs.ProjectVersion.findAll( params.where, {
+                include : [{
+                    model: dbs.Project.model,
+                }]
+            }, transaction);
+        })
+    }
+
+    adminGetVersion = async ({ version_id } : any, {uid}: IUser ) => {
+        return dbs.ProjectVersion.getTransaction( async (transaction : Transaction)=>{
+
+            const version = await dbs.ProjectVersion.findOne( {
+                id : version_id
+            }, transaction );
+            const project = await dbs.Project.findOne( {
+                id : version.project_id
+            }, transaction );
+            const developer = await dbs.Developer.findOne( {
+                id : project.developer_id
+            }, transaction );
+
+            return  {
+                version,
+                project,
+                developer
+            }
+        })
+    }
+
+    adminSetVersion = async ( params : any, {uid}: IUser )=>{
+        return dbs.ProjectVersion.getTransaction( async (transaction : Transaction)=>{
+            return await dbs.ProjectVersion.update( params.value, {
+                id : params.version_id
+            }, transaction);
+        })
+    }
 }
 
 

@@ -25,8 +25,8 @@ class ProjectModel extends Model {
         this.model.hasOne(dbs.ProjectVersion.model, { sourceKey : 'deploy_version_id'});
     }
 
-    async create({ developer_id, name } : any, transaction?: Transaction) {
-        return super.create( { developer_id, name }, transaction );
+    async create({ developer_id, name, control_type, description } : any, transaction?: Transaction) {
+        return super.create( { developer_id, name, control_type, description }, transaction );
     }
 
     async getList({ developer_id } : any, transaction?: Transaction) {

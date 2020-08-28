@@ -21,6 +21,8 @@ export default (router: Router) => {
 
 
     router.post(`${apiVer}/studio/version`,   validateFirebaseIdToken, FileManager.uploadImage, convert(StudioController.createVersion));
+    router.post(`${apiVer}/studio/project`,   validateFirebaseIdToken, FileManager.uploadImage, convert(StudioController.updateProject));
+    router.post(`${apiVer}/studio/developer`,   validateFirebaseIdToken, FileManager.uploadImage, convert(StudioController.updateDeveloper));
 
 }
 
@@ -38,4 +40,10 @@ RpcController.generator( 'get-versions', StudioController.getVersions, true );
 RpcController.generator( 'get-version', StudioController.getVersion, true );
 RpcController.generator( 'create-version', StudioController.createVersion, true );
 RpcController.generator( 'set-version', StudioController.updateVersion, true );
+
+RpcController.generator( 'admin-get-versions', StudioController.adminGetVersions, true );
+RpcController.generator( 'admin-get-version', StudioController.adminGetVersion, true );
+RpcController.generator( 'admin-set-version', StudioController.adminSetVersion, true );
+
+
 // RpcController.generator( 'delete-version', StudioController.deleteProject, true );
