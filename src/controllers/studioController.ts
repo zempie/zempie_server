@@ -11,6 +11,14 @@ class StudioController {
     getDeveloper = async (params: any, {uid}: IUser)=>{
         return dbs.Developer.getTransaction( async (transaction : Transaction)=>{
             const user = await dbs.User.findOne({ uid });
+            if( !user ) {
+                // throw CreateError({
+                //     code: 2002,
+                //     message: '유저 정보 찾을 수 없음.'
+                // })
+                return null;
+            }
+
             return await dbs.Developer.getDeveloper( {user_id : user.id}, transaction );
         })
     }
