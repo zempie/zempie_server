@@ -22,18 +22,36 @@ class DeveloperModel extends Model {
         return super.create({ user_id }, transaction);
     }
 
-    async getDeveloper( { id } : any, transaction?: Transaction ) {
+    async getDeveloper( { user_id } : any, transaction?: Transaction ) {
         return this.model.findOne( {
-            where: { id },
+            where: { user_id },
+            include : [
+                {
+                    model: dbs.User.model,
+                }
+            ],
             transaction
         });
     }
 
-    async findDeveloper( { user_id } : any, transaction?: Transaction ) {
+    async findDeveloper( { id } : any, transaction?: Transaction ) {
         return this.model.findOne( {
-            where: { user_id },
+            where: { id },
             Transaction
         } );
+    }
+
+    async updateDeveloper({ user_id, name, picture } : any, transaction?: Transaction) {
+        const developer = await this.getDeveloper( { user_id }, transaction );
+        if( name ) {
+            developer.name = name;
+        }
+
+        if( picture ) {
+            developer.picture = picture;
+        }
+
+        return await developer.save({ transaction });
     }
 }
 

@@ -4,7 +4,8 @@
   "main": "index.js",
   "scripts": {
     "build": "tsc",
-    "start": "tsc && node ./dist/src/run.js"
+    "start": "tsc && node ./dist/src/run.js",
+    "startStudio": "tsc && node ./dist/src/runStudio.js"
   },
   "license": "MIT",
   "dependencies": {

@@ -25,13 +25,18 @@ class ProjectModel extends Model {
         this.model.hasOne(dbs.ProjectVersion.model, { sourceKey : 'deploy_version_id'});
     }
 
-    async create({ developer_id } : any, transaction?: Transaction) {
-        return super.create( { developer_id }, transaction );
+    async create({ developer_id, name } : any, transaction?: Transaction) {
+        return super.create( { developer_id, name }, transaction );
     }
 
     async getList({ developer_id } : any, transaction?: Transaction) {
         return this.model.findAll( {
             where: { developer_id},
+            include: [{
+                model: dbs.Game.model,
+            },{
+                model: dbs.ProjectVersion.model,
+            }],
             transaction
         });
     }
@@ -39,11 +44,14 @@ class ProjectModel extends Model {
     async getProject({ id } : any, transaction?: Transaction) {
         return this.model.findOne( {
             where: { id },
+            include: [{
+                model: dbs.Game.model,
+            }],
             transaction
         });
     }
 
-    async updateProject({ id, name, picture, control_type, description } : any, transaction?: Transaction) {
+    async updateProject({ id, name, picture, control_type, description, game_id, deploy_version_id } : any, transaction?: Transaction) {
         const project = await this.getProject( { id }, transaction );
 
         if( name ) {
@@ -62,19 +70,19 @@ class ProjectModel extends Model {
             project.description = description;
         }
 
-        await project.save( { transaction } );
+        if( game_id ) {
+            project.game_id = game_id;
+        }
+
+        if( deploy_version_id ) {
+            project.deploy_version_id = deploy_version_id;
+        }
+
+        return await project.save( { transaction } );
     }
 
-    async updateGame( { id, game_id } : any, transaction?: Transaction ) {
-        const project = await this.getProject( { id }, transaction );
-        project.game_id = game_id;
-        await project.save({ transaction });
-    }
+    async delete() {
 
-    async updateDeployVersion( { id, version_id } : any, transaction?: Transaction ) {
-        const project = await this.getProject( { id }, transaction );
-        project.deploy_version_id = version_id;
-        await project.save({ transaction });
     }
 }
 

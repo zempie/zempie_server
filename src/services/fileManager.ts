@@ -9,6 +9,7 @@ import * as imageminWebp from 'imagemin-webp';
 import { IUser } from '../controllers/_interfaces';
 import { Fields, Files, IncomingForm } from 'formidable';
 import Opt from '../../config/opt';
+import {getContentType} from "../commons/utils";
 
 AWS.config.loadFromPath('config/aws/credentials.json');
 const s3 = new AWS.S3({ apiVersion: '2006-03-01' });
@@ -81,6 +82,30 @@ class FileManager {
                 Bucket: `${Opt.AWS.Bucket}/${uid}/p`,
                 Key,
                 'ContentType': 'image/*',
+                ACL: 'public-read',
+                Body: fs.createReadStream(filePath),
+            };
+            const upload = new AWS.S3.ManagedUpload({ service: s3, params });
+            upload.send((err, data) => {
+                fs.unlink(filePath, (err) => {
+                    console.log('.webp 삭제')
+                });
+
+                if (err) {
+                    console.error(err);
+                    return reject(err);
+                }
+                resolve(data);
+            })
+        })
+    }
+
+    s3upload2 = (Key: string, filePath: string, uid: string, versionPath : string ) => {
+        return new Promise((resolve, reject) => {
+            const params = {
+                Bucket: `${Opt.AWS.Bucket}/${uid}/p/${versionPath}`,
+                Key,
+                ContentType: getContentType( filePath ),
                 ACL: 'public-read',
                 Body: fs.createReadStream(filePath),
             };
