@@ -29,7 +29,7 @@ module.exports = {
             repo: 'git@192.168.0.36:raptor/platform-api-server.git',
             path: '/home/loki/project/raptor/platform-server-studio',
             ssh_options: '',
-            'post-deploy': 'yarn install && tsc && pm2 startOrRestart ecosystem.config.studio.js --env development'
+            'post-deploy': 'yarn install && tsc && pm2 startOrRestart studio_ecosystem.config.js --env development'
         },
         staging: {
             user: 'loki',
