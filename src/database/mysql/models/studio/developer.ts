@@ -10,6 +10,7 @@ class DeveloperModel extends Model {
             user_id:            { type: DataTypes.INTEGER, allowNull: false },
             name:               { type: DataTypes.STRING(50), allowNull: true },
             picture:            { type: DataTypes.STRING(250), allowNull: true },
+            mileages:   { type: DataTypes.INTEGER.UNSIGNED, allowNull: false, defaultValue: 0 },
         }
     }
 
