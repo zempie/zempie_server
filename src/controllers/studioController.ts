@@ -12,11 +12,10 @@ class StudioController {
         return dbs.Developer.getTransaction( async (transaction : Transaction)=>{
             const user = await dbs.User.findOne({ uid });
             if( !user ) {
-                // throw CreateError({
-                //     code: 2002,
-                //     message: '유저 정보 찾을 수 없음.'
-                // })
-                return null;
+                throw CreateError({
+                    code: 2002,
+                    message: '유저 정보 찾을 수 없음.'
+                })
             }
 
             return await dbs.Developer.getDeveloper( {user_id : user.id}, transaction );
@@ -26,15 +25,16 @@ class StudioController {
     createDeveloper = async (params: any, {uid, name}: IUser) =>{
         return dbs.Developer.getTransaction( async (transaction : Transaction)=>{
             const user = await dbs.User.findOne({ uid });
-            const dev = dbs.Developer.getDeveloper( { user_id : user.id }, transaction );
+            const dev = await dbs.Developer.getDeveloper( { user_id : user.id }, transaction );
             if( dev ) {
                 return dev;
             }
             else {
-                return await dbs.Developer.create( {
+                await dbs.Developer.create( {
                     user_id : user.id,
                     name : name,
                 }, transaction );
+                return await dbs.Developer.getDeveloper( { user_id : user.id } );
             }
         })
     }

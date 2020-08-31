@@ -26,6 +26,9 @@ export default (router: Router) => {
 
 }
 
+
+RpcController.generator('get-user-info',    UserController.getInfo, true);
+
 RpcController.generator( 'get-developer', StudioController.getDeveloper, true );
 RpcController.generator( 'create-developer', StudioController.createDeveloper, true );
 RpcController.generator( 'set-developer', StudioController.updateDeveloper, true );
