@@ -1,6 +1,7 @@
 import * as crypto from 'crypto';
 import cfgOption from '../../config/opt';
 import * as jwt from 'jsonwebtoken';
+const path = require('path');
 
 
 /**
@@ -68,4 +69,38 @@ export function Today(hour = 0, minutes = 0, seconds = 0, milliseconds = 0) {
 export function Yesterday() {
     const now = new Date()
     return new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1)
+}
+
+export function getContentType(file : any) {
+    const ext = path.extname(file);
+    if ( ext.includes('.html') ) {
+        return 'text/html'
+    }
+    else if ( ext.includes('.js') ) {
+        return 'text/javascript'
+    }
+    else if ( ext.includes('.json') ) {
+        return 'application/json'
+    }
+    else if ( ext.includes('.css') ) {
+        return 'text/css'
+    }
+    else if ( ext.includes('.jpg') ) {
+        return 'image/jpeg'
+    }
+    else if ( ext.includes('.png') ) {
+        return 'image/png'
+    }
+    else if ( ext.includes('.webp') ) {
+        return 'image/webp'
+    }
+    else if ( ext.includes('.m4a') ) {
+        return 'audio/x-m4a'
+    }
+    else if ( ext.includes('.mp4') ) {
+        return 'video/mp4'
+    }
+    else {
+        return undefined
+    }
 }

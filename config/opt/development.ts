@@ -1,7 +1,7 @@
 export default {
     Server: {
         http: {
-            port: 8280,
+            port: 8281,
         },
         ws: {
             port: 8280,

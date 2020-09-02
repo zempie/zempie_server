@@ -11,10 +11,12 @@ class ProjectVersionModel extends Model {
         this.name = 'projectVersion';
         this.attributes = {
             project_id:         { type: DataTypes.INTEGER, allowNull: false },
+            number:             { type: DataTypes.INTEGER, allowNull: false },
             version:            { type: DataTypes.STRING(20), defaultValue: '0.0.1' },
             state:              { type: DataTypes.STRING(20), allowNull: false, defaultValue: 'none' },
             url:                { type: DataTypes.STRING, allowNull: true },
             description:        { type: DataTypes.STRING, allowNull: true },
+            reason:             { type: DataTypes.STRING, allowNull: true },
         }
     }
 
@@ -22,8 +24,8 @@ class ProjectVersionModel extends Model {
         this.model.belongsTo(dbs.Project.model);
     }
 
-    async create( { project_id, version} : any, transaction?: Transaction ) {
-        return super.create( { project_id, version }, transaction );
+    async create( { project_id, version, url, description, number, state} : any, transaction?: Transaction ) {
+        return super.create( { project_id, version, url, description, number, state }, transaction );
     }
 
     async getList( {project_id} : any, transaction?: Transaction ) {

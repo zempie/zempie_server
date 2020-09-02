@@ -28,28 +28,37 @@ class RpcController {
             'Last-Modified': (new Date()).toUTCString()
         });
 
-        const rpcMethod = this.methods[data.method];
-        if ( !rpcMethod ) {
+        try {
+            const rpcMethod = this.methods[data.method];
+            if ( !rpcMethod ) {
+                return onError({
+                    code: -32601,
+                    message: 'Method not found: ' + data.method,
+                    data: null
+                }, 404);
+            }
+
+            // if ok
+            let user = await this.validateFirebaseIdToken(req);
+            if ( rpcMethod.auth && !user ) {
+                const e: any = CreateError(ErrorCodes.UNAUTHORIZED);
+                return onFailure({
+                    code: -32603,
+                    message: e.message,
+                    data: e
+                });
+            }
+
+            const result = await rpcMethod.method(data.params, user);
+            return onSuccess(result);
+        }
+        catch( e ) {
             return onError({
                 code: -32601,
-                message: 'Method not found: ' + data.method,
+                message: e.message,
                 data: null
             }, 404);
         }
-
-        // if ok
-        let user = await this.validateFirebaseIdToken(req);
-        if ( rpcMethod.auth && !user ) {
-            const e: any = CreateError(ErrorCodes.UNAUTHORIZED);
-            return onFailure({
-                code: -32603,
-                message: e.message,
-                data: e
-            });
-        }
-
-        const result = await rpcMethod.method(data.params, user);
-        return onSuccess(result);
 
 
         function onSuccess(result: any) {

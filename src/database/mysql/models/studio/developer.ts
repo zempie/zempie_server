@@ -10,6 +10,7 @@ class DeveloperModel extends Model {
             user_id:            { type: DataTypes.INTEGER, allowNull: false },
             name:               { type: DataTypes.STRING(50), allowNull: true },
             picture:            { type: DataTypes.STRING(250), allowNull: true },
+            mileages:   { type: DataTypes.INTEGER.UNSIGNED, allowNull: false, defaultValue: 0 },
         }
     }
 
@@ -18,22 +19,40 @@ class DeveloperModel extends Model {
         this.model.hasMany(dbs.Project.model);
     }
 
-    async create({ user_id } : any, transaction?: Transaction) {
-        return super.create({ user_id }, transaction);
+    async create({ user_id, name } : any, transaction?: Transaction) {
+        return super.create({ user_id, name }, transaction);
     }
 
-    async getDeveloper( { id } : any, transaction?: Transaction ) {
+    async getDeveloper( { user_id } : any, transaction?: Transaction ) {
         return this.model.findOne( {
-            where: { id },
+            where: { user_id },
+            include : [
+                {
+                    model: dbs.User.model,
+                }
+            ],
             transaction
         });
     }
 
-    async findDeveloper( { user_id } : any, transaction?: Transaction ) {
+    async findDeveloper( { id } : any, transaction?: Transaction ) {
         return this.model.findOne( {
-            where: { user_id },
+            where: { id },
             Transaction
         } );
+    }
+
+    async updateDeveloper({ user_id, name, picture } : any, transaction?: Transaction) {
+        const developer = await this.getDeveloper( { user_id }, transaction );
+        if( name ) {
+            developer.name = name;
+        }
+
+        if( picture ) {
+            developer.picture = picture;
+        }
+
+        return await developer.save({ transaction });
     }
 }
 
