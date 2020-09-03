@@ -82,7 +82,7 @@ class FileManager {
                 Bucket: `${Opt.AWS.Bucket}/${uid}/p`,
                 Key,
                 'ContentType': 'image/*',
-                ACL: 'public-read',
+                // ACL: 'public-read',
                 Body: fs.createReadStream(filePath),
             };
             const upload = new AWS.S3.ManagedUpload({ service: s3, params });
@@ -106,7 +106,7 @@ class FileManager {
                 Bucket: `${Opt.AWS.Bucket}/${uid}/p/${versionPath}`,
                 Key,
                 ContentType: getContentType( filePath ),
-                ACL: 'public-read',
+                // ACL: 'public-read',
                 Body: fs.createReadStream(filePath),
             };
             const upload = new AWS.S3.ManagedUpload({ service: s3, params });
