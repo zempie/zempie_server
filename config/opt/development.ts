@@ -1,7 +1,7 @@
 export default {
     Server: {
         http: {
-            port: 8281,
+            port: 8280,
         },
         ws: {
             port: 8280,
@@ -13,6 +13,12 @@ export default {
             //     key: fs.readFileSync('key.pem'),
             //     cert: fs.readFileSync('cert.pem')
             // },
+        },
+        studio: {
+            port: 8281,
+        },
+        admin: {
+            port: 8299,
         },
     },
 

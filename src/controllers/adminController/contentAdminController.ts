@@ -1,10 +1,11 @@
-import { IAdmin, IGame } from './_interfaces';
-import { dbs } from '../commons/globals';
-import NotifyService from '../services/notifyService';
-import Opt from '../../config/opt'
+import { IAdmin } from '../_interfaces';
+import { dbs } from '../../commons/globals';
+import NotifyService from '../../services/notifyService';
+import Opt from '../../../config/opt'
 const { Url, Deploy } = Opt;
 
-class AdminController {
+
+class ContentAdminController {
     async getProjects(params: any, admin: IAdmin) {
 
     }
@@ -43,4 +44,4 @@ class AdminController {
     }
 }
 
-export default new AdminController()
+export default new ContentAdminController()

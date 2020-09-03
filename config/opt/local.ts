@@ -7,12 +7,18 @@ export default {
             port: 8280,
         },
         Secure: {
-            https: false,
-            port: 8281,
+            // https: false,
+            // port: 8281,
             // options: {
             //     key: fs.readFileSync('key.pem'),
             //     cert: fs.readFileSync('cert.pem')
             // },
+        },
+        studio: {
+            port: 8281,
+        },
+        admin: {
+            port: 8299,
         },
     },
 

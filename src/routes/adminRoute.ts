@@ -1,7 +1,8 @@
 import { Request, Response, Router } from 'express';
 import convert from '../controllers/_convert';
-import AdminController from '../controllers/adminController';
+import AdminController from '../controllers/adminController/contentAdminController';
 import RpcController from '../controllers/rpcController';
+import StudioAdminController from '../controllers/adminController/studioAdminController';
 
 
 const apiVer = `/api/v1`;
@@ -25,8 +26,12 @@ export default (router: Router) => {
 
 RpcController.generator('admin-get-projects',   AdminController.getProjects);
 RpcController.generator('admin-get-tokens',     AdminController.getProjects);
-
 RpcController.generator('admin-get-users',      AdminController.getUsers);
 RpcController.generator('admin-get-games',      AdminController.getGames);
-
 RpcController.generator('admin-notify',         AdminController.notify);
+
+
+
+RpcController.generator( 'admin-get-versions', StudioAdminController.getVersions, true );
+RpcController.generator( 'admin-get-version', StudioAdminController.getVersion, true );
+RpcController.generator( 'admin-set-version', StudioAdminController.setVersion, true );

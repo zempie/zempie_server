@@ -1,10 +1,10 @@
 import { IServerOptions } from './commons/interfaces'
-import StudioServer from './servers/studioServer';
+import AdminServer from './servers/adminServer';
 import cfgOption from '../config/opt';
 
 
 (async () => {
-    const apiServer = new StudioServer();
+    const apiServer = new AdminServer();
 
     const options : IServerOptions = {
         tcp: false,
@@ -13,7 +13,7 @@ import cfgOption from '../config/opt';
         ],
     };
     await apiServer.initialize(options);
-    await apiServer.start(options, cfgOption.Server.studio.port);
+    await apiServer.start(options, cfgOption.Server.admin.port);
 
 
 })();
