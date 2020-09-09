@@ -152,6 +152,7 @@ class UserModel extends Model {
                 }
             },
             include: [{
+                as: 'profile',
                 model: dbs.UserProfile.model,
                 attributes: {
                     exclude: ['createdAt', 'updatedAt', 'deleted_at'],

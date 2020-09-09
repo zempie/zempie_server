@@ -17,7 +17,7 @@ class UserProfileModel extends Model {
             state_msg:      { type: DataTypes.STRING(100) },
             following_cnt:  { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0 },
             followers_cnt:  { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0 },
-            points:         { type: DataTypes.INTEGER.UNSIGNED, allowNull: false, defaultValue: 0 },
+            // points:         { type: DataTypes.INTEGER.UNSIGNED, allowNull: false, defaultValue: 0 },
         };
     }
 

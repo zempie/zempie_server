@@ -15,6 +15,7 @@ class DeveloperModel extends Model {
     }
 
     async afterSync(): Promise<void> {
+        await super.afterSync()
         this.model.belongsTo(dbs.User.model);
         this.model.hasMany(dbs.Project.model);
     }

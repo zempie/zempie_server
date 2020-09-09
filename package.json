@@ -5,7 +5,8 @@
   "scripts": {
     "build": "tsc",
     "start": "tsc && node ./dist/src/run.js",
-    "startStudio": "tsc && node ./dist/src/runStudio.js"
+    "startStudio": "tsc && node ./dist/src/runStudio.js",
+    "startAdmin": "tsc && node ./dist/src/runAdmin.js"
   },
   "license": "MIT",
   "dependencies": {

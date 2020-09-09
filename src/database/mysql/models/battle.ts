@@ -29,10 +29,10 @@ class BattleModel extends Model {
             },
             include: [{
                 model: dbs.User.model,
-                attributes: ['user_uid', 'name', 'picture'],
+                attributes: ['uid', 'name', 'picture'],
             }, {
                 model: dbs.Game.model,
-                attributes: ['uid', 'pathname', 'title', 'version', 'main_ratio', 'control_type',
+                attributes: ['uid', 'pathname', 'title', 'version', 'control_type',
                 'genre_arcade', 'genre_puzzle', 'genre_sports', 'genre_racing', 'url_game', 'url_thumb', 'url_title']
             }]
         });
