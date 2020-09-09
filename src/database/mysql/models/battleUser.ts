@@ -22,7 +22,6 @@ class BattleUserModel extends Model {
     }
 
 
-
     async findOrCreate(where: any, transaction?: Transaction) {
         let record = await this.model.findOne({
             where,

@@ -35,6 +35,19 @@ export const ErrorCodes = {
         message: '공지사항 ID 오류'
     },
 
+    INVALID_ADMIN_USERNAME: {
+        code: 1201,
+        message: '관리자 로그인 오류'
+    },
+    INVALID_ADMIN_PASSWORD: {
+        code: 1202,
+        message: '관리자 로그인 오류'
+    },
+    INVALID_ADMIN_REFRESH_TOKEN: {
+        code: 1203,
+        message: '관리자 토큰 오류'
+    },
+
     INVALID_TIMELINE_USER_UID: {
         code: 1210,
         message: '타임라인 유저 아이디 오류'

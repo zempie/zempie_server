@@ -24,6 +24,10 @@ export default (router: Router) => {
     router.post(`${apiVer}/admin/notify`,   isAdmin,    convert(AdminController.notify));
 }
 
+RpcController.generator('admin-login',          AdminController.login);
+RpcController.generator('admin-logout',         AdminController.logout);
+RpcController.generator('admin-refresh-token',  AdminController.getAccessTokens);
+
 RpcController.generator('admin-get-projects',   AdminController.getProjects);
 RpcController.generator('admin-get-tokens',     AdminController.getProjects);
 RpcController.generator('admin-get-users',      AdminController.getUsers);
