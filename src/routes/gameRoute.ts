@@ -5,6 +5,7 @@ import RpcController from '../controllers/rpcController';
 import GameController from '../controllers/gameController';
 import BattleController from '../controllers/battleController';
 import AdController from '../controllers/adController';
+import LauncherController from '../controllers/launcherController';
 
 
 const apiVer = `/api/v1`;
@@ -44,3 +45,8 @@ RpcController.generator('battle-host',          BattleController.hostBattle, tru
 RpcController.generator('battle-start',         BattleController.gameStart);
 RpcController.generator('battle-over',          BattleController.gameOver);
 RpcController.generator('battle-update-name',   BattleController.updateUserName);
+
+
+RpcController.generator('launcher-game',        LauncherController.getGame);
+RpcController.generator('launcher-battle',      LauncherController.getBattleGame);
+RpcController.generator('launcher-share',       LauncherController.getSharedGame);

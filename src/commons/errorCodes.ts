@@ -83,6 +83,11 @@ export const ErrorCodes = {
     REJECT_USE_ITEM: {
         code: 2103,
         message: '아이템 사용 오류',
+    },
+
+
+    INVALID_QNA_PARAMS: {
+        message: 'QnA 파라미터 오류'
     }
 };
 

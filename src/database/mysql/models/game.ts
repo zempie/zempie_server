@@ -60,6 +60,24 @@ class GameModel extends Model {
 
         // return _.map(records, (record: any) => record.get({ plain: true }))
     }
+
+
+    async getInfo(uid: string) {
+        const record = await this.model.findOne({
+            where: { uid },
+            attributes: {
+                exclude: ['id', 'created_at', 'updated_at', 'deleted_at']
+            },
+            include: [{
+                model: dbs.Developer.model,
+                attributes: {
+                    exclude: ['id', 'created_at', 'updated_at', 'deleted_at']
+                },
+            }],
+        })
+
+        return record.get({ plain: true })
+    }
 }
 
 

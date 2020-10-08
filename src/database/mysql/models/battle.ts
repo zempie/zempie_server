@@ -17,7 +17,7 @@ class BattleModel extends Model {
     }
 
     async afterSync(): Promise<void> {
-        this.model.belongsTo(dbs.User.model, { foreignKey: 'user_uid', targetKey: 'uid' });
+        this.model.belongsTo(dbs.User.model, { foreignKey: 'user_uid', targetKey: 'uid', as: 'host' });
         this.model.belongsTo(dbs.Game.model, { foreignKey: 'game_uid', targetKey: 'uid' });
     }
 
@@ -38,6 +38,30 @@ class BattleModel extends Model {
         });
 
         return record.get({ plain: true });
+    }
+
+
+    async getInfo(uid: string) {
+        const record = await this.model.findOne({
+            where: { uid },
+            attributes: {
+                exclude: ['id', 'created_at', 'updated_at', 'deleted_at']
+            },
+            include: [{
+                model: dbs.User.model,
+                as: 'host',
+                attributes: {
+                    exclude: ['id', 'created_at', 'updated_at', 'deleted_at']
+                },
+            }, {
+                model: dbs.Game.model,
+                attributes: {
+                    exclude: ['id', 'created_at', 'updated_at', 'deleted_at']
+                },
+            }]
+        })
+
+        return record.get({ plain: true })
     }
 }
 
