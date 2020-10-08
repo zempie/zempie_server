@@ -1,7 +1,13 @@
 import { dbs } from '../commons/globals';
+import { IUser } from './_interfaces';
+import Opt from '../../config/opt';
+const { Url, Deploy } = Opt;
+
 
 interface ILauncherParams {
     uid: string
+    game_id: number
+    game_uid: string
 }
 
 
@@ -16,16 +22,40 @@ class LauncherController {
 
 
     async getBattleGame({ uid }: ILauncherParams) {
-        const game = await dbs.Battle.getInfo(uid);
+        const battle = await dbs.Battle.getInfo(uid);
 
         return {
-            game
+            battle_uid: battle.uid,
+            battle: {
+                uid: battle.uid,
+                title: battle.title,
+                user_count: battle.user_count,
+                end_at: battle.end_at,
+            },
+            game: battle.game,
+            host: battle.host,
         }
     }
 
 
     async getSharedGame({ uid }: ILauncherParams) {
-        
+        const sg = await dbs.SharedGame.getInfo(uid);
+
+        return {
+            game: sg.game,
+        }
+    }
+
+
+    /**
+     *
+     */
+    async getSharedUrl({ game_uid }: ILauncherParams, { uid: user_uid }: IUser) {
+        const uid = await dbs.SharedGame.getSharedUid({ user_uid, game_uid });
+
+        return {
+            shared_url: `${Url.Shared}/${uid}`
+        }
     }
 }
 

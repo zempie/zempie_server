@@ -46,7 +46,3 @@ RpcController.generator('battle-start',         BattleController.gameStart);
 RpcController.generator('battle-over',          BattleController.gameOver);
 RpcController.generator('battle-update-name',   BattleController.updateUserName);
 
-
-RpcController.generator('launcher-game',        LauncherController.getGame);
-RpcController.generator('launcher-battle',      LauncherController.getBattleGame);
-RpcController.generator('launcher-share',       LauncherController.getSharedGame);

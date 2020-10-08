@@ -8,6 +8,7 @@ import { fetchHelper } from '../services/fetchHelper';
 import gameRoute from "../routes/gameRoute";
 import ExchangeManager from '../services/exchangeManager';
 import scheduleService from "../services/scheduleService";
+import launcherRoute from '../routes/launcherRoute';
 
 class ApiServer extends Server {
     private timer: any;
@@ -19,6 +20,7 @@ class ApiServer extends Server {
         userRoute(app);
         contentRoute(app);
         gameRoute(app);
+        launcherRoute(app);
 
         // scheduleService.start()
         ExchangeManager.start()
