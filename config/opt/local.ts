@@ -27,7 +27,7 @@ export default {
         DeployApiV1: 'http://192.168.0.196:8288/api/v1',
         GameClient: 'http://localhost:8080/#/play',
         Redirect: 'http://localhost:8280/game',
-        Shared: 'http://localhost:8280/shared',
+        Launcher: 'http://launcher.zempie.com',
     },
 
     Deploy: {

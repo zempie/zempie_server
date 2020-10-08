@@ -1,3 +1,4 @@
+import * as uniqid from 'uniqid';
 import { dbs } from '../commons/globals';
 import { IUser } from './_interfaces';
 import Opt from '../../config/opt';
@@ -54,7 +55,25 @@ class LauncherController {
         const uid = await dbs.SharedGame.getSharedUid({ user_uid, game_uid });
 
         return {
-            shared_url: `${Url.Shared}/${uid}`
+            shared_uid: uid,
+            shared_url: `${Url.Launcher}/shared/${uid}`
+        }
+    }
+
+
+    async getBattleUrl({ game_uid }: ILauncherParams, { uid: user_uid }: IUser) {
+        const uid = uniqid();
+
+        await dbs.Battle.create({
+            uid,
+            user_uid,
+            game_uid,
+            end_at: Date.now() + (1000 * 60 * 10),
+        })
+
+        return {
+            battle_uid: uid,
+            battle_url: `${Url.Launcher}/battle/${uid}`
         }
     }
 }
