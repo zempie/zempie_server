@@ -14,6 +14,7 @@ class ProjectModel extends Model {
             description:        { type: DataTypes.STRING, defaultValue: '' },
             game_id:            { type: DataTypes.INTEGER, allowNull: true },
             deploy_version_id:  { type: DataTypes.INTEGER, allowNull: true },
+            update_version_id:  { type: DataTypes.INTEGER, allowNull: true },
         }
     }
 
@@ -23,6 +24,7 @@ class ProjectModel extends Model {
 
         this.model.belongsTo( dbs.Game.model );
         this.model.hasOne(dbs.ProjectVersion.model, { sourceKey : 'deploy_version_id'});
+        this.model.hasOne(dbs.ProjectVersion.model, { sourceKey : 'update_version_id'});
     }
 
     async create({ developer_id, name, control_type, description } : any, transaction?: Transaction) {
@@ -72,7 +74,7 @@ class ProjectModel extends Model {
 
         if( game_id ) {
             project.game_id = game_id;
-        }
+        }0
 
         if( deploy_version_id ) {
             project.deploy_version_id = deploy_version_id;

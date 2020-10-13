@@ -7,22 +7,40 @@ import { v4 as uuid } from 'uuid';
 
 const replaceExt = require('replace-ext');
 
+const ERROR_STUDIO = {
+    NOT_FIND_USER : {
+        code: 2001,
+        message: '유저 정보 찾을 수 없음.'
+    },
+    NOT_FIND_DEVELOPER : {
+        code: 2002,
+        message: '개발자 정보 찾을 수 없음.'
+    },
+    ALREADY_EXIST_GAME_PATH : {
+        code: 2101,
+        message: '이미 존재하는 게임 경로 입니다.'
+    },
+    INVALID_VERSION_FILE : {
+        code: 2102,
+        message: '업로드된 게임 파일이 없습니다.'
+    },
+
+}
+
+
 class StudioController {
     getDeveloper = async (params: any, {uid}: IUser)=>{
         return dbs.Developer.getTransaction( async (transaction : Transaction)=>{
             const user = await dbs.User.findOne({ uid });
             if( !user ) {
-                throw CreateError({
-                    code: 2002,
-                    message: '유저 정보 찾을 수 없음.'
-                })
+                throw CreateError(ERROR_STUDIO.NOT_FIND_USER)
             }
 
             return await dbs.Developer.getDeveloper( {user_id : user.id}, transaction );
         })
     }
 
-    createDeveloper = async (params: any, {uid, name}: IUser) =>{
+    createDeveloper = async (params: any, {uid, name}: IUser, {file} : any) =>{
         return dbs.Developer.getTransaction( async (transaction : Transaction)=>{
             const user = await dbs.User.findOne({ uid });
             const dev = await dbs.Developer.getDeveloper( { user_id : user.id }, transaction );
@@ -30,9 +48,18 @@ class StudioController {
                 return dev;
             }
             else {
+
+                let picture = undefined;
+                if( file ) {
+                    const webp = await FileManager.convertToWebp(file, 80);
+                    const data: any = await FileManager.s3upload(replaceExt(file.name, '.webp'), webp[0].destinationPath, uid);
+                    picture = data.Location;
+                }
+
                 await dbs.Developer.create( {
                     user_id : user.id,
                     name : name,
+                    picture
                 }, transaction );
                 return await dbs.Developer.getDeveloper( { user_id : user.id } );
             }
@@ -87,6 +114,70 @@ class StudioController {
         })
     }
 
+    /*
+
+    프로젝트 생성, 버전 생성,
+     */
+    createProjectAll = async ( params : { name : string, control_type : number, description : string, startFile : string }, {uid}: IUser, files: any)=>{
+
+        if( !files ) {
+            throw CreateError(ERROR_STUDIO.INVALID_VERSION_FILE)
+        }
+
+        const user = await dbs.User.findOne({ uid });
+        if( !user ) {
+            throw CreateError(ERROR_STUDIO.NOT_FIND_USER)
+        }
+
+        const dev = await dbs.Developer.getDeveloper( {user_id : user.id} );
+        if( !dev ) {
+            throw CreateError(ERROR_STUDIO.NOT_FIND_DEVELOPER)
+        }
+
+
+        return dbs.Project.getTransaction( async (transaction : Transaction)=>{
+
+            let picture = undefined;
+            const picFile = files[ 'project_picture' ];
+            if( picFile ) {
+                const webp = await FileManager.convertToWebp(picFile, 80);
+                const data: any = await FileManager.s3upload(replaceExt(picFile.name, '.webp'), webp[0].destinationPath, uid);
+                picture = data.Location;
+            }
+
+            const project =  await dbs.Project.create( {
+                name: params.name,
+                control_type : params.control_type,
+                description : params.description,
+                developer_id : dev.id,
+                picture
+            }, transaction );
+
+            const versionPath = `${project.id}/${uuid()}`;
+
+            const versionFiles = files.filter( (file : any) => file.includes('file_') );
+            const version_url = await uploadVersionFile( versionFiles, uid, versionPath, params.startFile );
+            const versionString = new Version().nextPatch();
+
+            const version = dbs.ProjectVersion.create( {
+                project_id : project.id,
+                version : versionString,
+                url : version_url,
+                description : params.description,
+                number : 1,
+                state : 'process'
+            }, transaction );
+
+            project.update_version_id = version.id;
+            await project.save({transaction});
+            return project;
+        });
+    }
+
+    updateProjectAll = async (params : any, {uid}: IUser)=>{
+
+    }
+
     deleteProject = async  ( params : any, {uid}: IUser )=>{
         return dbs.Project.getTransaction( async (transaction : Transaction)=>{
 
@@ -110,10 +201,7 @@ class StudioController {
                     }, transaction );
 
                     if( path ) {
-                        throw CreateError({
-                            code: 2001,
-                            message: '이미 사용 중인 패스 입니다.'
-                        })
+                        throw CreateError(ERROR_STUDIO.ALREADY_EXIST_GAME_PATH)
                     }
 
                     const game = await dbs.Game.create( {
@@ -139,7 +227,9 @@ class StudioController {
                     if( params.control_type !== undefined ) {
                         value.control_type = params.control_type;
                     }
+
                     const game = await dbs.Game.update(value, {id:game_id}, transaction);
+
                 }
 
                 if( project.deploy_version_id ) {
@@ -175,19 +265,7 @@ class StudioController {
         const startFile = params.startFile;
         const description = params.description;
 
-        let url = '';
-
-        for( let key in files ) {
-            const file = files[key];
-            const data = await FileManager.s3upload2(
-                file.name, file.path, uid, versionPath
-            ) as any;
-
-            if( file.name === startFile ) {
-                url = data.Location;
-            }
-        }
-
+        const url = await uploadVersionFile( files, uid, versionPath, startFile );
 
         // const data: any = await FileManager.s3upload(replaceExt(file.name, '.webp'), webp[0].destinationPath, uid);
         return dbs.ProjectVersion.getTransaction( async (transaction : Transaction)=>{
@@ -265,3 +343,49 @@ class StudioController {
 
 
 export default new StudioController();
+
+class Version {
+
+    major : number = 0;
+    minor : number = 0;
+    patch : number = 0;
+
+    constructor( ver : string = '' ) {
+        if( ver ) {
+            const split = ver.split('.');
+            if( split.length >= 3 ) {
+                this.major = Number(split[0]);
+                this.minor = Number(split[1]);
+                this.patch = Number(split[2]);
+            }
+        }
+    }
+
+    nextPatch() {
+        return `${this.major}.${this.minor}.${this.patch + 1}`;
+    }
+
+    toString() : string {
+        return `${this.major}.${this.minor}.${this.patch}`;
+    }
+
+}
+
+async function uploadVersionFile( files : any, uid : string, versionPath : string, startFile : string ) {
+
+    let url = '';
+    for( let key in files ) {
+        const file = files[key];
+        const data = await FileManager.s3upload2(
+            file.name, file.path, uid, versionPath
+        ) as any;
+
+        if( file.name === startFile ) {
+            url = data.Location;
+        }
+    }
+
+    return new Promise(function (resolve) {
+        resolve(url);
+    });
+}
