@@ -39,7 +39,7 @@ class GameModel extends Model {
     }
 
     async afterSync(): Promise<void> {
-        this.model.belongsTo(dbs.Developer.model, { foreignKey: 'developer_id', targetKey: 'id', as: 'developer' });
+        this.model.belongsTo(dbs.Developer.model, { foreignKey: 'developer_id', targetKey: 'id' });
     }
 
 
@@ -54,7 +54,6 @@ class GameModel extends Model {
             },
             include: [{
                 model: dbs.Developer.model,
-                as: 'developer',
             }]
         })
 
