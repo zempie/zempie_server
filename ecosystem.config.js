@@ -29,7 +29,7 @@ module.exports = {
             repo: 'git@192.168.0.36:raptor/platform-api-server.git',
             path: '/home/loki/project/raptor/platform-server',
             ssh_options: '',
-            'post-deploy': 'yarn install && tsc && pm2 startOrRestart ecosystem.config.js --env development'
+            'post-deploy': 'npm install && tsc && pm2 startOrRestart ecosystem.config.js --env development'
         },
         staging: {
             user: 'loki',
@@ -38,7 +38,7 @@ module.exports = {
             repo: 'git@192.168.0.36:raptor/platform-api-server.git',
             path: '/home/loki/project/raptor/platform-server',
             ssh_options: '',
-            'post-deploy': 'yarn install && tsc && pm2 startOrRestart ecosystem.config.js --env staging && pm2 startOrRestart admin_ecosystem.config.js --env staging'
+            'post-deploy': 'npm install && tsc && pm2 startOrRestart ecosystem.config.js --env staging && pm2 startOrRestart admin_ecosystem.config.js --env staging'
         }
     }
 };
