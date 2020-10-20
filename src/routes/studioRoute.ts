@@ -4,21 +4,21 @@ import {validateFirebaseIdToken} from "./_common";
 import FileManager from "../services/fileManager";
 import convert from "../controllers/_convert";
 import UserController from "../controllers/userController";
-import StudioController  from '../controllers/studioController';
+import StudioController  from '../controllers/studio/studioController';
 import StudioAdminController from '../controllers/adminController/studioAdminController';
 
 
 const apiVer = `/api/v1`;
 
 export default (router: Router) => {
+    router.post(`${apiVer}/studio/developer`,   validateFirebaseIdToken, FileManager.uploadImage, convert(StudioController.createDeveloper));
     router.post(`${apiVer}/studio/version`,     validateFirebaseIdToken, FileManager.uploadImage, convert(StudioController.createVersion));
     router.post(`${apiVer}/studio/project`,     validateFirebaseIdToken, FileManager.uploadImage, convert(StudioController.updateProject));
-    router.post(`${apiVer}/studio/developer`,   validateFirebaseIdToken, FileManager.uploadImage, convert(StudioController.updateDeveloper));
+    router.put(`${apiVer}/studio/developer`,   validateFirebaseIdToken, FileManager.uploadImage, convert(StudioController.updateDeveloper));
 }
 
-
 RpcController.generator( 'get-developer', StudioController.getDeveloper, true );
-RpcController.generator( 'create-developer', StudioController.createDeveloper, true );
+// RpcController.generator( 'create-developer', StudioController.createDeveloper, true );
 RpcController.generator( 'set-developer', StudioController.updateDeveloper, true );
 
 RpcController.generator( 'get-projects', StudioController.getProjects, true );

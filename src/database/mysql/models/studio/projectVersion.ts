@@ -17,6 +17,7 @@ class ProjectVersionModel extends Model {
             url:                { type: DataTypes.STRING, allowNull: true },
             description:        { type: DataTypes.STRING, allowNull: true },
             reason:             { type: DataTypes.STRING, allowNull: true },
+            autoDeploy:         { type: DataTypes.BOOLEAN, defaultValue: false },
         }
     }
 
@@ -24,27 +25,33 @@ class ProjectVersionModel extends Model {
         this.model.belongsTo(dbs.Project.model);
     }
 
-    async create( { project_id, version, url, description, number, state} : any, transaction?: Transaction ) {
-        return super.create( { project_id, version, url, description, number, state }, transaction );
+    async create( { project_id, version, url, description, number, state, autoDeploy } : any, transaction?: Transaction ) {
+
+        const value : any = {
+            project_id,
+            version,
+            url,
+            number
+        }
+
+        if( description ) {
+            value.description = description;
+        }
+
+        if( state ) {
+            value.state = state;
+        }
+
+        if( autoDeploy === false || autoDeploy ) {
+            value.autoDeploy = autoDeploy
+        }
+
+        return super.create( value, transaction );
     }
 
-    async getList( {project_id} : any, transaction?: Transaction ) {
-        return this.model.findAll( {
-            where: { project_id },
-            transaction
-        });
-    }
+    async updateVersion( { id, state, url, description, reason, autoDeploy } : any, transaction?: Transaction ) {
+        const version = await this.model.findOne( { id }, transaction );
 
-    async getVersion( { id } : any, transaction?: Transaction) {
-        return this.model.findOne({
-            where: {
-                id
-            }
-        });
-    }
-
-    async updateVersion( {id, state, url, description} : any, transaction?: Transaction ) {
-        const version = await this.getVersion( { id }, transaction );
 
         if( url ) {
             version.url = url;
@@ -56,6 +63,14 @@ class ProjectVersionModel extends Model {
 
         if( description ) {
             version.description = description;
+        }
+
+        if( reason ) {
+            version.reason = reason;
+        }
+
+        if( autoDeploy === false || autoDeploy ) {
+            version.autoDeploy = autoDeploy;
         }
 
         await version.save({ transaction });

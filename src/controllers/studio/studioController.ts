@@ -1,0 +1,440 @@
+import {IUser} from "../_interfaces";
+import { dbs, caches } from '../../commons/globals';
+import {Transaction} from "sequelize";
+import {CreateError, ErrorCodes} from "../../commons/errorCodes";
+import FileManager from "../../services/fileManager";
+import { v4 as uuid } from 'uuid';
+
+const replaceExt = require('replace-ext');
+
+const ERROR_STUDIO = {
+    NOT_FIND_USER : {
+        code: 2001,
+        message: '유저 정보를 찾을 수 없습니다.'
+    },
+    NOT_FIND_DEVELOPER : {
+        code: 2002,
+        message: '개발자 정보를 찾을 수 없습니다.'
+    },
+    ALREADY_EXIST_GAME_PATH : {
+        code: 2101,
+        message: '이미 존재하는 게임 경로 입니다.'
+    },
+    INVALID_VERSION_FILE : {
+        code: 2102,
+        message: '업로드된 게임 파일이 없습니다.'
+    },
+    INVALID_PROJECT_ID : {
+        code: 2103,
+        message: '프로젝트'
+    },
+    ACTIVE_VERSION : {
+        code : 2104,
+        message: '사용중인 버전 입니다.',
+    },
+    ALREADY_EXIST_UPDATE_VERSION : {
+        code : 2105,
+        message: '이미 등록된 버전이 있습니다.',
+    },
+}
+
+interface IProject {
+    name : string,
+    developer_id? : number,
+    description? : string,
+    picture? : string,
+    updateVersion? : IVersion,
+    pathname : string,
+}
+
+interface IVersion {
+    project_id : number,
+    startFile? : string,
+    version? : string,
+    url? : string,
+    description? : string,
+    number? : number,
+    state? : string,
+    autoDeploy? : boolean
+}
+
+class StudioController {
+    getDeveloper = async (params: any, {uid}: IUser)=>{
+        const user = await dbs.User.findOne({ uid });
+        if( !user ) {
+            throw CreateError(ERROR_STUDIO.NOT_FIND_USER)
+        }
+
+        return await dbs.Developer.findOne( {user_id : user.id} );
+    }
+
+    createDeveloper = async (params: any, { uid }: IUser, {file} : any) =>{
+        return dbs.Developer.getTransaction( async (transaction : Transaction) => {
+            const user = await dbs.User.findOne({ uid });
+            const dev = await dbs.Developer.findOne( { user_id : user.id } );
+            if( dev ) {
+                return dev;
+            }
+            else {
+
+                let picture = params.picture || undefined;
+                if( file ) {
+                    const webp = await FileManager.convertToWebp(file, 80);
+                    const data: any = await FileManager.s3upload(replaceExt(file.name, '.webp'), webp[0].destinationPath, uid);
+                    picture = data.Location;
+                }
+
+                return await dbs.Developer.create( {
+                    user_id : user.id,
+                    user_uid : uid,
+                    name : params.name,
+                    picture
+                }, transaction );
+            }
+        })
+    }
+
+    updateDeveloper = async  (params: any, { uid }: IUser, {file} : any) =>{
+        return dbs.Developer.getTransaction( async (transaction : Transaction)=>{
+            params = params || {};
+            params.user_uid = uid;
+
+            if ( file ) {
+                const webp = await FileManager.convertToWebp(file, 80);
+                const data: any = await FileManager.s3upload(replaceExt(file.name, '.webp'), webp[0].destinationPath, uid);
+                params.picture = data.Location;
+            }
+
+            return await dbs.Developer.updateDeveloper( params, transaction ) ;
+        })
+    }
+
+    getProjects = async ( params : any, {uid}: IUser )=>{
+        // const user = await dbs.User.findOne({ uid });
+        const dev = await dbs.Developer.findOne( { user_uid : uid } );
+        if( !dev ) {
+            //등록된 개발자 찾을수 없음
+            throw CreateError(ERROR_STUDIO.NOT_FIND_DEVELOPER);
+        }
+
+        return await dbs.Project.getProjects( { developer_id : dev.id } );
+    }
+
+    getProject = async ( params : any, { uid }: IUser )=>{
+
+        if( !params.id ) {
+            throw CreateError(ErrorCodes.INVALID_PARAMS);
+        }
+
+        return await dbs.Project.getProject( { id : params.id } );
+    }
+
+    verifyGamePathname = async ( params : any, { uid }: IUser ) => {
+        const path = await dbs.Game.findOne( {
+            pathname : params.pathname
+        } );
+
+        let success = true;
+
+        if( path ) {
+            success = false;
+            // throw CreateError(ERROR_STUDIO.ALREADY_EXIST_GAME_PATH)
+        }
+
+        return {
+            success,
+        }
+    }
+
+
+    createProject = async ( params : IProject, {uid}: IUser, files : any) => {
+        return dbs.Project.getTransaction( async (transaction : Transaction)=>{
+            const dev = await dbs.Developer.findOne( {user_uid : uid} );
+            params.developer_id = dev.id;
+
+            const picFile = files && files[ 'project_picture' ] || undefined;
+
+            if( picFile ) {
+                const webp = await FileManager.convertToWebp(picFile, 80);
+                const data: any = await FileManager.s3upload(replaceExt(picFile.name, '.webp'), webp[0].destinationPath, uid);
+                params.picture = data.Location;
+            }
+
+            const project = await dbs.Project.create( params, transaction );
+
+
+            const versionParams : IVersion = params.updateVersion || {
+                project_id : project.id
+            };
+            versionParams.number = 1;
+            versionParams.autoDeploy = versionParams.autoDeploy || true;
+            versionParams.version = new Version().nextPatch();
+
+            const versionFiles = files.filter( (file : any) => file.includes('file_') );
+            if( versionFiles && versionParams.startFile ) {
+                const versionPath = `${project.id}/${uuid()}`;
+                versionParams.url = await uploadVersionFile( versionFiles, uid, versionPath, versionParams.startFile );
+                versionParams.state = 'process';
+            }
+
+            const version = await dbs.ProjectVersion.create( versionParams, transaction );
+            project.update_version_id = version.id;
+
+            const game = await dbs.Game.create( {
+                uid : uuid(),
+                activated : 0,
+                enabled : 0,
+                developer_id : project.developer_id,
+                pathname : params.pathname,
+                title : project.name,
+                // version : version.version,
+                // url_game : version.url,
+                url_thumb : project.picture,
+            }, transaction );
+            project.game_id = game.id;
+
+            return await project.save();
+        })
+    }
+
+    deleteProject = async ( params : any, {uid}: IUser ) => {
+        if( !params.id ) {
+            throw CreateError(ErrorCodes.INVALID_PARAMS);
+        }
+
+        return dbs.Project.getTransaction( async (transaction : Transaction) => {
+            const project = dbs.Project.findOne( {id : params.id} );
+            const versions = dbs.ProjectVersion.findAll( { project_id : params.id } );
+            for( let i = 0; i < versions.length; i++ ) {
+                await dbs.ProjectVersion.destroy( { id : versions.id }, transaction );
+            }
+            await dbs.Game.destroy( { id : project.game_id }, transaction );
+            return await dbs.Project.destroy( { id : params.id }, transaction );
+        });
+    }
+
+    /*
+    project와 연관있는 game 필드
+     description, version, title
+     url_game, url_thumb, url_title
+     activated
+     */
+    updateProject = async ( params : any, {uid}: IUser, {file}: any )=>{
+
+        return dbs.Project.getTransaction( async (transaction : Transaction) => {
+            const project = await dbs.Project.getProject( { id : params.id } );
+            const game = await dbs.Game.findOne( {
+                id : project.game_id,
+            } );
+
+            if ( file ) {
+                const webp = await FileManager.convertToWebp(file, 80);
+                const data: any = await FileManager.s3upload(replaceExt(file.name, '.webp'), webp[0].destinationPath, uid);
+                params.picture = data.Location;
+                game.url_thumb = params.picture;
+            }
+
+            if( params.description ) {
+                game.description = params.description;
+            }
+
+            if( params.title ) {
+                game.title = params.title;
+            }
+
+            game.save();
+            return await dbs.Project.updateProject( params, transaction );
+        })
+    }
+
+    createVersion = async ( params : any, {uid}: IUser, files: any ) => {
+
+        const project_id = params.project_id;
+        const versionPath = `${project_id}/${uuid()}`;
+
+        // const data: any = await FileManager.s3upload(replaceExt(file.name, '.webp'), webp[0].destinationPath, uid);
+        return dbs.ProjectVersion.getTransaction( async (transaction : Transaction)=>{
+
+            const project = await dbs.Project.findOne( { id : project_id }, transaction );
+            if( project.update_version_id ) {
+                const preUpdateVersion = await dbs.ProjectVersion.findOne( { id : project.update_version_id }, transaction );
+                if( preUpdateVersion.state !== 'fail' ) {
+                    throw CreateError(ERROR_STUDIO.ALREADY_EXIST_UPDATE_VERSION);
+                }
+                preUpdateVersion.state = 'passed';
+                preUpdateVersion.save();
+            }
+
+            const result = await dbs.ProjectVersion.findAndCountAll( {
+                project_id
+            } );
+            let maxNum = 0;
+            if(result.rows.length) {
+                const lastVersion = result.rows[ result.rows.length - 1 ];
+                maxNum = lastVersion.number;
+            }
+
+            const url = await uploadVersionFile( files, uid, versionPath, params.startFile );
+            params.number = maxNum + 1;
+            params.state = 'process';
+            params.url = url;
+
+            const version = await dbs.ProjectVersion.create( params, transaction );
+            project.update_version_id = version.id;
+            project.save();
+            return version;
+        })
+    }
+
+    getVersions = async  ( params : any, {uid}: IUser )=>{
+        return await dbs.ProjectVersion.findAll( {
+            project_id : params.project
+        } )
+    }
+
+    getVersion = async  ( params : any, {uid}: IUser )=>{
+        return await dbs.ProjectVersion.findOne( {
+            id : params.id
+        } );
+    }
+
+    deleteVersion = async  ( params : any, {uid}: IUser )=>{
+
+        return dbs.ProjectVersion.getTransaction( async (transaction : Transaction)=>{
+            const version = await dbs.ProjectVersion.findOne( { id : params.id } );
+            const project = await dbs.Project.findOne( { id : params.project_id }, transaction );
+
+            if( project.update_version_id === version.id ) {
+                project.update_version_id = null;
+            }
+
+            if( project.deploy_version_id === version.id ) {
+                throw CreateError(ERROR_STUDIO.ACTIVE_VERSION);
+            }
+
+            project.save();
+            return await dbs.ProjectVersion.destroy( {
+                id : params.id
+            } );
+        })
+
+
+    }
+
+    updateVersion = async  ( params : any, {uid}: IUser )=>{
+        return dbs.ProjectVersion.getTransaction( async (transaction : Transaction)=>{
+            if( params.state === 'passed' ) {
+                const version = await dbs.ProjectVersion.findOne( { id : params.id } );
+                const project = await dbs.Project.findOne( { id : version.project_id } );
+                const game = await dbs.Game.findOne( { id : project.game_id }, transaction );
+
+                if( game.update_version_id === version.id ) {
+                    game.update_version_id = null;
+                }
+
+                if( version.autoDeploy ) {
+                    params.state = 'deploy';
+                    if( game.deploy_version_id ) {
+                        const preDeployVersion = await dbs.ProjectVersion.findOne( { id : game.deploy_version_id }, transaction );
+                        preDeployVersion.state = 'passed';
+                    }
+                    game.deploy_version_id = version.id;
+                }
+
+                game.save();
+            }
+
+            return await dbs.ProjectVersion.updateVersion( params, transaction );
+        })
+    }
+
+
+
+    adminGetVersions = async  ( params : any, {uid}: IUser )=>{
+        return dbs.ProjectVersion.getTransaction( async (transaction : Transaction)=>{
+            return await dbs.ProjectVersion.findAll( params.where, {
+                include : [{
+                    model: dbs.Project.model,
+                }]
+            }, transaction);
+        })
+    }
+
+    adminGetVersion = async ({ version_id } : any, {uid}: IUser ) => {
+        return dbs.ProjectVersion.getTransaction( async (transaction : Transaction)=>{
+
+            const version = await dbs.ProjectVersion.findOne( {
+                id : version_id
+            }, transaction );
+            const project = await dbs.Project.findOne( {
+                id : version.project_id
+            }, transaction );
+            const developer = await dbs.Developer.findOne( {
+                id : project.developer_id
+            }, transaction );
+
+            return  {
+                version,
+                project,
+                developer
+            }
+        })
+    }
+
+    adminSetVersion = async ( params : any, {uid}: IUser )=>{
+        return dbs.ProjectVersion.getTransaction( async (transaction : Transaction)=>{
+            return await dbs.ProjectVersion.update( params.value, {
+                id : params.version_id
+            }, transaction);
+        })
+    }
+}
+
+
+export default new StudioController();
+
+class Version {
+
+    major : number = 0;
+    minor : number = 0;
+    patch : number = 0;
+
+    constructor( ver : string = '' ) {
+        if( ver ) {
+            const split = ver.split('.');
+            if( split.length >= 3 ) {
+                this.major = Number(split[0]);
+                this.minor = Number(split[1]);
+                this.patch = Number(split[2]);
+            }
+        }
+    }
+
+    nextPatch() {
+        return `${this.major}.${this.minor}.${this.patch + 1}`;
+    }
+
+    toString() : string {
+        return `${this.major}.${this.minor}.${this.patch}`;
+    }
+
+}
+
+async function uploadVersionFile( files : any, uid : string, versionPath : string, startFile : string ) : Promise<string> {
+
+    let url = '';
+    for( let key in files ) {
+        const file = files[key];
+        const data = await FileManager.s3upload2(
+            file.name, file.path, uid, versionPath
+        ) as any;
+
+        if( file.name === startFile ) {
+            url = data.Location;
+        }
+    }
+
+    return new Promise(function (resolve) {
+        resolve(url);
+    });
+}
