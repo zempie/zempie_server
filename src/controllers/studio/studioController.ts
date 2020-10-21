@@ -65,7 +65,11 @@ class StudioController {
             throw CreateError(ERROR_STUDIO.NOT_FIND_USER)
         }
 
-        return await dbs.Developer.findOne( {user_id : user.id} );
+        const developer = await dbs.Developer.findOne( {user_id : user.id} );
+        return {
+            developer,
+            user,
+        }
     }
 
     createDeveloper = async (params: any, { uid }: IUser, {file} : any) =>{
@@ -77,7 +81,7 @@ class StudioController {
             }
             else {
 
-                let picture = params.picture || undefined;
+                let picture = params.picture || user.picture;
                 if( file ) {
                     const webp = await FileManager.convertToWebp(file, 80);
                     const data: any = await FileManager.s3upload(replaceExt(file.name, '.webp'), webp[0].destinationPath, uid);
@@ -87,8 +91,8 @@ class StudioController {
                 return await dbs.Developer.create( {
                     user_id : user.id,
                     user_uid : uid,
-                    name : params.name,
-                    picture
+                    name : params.name || user.name,
+                    picture,
                 }, transaction );
             }
         })
