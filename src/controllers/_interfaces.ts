@@ -1,4 +1,5 @@
 import { eAlarm, eNotice, eNotify, eTimeline } from "../commons/enums";
+import { KafkaService } from '../services/kafkaService';
 
 /**
  * json-rpc
@@ -38,6 +39,17 @@ export interface IUser extends IDecoded {
     picture?: string,
 }
 
+
+/**
+ * message queue - kafka
+ */
+export interface IMQ {
+    producer: KafkaService.Producer
+    consumer: KafkaService.Consumer
+}
+export interface IMQMethod {
+    method: Function
+}
 
 /**
  * parameters

@@ -2,10 +2,16 @@ import { Request, Response } from "express";
 import { IRpcMethod, IRpcBody, IRpcError } from "./_interfaces";
 import { CreateError, ErrorCodes } from "../commons/errorCodes";
 import * as admin from "firebase-admin";
+import { KafkaService } from '../services/kafkaService';
 
 
 class RpcController {
     private methods: {[key: string]: IRpcMethod} = {};
+    private producer?: KafkaService.Producer;
+
+    setMQ = (producer: KafkaService.Producer) => {
+        this.producer = producer;
+    }
 
     generator = (name: string, method: Function, auth: boolean = false) => {
         this.methods[name] = { auth, method };
@@ -49,7 +55,7 @@ class RpcController {
                 });
             }
 
-            const result = await rpcMethod.method(data.params, user);
+            const result = await rpcMethod.method(data.params, user, { producer: this.producer });
             return onSuccess(result);
         }
         catch( e ) {

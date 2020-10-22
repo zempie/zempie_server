@@ -46,3 +46,4 @@ RpcController.generator('battle-start',         BattleController.gameStart);
 RpcController.generator('battle-over',          BattleController.gameOver);
 RpcController.generator('battle-update-name',   BattleController.updateUserName);
 
+RpcController.generator('sample-test',          GameController.sampleTest);

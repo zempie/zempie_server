@@ -1,7 +1,7 @@
 import { v4 as uuid } from 'uuid';
-import Model from '../../../database/mysql/model';
+import Model from '../../model';
 import { Sequelize, DataTypes } from 'sequelize';
-import { makePassword } from '../../../commons/utils';
+import { makePassword } from '../../../../commons/utils';
 
 class AdminModel extends Model {
     protected initialize() {

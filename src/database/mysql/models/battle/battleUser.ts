@@ -1,7 +1,7 @@
 import * as _ from 'lodash';
-import Model from '../../../database/mysql/model';
+import Model from '../../model';
 import { DataTypes, Sequelize, Transaction, Op } from 'sequelize';
-import { dbs } from '../../../commons/globals';
+import { dbs } from '../../../../commons/globals';
 
 
 class BattleUserModel extends Model {

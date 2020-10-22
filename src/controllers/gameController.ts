@@ -1,6 +1,6 @@
 import * as _ from 'lodash';
 import { Request, Response } from 'express';
-import { IGameParams, IGamePlayParams, IUser } from './_interfaces';
+import { IGameParams, IGamePlayParams, IMQ, IUser } from './_interfaces';
 import { Op, Sequelize, Transaction } from 'sequelize';
 import { dbs } from '../commons/globals';
 import TimelineController from './timelineController';
@@ -26,7 +26,7 @@ class GameController {
     }
 
 
-    gameOver = async ({ game_uid, score, pid }: IGameParams, user: IUser) => {
+    gameOver = async ({ game_uid, score, pid }: IGameParams, user: IUser, { producer, consumer }: IMQ) => {
         const user_uid = user.uid;
         const userRecord = await dbs.User.findOne({ uid: user_uid });
         const game = await dbs.Game.findOne({ uid: game_uid });
@@ -65,6 +65,14 @@ class GameController {
 
             // 임시
             await TimelineController.doPosting({type: eTimeline.PR, score, game_uid, game_id, user_id}, user, transaction);
+
+            // await producer.send([{
+            //     topic: 'game-over',
+            //     messages: JSON.stringify({
+            //         user_uid,
+            //         score,
+            //     }),
+            // }])
 
             return {
                 new_record
@@ -269,6 +277,18 @@ class GameController {
                 }
             })
         }
+    }
+
+    sampleTest = async ({}, user: {}, { producer }: IMQ) => {
+        const data = await producer.send([{
+            topic: 'game-over',
+            messages: JSON.stringify({
+                key1: 'value1',
+                key2: 'value2',
+            }),
+        }]);
+        console.log(data)
+        console.log('sent')
     }
 }
 

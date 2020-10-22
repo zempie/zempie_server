@@ -1,7 +1,7 @@
 import * as _ from 'lodash';
-import Model from '../model';
+import Model from '../../model';
 import { DataTypes, Sequelize } from 'sequelize';
-import { dbs } from '../../../commons/globals';
+import { dbs } from '../../../../commons/globals';
 
 class GameModel extends Model {
     protected initialize(): void {

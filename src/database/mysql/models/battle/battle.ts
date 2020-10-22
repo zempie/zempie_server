@@ -1,6 +1,6 @@
-import Model from '../model';
+import Model from '../../model';
 import { DataTypes, Sequelize, Transaction } from 'sequelize';
-import { dbs } from '../../../commons/globals';
+import { dbs } from '../../../../commons/globals';
 
 class BattleModel extends Model {
     protected initialize(): void {
