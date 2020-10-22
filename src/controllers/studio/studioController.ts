@@ -38,21 +38,23 @@ const ERROR_STUDIO = {
     },
 }
 
+interface ICreateProject extends IVersion, IProject{
+
+}
+
 interface IProject {
     name : string,
     developer_id? : number,
     description? : string,
     picture? : string,
-    updateVersion? : IVersion,
     pathname : string,
 }
 
 interface IVersion {
-    project_id : number,
+    project_id? : number,
     startFile? : string,
     version? : string,
     url? : string,
-    description? : string,
     number? : number,
     state? : string,
     autoDeploy? : boolean
@@ -151,12 +153,13 @@ class StudioController {
     }
 
 
-    createProject = async ( params : IProject, {uid}: IUser, files : any) => {
+    createProject = async ( params : ICreateProject, {uid}: IUser, files : any) => {
         return dbs.Project.getTransaction( async (transaction : Transaction)=>{
             const dev = await dbs.Developer.findOne( {user_uid : uid} );
             params.developer_id = dev.id;
 
             const picFile = files && files[ 'project_picture' ] || undefined;
+            files[ 'project_picture' ] = undefined;
 
             if( picFile ) {
                 const webp = await FileManager.convertToWebp(picFile, 80);
@@ -167,14 +170,16 @@ class StudioController {
             const project = await dbs.Project.create( params, transaction );
 
 
-            const versionParams : IVersion = params.updateVersion || {
-                project_id : project.id
-            };
-            versionParams.number = 1;
-            versionParams.autoDeploy = versionParams.autoDeploy || true;
-            versionParams.version = new Version().nextPatch();
+            const versionParams : IVersion = {};
 
-            const versionFiles = files.filter( (file : any) => file.includes('file_') );
+            versionParams.project_id = project.id;
+            versionParams.number = 1;
+            versionParams.autoDeploy = params.autoDeploy || true;
+            versionParams.version = params.version || '1.0.0';
+            versionParams.startFile = params.startFile || '';
+
+
+            const versionFiles = files;
             if( versionFiles && versionParams.startFile ) {
                 const versionPath = `${project.id}/${uuid()}`;
                 versionParams.url = await uploadVersionFile( versionFiles, uid, versionPath, versionParams.startFile );
@@ -191,13 +196,14 @@ class StudioController {
                 developer_id : project.developer_id,
                 pathname : params.pathname,
                 title : project.name,
+                description : project.description,
                 // version : version.version,
                 // url_game : version.url,
                 url_thumb : project.picture,
             }, transaction );
             project.game_id = game.id;
 
-            return await project.save();
+            return await project.save({transaction});
         })
     }
 
@@ -242,11 +248,11 @@ class StudioController {
                 game.description = params.description;
             }
 
-            if( params.title ) {
-                game.title = params.title;
+            if( params.name ) {
+                game.name = params.name;
             }
 
-            game.save();
+            game.save({transaction});
             return await dbs.Project.updateProject( params, transaction );
         })
     }
@@ -285,7 +291,7 @@ class StudioController {
 
             const version = await dbs.ProjectVersion.create( params, transaction );
             project.update_version_id = version.id;
-            project.save();
+            project.save({transaction});
             return version;
         })
     }
@@ -316,7 +322,7 @@ class StudioController {
                 throw CreateError(ERROR_STUDIO.ACTIVE_VERSION);
             }
 
-            project.save();
+            project.save({transaction});
             return await dbs.ProjectVersion.destroy( {
                 id : params.id
             } );
@@ -327,71 +333,50 @@ class StudioController {
 
     updateVersion = async  ( params : any, {uid}: IUser )=>{
         return dbs.ProjectVersion.getTransaction( async (transaction : Transaction)=>{
-            if( params.state === 'passed' ) {
-                const version = await dbs.ProjectVersion.findOne( { id : params.id } );
-                const project = await dbs.Project.findOne( { id : version.project_id } );
-                const game = await dbs.Game.findOne( { id : project.game_id }, transaction );
-
-                if( game.update_version_id === version.id ) {
-                    game.update_version_id = null;
-                }
-
-                if( version.autoDeploy ) {
-                    params.state = 'deploy';
-                    if( game.deploy_version_id ) {
-                        const preDeployVersion = await dbs.ProjectVersion.findOne( { id : game.deploy_version_id }, transaction );
-                        preDeployVersion.state = 'passed';
-                    }
-                    game.deploy_version_id = version.id;
-                }
-
-                game.save();
-            }
-
             return await dbs.ProjectVersion.updateVersion( params, transaction );
-        })
+        });
     }
 
 
 
-    adminGetVersions = async  ( params : any, {uid}: IUser )=>{
-        return dbs.ProjectVersion.getTransaction( async (transaction : Transaction)=>{
-            return await dbs.ProjectVersion.findAll( params.where, {
-                include : [{
-                    model: dbs.Project.model,
-                }]
-            }, transaction);
-        })
-    }
-
-    adminGetVersion = async ({ version_id } : any, {uid}: IUser ) => {
-        return dbs.ProjectVersion.getTransaction( async (transaction : Transaction)=>{
-
-            const version = await dbs.ProjectVersion.findOne( {
-                id : version_id
-            }, transaction );
-            const project = await dbs.Project.findOne( {
-                id : version.project_id
-            }, transaction );
-            const developer = await dbs.Developer.findOne( {
-                id : project.developer_id
-            }, transaction );
-
-            return  {
-                version,
-                project,
-                developer
-            }
-        })
-    }
-
-    adminSetVersion = async ( params : any, {uid}: IUser )=>{
-        return dbs.ProjectVersion.getTransaction( async (transaction : Transaction)=>{
-            return await dbs.ProjectVersion.update( params.value, {
-                id : params.version_id
-            }, transaction);
-        })
-    }
+    // adminGetVersions = async  ( params : any, {uid}: IUser )=>{
+    //     return dbs.ProjectVersion.getTransaction( async (transaction : Transaction)=>{
+    //         return await dbs.ProjectVersion.findAll( params.where, {
+    //             include : [{
+    //                 model: dbs.Project.model,
+    //             }]
+    //         }, transaction);
+    //     })
+    // }
+    //
+    // adminGetVersion = async ({ version_id } : any, {uid}: IUser ) => {
+    //     return dbs.ProjectVersion.getTransaction( async (transaction : Transaction)=>{
+    //
+    //         const version = await dbs.ProjectVersion.findOne( {
+    //             id : version_id
+    //         }, transaction );
+    //         const project = await dbs.Project.findOne( {
+    //             id : version.project_id
+    //         }, transaction );
+    //         const developer = await dbs.Developer.findOne( {
+    //             id : project.developer_id
+    //         }, transaction );
+    //
+    //         return  {
+    //             version,
+    //             project,
+    //             developer
+    //         }
+    //     })
+    // }
+    //
+    // adminSetVersion = async ( params : any, {uid}: IUser )=>{
+    //     return dbs.ProjectVersion.getTransaction( async (transaction : Transaction)=>{
+    //         return await dbs.ProjectVersion.update( params.value, {
+    //             id : params.version_id
+    //         }, transaction);
+    //     })
+    // }
 }
 
 
@@ -429,12 +414,14 @@ async function uploadVersionFile( files : any, uid : string, versionPath : strin
     let url = '';
     for( let key in files ) {
         const file = files[key];
-        const data = await FileManager.s3upload2(
-            file.name, file.path, uid, versionPath
-        ) as any;
+        if( file ) {
+            const data = await FileManager.s3upload2(
+                file.name, file.path, uid, versionPath
+            ) as any;
 
-        if( file.name === startFile ) {
-            url = data.Location;
+            if( file.name === startFile ) {
+                url = data.Location;
+            }
         }
     }
 

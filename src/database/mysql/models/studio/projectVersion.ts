@@ -50,7 +50,7 @@ class ProjectVersionModel extends Model {
     }
 
     async updateVersion( { id, state, url, description, reason, autoDeploy } : any, transaction?: Transaction ) {
-        const version = await this.model.findOne( { id }, transaction );
+        const version = await super.findOne( { id }, transaction );
 
 
         if( url ) {

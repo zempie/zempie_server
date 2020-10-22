@@ -13,7 +13,7 @@ const apiVer = `/api/v1`;
 export default (router: Router) => {
     router.post(`${apiVer}/studio/developer`,   validateFirebaseIdToken, FileManager.uploadImage, convert(StudioController.createDeveloper));
     router.post(`${apiVer}/studio/version`,     validateFirebaseIdToken, FileManager.uploadImage, convert(StudioController.createVersion));
-    router.post(`${apiVer}/studio/project`,     validateFirebaseIdToken, FileManager.uploadImage, convert(StudioController.updateProject));
+    router.post(`${apiVer}/studio/project`,     validateFirebaseIdToken, FileManager.uploadImage, convert(StudioController.createProject));
     router.put(`${apiVer}/studio/developer`,   validateFirebaseIdToken, FileManager.uploadImage, convert(StudioController.updateDeveloper));
 }
 
@@ -23,7 +23,8 @@ RpcController.generator( 'set-developer', StudioController.updateDeveloper, true
 
 RpcController.generator( 'get-projects', StudioController.getProjects, true );
 RpcController.generator( 'get-project', StudioController.getProject, true );
-RpcController.generator( 'create-project', StudioController.createProject, true );
+// RpcController.generator( 'create-project', StudioController.createProject, true );
+RpcController.generator( 'verify-pathname', StudioController.verifyGamePathname, true );
 RpcController.generator( 'set-project', StudioController.updateProject, true );
 RpcController.generator( 'delete-project', StudioController.deleteProject, true );
 
