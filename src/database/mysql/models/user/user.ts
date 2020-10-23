@@ -29,8 +29,8 @@ class UserModel extends Model {
         await super.afterSync()
         this.model.hasOne(dbs.UserProfile.model, { sourceKey: 'id', foreignKey: 'user_id', as: 'profile' });
         this.model.hasOne(dbs.UserSetting.model, { sourceKey: 'id', foreignKey: 'user_id', as: 'setting' });
-        this.model.hasMany(dbs.UserGame.model, { sourceKey: 'id', foreignKey: 'user_id', as: 'gameRecords' });
-        this.model.hasMany(dbs.UserPublishing.model, { sourceKey: 'id', foreignKey: 'user_id', as: 'publishing' });
+        this.model.hasMany(dbs.UserGame.model, { sourceKey: 'uid', foreignKey: 'user_uid', as: 'gameRecords' });
+        this.model.hasMany(dbs.UserPublishing.model, { sourceKey: 'uid', foreignKey: 'user_uid', as: 'publishing' });
     }
 
     async getInfo({uid}: IUser, transaction?: Transaction) {
@@ -41,28 +41,32 @@ class UserModel extends Model {
                 },
                 uid
             },
-            include: [{
-                model: dbs.UserProfile.model,
-                as: 'profile',
-                attributes: {
-                    exclude: ['created_at', 'updated_at', 'deleted_at'],
-                }
-            }, {
-                model: dbs.UserSetting.model,
-                as: 'setting',
-                attributes: {
-                    exclude: ['created_at', 'updated_at', 'deleted_at'],
-                }
-            }, {
-                model: dbs.UserGame.model,
-                as: 'gameRecords',
-                attributes: {
-                    exclude: ['created_at', 'updated_at', 'deleted_at'],
+            include: [
+                {
+                    model: dbs.UserProfile.model,
+                    as: 'profile',
+                    attributes: {
+                        exclude: ['created_at', 'updated_at', 'deleted_at'],
+                    }
                 },
-                include: [{
-                    model: dbs.Game.model,
-                }]
-            }],
+                {
+                    model: dbs.UserSetting.model,
+                    as: 'setting',
+                    attributes: {
+                        exclude: ['created_at', 'updated_at', 'deleted_at'],
+                    }
+                },
+                {
+                    model: dbs.UserGame.model,
+                    as: 'gameRecords',
+                    attributes: {
+                        exclude: ['created_at', 'updated_at', 'deleted_at'],
+                    },
+                    include: [{
+                        model: dbs.Game.model,
+                    }]
+                }
+            ],
             transaction
         })
     }
@@ -144,20 +148,25 @@ class UserModel extends Model {
     }
 
 
-    async getAllProfiles({}, transaction?: Transaction) {
+    async getProfileAll({limit = 50, offset = 0}, transaction?: Transaction) {
         const records = await this.model.findAll({
             where: {
                 is_admin: {
                     [Op.ne]: true
                 }
             },
+            attributes: {
+                exclude: ['is_admin', 'deleted_at'],
+            },
             include: [{
                 as: 'profile',
                 model: dbs.UserProfile.model,
                 attributes: {
-                    exclude: ['createdAt', 'updatedAt', 'deleted_at'],
+                    exclude: ['id', 'created_at', 'updated_at', 'deleted_at'],
                 }
             }],
+            limit,
+            offset,
             transaction
         });
 

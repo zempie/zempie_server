@@ -19,6 +19,18 @@ export function capitalize(str: string, lowercaseRest: boolean = false) : string
     return str.charAt(0).toUpperCase() + remainingChars;
 }
 
+
+/**
+ *
+ */
+export function parseBoolean(str: string) {
+    str = str.toLowerCase();
+    if ( str === '1' ) return true;
+    else if ( str === 'true' ) return true;
+    return false
+
+}
+
 /**
  * Password - pbkdf2
  */

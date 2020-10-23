@@ -11,17 +11,16 @@ import PublishingController from '../controllers/publishingController';
 const apiVer = `/api/v1`;
 
 export default (router: Router) => {
+    router.post(`${apiVer}/user/sign-out`,          validateFirebaseIdToken,    convert(UserController.signOut));
 
-    router.post(`${apiVer}/user/sign-out`,      validateFirebaseIdToken,    convert(UserController.signOut));
+    router.post(`${apiVer}/user/update/info`,       validateFirebaseIdToken,    FileManager.uploadImage,    convert(UserController.setInfo));
+    router.post(`${apiVer}/user/update/setting`,    validateFirebaseIdToken,    convert(UserController.updateSetting));
 
-    router.get(`${apiVer}/users/info`,              validateFirebaseIdToken,    convert(UserController.getInfo));
-    router.get(`${apiVer}/users/info/:target_uid`,  validateFirebaseIdToken,    convert(UserController.getTargetInfo));
-    router.get(`${apiVer}/users/s`,             validateFirebaseIdToken,    convert(UserController.searchUser));
-    router.post(`${apiVer}/user/u`,             validateFirebaseIdToken,    FileManager.uploadImage, convert(UserController.setInfo));
-
-    router.post(`${apiVer}/user/setting`,       validateFirebaseIdToken,    convert(UserController.updateSetting));
-    router.get(`${apiVer}/user/alarm`,          validateFirebaseIdToken,    convert(AlarmController.getList));
-
+    router.get(`${apiVer}/user/info`,               validateFirebaseIdToken,    convert(UserController.getInfo));
+    router.get(`${apiVer}/user/info/:target`,       validateFirebaseIdToken,    convert(UserController.getTargetInfo));
+    router.get(`${apiVer}/user/search`,             validateFirebaseIdToken,    convert(UserController.searchUser));
+    router.get(`${apiVer}/user/alarm`,              validateFirebaseIdToken,    convert(AlarmController.getList));
+    router.get(`${apiVer}/user/publishing`,         validateFirebaseIdToken,    convert(PublishingController.getList));
 }
 
 RpcController.generator('sign-out',         UserController.signOut, true);

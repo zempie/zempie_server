@@ -35,6 +35,10 @@ export const ErrorCodes = {
         message: '공지사항 ID 오류'
     },
 
+
+    FORBIDDEN_ADMIN: {
+        message: '관리자 로그인 금지'
+    },
     INVALID_ADMIN_USERNAME: {
         code: 1201,
         message: '관리자 로그인 오류'
@@ -46,6 +50,12 @@ export const ErrorCodes = {
     INVALID_ADMIN_REFRESH_TOKEN: {
         code: 1203,
         message: '관리자 토큰 오류'
+    },
+    INVALID_ADMIN_LEVEL: {
+        message: '관리자 권한 오류'
+    },
+    INVALID_ADMIN_PARAMS: {
+        message: '관리자 파라미터 오류'
     },
 
     INVALID_TIMELINE_USER_UID: {

@@ -11,7 +11,8 @@ export interface IRpcError {
 }
 export interface IRpcMethod {
     auth: boolean,
-    method: Function
+    method: Function,
+    is_admin: boolean,
 }
 export interface IRpcBody {
     jsonrpc: string,
@@ -28,6 +29,8 @@ export interface IDecoded {
     uid: string,
 }
 export interface IAdmin extends IDecoded {
+    id: number,
+    uid: string,
     name : string,
     level: number,
 }
