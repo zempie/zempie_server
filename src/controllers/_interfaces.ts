@@ -38,6 +38,7 @@ export interface IPublisher extends IDecoded {
     domain: string,
 }
 export interface IUser extends IDecoded {
+    id?: number,
     name?: string,
     picture?: string,
 }
