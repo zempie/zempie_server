@@ -3,6 +3,7 @@ import { DataTypes, Op, Sequelize, Transaction } from 'sequelize';
 import { dbs } from '../../../../commons/globals';
 import { IUser } from '../../../../controllers/_interfaces';
 import { eNotify } from '../../../../commons/enums';
+import * as _ from 'lodash';
 
 
 /**
@@ -71,14 +72,9 @@ class UserModel extends Model {
         })
     }
 
-    async getProfile({uid}: IUser, transaction?: Transaction) {
+    async getProfile({ id }: IUser, transaction?: Transaction) {
         const user = await this.model.findOne({
-            where: {
-                is_admin: {
-                    [Op.ne]: true
-                },
-                uid
-            },
+            where: { id },
             include: [{
                 model: dbs.UserProfile.model,
                 as: 'profile',
@@ -165,8 +161,8 @@ class UserModel extends Model {
                     exclude: ['id', 'created_at', 'updated_at', 'deleted_at'],
                 }
             }],
-            limit,
-            offset,
+            limit: _.toNumber(limit),
+            offset: _.toNumber(offset),
             transaction
         });
 

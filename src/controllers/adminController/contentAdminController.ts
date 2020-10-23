@@ -156,16 +156,72 @@ class ContentAdminController {
     }
 
 
-    async getUsers({limit = 50, offset = 0}, admin: IAdmin) {
-        limit = _.toNumber(limit);
-        offset = _.toNumber(offset);
-        const users = await dbs.User.getProfileAll({limit, offset});
+    /**
+     * 사용자
+     */
+    async getUsers({ limit = 50, offset = 0 }, admin: IAdmin) {
+        const users = await dbs.User.getProfileAll({ limit, offset });
         return {
             users
         }
     }
 
+    async getUserProfile({ id }: any, admin: IAdmin) {
+        const user = await dbs.UserProfile.findOne({ user_id: id });
+        return {
+            user: user.get({ plain: true })
+        }
+    }
 
+    async getUserQuestions({ user_id, no_answer, limit = 50, offset = 0 }: any) {
+        const questions = await dbs.UserQuestion.getList({ user_id, no_answer, limit, offset });
+        return {
+            questions
+        }
+    }
+
+    async answerQuestion({ question_id, answer }: any, admin: IAdmin) {
+        const question = await dbs.UserQuestion.findOne({ id: question_id });
+        if ( question.answer ) {
+            // 어쩔까?
+        }
+
+        question.answer = answer;
+        question.admin_id = admin.id;
+        question.save();
+
+    }
+
+
+    /**
+     * 고객지원
+     */
+    async getSupportQuestions({ no_answer, limit = 50, offset = 0 }: any, admin: IAdmin) {
+        const questions = await dbs.UserQuestion.getList({ no_answer, limit, offset });
+        return {
+            questions
+        }
+    }
+
+
+    async getNotices({ limit = 50, offset = 0 }) {
+        const notices = await dbs.Notice.findAll({}, {
+            limit: _.toNumber(limit),
+            offset: _.toNumber(offset),
+        })
+
+        return {
+            notices: _.map(notices, n => n.get({plain: true}))
+        }
+    }
+
+    async createNotice() {}
+    async updateNotice() {}
+    async deleteNotice() {}
+
+    /**
+     * 게임
+     */
     async getGames(params: any, admin: IAdmin) {
         const response = await fetch(`${Url.DeployApiV1}/games?key=${Deploy.api_key}`);
         if( response.status === 200 ) {

@@ -16,15 +16,34 @@ export default (router: Router) => {
     /**
      * 관리자
      */
-    router.get(`${apiVer}/admin/admin/list`,    validateAdminIdToken,   adminTracking,  convert(AdminController.getAdmins));
+    router.get(`${apiVer}/admin/admin/list`,    validateAdminIdToken,   convert(AdminController.getAdmins));
     router.post(`${apiVer}/admin/admin/add`,    validateAdminIdToken,   adminTracking,  convert(AdminController.addAdmin));
-    router.put(`${apiVer}/admin/admin/mod`,     validateAdminIdToken,   adminTracking,  convert(AdminController.updateAdmin));
+    router.post(`${apiVer}/admin/admin/mod`,    validateAdminIdToken,   adminTracking,  convert(AdminController.updateAdmin));
 
 
     /**
      * 사용자
      */
-    router.get(`${apiVer}/admin/user/list`,     validateAdminIdToken,    convert(AdminController.getUsers));
+    router.get(`${apiVer}/admin/user/list`,         validateAdminIdToken,   convert(AdminController.getUsers));
+    router.get(`${apiVer}/admin/user/profile`,      validateAdminIdToken,   convert(AdminController.getUserProfile));
+    router.get(`${apiVer}/admin/user/questions`,    validateAdminIdToken,   convert(AdminController.getUserQuestions));
+    router.post(`${apiVer}/admin/user/answer`,      validateAdminIdToken,   adminTracking,  convert(AdminController.answerQuestion))
+
+
+    /**
+     * 고객지원
+     */
+    router.get(`${apiVer}/admin/support/questions`,     validateAdminIdToken,   convert(AdminController.getSupportQuestions));
+
+
+    /**
+     * 공지사항
+     */
+    router.get(`${apiVer}/admin/support/notices`,       validateAdminIdToken,   convert(AdminController.getNotices));
+    router.post(`${apiVer}/admin/support/notice`,       validateAdminIdToken,   adminTracking,  convert(AdminController.createNotice));
+    router.post(`${apiVer}/admin/support/notice/mod`,   validateAdminIdToken,   adminTracking,  convert(AdminController.updateNotice));
+    router.post(`${apiVer}/admin/support/notice/del`,   validateAdminIdToken,   adminTracking,  convert(AdminController.deleteNotice));
+
 
     /**
      * 게임
