@@ -252,7 +252,7 @@ class StudioController {
                 game.name = params.name;
             }
 
-            game.save({transaction});
+            await game.save({transaction});
             return await dbs.Project.updateProject( params, transaction );
         })
     }
@@ -268,11 +268,9 @@ class StudioController {
             const project = await dbs.Project.findOne( { id : project_id }, transaction );
             if( project.update_version_id ) {
                 const preUpdateVersion = await dbs.ProjectVersion.findOne( { id : project.update_version_id }, transaction );
-                if( preUpdateVersion.state !== 'fail' ) {
+                if( preUpdateVersion.state !== 'fail' && preUpdateVersion.state !== 'passed' ) {
                     throw CreateError(ERROR_STUDIO.ALREADY_EXIST_UPDATE_VERSION);
                 }
-                preUpdateVersion.state = 'passed';
-                preUpdateVersion.save();
             }
 
             const result = await dbs.ProjectVersion.findAndCountAll( {
@@ -291,7 +289,7 @@ class StudioController {
 
             const version = await dbs.ProjectVersion.create( params, transaction );
             project.update_version_id = version.id;
-            project.save({transaction});
+            await project.save({transaction});
             return version;
         })
     }
@@ -322,7 +320,7 @@ class StudioController {
                 throw CreateError(ERROR_STUDIO.ACTIVE_VERSION);
             }
 
-            project.save({transaction});
+            await project.save({transaction});
             return await dbs.ProjectVersion.destroy( {
                 id : params.id
             } );

@@ -57,8 +57,8 @@ class StudioAdminController {
                         project.update_version_id = null;
                     }
 
-                    project.save( {transaction} );
-                    game.save( {transaction} );
+                    await project.save( {transaction} );
+                    await game.save( {transaction} );
                 }
 
             }
