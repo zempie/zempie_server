@@ -1,6 +1,6 @@
 import * as admin from 'firebase-admin';
 import * as _ from 'lodash';
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import { verifyJWT } from '../commons/utils';
 import { dbs } from '../commons/globals';
 import { Transaction } from 'sequelize';
@@ -8,30 +8,12 @@ import { CreateError } from '../commons/errorCodes';
 import cfgOption from '../../config/opt';
 
 
-function throwError(res: Response, e: string) {
-    res.statusCode = 401;
+function throwError(res: Response, e: string, statusCode = 401) {
+    res.statusCode = statusCode;
     res.send({
         error: e
     });
 }
-
-export const validateToken = async (req: Request, res: Response, next: Function) => {
-    try {
-        if ( !req.headers.authorization || !req.headers.authorization.startsWith('Bearer ') ) {
-            return throwError(res, 'Unauthorized')
-        }
-
-        const token = req.headers.authorization.split('Bearer ')[1];
-
-        // @ts-ignore
-        req.user = verifyJWT(token);
-        next();
-    }
-    catch (e) {
-        console.error(e);
-        return throwError(res, 'invalid token')
-    }
-};
 
 
 export const validateUid = async (req: Request, res: Response, next: Function) => {
@@ -89,16 +71,23 @@ export const readyToPlay = async (req: Request, res: Response, next: Function) =
 };
 
 
-export const validateFirebaseIdToken = async (req: any, res: any, next: any) => {
-    console.log('Check if request is authorized with Firebase ID token');
+declare global {
+    namespace Express {
+        export interface Request {
+            user: any
+        }
+    }
+}
 
+
+const getIdToken = (req: Request) => {
     if ((!req.headers.authorization || !req.headers.authorization.startsWith('Bearer ')) &&
         !(req.cookies && req.cookies.__session)) {
         console.error('No Firebase ID token was passed as a Bearer token in the Authorization header.',
             'Make sure you authorize your request by providing the following HTTP header:',
             'Authorization: Bearer <Firebase ID Token>',
             'or by passing a "__session" cookie.');
-        res.status(403).send('Unauthorized');
+        // res.status(403).send('Unauthorized');
         return;
     }
 
@@ -113,19 +102,42 @@ export const validateFirebaseIdToken = async (req: any, res: any, next: any) => 
         idToken = req.cookies.__session;
     } else {
         // No cookie
-        res.status(403).send('Unauthorized');
+        // res.status(403).send('Unauthorized');
         return;
     }
+    return idToken
+}
 
+export const validateFirebaseIdToken = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const decodedIdToken = await admin.auth().verifyIdToken(idToken);
-        console.log('ID Token correctly decoded', decodedIdToken);
-        req.user = decodedIdToken;
-        next();
-        return;
+        const idToken = getIdToken(req);
+        // const decodedIdToken = await admin.auth().verifyIdToken(idToken);
+        // console.log('ID Token correctly decoded', decodedIdToken);
+        req.user = await admin.auth().verifyIdToken(idToken);
+        return next();
     } catch (error) {
-        console.error('Error while verifying Firebase ID token:', error);
-        res.status(403).send('Unauthorized');
-        return;
+        // console.error('Error while verifying Firebase ID token:', error);
+        return throwError(res, 'Unauthorized', 403)
     }
 };
+
+export const validateAdminIdToken = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const idToken = getIdToken(req);
+        req.user = await verifyJWT(idToken);
+        return next();
+    }
+    catch (error) {
+        return throwError(res, 'Unauthorized', 403)
+    }
+}
+
+
+export const adminTracking = async (req: Request, res: Response, next: NextFunction) => {
+    dbs.AdminLog.create({
+        admin_id: req.user.id,
+        path: req.route.path.substring('/api/v1/admin/'.length),
+        body: JSON.stringify(req.body)
+    })
+    return next();
+}

@@ -13,7 +13,7 @@ import cfgOption from '../config/opt';
         ],
     };
     await apiServer.initialize(options);
-    await apiServer.start(options, cfgOption.Server.studio.port);
+    await apiServer.start(cfgOption.Server.studio.port);
 
 
 })();

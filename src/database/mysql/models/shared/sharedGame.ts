@@ -1,7 +1,7 @@
 import { v4 as uuid } from 'uuid';
-import Model from '../model'
+import Model from '../../model'
 import { DataTypes, Sequelize } from 'sequelize';
-import { dbs } from '../../../commons/globals';
+import { dbs } from '../../../../commons/globals';
 
 
 interface ISharedParams {

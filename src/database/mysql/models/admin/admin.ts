@@ -1,17 +1,19 @@
 import { v4 as uuid } from 'uuid';
-import Model from '../../../database/mysql/model';
+import Model from '../../model';
 import { Sequelize, DataTypes } from 'sequelize';
-import { makePassword } from '../../../commons/utils';
+import { makePassword } from '../../../../commons/utils';
+
 
 class AdminModel extends Model {
     protected initialize() {
         this.name = 'admin';
         this.attributes = {
             uid:            { type: DataTypes.UUID, allowNull: false },
-            name:           { type: DataTypes.STRING(50), allowNull: false },
-            password:       { type: DataTypes.STRING(1000), allowNull: false },
-            level:          { type: DataTypes.SMALLINT, allowNull: false, defaultValue: 1 },
             activated:      { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: true },
+            account:        { type: DataTypes.STRING(20), unique: true, allowNull: false },
+            name:           { type: DataTypes.STRING(20), allowNull: false },
+            level:          { type: DataTypes.SMALLINT, allowNull: false, defaultValue: 1 },
+            password:       { type: DataTypes.STRING(250), allowNull: false },
         };
     }
 
@@ -20,8 +22,9 @@ class AdminModel extends Model {
             const password = makePassword('administrator');
             await this.model.create({
                 uid: uuid(),
-                name: 'admin',
+                account: 'admin',
                 password,
+                name: 'master',
                 level: 10,
             });
         }

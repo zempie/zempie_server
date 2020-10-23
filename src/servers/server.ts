@@ -19,7 +19,7 @@ import deployApp from '../services/deployApp';
 
 import { Sequelize } from 'sequelize';
 import { dbs } from '../commons/globals';
-import { Response } from 'express';
+import { Router, Response } from 'express';
 import cfgOption from '../../config/opt';
 
 import RpcController from '../controllers/rpcController';
@@ -36,6 +36,7 @@ import swaggerDef from './swaggerDef';
 // colors
 import * as colors from 'colors';
 import { logger } from '../commons/logger';
+import { KafkaService } from '../services/kafkaService';
 colors.setTheme({
     silly: 'rainbow',
     input: 'grey',
@@ -51,18 +52,20 @@ colors.setTheme({
 
 
 export default class Server {
-
+    protected producer?: KafkaService.Producer;
+    protected consumer?: KafkaService.Consumer;
     private app?: express.Application;
-    private wss: any;
-
+    private options!: IServerOptions;
 
 
     public initialize = async (options : IServerOptions) => {
+        this.options = options;
 
         this.setFirebase();
         this.setDeployApp();
 
         this.setExpress(options);
+        await this.setMessageQueue(options);
 
         await Server.setRDB();
 
@@ -135,6 +138,28 @@ export default class Server {
     }
 
 
+    private async setMessageQueue(options: IServerOptions) {
+        if ( !!options.messageQueue ) {
+            this.producer = new KafkaService.Producer();
+            this.consumer = new KafkaService.Consumer();
+
+            this.producer.connect().then(() => {
+                console.log(`produce's ready`.bgRed)
+                if ( this.producer ) {
+                    RpcController.setMQ(this.producer);
+                }
+            })
+            this.consumer.connect(options.messageQueue.groupId, options.messageQueue.autoCommit, options.messageQueue.onMessage)
+            this.consumer.addTopic(['game-over'], (error: any, added: string[]) => {
+                if ( error ) {
+                    return console.error(error)
+                }
+                console.log(`addTopic: `, added)
+            })
+        }
+    }
+
+
 
     private setExpress(options : IServerOptions) : void {
         this.app = express();
@@ -178,7 +203,7 @@ export default class Server {
 
 
 
-    protected routes(app: express.Router) {
+    protected routes(app: Router) {
         app.use((req, res, next) => {
             // req.dbs = MySql.getDBS();
             next();
@@ -194,7 +219,7 @@ export default class Server {
 
 
 
-    public start = async (srvOpt : IServerOptions, _port : number = cfgOption.Server.http.port) : Promise<void> => {
+    public start = async (_port : number = cfgOption.Server.http.port) : Promise<void> => {
         await this.beforeStart();
 
         const port = await getPort({ port: getPort.makeRange(_port, _port+100)});
