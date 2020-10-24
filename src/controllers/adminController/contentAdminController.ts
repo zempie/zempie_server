@@ -8,6 +8,7 @@ import { CreateError, ErrorCodes } from '../../commons/errorCodes';
 import { makePassword, signJWT, verifyPassword } from '../../commons/utils';
 import { EAdminTask } from '../../database/mysql/models/admin/adminLog';
 import Opt from '../../../config/opt'
+import { EBan } from '../../database/mysql/models/user/user';
 const { Url, Deploy } = Opt;
 
 
@@ -78,6 +79,25 @@ class ContentAdminController {
     /**
      * 관리자
      */
+    async getAdminLogs({ admin_id, limit = 50, offset = 0 }: any, admin: IAdmin) {
+        const logs = await dbs.AdminLog.getLogs({ admin_id, limit, offset });
+        return {
+            logs: _.map(logs, (l: any) => {
+                const admin = l.admin;
+                return {
+                    admin: {
+                        id: admin.id,
+                        account: admin.account,
+                        name: admin.name,
+                        level: admin.level,
+                    },
+                    path: l.path,
+                    body: JSON.parse(l.body),
+                }
+            })
+        }
+    }
+
     async getAdmins({ limit = 50, offset = 0 }, admin: IAdmin) {
         const records = await dbs.Admin.findAll({}, {
             attributes: {
@@ -107,7 +127,7 @@ class ContentAdminController {
             throw CreateError(ErrorCodes.INVALID_ADMIN_USERNAME)
         }
 
-        await dbs.Admin.create({
+        await dbs.Admin.model.create({
             uid: uuid(),
             account,
             name,
@@ -171,6 +191,21 @@ class ContentAdminController {
         return {
             user: user.get({ plain: true })
         }
+    }
+
+    async banUser({ id, activated, banned, reason, period }: any, admin: IAdmin) {
+        const user = await dbs.User.getInfo({ user_id: id });
+        if ( activated ) user.activated = activated;
+        if ( banned && reason && period && Object.values(EBan).includes(banned) ) {
+            user.banned = banned;
+            await dbs.UserBan.create({
+                user_id: id,
+                admin_id: admin.id,
+                reason,
+                period,
+            })
+        }
+        user.save();
     }
 
     async getUserQuestions({ user_id, no_answer, limit = 50, offset = 0 }: any) {

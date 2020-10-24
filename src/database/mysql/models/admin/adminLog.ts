@@ -1,3 +1,4 @@
+import * as _ from 'lodash';
 import Model from '../../model';
 import { dbs } from '../../../../commons/globals';
 import { DataTypes, Sequelize } from 'sequelize';
@@ -29,6 +30,18 @@ class AdminLogModel extends Model {
     }
 
 
+    async getLogs({admin_id, limit = 50, offset = 0}: any) {
+        const where: any = {};
+        if ( admin_id ) where.admin_id = admin_id;
+        return this.model.findAll({
+            where,
+            include: [{
+                model: dbs.Admin.model,
+            }],
+            limit: _.toNumber(limit),
+            offset: _.toNumber(offset),
+        })
+    }
 }
 
 
