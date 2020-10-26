@@ -13,7 +13,7 @@ import { firebase } from '../commons/globals';
 import MySql from '../database/mysql';
 import Redis from '../database/redis';
 
-import { IServerOptions } from '../commons/interfaces';
+import { IMessageQueueOptions, IServerOptions } from '../commons/interfaces';
 import * as Pkg from '../../package.json';
 import deployApp from '../services/deployApp';
 
@@ -36,7 +36,7 @@ import swaggerDef from './swaggerDef';
 // colors
 import * as colors from 'colors';
 import { logger } from '../commons/logger';
-import { KafkaService } from '../services/kafkaService';
+import { Producer, Consumer } from '../services/kafkaService';
 colors.setTheme({
     silly: 'rainbow',
     input: 'grey',
@@ -52,30 +52,29 @@ colors.setTheme({
 
 
 export default class Server {
-    protected producer?: KafkaService.Producer;
-    protected consumer?: KafkaService.Consumer;
-    private app?: express.Application;
-    private options!: IServerOptions;
+    // protected producer?: Producer;
+    // protected consumer?: Consumer;
+    protected options!: IServerOptions;
+    protected app?: express.Application;
 
 
     public initialize = async (options : IServerOptions) => {
         this.options = options;
 
-        this.setFirebase();
-        this.setDeployApp();
-
+        // this.setFirebase();
+        // this.setDeployApp();
+        //
         this.setExpress(options);
-        await this.setMessageQueue(options);
+        //
+        // await Server.setRDB();
+        //
+        // // this.setEJS();
+        // this.setSwagger();
+        // this.setGraphQL();
 
-        await Server.setRDB();
-
-        // this.setEJS();
-        this.setSwagger();
-        this.setGraphQL();
-
-        if ( !!this.app ) {
-            this.routes(this.app);
-        }
+        // if ( !!this.app ) {
+        //     this.routes(this.app);
+        // }
     }
 
 
@@ -138,30 +137,15 @@ export default class Server {
     }
 
 
-    private async setMessageQueue(options: IServerOptions) {
-        if ( !!options.messageQueue ) {
-            this.producer = new KafkaService.Producer();
-            this.consumer = new KafkaService.Consumer();
-
-            this.producer.connect().then(() => {
-                console.log(`produce's ready`.bgRed)
-                if ( this.producer ) {
-                    RpcController.setMQ(this.producer);
-                }
-            })
-            this.consumer.connect(options.messageQueue.groupId, options.messageQueue.autoCommit, options.messageQueue.onMessage)
-            this.consumer.addTopic(['game-over'], (error: any, added: string[]) => {
-                if ( error ) {
-                    return console.error(error)
-                }
-                console.log(`addTopic: `, added)
-            })
-        }
+    protected async setMessageQueue(options: IMessageQueueOptions) {
+        await Producer.connect()
+        await Consumer.connect(options.groupId, options.autoCommit, options.onMessage)
+        Consumer.addTopic(options.addTopics);
     }
 
 
 
-    private setExpress(options : IServerOptions) : void {
+    protected setExpress(options : IServerOptions) : void {
         this.app = express();
         if ( this.app ) {
             if ( !!options.static_path && options.static_path instanceof Array ) {
@@ -188,12 +172,14 @@ export default class Server {
             this.app.use(cors());
             this.app.use(bodyParser.json());
             this.app.use(bodyParser.urlencoded({extended:false}));
+
+            this.routes(this.app);
         }
     }
 
 
 
-    private static async setRDB() {
+    protected static async setRDB() {
         await MySql.initialize();
         logger.info('mysql is ready.'.cyan)
 
@@ -219,10 +205,10 @@ export default class Server {
 
 
 
-    public start = async (_port : number = cfgOption.Server.http.port) : Promise<void> => {
+    public start = async () : Promise<void> => {
         await this.beforeStart();
 
-        const port = await getPort({ port: getPort.makeRange(_port, _port+100)});
+        const port = await getPort({ port: getPort.makeRange(this.options.port, this.options.port+100)});
         const errorCallback: any = (err: Error) => {
             if ( err ) {
                 console.error(err.stack);
@@ -240,8 +226,8 @@ export default class Server {
     }
 
     protected beforeStart = async(): Promise<void> => {
-        //
     }
+
     protected afterStart = async (): Promise<void> => {
         //
     }

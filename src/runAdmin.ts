@@ -7,11 +7,12 @@ import cfgOption from '../config/opt';
     const apiServer = new AdminServer();
     const options : IServerOptions = {
         tcp: false,
+        port: cfgOption.Server.admin.port,
         static_path: [
             { path: '/', route: 'public' },
         ],
     };
 
     await apiServer.initialize(options);
-    await apiServer.start(cfgOption.Server.admin.port);
+    await apiServer.start();
 })();
