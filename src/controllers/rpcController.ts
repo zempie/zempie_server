@@ -2,18 +2,12 @@ import { Request, Response } from "express";
 import { IRpcMethod, IRpcBody, IRpcError } from "./_interfaces";
 import { CreateError, ErrorCodes } from "../commons/errorCodes";
 import * as admin from "firebase-admin";
-import { KafkaService } from '../services/kafkaService';
 import { verifyJWT, verifyPassword } from '../commons/utils';
 import { dbs } from '../commons/globals';
 
 
 class RpcController {
     private methods: {[key: string]: IRpcMethod} = {};
-    private producer?: KafkaService.Producer;
-
-    setMQ = (producer: KafkaService.Producer) => {
-        this.producer = producer;
-    }
 
     generator = (name: string, method: Function, auth: boolean = false, is_admin: boolean = false) => {
         this.methods[name] = { auth, method, is_admin };
@@ -60,7 +54,7 @@ class RpcController {
                 }
             }
 
-            const result = await rpcMethod.method(data.params, user, { producer: this.producer });
+            const result = await rpcMethod.method(data.params, user);
             if ( rpcMethod.is_admin ) {
                 dbs.AdminLog.create({
                     admin_uid: user.uid,
