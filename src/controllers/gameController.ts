@@ -7,6 +7,8 @@ import TimelineController from './timelineController';
 import { ePubType, eTimeline } from '../commons/enums';
 import Opt from '../../config/opt';
 import { CreateError, ErrorCodes } from '../commons/errorCodes';
+import { Producer } from '../services/kafkaService';
+
 
 const { Url, Deploy } = Opt;
 
@@ -26,7 +28,7 @@ class GameController {
     }
 
 
-    gameOver = async ({ game_uid, score, pid }: IGameParams, user: IUser, { producer, consumer }: IMQ) => {
+    gameOver = async ({ game_uid, score, pid }: IGameParams, user: IUser) => {
         const user_uid = user.uid;
         const userRecord = await dbs.User.findOne({ uid: user_uid });
         const game = await dbs.Game.findOne({ uid: game_uid });
@@ -37,11 +39,11 @@ class GameController {
         const user_id = userRecord.id;
         const game_id = game.id;
 
-        await dbs.GameLog.create({
-            user_id,
-            game_id,
-            score
-        });
+        // await dbs.GameLog.create({
+        //     user_id,
+        //     game_id,
+        //     score
+        // });
 
         if ( pid ) {
             const pu = await dbs.User.findOne({ uid: pid });
@@ -63,16 +65,18 @@ class GameController {
                 }
             }
 
-            // 임시
-            await TimelineController.doPosting({type: eTimeline.PR, score, game_uid, game_id, user_id}, user, transaction);
+            // // 임시
+            // await TimelineController.doPosting({type: eTimeline.PR, score, game_uid, game_id, user_id}, user, transaction);
 
-            // await producer.send([{
-            //     topic: 'game-over',
-            //     messages: JSON.stringify({
-            //         user_uid,
-            //         score,
-            //     }),
-            // }])
+            Producer.send([{
+                topic: 'gameOver',
+                messages: JSON.stringify({
+                    user_uid,
+                    user_id,
+                    game_id,
+                    score,
+                }),
+            }])
 
             return {
                 new_record
@@ -279,9 +283,9 @@ class GameController {
         }
     }
 
-    sampleTest = async ({}, user: {}, { producer }: IMQ) => {
-        const data = await producer.send([{
-            topic: 'game-over',
+    sampleTest = async ({}, user: {}) => {
+        const data = await Producer.send([{
+            topic: 'gameOver',
             messages: JSON.stringify({
                 key1: 'value1',
                 key2: 'value2',

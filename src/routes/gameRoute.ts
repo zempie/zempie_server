@@ -25,6 +25,8 @@ export default (router: Router) => {
     router.post(`${apiVer}/battle/host`,        convert(BattleController.hostBattle));
     router.post(`${apiVer}/battle/start`,       convert(BattleController.gameStart));
     router.post(`${apiVer}/battle/over`,        convert(BattleController.gameOver));
+
+    router.get(`${apiVer}/sample-test`,         convert(GameController.sampleTest));
 }
 
 

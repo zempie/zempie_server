@@ -6,9 +6,24 @@ import userRoute from '../routes/userRoute';
 import gameRoute from "../routes/gameRoute";
 import ExchangeManager from '../services/exchangeManager';
 import launcherRoute from '../routes/launcherRoute';
+import { IMessageQueueOptions, IServerOptions } from '../commons/interfaces';
+import mq from '../controllers/messageQueues/apiMQ';
+
 
 class ApiServer extends Server {
     private timer: any;
+
+    initialize = async (options: IServerOptions) => {
+        this.options = options;
+
+        this.setFirebase();
+        this.setExpress(options);
+        await ApiServer.setRDB();
+
+        // this.setEJS();
+        this.setSwagger();
+        this.setGraphQL();
+    }
 
     routes(app: Router) {
         super.routes(app);
@@ -23,10 +38,15 @@ class ApiServer extends Server {
         // ExchangeManager.start()
     }
 
-    protected beforeStart = async (): Promise<any> => {
-        // await this.updateGameList();
+    protected afterStart = async (): Promise<void> => {
+        const options: IMessageQueueOptions = {
+            groupId: 'api-server',
+            autoCommit: true,
+            onMessage: mq.onMessage.bind(mq),
+            addTopics: mq.addTopics(),
+        }
+        await this.setMessageQueue(options);
     }
-
 }
 
 
