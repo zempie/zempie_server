@@ -1,4 +1,5 @@
 import { eAlarm, eNotice, eNotify, eTimeline } from "../commons/enums";
+import { KafkaService } from '../services/kafkaService';
 
 /**
  * json-rpc
@@ -10,7 +11,8 @@ export interface IRpcError {
 }
 export interface IRpcMethod {
     auth: boolean,
-    method: Function
+    method: Function,
+    is_admin: boolean,
 }
 export interface IRpcBody {
     jsonrpc: string,
@@ -27,6 +29,8 @@ export interface IDecoded {
     uid: string,
 }
 export interface IAdmin extends IDecoded {
+    id: number,
+    uid: string,
     name : string,
     level: number,
 }
@@ -34,10 +38,22 @@ export interface IPublisher extends IDecoded {
     domain: string,
 }
 export interface IUser extends IDecoded {
+    id?: number,
     name?: string,
     picture?: string,
 }
 
+
+/**
+ * message queue - kafka
+ */
+export interface IMQ {
+    producer: KafkaService.Producer
+    consumer: KafkaService.Consumer
+}
+export interface IMQMethod {
+    method: Function
+}
 
 /**
  * parameters

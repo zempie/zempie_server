@@ -3,18 +3,24 @@ import { DataTypes, Op, Sequelize, Transaction } from 'sequelize';
 import { dbs } from '../../../../commons/globals';
 import { IUser } from '../../../../controllers/_interfaces';
 import { eNotify } from '../../../../commons/enums';
+import * as _ from 'lodash';
 
 
 /**
  * firebase authentication 에서 얻어온 사용자 정보
  */
-
+export enum EBan {
+    not,
+    suspension,
+    permanent
+}
 class UserModel extends Model {
     protected initialize() {
         this.name = 'user';
         this.attributes = {
             uid:                { type: DataTypes.STRING(36), allowNull: false, unique: true },
             activated:          { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: true },
+            banned:             { type: DataTypes.SMALLINT, allowNull: false, defaultValue: EBan.not },
             is_admin:           { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false },
             name:               { type: DataTypes.STRING(50), allowNull: true },
             picture:            { type: DataTypes.STRING(250), allowNull: true },
@@ -29,8 +35,8 @@ class UserModel extends Model {
         await super.afterSync()
         this.model.hasOne(dbs.UserProfile.model, { sourceKey: 'id', foreignKey: 'user_id', as: 'profile' });
         this.model.hasOne(dbs.UserSetting.model, { sourceKey: 'id', foreignKey: 'user_id', as: 'setting' });
-        this.model.hasMany(dbs.UserGame.model, { sourceKey: 'id', foreignKey: 'user_id', as: 'gameRecords' });
-        this.model.hasMany(dbs.UserPublishing.model, { sourceKey: 'id', foreignKey: 'user_id', as: 'publishing' });
+        this.model.hasMany(dbs.UserGame.model, { sourceKey: 'uid', foreignKey: 'user_uid', as: 'gameRecords' });
+        this.model.hasMany(dbs.UserPublishing.model, { sourceKey: 'uid', foreignKey: 'user_uid', as: 'publishing' });
     }
 
     async getInfo({uid}: IUser, transaction?: Transaction) {
@@ -41,40 +47,39 @@ class UserModel extends Model {
                 },
                 uid
             },
-            include: [{
-                model: dbs.UserProfile.model,
-                as: 'profile',
-                attributes: {
-                    exclude: ['created_at', 'updated_at', 'deleted_at'],
-                }
-            }, {
-                model: dbs.UserSetting.model,
-                as: 'setting',
-                attributes: {
-                    exclude: ['created_at', 'updated_at', 'deleted_at'],
-                }
-            }, {
-                model: dbs.UserGame.model,
-                as: 'gameRecords',
-                attributes: {
-                    exclude: ['created_at', 'updated_at', 'deleted_at'],
+            include: [
+                {
+                    model: dbs.UserProfile.model,
+                    as: 'profile',
+                    attributes: {
+                        exclude: ['created_at', 'updated_at', 'deleted_at'],
+                    }
                 },
-                include: [{
-                    model: dbs.Game.model,
-                }]
-            }],
+                {
+                    model: dbs.UserSetting.model,
+                    as: 'setting',
+                    attributes: {
+                        exclude: ['created_at', 'updated_at', 'deleted_at'],
+                    }
+                },
+                {
+                    model: dbs.UserGame.model,
+                    as: 'gameRecords',
+                    attributes: {
+                        exclude: ['created_at', 'updated_at', 'deleted_at'],
+                    },
+                    include: [{
+                        model: dbs.Game.model,
+                    }]
+                }
+            ],
             transaction
         })
     }
 
-    async getProfile({uid}: IUser, transaction?: Transaction) {
+    async getProfile({ id }: IUser, transaction?: Transaction) {
         const user = await this.model.findOne({
-            where: {
-                is_admin: {
-                    [Op.ne]: true
-                },
-                uid
-            },
+            where: { id },
             include: [{
                 model: dbs.UserProfile.model,
                 as: 'profile',
@@ -144,20 +149,25 @@ class UserModel extends Model {
     }
 
 
-    async getAllProfiles({}, transaction?: Transaction) {
+    async getProfileAll({limit = 50, offset = 0}, transaction?: Transaction) {
         const records = await this.model.findAll({
             where: {
                 is_admin: {
                     [Op.ne]: true
                 }
             },
+            attributes: {
+                exclude: ['is_admin', 'deleted_at'],
+            },
             include: [{
                 as: 'profile',
                 model: dbs.UserProfile.model,
                 attributes: {
-                    exclude: ['createdAt', 'updatedAt', 'deleted_at'],
+                    exclude: ['id', 'created_at', 'updated_at', 'deleted_at'],
                 }
             }],
+            limit: _.toNumber(limit),
+            offset: _.toNumber(offset),
             transaction
         });
 

@@ -2,13 +2,21 @@ import { Request, Response } from "express";
 import { IRpcMethod, IRpcBody, IRpcError } from "./_interfaces";
 import { CreateError, ErrorCodes } from "../commons/errorCodes";
 import * as admin from "firebase-admin";
+import { KafkaService } from '../services/kafkaService';
+import { verifyJWT, verifyPassword } from '../commons/utils';
+import { dbs } from '../commons/globals';
 
 
 class RpcController {
     private methods: {[key: string]: IRpcMethod} = {};
+    private producer?: KafkaService.Producer;
 
-    generator = (name: string, method: Function, auth: boolean = false) => {
-        this.methods[name] = { auth, method };
+    setMQ = (producer: KafkaService.Producer) => {
+        this.producer = producer;
+    }
+
+    generator = (name: string, method: Function, auth: boolean = false, is_admin: boolean = false) => {
+        this.methods[name] = { auth, method, is_admin };
     }
 
     routeRpc = async (req: Request, res: Response) => {
@@ -39,17 +47,28 @@ class RpcController {
             }
 
             // if ok
-            let user = await this.validateFirebaseIdToken(req);
-            if ( rpcMethod.auth && !user ) {
-                const e: any = CreateError(ErrorCodes.UNAUTHORIZED);
-                return onFailure({
-                    code: -32603,
-                    message: e.message,
-                    data: e
-                });
+            let user;
+            if ( rpcMethod.auth ) {
+                user = rpcMethod.is_admin? await this.validateAdminToken(req) : await this.validateFirebaseIdToken(req);
+                if ( !user ) {
+                    const e: any = CreateError(ErrorCodes.UNAUTHORIZED);
+                    return onFailure({
+                        code: -32603,
+                        message: e.message,
+                        data: e
+                    });
+                }
             }
 
-            const result = await rpcMethod.method(data.params, user);
+            const result = await rpcMethod.method(data.params, user, { producer: this.producer });
+            if ( rpcMethod.is_admin ) {
+                dbs.AdminLog.create({
+                    admin_uid: user.uid,
+                    task: rpcMethod.method.toString(),
+                    value: data.params,
+                })
+            }
+
             return onSuccess(result);
         }
         catch( e ) {
@@ -83,7 +102,7 @@ class RpcController {
         }
     }
 
-    private validateFirebaseIdToken = async (req: Request) => {
+    private getIdToken = (req: Request) => {
         let authorization;
         if( typeof req.body.params === "object" ) {
             authorization = req.body.params.authorization;
@@ -114,6 +133,29 @@ class RpcController {
             // No cookie
             // throw CreateError(ErrorCodes.UNAUTHORIZED);
             return null
+        }
+        return idToken
+    }
+
+    private validateAdminToken = (req: Request) => {
+        const idToken = this.getIdToken(req);
+        if ( !idToken ) {
+            return null;
+        }
+
+        try {
+            return verifyJWT(idToken);
+        }
+        catch(error) {
+            console.error('Error while verifying Admin ID token:', error);
+            return null;
+        }
+    }
+
+    private validateFirebaseIdToken = async (req: Request) => {
+        const idToken = this.getIdToken(req);
+        if ( !idToken ) {
+            return null;
         }
 
         try {

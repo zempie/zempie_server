@@ -1,31 +1,45 @@
+import * as _ from 'lodash';
+import { v4 as uuid } from 'uuid';
+import { Transaction } from 'sequelize';
 import { IAdmin } from '../_interfaces';
 import { dbs } from '../../commons/globals';
 import NotifyService from '../../services/notifyService';
-import Opt from '../../../config/opt'
 import { CreateError, ErrorCodes } from '../../commons/errorCodes';
-import { signJWT, verifyPassword } from '../../commons/utils';
-import { Transaction } from 'sequelize';
+import { makePassword, signJWT, verifyPassword } from '../../commons/utils';
+import { EAdminTask } from '../../database/mysql/models/admin/adminLog';
+import Opt from '../../../config/opt'
+import { EBan } from '../../database/mysql/models/user/user';
 const { Url, Deploy } = Opt;
 
 
 class ContentAdminController {
     async login(params: any, admin: IAdmin) {
-        const { id: name, password } = params;
-        const record = await dbs.Admin.findOne({name});
-        if (!record) {
+        const { account, password } = params;
+        const record = await dbs.Admin.findOne({account});
+        if ( !record ) {
             throw CreateError(ErrorCodes.INVALID_ADMIN_USERNAME);
         }
 
-        if (!verifyPassword(password, record.password)) {
+        if ( !verifyPassword(password, record.password) ) {
             throw CreateError(ErrorCodes.INVALID_ADMIN_PASSWORD);
         }
 
+        if ( !record.activated ) {
+            throw CreateError(ErrorCodes.FORBIDDEN_ADMIN);
+        }
+
         const access_token = signJWT({
+            is_admin: true,
+            id: record.id,
+            uid: record.uid,
+            account: record.account,
             name: record.name,
             level: record.level,
         }, '1d');
         const refresh_token = signJWT({
+            is_admin: true,
             id: record.id,
+            account: record.account,
             name: record.name,
             level: record.level,
         }, '30d');
@@ -62,19 +76,187 @@ class ContentAdminController {
     }
 
 
+    /**
+     * 관리자
+     */
+    async getAdminLogs({ admin_id, limit = 50, offset = 0 }: any, admin: IAdmin) {
+        const logs = await dbs.AdminLog.getLogs({ admin_id, limit, offset });
+        return {
+            logs: _.map(logs, (l: any) => {
+                const admin = l.admin;
+                return {
+                    admin: {
+                        id: admin.id,
+                        account: admin.account,
+                        name: admin.name,
+                        level: admin.level,
+                    },
+                    path: l.path,
+                    body: JSON.parse(l.body),
+                }
+            })
+        }
+    }
+
+    async getAdmins({ limit = 50, offset = 0 }, admin: IAdmin) {
+        const records = await dbs.Admin.findAll({}, {
+            attributes: {
+                exclude: ['password']
+            },
+            limit: _.toNumber(limit),
+            offset: _.toNumber(offset),
+        });
+        return {
+            admins: _.map(records, record => record.get({ plain: true }))
+        }
+    }
+
+    async addAdmin({ account, name, password, level }: any, { id, uid }: IAdmin) {
+        const admin = await dbs.Admin.findOne({ id });
+        if ( admin.level < 10 ) {
+            throw CreateError(ErrorCodes.INVALID_ADMIN_LEVEL)
+        }
+
+        level = _.toNumber(level);
+        if ( isNaN(level) || level >= 10 || level < 1 ) {
+            throw CreateError(ErrorCodes.INVALID_ADMIN_PARAMS)
+        }
+
+        const record = await dbs.Admin.findOne({ account });
+        if ( record ) {
+            throw CreateError(ErrorCodes.INVALID_ADMIN_USERNAME)
+        }
+
+        await dbs.Admin.model.create({
+            uid: uuid(),
+            account,
+            name,
+            level,
+            password: makePassword(password),
+        })
+    }
+
+    async updateAdmin({ id: target_id, name, password, level, activated }: any, { id, level: order_level }: IAdmin) {
+        target_id = _.toNumber(target_id);
+
+        const admin = await dbs.Admin.findOne({ id: target_id });
+        if ( !admin ) {
+            throw CreateError(ErrorCodes.INVALID_ADMIN_PARAMS)
+        }
+
+        if ( order_level === 10 && id !== target_id ) {
+            if ( level ) {
+                level = _.toNumber(level);
+                if ( isNaN(level) || level >= 10 || level < 1 ) {
+                    throw CreateError(ErrorCodes.INVALID_ADMIN_PARAMS)
+                }
+                admin.level = level || admin.level;
+            }
+            if ( activated ) {
+                admin.activated = (activated === 'true');
+            }
+        }
+
+        if ( id === target_id ) {
+            admin.password = password? makePassword(password) : admin.password;
+            admin.name = name || admin.name;
+        }
+
+        await admin.save()
+    }
+
+
+    /**
+     *
+     * @param params
+     * @param admin
+     */
     async getProjects(params: any, admin: IAdmin) {
 
     }
 
 
-    async getUsers(params: any, admin: IAdmin) {
-        const users = await dbs.User.getAllProfiles({});
+    /**
+     * 사용자
+     */
+    async getUsers({ limit = 50, offset = 0 }, admin: IAdmin) {
+        const users = await dbs.User.getProfileAll({ limit, offset });
         return {
             users
         }
     }
 
+    async getUserProfile({ id }: any, admin: IAdmin) {
+        const user = await dbs.UserProfile.findOne({ user_id: id });
+        return {
+            user: user.get({ plain: true })
+        }
+    }
 
+    async banUser({ id, activated, banned, reason, period }: any, admin: IAdmin) {
+        const user = await dbs.User.getInfo({ user_id: id });
+        if ( activated ) user.activated = activated;
+        if ( banned && reason && period && Object.values(EBan).includes(banned) ) {
+            user.banned = banned;
+            await dbs.UserBan.create({
+                user_id: id,
+                admin_id: admin.id,
+                reason,
+                period,
+            })
+        }
+        user.save();
+    }
+
+    async getUserQuestions({ user_id, no_answer, limit = 50, offset = 0 }: any) {
+        const questions = await dbs.UserQuestion.getList({ user_id, no_answer, limit, offset });
+        return {
+            questions
+        }
+    }
+
+    async answerQuestion({ question_id, answer }: any, admin: IAdmin) {
+        const question = await dbs.UserQuestion.findOne({ id: question_id });
+        if ( question.answer ) {
+            // 어쩔까?
+        }
+
+        question.answer = answer;
+        question.admin_id = admin.id;
+        question.save();
+
+    }
+
+
+    /**
+     * 고객지원
+     */
+    async getSupportQuestions({ no_answer, limit = 50, offset = 0 }: any, admin: IAdmin) {
+        const questions = await dbs.UserQuestion.getList({ no_answer, limit, offset });
+        return {
+            questions
+        }
+    }
+
+
+    async getNotices({ limit = 50, offset = 0 }) {
+        const notices = await dbs.Notice.findAll({}, {
+            limit: _.toNumber(limit),
+            offset: _.toNumber(offset),
+        })
+
+        return {
+            notices: _.map(notices, n => n.get({plain: true}))
+        }
+    }
+
+    async createNotice() {}
+    async updateNotice() {}
+    async deleteNotice() {}
+
+    /**
+     * 게임
+     */
     async getGames(params: any, admin: IAdmin) {
         const response = await fetch(`${Url.DeployApiV1}/games?key=${Deploy.api_key}`);
         if( response.status === 200 ) {

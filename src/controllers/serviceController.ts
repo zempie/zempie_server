@@ -32,7 +32,7 @@ class ServiceController {
 
     async getMyQuestionList({}, { uid }: IUser) {
         const user = await dbs.User.findOne({ uid });
-        const questions = await dbs.QnaQuestion.getMyQuestionList({ user_id: user.id });
+        const questions = await dbs.QnaQuestion.getList({ user_id: user.id });
         return {
             questions
         }

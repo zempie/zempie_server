@@ -5,7 +5,6 @@ import { IUser } from './_interfaces';
 
 
 export default function convert(func: Function, middleware: boolean = false) {
-
     function response(res: Response, result: any) {
         res.header('Last-Modified', (new Date()).toUTCString());
 
@@ -17,7 +16,7 @@ export default function convert(func: Function, middleware: boolean = false) {
         }
 
         return res.status(200).send({
-            data: result || {}
+            result: result || {}
         });
     }
 

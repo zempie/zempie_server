@@ -1,8 +1,8 @@
-import Model from '../model';
+import Model from '../../model';
 import { DataTypes, Sequelize } from 'sequelize';
-import { dbs } from '../../../commons/globals';
-import { signJWT, verifyJWT } from '../../../commons/utils';
-import { CreateError, ErrorCodes } from '../../../commons/errorCodes';
+import { dbs } from '../../../../commons/globals';
+import { signJWT, verifyJWT } from '../../../../commons/utils';
+import { CreateError, ErrorCodes } from '../../../../commons/errorCodes';
 
 class AdminRefreshTokenModel extends Model {
     protected initialize(): void {

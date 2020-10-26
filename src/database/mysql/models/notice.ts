@@ -17,6 +17,7 @@ class NoticeModel extends Model {
         this.name = 'notice';
         this.attributes = {
             type:           { type: DataTypes.SMALLINT, allowNull: false },
+            activated:      { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: true },
             title:          { type: DataTypes.STRING(100), allowNull: false },
             content:        { type: DataTypes.STRING(500), allowNull: false },
             img_link:       { type: DataTypes.STRING(500) },
