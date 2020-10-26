@@ -1,6 +1,6 @@
 import * as _ from 'lodash';
 import { Request, Response } from 'express';
-import { IGameParams, IGamePlayParams, IMQ, IUser } from './_interfaces';
+import { IGameParams, IGamePlayParams, IUser } from './_interfaces';
 import { Op, Sequelize, Transaction } from 'sequelize';
 import { dbs } from '../commons/globals';
 import TimelineController from './timelineController';
