@@ -22,7 +22,7 @@ class AdminModel extends Model {
             const password = makePassword('administrator');
             await this.model.create({
                 uid: uuid(),
-                account: 'admin',
+                account: 'master',
                 password,
                 name: 'master',
                 level: 10,

@@ -9,13 +9,18 @@ import * as _ from 'lodash';
 /**
  * firebase authentication 에서 얻어온 사용자 정보
  */
-
+export enum EBan {
+    not,
+    suspension,
+    permanent
+}
 class UserModel extends Model {
     protected initialize() {
         this.name = 'user';
         this.attributes = {
             uid:                { type: DataTypes.STRING(36), allowNull: false, unique: true },
             activated:          { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: true },
+            banned:             { type: DataTypes.SMALLINT, allowNull: false, defaultValue: EBan.not },
             is_admin:           { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false },
             name:               { type: DataTypes.STRING(50), allowNull: true },
             picture:            { type: DataTypes.STRING(250), allowNull: true },

@@ -16,6 +16,7 @@ export default (router: Router) => {
     /**
      * 관리자
      */
+    router.get(`${apiVer}/admin/admin/logs`,    validateAdminIdToken,   convert(AdminController.getAdminLogs));
     router.get(`${apiVer}/admin/admin/list`,    validateAdminIdToken,   convert(AdminController.getAdmins));
     router.post(`${apiVer}/admin/admin/add`,    validateAdminIdToken,   adminTracking,  convert(AdminController.addAdmin));
     router.post(`${apiVer}/admin/admin/mod`,    validateAdminIdToken,   adminTracking,  convert(AdminController.updateAdmin));
@@ -26,6 +27,7 @@ export default (router: Router) => {
      */
     router.get(`${apiVer}/admin/user/list`,         validateAdminIdToken,   convert(AdminController.getUsers));
     router.get(`${apiVer}/admin/user/profile`,      validateAdminIdToken,   convert(AdminController.getUserProfile));
+    router.post(`${apiVer}/admin/user/ban`,         validateAdminIdToken,   adminTracking,  convert(AdminController.banUser));
     router.get(`${apiVer}/admin/user/questions`,    validateAdminIdToken,   convert(AdminController.getUserQuestions));
     router.post(`${apiVer}/admin/user/answer`,      validateAdminIdToken,   adminTracking,  convert(AdminController.answerQuestion))
 
