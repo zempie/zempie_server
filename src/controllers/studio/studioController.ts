@@ -213,10 +213,10 @@ class StudioController {
         }
 
         return dbs.Project.getTransaction( async (transaction : Transaction) => {
-            const project = dbs.Project.findOne( {id : params.id} );
-            const versions = dbs.ProjectVersion.findAll( { project_id : params.id } );
+            const project = await dbs.Project.findOne( {id : params.id} );
+            const versions = await dbs.ProjectVersion.findAll( { project_id : params.id } );
             for( let i = 0; i < versions.length; i++ ) {
-                await dbs.ProjectVersion.destroy( { id : versions.id }, transaction );
+                await dbs.ProjectVersion.destroy( { id : versions[i].id }, transaction );
             }
             await dbs.Game.destroy( { id : project.game_id }, transaction );
             return await dbs.Project.destroy( { id : params.id }, transaction );
@@ -232,7 +232,7 @@ class StudioController {
     updateProject = async ( params : any, {uid}: IUser, {file}: any )=>{
 
         return dbs.Project.getTransaction( async (transaction : Transaction) => {
-            const project = await dbs.Project.getProject( { id : params.id } );
+            const project = await dbs.Project.findOne( { id : params.id } );
             const game = await dbs.Game.findOne( {
                 id : project.game_id,
             } );
@@ -250,6 +250,27 @@ class StudioController {
 
             if( params.name ) {
                 game.name = params.name;
+            }
+
+            if( params.deploy_version_id ) {
+                if( project.deploy_version_id ) {
+                    const preDeployVersion = await dbs.ProjectVersion.findOne(  {
+                        id : project.deploy_version_id
+                    }, transaction );
+                    preDeployVersion.state = 'passed';
+                    await preDeployVersion.save({transaction});
+                }
+
+                if( project.update_version_id === params.deploy_version_id ) {
+                    params.update_version_id = null;
+                }
+
+                const deployVersion = await dbs.ProjectVersion.findOne( {
+                    id : params.deploy_version_id
+                },transaction );
+                deployVersion.state = 'deploy';
+                await deployVersion.save({transaction});
+                game.version = deployVersion.version;
             }
 
             await game.save({transaction});
@@ -294,23 +315,23 @@ class StudioController {
         })
     }
 
-    getVersions = async  ( params : any, {uid}: IUser )=>{
-        return await dbs.ProjectVersion.findAll( {
-            project_id : params.project
-        } )
-    }
+    // getVersions = async  ( params : any, {uid}: IUser )=>{
+    //     return await dbs.ProjectVersion.findAll( {
+    //         project_id : params.project_id
+    //     } )
+    // }
 
-    getVersion = async  ( params : any, {uid}: IUser )=>{
-        return await dbs.ProjectVersion.findOne( {
-            id : params.id
-        } );
-    }
+    // getVersion = async  ( params : any, {uid}: IUser )=>{
+    //     return await dbs.ProjectVersion.findOne( {
+    //         id : params.id
+    //     } );
+    // }
 
     deleteVersion = async  ( params : any, {uid}: IUser )=>{
 
         return dbs.ProjectVersion.getTransaction( async (transaction : Transaction)=>{
             const version = await dbs.ProjectVersion.findOne( { id : params.id } );
-            const project = await dbs.Project.findOne( { id : params.project_id }, transaction );
+            const project = await dbs.Project.findOne( { id : version.project_id }, transaction );
 
             if( project.update_version_id === version.id ) {
                 project.update_version_id = null;
@@ -329,51 +350,10 @@ class StudioController {
 
     }
 
-    updateVersion = async  ( params : any, {uid}: IUser )=>{
-        return dbs.ProjectVersion.getTransaction( async (transaction : Transaction)=>{
-            return await dbs.ProjectVersion.updateVersion( params, transaction );
-        });
-    }
-
-
-
-    // adminGetVersions = async  ( params : any, {uid}: IUser )=>{
+    // updateVersion = async  ( params : any, {uid}: IUser )=>{
     //     return dbs.ProjectVersion.getTransaction( async (transaction : Transaction)=>{
-    //         return await dbs.ProjectVersion.findAll( params.where, {
-    //             include : [{
-    //                 model: dbs.Project.model,
-    //             }]
-    //         }, transaction);
-    //     })
-    // }
-    //
-    // adminGetVersion = async ({ version_id } : any, {uid}: IUser ) => {
-    //     return dbs.ProjectVersion.getTransaction( async (transaction : Transaction)=>{
-    //
-    //         const version = await dbs.ProjectVersion.findOne( {
-    //             id : version_id
-    //         }, transaction );
-    //         const project = await dbs.Project.findOne( {
-    //             id : version.project_id
-    //         }, transaction );
-    //         const developer = await dbs.Developer.findOne( {
-    //             id : project.developer_id
-    //         }, transaction );
-    //
-    //         return  {
-    //             version,
-    //             project,
-    //             developer
-    //         }
-    //     })
-    // }
-    //
-    // adminSetVersion = async ( params : any, {uid}: IUser )=>{
-    //     return dbs.ProjectVersion.getTransaction( async (transaction : Transaction)=>{
-    //         return await dbs.ProjectVersion.update( params.value, {
-    //             id : params.version_id
-    //         }, transaction);
-    //     })
+    //         return await dbs.ProjectVersion.updateVersion( params, transaction );
+    //     });
     // }
 }
 
