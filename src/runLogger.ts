@@ -11,4 +11,4 @@ import { IServerOptions } from './commons/interfaces';
 
     await logServer.initialize(options);
     await logServer.start()
-})()
+})();

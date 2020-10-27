@@ -1,6 +1,5 @@
 import PublishingServer from './servers/publishingServer';
 import { IServerOptions } from './commons/interfaces';
-import cfgOption from '../config/opt';
 
 
 (async () => {
@@ -12,4 +11,4 @@ import cfgOption from '../config/opt';
 
     await pubServer.initialize(options)
     await pubServer.start();
-})()
+})();

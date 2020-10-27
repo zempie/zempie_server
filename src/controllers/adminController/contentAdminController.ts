@@ -1,7 +1,7 @@
 import * as _ from 'lodash';
 import { v4 as uuid } from 'uuid';
 import { Transaction } from 'sequelize';
-import { IAdmin } from '../_interfaces';
+import { IAdmin, INoticeParams } from '../_interfaces';
 import { dbs } from '../../commons/globals';
 import NotifyService from '../../services/notifyService';
 import { CreateError, ErrorCodes } from '../../commons/errorCodes';
@@ -250,9 +250,36 @@ class ContentAdminController {
         }
     }
 
-    async createNotice() {}
-    async updateNotice() {}
-    async deleteNotice() {}
+
+    async createNotice({type, title, content, img_link, start_at, end_at}: INoticeParams) {
+        await dbs.Notice.create({ type, title, content, img_link, start_at, end_at })
+    }
+
+
+    async updateNotice({id}: INoticeParams) {
+        return dbs.Notice.getTransaction(async (transaction: Transaction) => {
+            const notice = await dbs.Notice.findOne({id}, transaction);
+            if( !notice ) {
+                throw CreateError(ErrorCodes.INVALID_NOTICE_ID);
+            }
+
+            await notice.destroy({ transaction });
+        })
+    }
+
+
+    async deleteNotice({id}: INoticeParams) {
+        return dbs.Notice.getTransaction(async (transaction: Transaction) => {
+            const notice = await dbs.Notice.findOne({id}, transaction);
+            if( !notice ) {
+                throw CreateError(ErrorCodes.INVALID_NOTICE_ID);
+            }
+
+            // 수정수정
+
+            await notice.save({transaction});
+        })
+    }
 
     /**
      * 게임

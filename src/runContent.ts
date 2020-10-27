@@ -12,4 +12,4 @@ import cfgOption from '../config/opt';
 
     await contentServer.initialize(options)
     await contentServer.start();
-})()
+})();

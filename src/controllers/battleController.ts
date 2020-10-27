@@ -1,12 +1,11 @@
-import * as _ from 'lodash';
 import * as uniqid from 'uniqid';
-import { v4 as uuid } from 'uuid';
 import { dbs } from '../commons/globals';
 import { IBattleParams, IUser, IGamePlayParams, IGameKey, IBattlePlayParams } from './_interfaces';
 import { Transaction } from 'sequelize';
 import { signJWT, verifyJWT } from '../commons/utils';
 import { CreateError, ErrorCodes } from '../commons/errorCodes';
-import { gameCache } from '../database/redis/models/games';
+import { Producer } from '../services/kafkaService';
+
 
 class BattleController {
     getBattleList = async () => {
@@ -98,20 +97,25 @@ class BattleController {
         const decoded = verifyJWT(battle_key);
         const { uid: battle_uid, game_uid, user_uid, secret_id, best_score } = decoded;
 
-        return dbs.BattleLog.getTransaction(async (transaction: Transaction) => {
-            await dbs.BattleLog.updateScore({ id: secret_id, score }, transaction);
+        const new_record = score > best_score;
+        if ( new_record ) {
+            await dbs.BattleUser.updateBestScore({ battle_uid, user_uid, best_score: score });
+        }
 
-            const new_record = score > best_score;
-            if ( new_record ) {
-                await dbs.BattleUser.updateBestScore({ battle_uid, user_uid, best_score: score }, transaction);
-            }
+        Producer.send([{
+            topic: 'battle_gameOver',
+            messages: JSON.stringify({
+                battle_uid,
+                user_uid,
+                secret_id,
+                best_score,
+                score,
+            })
+        }])
 
-            // timeline
-
-            return {
-                new_record
-            }
-        })
+        return {
+            new_record
+        }
     }
 
 

@@ -39,18 +39,6 @@ class GameController {
         const user_id = userRecord.id;
         const game_id = game.id;
 
-        // await dbs.GameLog.create({
-        //     user_id,
-        //     game_id,
-        //     score
-        // });
-
-        if ( pid ) {
-            const pu = await dbs.User.findOne({ uid: pid });
-            await dbs.UserPublishing.updateCount({ user_id: pu.id, game_id, pub_type: ePubType.PubGamePlay });
-            await dbs.GeneratedPointsLog.createPoints({ user_id: pu.id, game_id, pub_type: ePubType.PubGamePlay });
-        }
-
         return await dbs.UserGame.getTransaction(async (transaction: Transaction) => {
             const record = await dbs.UserGame.findOne({user_id, game_id}, transaction);
             const previous_score = record? record.score : 0;
@@ -65,9 +53,6 @@ class GameController {
                 }
             }
 
-            // // 임시
-            // await TimelineController.doPosting({type: eTimeline.PR, score, game_uid, game_id, user_id}, user, transaction);
-
             Producer.send([{
                 topic: 'gameOver',
                 messages: JSON.stringify({
@@ -75,6 +60,7 @@ class GameController {
                     user_id,
                     game_id,
                     score,
+                    pid,
                 }),
             }])
 
@@ -128,19 +114,13 @@ class GameController {
             return;
         }
 
-        const game = await dbs.Game.findOne({ title: pathname });
-        if ( !game ) {
-            throw CreateError(ErrorCodes.INVALID_GAME_UID);
-        }
-
-        return dbs.User.getTransaction(async (transaction: Transaction) => {
-            const user = await dbs.User.findOne({ uid: user_uid }, transaction);
-            if ( !user ) {
-                throw CreateError(ErrorCodes.INVALID_USER_UID);
-            }
-
-            await dbs.UserPublishing.updateCount({ user_id: user.id, game_id: game.id, type: 'open' }, transaction);
-        })
+        Producer.send([{
+            topic: 'pubPlayGame',
+            messages: JSON.stringify({
+                pathname,
+                user_uid,
+            })
+        }])
     }
 
     redirectGame = (req: Request, res: Response) => {

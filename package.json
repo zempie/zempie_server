@@ -7,7 +7,9 @@
     "start": "node ./dist/src/run.js",
     "startStudio": "tsc && node ./dist/src/runStudio.js",
     "startAdmin": "tsc && node ./dist/src/runAdmin.js",
-    "startContent": "node ./dist/src/runContent.js"
+    "startContent": "node ./dist/src/runContent.js",
+    "startLogger": "node ./dist/src/runLogger.js",
+    "startPublishing": "node ./dist/src/runPublish.js"
   },
   "license": "MIT",
   "dependencies": {
