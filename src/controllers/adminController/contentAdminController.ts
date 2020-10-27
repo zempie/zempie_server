@@ -76,6 +76,14 @@ class ContentAdminController {
     }
 
 
+    async verifyToken({}, admin: IAdmin) {
+        return {
+            name: admin.name,
+            level: admin.level,
+        }
+    }
+
+
     /**
      * 관리자
      */

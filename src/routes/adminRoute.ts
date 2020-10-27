@@ -11,6 +11,7 @@ export default (router: Router) => {
     router.post(`${apiVer}/admin/login`,        convert(AdminController.login));
     router.post(`${apiVer}/admin/logout`,       validateAdminIdToken,   convert(AdminController.logout));
     router.post(`${apiVer}/admin/token`,        convert(AdminController.getAccessTokens));
+    router.get(`${apiVer}/admin/verify`,        validateAdminIdToken,   convert(AdminController.verifyToken));
 
 
     /**
