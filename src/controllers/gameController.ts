@@ -123,8 +123,8 @@ class GameController {
         }])
     }
 
-    redirectGame = (params: any, user: any, { req, res }: IRoute) => {
-        const { pathname, pid } = _.assignIn({}, req.body, req.query, req.params);
+    redirectGame = ({ pathname, pid }: any, user: any, { req, res }: IRoute) => {
+        // const { pathname, pid } = _.assignIn({}, req.body, req.query, req.params);
         let url = `${Url.GameClient}/${pathname}`;
         if ( pid ) {
             url += `/${pid}`;
