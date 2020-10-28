@@ -1,4 +1,4 @@
-import {IUser} from "./_interfaces";
+import { IRoute, IUser } from './_interfaces';
 import { dbs, caches } from '../commons/globals';
 import {Transaction} from "sequelize";
 import {CreateError, ErrorCodes} from "../commons/errorCodes";
@@ -39,7 +39,7 @@ class StudioController {
         })
     }
 
-    updateDeveloper = async  (params: any, {uid, name}: IUser, {file} : any) =>{
+    updateDeveloper = async  (params: any, {uid, name}: IUser, { req: { files: { file }} }: IRoute) =>{
         return dbs.Developer.getTransaction( async (transaction : Transaction)=>{
             const user = await dbs.User.findOne({ uid });
             params = params || {};
@@ -93,8 +93,9 @@ class StudioController {
         })
     }
 
-    updateProject = async  ( params : any, {uid}: IUser, {file}: any )=>{
-
+    updateProject = async  ( params : any, {uid}: IUser, { req }: IRoute)=>{
+        const { files } = req;
+        const { file } = files;
 
         return dbs.Project.getTransaction( async (transaction : Transaction)=>{
 

@@ -1,4 +1,4 @@
-import { Response } from 'express';
+import { NextFunction, Response } from 'express';
 import * as _ from 'lodash';
 import { IUser } from './_interfaces';
 
@@ -20,11 +20,11 @@ export default function convert(func: Function, middleware: boolean = false) {
         });
     }
 
-    return async (req: any, res: Response, next: Function) => {
+    return async (req: any, res: Response, next: NextFunction) => {
         try {
             const params = _.assignIn({}, req.body, req.query, req.params);
-            const user: IUser = _.assignIn({}, req.user);
-            const result = await func(params, user, req.files);
+            const user = _.assignIn({}, req.user);
+            const result = await func(params, user, { req, res });
             if ( middleware ) {
                 return next();
             }

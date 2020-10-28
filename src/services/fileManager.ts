@@ -15,7 +15,7 @@ AWS.config.loadFromPath('config/aws/credentials.json');
 const s3 = new AWS.S3({ apiVersion: '2006-03-01' });
 
 class FileManager {
-    uploadImage = async (req: any, res: Response, next: Function) => {
+    uploadImage = async (req: Request, res: Response, next: Function) => {
         try {
             const { user } = req;
             const { params, files }: any = await this.formidable(req, user);

@@ -1,6 +1,6 @@
 import * as _ from 'lodash';
 import { Request, Response } from 'express';
-import { IGameParams, IGamePlayParams, IUser } from './_interfaces';
+import { IGameParams, IGamePlayParams, IRoute, IUser } from './_interfaces';
 import { Op, Sequelize, Transaction } from 'sequelize';
 import { dbs } from '../commons/globals';
 import TimelineController from './timelineController';
@@ -123,7 +123,7 @@ class GameController {
         }])
     }
 
-    redirectGame = (req: Request, res: Response) => {
+    redirectGame = (params: any, user: any, { req, res }: IRoute) => {
         const { pathname, pid } = _.assignIn({}, req.body, req.query, req.params);
         let url = `${Url.GameClient}/${pathname}`;
         if ( pid ) {
@@ -131,6 +131,14 @@ class GameController {
         }
         res.redirect(url);
     }
+    // redirectGame = (req: Request, res: Response) => {
+    //     const { pathname, pid } = _.assignIn({}, req.body, req.query, req.params);
+    //     let url = `${Url.GameClient}/${pathname}`;
+    //     if ( pid ) {
+    //         url += `/${pid}`;
+    //     }
+    //     res.redirect(url);
+    // }
 
 
     /**

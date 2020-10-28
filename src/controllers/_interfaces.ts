@@ -1,3 +1,4 @@
+import { NextFunction, Request, Response } from 'express';
 import { eAlarm, eNotice, eNotify, eTimeline } from "../commons/enums";
 
 /**
@@ -46,6 +47,11 @@ export interface IUser extends IDecoded {
 /**
  * parameters
  */
+export interface IRoute {
+    req: Request,
+    res: Response,
+    next: NextFunction
+}
 export interface ISocialMedia {
     user_uid: string,
     target_uid: string,

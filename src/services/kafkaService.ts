@@ -15,17 +15,20 @@ namespace KafkaService {
 
         connect() {
             return new Promise((resolve, reject) => {
-                if ( !this.producer ) {
+                try {
+                    if ( this.producer ) {
+                        return resolve(this.producer);
+                    }
                     const client = new kafka.KafkaClient();
                     client.createTopics(topics, (error: any, result: CreateTopicResponse[]) => {
                         this.producer = new kafka.Producer(client, this.options);
                         this.producer.on('ready', resolve);
                         this.producer.on('error', this.onError);
-                        resolve();
+                        resolve(this.producer);
                     })
                 }
-                else {
-                    reject();
+                catch (e) {
+                    reject(e);
                 }
             })
         }
