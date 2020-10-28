@@ -1,32 +1,42 @@
-import { Router } from 'express';
+import { NextFunction, Request, Response, Router } from 'express';
 import RpcController from '../controllers/rpcController';
 import LauncherController from '../controllers/launcherController';
 import convert from '../controllers/_convert';
 import GameController from '../controllers/gameController';
 import BattleController from '../controllers/battleController';
-import { validateFirebaseIdToken } from './_common';
+import { throwError, validateFirebaseIdToken } from './_common';
 
 
 const apiVer = `/api/v1`
+const isAuthenticated = (req: Request, res: Response, next: NextFunction) => {
+    if ( !req.user ) {
+        return throwError(res, '^_^ㅗ');
+    }
+    next();
+}
 export default (router: Router) => {
+    // 게임 실행
     router.get(`${apiVer}/launch/game/:uid`,             convert(LauncherController.getGame));
     router.get(`${apiVer}/launch/battle/:uid`,           convert(LauncherController.getBattleGame));
     router.get(`${apiVer}/launch/shared/:uid`,           convert(LauncherController.getSharedGame));
 
 
-    router.get(`${apiVer}/launch/host/battle`,           convert(LauncherController.getBattleUrl));
-    router.get(`${apiVer}/launch/host/shared`,           convert(LauncherController.getSharedUrl));
+    // 링크 생성
+    router.post(`${apiVer}/launch/host/battle`,          validateFirebaseIdToken,   isAuthenticated,    convert(LauncherController.getBattleUrl));
+    router.post(`${apiVer}/launch/host/shared`,          validateFirebaseIdToken,   isAuthenticated,    convert(LauncherController.getSharedUrl));
 
 
+    // 젬파이
     router.post(`${apiVer}/launch/game-start`,           validateFirebaseIdToken,   convert(GameController.gameStart));
     router.post(`${apiVer}/launch/game-over`,            validateFirebaseIdToken,   convert(GameController.gameOver));
-    router.get(`${apiVer}/launch/game-ranking-global`,   convert(GameController.getGlobalRanking));
+    router.get(`${apiVer}/launch/game-ranking-global/:game_uid`,   validateFirebaseIdToken,     convert(GameController.getGlobalRanking));
 
 
-    router.post(`${apiVer}/launch/battle-start`,         convert(BattleController.gameStart));
+    // 배틀
+    router.post(`${apiVer}/launch/battle-start`,         validateFirebaseIdToken,   convert(BattleController.gameStart));
     router.post(`${apiVer}/launch/battle-over`,          convert(BattleController.gameStart));
     router.post(`${apiVer}/launch/battle-update-name`,   convert(BattleController.updateUserName));
-    router.get(`${apiVer}/launch/battle-ranking`,        convert(BattleController.getRanking));
+    router.get(`${apiVer}/launch/battle-ranking/:battle_uid`,   convert(BattleController.getRanking));
 }
 
 

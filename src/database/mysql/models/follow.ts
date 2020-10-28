@@ -21,7 +21,7 @@ class FollowModel extends Model {
     async afterSync(): Promise<void> {
         this.model.belongsTo(dbs.User.model, { foreignKey: 'user_id', targetKey: 'id', as: 'user' });
         this.model.belongsTo(dbs.User.model, { foreignKey: 'target_id', targetKey: 'id', as: 'target' });
-        this.model.belongsTo(dbs.UserGame.model, { foreignKey: 'target_id', targetKey: 'user_id', as: 'gameRecord' });
+        // this.model.belongsTo(dbs.UserGame.model, { foreignKey: 'target_id', targetKey: 'user_id', as: 'gameRecord' });
     }
 
 

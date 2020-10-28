@@ -8,7 +8,7 @@ import { CreateError } from '../commons/errorCodes';
 import cfgOption from '../../config/opt';
 
 
-function throwError(res: Response, e: string, statusCode = 401) {
+export function throwError(res: Response, e: string, statusCode = 401) {
     res.statusCode = statusCode;
     res.send({
         error: e
@@ -114,7 +114,9 @@ export const validateFirebaseIdToken = async (req: Request, res: Response, next:
         const idToken = getIdToken(req);
         // const decodedIdToken = await admin.auth().verifyIdToken(idToken);
         // console.log('ID Token correctly decoded', decodedIdToken);
-        req.user = await admin.auth().verifyIdToken(idToken);
+        if ( idToken ) {
+            req.user = await admin.auth().verifyIdToken(idToken);
+        }
         return next();
     } catch (error) {
         // console.error('Error while verifying Firebase ID token:', error);

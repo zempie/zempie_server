@@ -8,10 +8,13 @@ import { Transaction } from 'sequelize';
 
 class PublishMQ extends SrvMQ {
     async gameOver(message: Message) {
-        const { pid, game_id, }: any = message;
+        const { pid, game_uid, }: any = message;
 
         if ( pid ) {
             const pu = await dbs.User.findOne({ uid: pid });
+            const game = await dbs.Game.findOne({ uid: game_uid });
+            const { id: game_id } = game;
+
             await dbs.UserPublishing.updateCount({ user_id: pu.id, game_id, pub_type: ePubType.PubGamePlay });
             await dbs.GeneratedPointsLog.createPoints({ user_id: pu.id, game_id, pub_type: ePubType.PubGamePlay });
         }

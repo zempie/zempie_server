@@ -29,18 +29,30 @@ class GameController {
 
 
     gameOver = async ({ game_uid, score, pid }: IGameParams, user: IUser) => {
-        const user_uid = user.uid;
-        const userRecord = await dbs.User.findOne({ uid: user_uid });
-        const game = await dbs.Game.findOne({ uid: game_uid });
-        if ( !game ) {
-            throw CreateError(ErrorCodes.INVALID_GAME_UID);
-        }
+        const { uid: user_uid } = user;
+        // const user_uid = user.uid;
+        // const userRecord = await dbs.User.findOne({ uid: user_uid });
+        // const game = await dbs.Game.findOne({ uid: game_uid });
+        // if ( !game ) {
+        //     throw CreateError(ErrorCodes.INVALID_GAME_UID);
+        // }
+        //
+        // const user_id = userRecord.id;
+        // const game_id = game.id;
 
-        const user_id = userRecord.id;
-        const game_id = game.id;
+        Producer.send([{
+            topic: 'gameOver',
+            messages: JSON.stringify({
+                user_uid,
+                game_uid,
+                score,
+                pid,
+            }),
+        }])
 
         return await dbs.UserGame.getTransaction(async (transaction: Transaction) => {
-            const record = await dbs.UserGame.findOne({user_id, game_id}, transaction);
+            // const record = await dbs.UserGame.findOne({user_id, game_id}, transaction);
+            const record = await dbs.UserGame.findOne({user_uid, game_uid}, transaction);
             const previous_score = record? record.score : 0;
             const new_record = score > previous_score;
 
@@ -49,20 +61,9 @@ class GameController {
                     record.score = score;
                     await record.save({transaction});
                 } else {
-                    await dbs.UserGame.create({user_id, game_id, score}, transaction);
+                    await dbs.UserGame.create({user_uid, game_uid, score}, transaction);
                 }
             }
-
-            Producer.send([{
-                topic: 'gameOver',
-                messages: JSON.stringify({
-                    user_uid,
-                    user_id,
-                    game_id,
-                    score,
-                    pid,
-                }),
-            }])
 
             return {
                 new_record
@@ -144,36 +145,37 @@ class GameController {
     /**
      * 랭킹
      */
-    getGlobalRanking = async ({ game_uid, limit = 50, offset = 0 }: IGameParams, {uid}: IUser, transaction?: Transaction) => {
+    getGlobalRanking = async ({ game_uid, limit = 50, offset = 0 }: IGameParams, {uid: user_uid}: IUser) => {
         let score, rank;
 
-        const userRecord = await dbs.User.findOne({ uid });
-        const game = await dbs.Game.findOne({ uid: game_uid });
-        if ( !game ) {
-            throw CreateError(ErrorCodes.INVALID_GAME_UID);
-        }
+        // const userRecord = await dbs.User.findOne({ uid });
+        // const game = await dbs.Game.findOne({ uid: game_uid });
+        // if ( !game ) {
+        //     throw CreateError(ErrorCodes.INVALID_GAME_UID);
+        // }
+        //
+        // const user_id = userRecord.id;
+        // const game_id = game.id;
 
-        const user_id = userRecord.id;
-        const game_id = game.id;
-
-        const gameRecord = await dbs.UserGame.findOne({game_id, user_id}, transaction);
-        if ( gameRecord ) {
-            score = gameRecord.score;
-            rank = await dbs.UserGame.model.count({
-                where: {
-                    game_id,
-                    score: {
-                        [Op.gt]: score
+        if ( user_uid ) {
+            const gameRecord = await dbs.UserGame.findOne({game_uid, user_uid});
+            if ( gameRecord ) {
+                score = gameRecord.score;
+                rank = await dbs.UserGame.model.count({
+                    where: {
+                        game_uid,
+                        score: {
+                            [Op.gt]: score
+                        },
                     },
-                },
-                order: [['score', 'desc']],
-                transaction
-            });
-            rank += 1;
+                    order: [['score', 'desc']],
+                });
+                rank += 1;
+            }
         }
 
         const { count, rows } = await dbs.UserGame.model.findAndCountAll({
-            where: { game_id },
+            where: { game_uid },
             include: [{
                 model: dbs.User.model,
             }],
@@ -183,8 +185,7 @@ class GameController {
                 ],
             },
             limit,
-            offset,
-            transaction
+            offset
         });
 
         return {

@@ -55,7 +55,7 @@ class BattleController {
             await battle.save({transaction});
 
 
-            let decoded = battle_key? verifyJWT(battle_key) : {
+            let decoded = battle_key && battle_key !== ''? verifyJWT(battle_key) : {
                 user_uid: uniqid(),
                 best_score: -1
             };
