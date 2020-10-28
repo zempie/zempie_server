@@ -35,6 +35,7 @@ class ContentAdminController {
             account: record.account,
             name: record.name,
             level: record.level,
+            sub_level: record.sub_level,
         }, '1d');
         const refresh_token = signJWT({
             is_admin: true,
@@ -42,6 +43,7 @@ class ContentAdminController {
             account: record.account,
             name: record.name,
             level: record.level,
+            sub_level: record.sub_level,
         }, '30d');
 
         await dbs.AdminRefreshToken.getTransaction(async (transaction: Transaction) => {
@@ -80,6 +82,7 @@ class ContentAdminController {
         return {
             name: admin.name,
             level: admin.level,
+            sub_level: admin.sub_level,
         }
     }
 
@@ -98,6 +101,7 @@ class ContentAdminController {
                         account: admin.account,
                         name: admin.name,
                         level: admin.level,
+                        sub_level: admin.sub_level,
                     },
                     path: l.path,
                     body: JSON.parse(l.body),
@@ -119,7 +123,7 @@ class ContentAdminController {
         }
     }
 
-    async addAdmin({ account, name, password, level }: any, { id, uid }: IAdmin) {
+    async addAdmin({ account, name, password, level, sub_level }: any, { id, uid }: IAdmin) {
         const admin = await dbs.Admin.findOne({ id });
         if ( admin.level < 10 ) {
             throw CreateError(ErrorCodes.INVALID_ADMIN_LEVEL)
@@ -127,6 +131,10 @@ class ContentAdminController {
 
         level = _.toNumber(level);
         if ( isNaN(level) || level >= 10 || level < 1 ) {
+            throw CreateError(ErrorCodes.INVALID_ADMIN_PARAMS)
+        }
+        sub_level = _.toNumber(level);
+        if ( isNaN(sub_level) || sub_level >= 10 || sub_level < 0 ) {
             throw CreateError(ErrorCodes.INVALID_ADMIN_PARAMS)
         }
 
@@ -140,11 +148,12 @@ class ContentAdminController {
             account,
             name,
             level,
+            sub_level,
             password: makePassword(password),
         })
     }
 
-    async updateAdmin({ id: target_id, name, password, level, activated }: any, { id, level: order_level }: IAdmin) {
+    async updateAdmin({ id: target_id, name, password, level, sub_level, activated }: any, { id, level: order_level, sub_level: order_sub_level }: IAdmin) {
         target_id = _.toNumber(target_id);
 
         const admin = await dbs.Admin.findOne({ id: target_id });
@@ -160,6 +169,15 @@ class ContentAdminController {
                 }
                 admin.level = level || admin.level;
             }
+
+            if ( sub_level ) {
+                sub_level = _.toNumber(sub_level);
+                if ( isNaN(sub_level) || level >= 10 || level < 0 ) {
+                    throw CreateError(ErrorCodes.INVALID_ADMIN_PARAMS)
+                }
+                admin.sub_level = sub_level || admin.sub_level;
+            }
+
             if ( activated ) {
                 admin.activated = (activated === 'true');
             }

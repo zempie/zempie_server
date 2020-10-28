@@ -13,6 +13,7 @@ class AdminModel extends Model {
             account:        { type: DataTypes.STRING(20), unique: true, allowNull: false },
             name:           { type: DataTypes.STRING(20), allowNull: false },
             level:          { type: DataTypes.SMALLINT, allowNull: false, defaultValue: 1 },
+            sub_level:      { type: DataTypes.SMALLINT, allowNull: false, defaultValue: 0 },
             password:       { type: DataTypes.STRING(250), allowNull: false },
         };
     }

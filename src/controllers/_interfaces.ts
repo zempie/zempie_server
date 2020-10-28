@@ -33,6 +33,7 @@ export interface IAdmin extends IDecoded {
     uid: string,
     name : string,
     level: number,
+    sub_level: number,
 }
 export interface IPublisher extends IDecoded {
     domain: string,
