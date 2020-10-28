@@ -1,4 +1,4 @@
-import {IUser} from "../_interfaces";
+import { IRoute, IUser } from '../_interfaces';
 import { dbs, caches } from '../../commons/globals';
 import {Transaction} from "sequelize";
 import {CreateError, ErrorCodes} from "../../commons/errorCodes";
@@ -74,7 +74,7 @@ class StudioController {
         }
     }
 
-    createDeveloper = async (params: any, { uid }: IUser, {file} : any) =>{
+    createDeveloper = async (params: any, { uid }: IUser, {req: {files: {file}}}: IRoute) =>{
         return dbs.Developer.getTransaction( async (transaction : Transaction) => {
             const user = await dbs.User.findOne({ uid });
             const dev = await dbs.Developer.findOne( { user_id : user.id } );
@@ -100,7 +100,7 @@ class StudioController {
         })
     }
 
-    updateDeveloper = async  (params: any, { uid }: IUser, {file} : any) =>{
+    updateDeveloper = async  (params: any, { uid }: IUser, {req: {files: {file}}}: IRoute) =>{
         return dbs.Developer.getTransaction( async (transaction : Transaction)=>{
             params = params || {};
             params.user_uid = uid;
@@ -153,7 +153,7 @@ class StudioController {
     }
 
 
-    createProject = async ( params : ICreateProject, {uid}: IUser, files : any) => {
+    createProject = async ( params : ICreateProject, {uid}: IUser, {req:{files}}: IRoute) => {
         return dbs.Project.getTransaction( async (transaction : Transaction)=>{
             const dev = await dbs.Developer.findOne( {user_uid : uid} );
             params.developer_id = dev.id;
@@ -229,7 +229,7 @@ class StudioController {
      url_game, url_thumb, url_title
      activated
      */
-    updateProject = async ( params : any, {uid}: IUser, {file}: any )=>{
+    updateProject = async ( params : any, {uid}: IUser, {req: {files: {file}}}: IRoute)=>{
 
         return dbs.Project.getTransaction( async (transaction : Transaction) => {
             const project = await dbs.Project.findOne( { id : params.id } );

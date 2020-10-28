@@ -1,5 +1,5 @@
 import * as _ from 'lodash';
-import { IUser } from './_interfaces';
+import { IRoute, IUser } from './_interfaces';
 import { dbs, caches } from '../commons/globals';
 import admin from 'firebase-admin';
 import { Transaction, Op } from 'sequelize';
@@ -104,7 +104,7 @@ class UserController {
     }
 
 
-    setInfo = async (params: any, {uid}: IUser, {file}: any) => {
+    setInfo = async (params: any, {uid}: IUser, {req: {files: {file}}}: IRoute) => {
         return dbs.User.getTransaction(async (transaction: Transaction) => {
             const user = await dbs.User.getInfo({ uid }, transaction);
             if ( !user ) {
