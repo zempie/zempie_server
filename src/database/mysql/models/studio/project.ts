@@ -14,6 +14,7 @@ class ProjectModel extends Model {
             description:        { type: DataTypes.STRING, defaultValue: '' },
             game_id:            { type: DataTypes.INTEGER, allowNull: true },
             deploy_version_id:  { type: DataTypes.INTEGER, allowNull: true },
+            update_version_id:  { type: DataTypes.INTEGER, allowNull: true },
         }
     }
 
@@ -23,15 +24,40 @@ class ProjectModel extends Model {
 
         this.model.belongsTo( dbs.Game.model );
         this.model.hasOne(dbs.ProjectVersion.model, { sourceKey : 'deploy_version_id'});
+        this.model.hasOne(dbs.ProjectVersion.model, { sourceKey : 'update_version_id'});
     }
 
-    async create({ developer_id, name, control_type, description } : any, transaction?: Transaction) {
-        return super.create( { developer_id, name, control_type, description }, transaction );
+    async create({ developer_id, name, description, picture } : any, transaction?: Transaction) {
+        const value : any = {
+            developer_id,
+            name,
+            description,
+        }
+
+        if( picture ) {
+            value.picture = picture;
+        }
+
+
+        return super.create( value, transaction );
     }
 
-    async getList({ developer_id } : any, transaction?: Transaction) {
+    async getProjects({ developer_id } : any, transaction?: Transaction) {
         return this.model.findAll( {
-            where: { developer_id},
+            where: { developer_id },
+            include: [{
+                model: dbs.Game.model,
+            },{
+                model: dbs.ProjectVersion.model,
+            }],
+            transaction
+        });
+
+    }
+
+    async getProject({ id } : any, transaction?: Transaction) {
+        return this.model.findOne( {
+            where: { id },
             include: [{
                 model: dbs.Game.model,
             },{
@@ -41,18 +67,8 @@ class ProjectModel extends Model {
         });
     }
 
-    async getProject({ id } : any, transaction?: Transaction) {
-        return this.model.findOne( {
-            where: { id },
-            include: [{
-                model: dbs.Game.model,
-            }],
-            transaction
-        });
-    }
-
-    async updateProject({ id, name, picture, control_type, description, game_id, deploy_version_id } : any, transaction?: Transaction) {
-        const project = await this.getProject( { id }, transaction );
+    async updateProject({ id, name, picture, control_type, description, game_id, deploy_version_id, update_version_id } : any, transaction?: Transaction) {
+        const project = await this.model.findOne( { id }, transaction );
 
         if( name ) {
             project.name = name;
@@ -76,6 +92,10 @@ class ProjectModel extends Model {
 
         if( deploy_version_id ) {
             project.deploy_version_id = deploy_version_id;
+        }
+
+        if( update_version_id ) {
+            project.update_version_id = deploy_version_id;
         }
 
         return await project.save( { transaction } );
