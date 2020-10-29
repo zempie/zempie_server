@@ -289,7 +289,9 @@ class ContentAdminController {
                 throw CreateError(ErrorCodes.INVALID_NOTICE_ID);
             }
 
-            await notice.destroy({ transaction });
+            // 수정수정
+
+            await notice.save({transaction});
         })
     }
 
@@ -301,9 +303,7 @@ class ContentAdminController {
                 throw CreateError(ErrorCodes.INVALID_NOTICE_ID);
             }
 
-            // 수정수정
-
-            await notice.save({transaction});
+            await notice.destroy({ transaction });
         })
     }
 
