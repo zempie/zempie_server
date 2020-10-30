@@ -62,6 +62,7 @@ class UserQuestionModel extends Model {
             count,
             questions: _.map(rows, (r: any) => {
                 return {
+                    id: r.id,
                     name: r.user.name,
                     title: r.title,
                     content: r.content,
