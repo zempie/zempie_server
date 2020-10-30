@@ -263,7 +263,7 @@ class ContentAdminController {
      * 고객지원
      */
     async getSupportQuestions({ no_answer, limit = 50, offset = 0, sort = 'id', dir = 'desc' }: any, admin: IAdmin) {
-        const { count, questions } = await dbs.UserQuestion.getList({ no_answer, limit, offset });
+        const { count, questions } = await dbs.UserQuestion.getList({ no_answer, limit, offset, sort, dir });
         return {
             count,
             questions
