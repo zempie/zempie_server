@@ -216,8 +216,10 @@ class ContentAdminController {
         }
     }
 
-    async getUserProfile({ id }: any, admin: IAdmin) {
-        const user = await dbs.UserProfile.findOne({ user_id: id });
+    async getUserProfile({ id, sort = 'id', dir = 'desc' }: any, admin: IAdmin) {
+        const user = await dbs.UserProfile.findAndCountAll({ user_id: id }, {
+            order: [[sort, dir]],
+        });
         return {
             user: user.get({ plain: true })
         }
@@ -238,8 +240,8 @@ class ContentAdminController {
         user.save();
     }
 
-    async getUserQuestions({ user_id, no_answer, limit = 50, offset = 0 }: any) {
-        const { count, questions } = await dbs.UserQuestion.getList({ user_id, no_answer, limit, offset });
+    async getUserQuestions({ user_id, no_answer, limit = 50, offset = 0, sort = 'id', dir = 'desc' }: any) {
+        const { count, questions } = await dbs.UserQuestion.getList({ user_id, no_answer, limit, offset, sort, dir });
         return {
             count,
             questions
