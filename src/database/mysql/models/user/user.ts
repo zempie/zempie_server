@@ -149,8 +149,8 @@ class UserModel extends Model {
     }
 
 
-    async getProfileAll({limit = 50, offset = 0}, transaction?: Transaction) {
-        const records = await this.model.findAll({
+    async getProfileAll({limit = 50, offset = 0, sort = 'id', dir = 'desc'}, transaction?: Transaction) {
+        return await this.model.findAndCountAll({
             where: {
                 is_admin: {
                     [Op.ne]: true
@@ -166,12 +166,13 @@ class UserModel extends Model {
                     exclude: ['id', 'created_at', 'updated_at', 'deleted_at'],
                 }
             }],
+            order: [[sort, dir]],
             limit: _.toNumber(limit),
             offset: _.toNumber(offset),
             transaction
         });
 
-        return records.map((record: any) => record.get({plain: true}))
+        // return records.map((record: any) => record.get({plain: true}))
     }
 
     search = async ({ search_name, limit = 100, offset = 0 }: any, transaction?: Transaction) => {

@@ -90,10 +90,11 @@ class ContentAdminController {
     /**
      * 관리자
      */
-    async getAdminLogs({ admin_id, limit = 50, offset = 0 }: any, admin: IAdmin) {
-        const logs = await dbs.AdminLog.getLogs({ admin_id, limit, offset });
+    async getAdminLogs({ admin_id, limit = 50, offset = 0, sort = 'id', dir = 'desc' }: any, admin: IAdmin) {
+        const { count, rows } = await dbs.AdminLog.getLogs({ admin_id, limit, offset, sort, dir });
         return {
-            logs: _.map(logs, (l: any) => {
+            count,
+            logs: _.map(rows, (l: any) => {
                 const admin = l.admin;
                 return {
                     admin: {
@@ -110,16 +111,18 @@ class ContentAdminController {
         }
     }
 
-    async getAdmins({ limit = 50, offset = 0 }, admin: IAdmin) {
-        const records = await dbs.Admin.findAll({}, {
+    async getAdmins({ limit = 50, offset = 0, sort = 'id', dir = 'desc' }, admin: IAdmin) {
+        const { count, rows } = await dbs.Admin.findAndCountAll({}, {
             attributes: {
                 exclude: ['password']
             },
+            order: [[sort, dir]],
             limit: _.toNumber(limit),
             offset: _.toNumber(offset),
         });
         return {
-            admins: _.map(records, record => record.get({ plain: true }))
+            count,
+            admins: _.map(rows, record => record.get({ plain: true }))
         }
     }
 
@@ -205,10 +208,11 @@ class ContentAdminController {
     /**
      * 사용자
      */
-    async getUsers({ limit = 50, offset = 0 }, admin: IAdmin) {
-        const users = await dbs.User.getProfileAll({ limit, offset });
+    async getUsers({ limit = 50, offset = 0, sort = 'id', dir = 'desc' }, admin: IAdmin) {
+        const { count, rows } = await dbs.User.getProfileAll({ limit, offset, sort, dir });
         return {
-            users
+            count,
+            users: _.map(rows, (record: any) => record.get({plain: true}))
         }
     }
 
@@ -235,8 +239,9 @@ class ContentAdminController {
     }
 
     async getUserQuestions({ user_id, no_answer, limit = 50, offset = 0 }: any) {
-        const questions = await dbs.UserQuestion.getList({ user_id, no_answer, limit, offset });
+        const { count, questions } = await dbs.UserQuestion.getList({ user_id, no_answer, limit, offset });
         return {
+            count,
             questions
         }
     }
@@ -257,22 +262,25 @@ class ContentAdminController {
     /**
      * 고객지원
      */
-    async getSupportQuestions({ no_answer, limit = 50, offset = 0 }: any, admin: IAdmin) {
-        const questions = await dbs.UserQuestion.getList({ no_answer, limit, offset });
+    async getSupportQuestions({ no_answer, limit = 50, offset = 0, sort = 'id', dir = 'desc' }: any, admin: IAdmin) {
+        const { count, questions } = await dbs.UserQuestion.getList({ no_answer, limit, offset });
         return {
+            count,
             questions
         }
     }
 
 
-    async getNotices({ limit = 50, offset = 0 }) {
-        const notices = await dbs.Notice.findAll({}, {
+    async getNotices({ limit = 50, offset = 0, sort = 'id', dir = 'desc' }) {
+        const { count, rows } = await dbs.Notice.findAndCountAll({}, {
+            order: [[sort, dir]],
             limit: _.toNumber(limit),
             offset: _.toNumber(offset),
         })
 
         return {
-            notices: _.map(notices, n => n.get({plain: true}))
+            count,
+            notices: _.map(rows, n => n.get({plain: true}))
         }
     }
 
@@ -310,13 +318,30 @@ class ContentAdminController {
     /**
      * 게임
      */
-    async getGames(params: any, admin: IAdmin) {
-        const response = await fetch(`${Url.DeployApiV1}/games?key=${Deploy.api_key}`);
-        if( response.status === 200 ) {
-            const json = await response.json();
-            return json.data
+    // async getGames(params: any, admin: IAdmin) {
+    //     const response = await fetch(`${Url.DeployApiV1}/games?key=${Deploy.api_key}`);
+    //     if( response.status === 200 ) {
+    //         const json = await response.json();
+    //         return json.data
+    //     }
+    //     throw new Error(response.statusText);
+    // }
+    async getGames({ limit = 50, offset = 0 }) {
+        const { count, rows } = await dbs.Games.findAndCountAll({}, {
+            include: [{
+                model: dbs.Developer.model,
+            }],
+            limit: _.toNumber(limit),
+            offset: _.toNumber(offset),
+        });
+        return {
+            count,
+            games: _.map(rows, (row) => {
+                return {
+                    ...row
+                }
+            })
         }
-        throw new Error(response.statusText);
     }
 
 

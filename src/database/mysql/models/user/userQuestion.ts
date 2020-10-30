@@ -10,6 +10,8 @@ interface IUserQuestionParams {
     title?: string
     content?: string
     no_answer?: any
+    sort: string,
+    dir: string,
     limit: number
     offset: number
 }
@@ -34,7 +36,7 @@ class UserQuestionModel extends Model {
         this.model.belongsTo(dbs.Admin.model);
     }
 
-    async getList({ user_id, no_answer, limit = 50, offset = 0 }: IUserQuestionParams) {
+    async getList({ user_id, no_answer, limit = 50, offset = 0, sort = 'id', dir = 'desc' }: IUserQuestionParams) {
         const where: any = {};
         if ( user_id ) {
             where.user_id = user_id;
@@ -44,28 +46,32 @@ class UserQuestionModel extends Model {
                 [Op.eq]: null
             }
         }
-        const records = await this.findAll(where, {
+        const { count, rows } = await this.findAndCountAll(where, {
             include: [{
                 model: dbs.User.model,
             }, {
                 model: dbs.Admin.model,
                 attributes: ['id', 'account', 'name', 'level', 'activated'],
             }],
+            order: [[sort, dir]],
             limit: _.toNumber(limit),
             offset: _.toNumber(offset),
         });
 
-        return _.map(records, (r: any) => {
-            return {
-                name: r.user.name,
-                title: r.title,
-                content: r.content,
-                answer: r.answer,
-                asked_at: r.created_at,
-                answered_at: r.updated_at,
-                admin: r.admin
-            }
-        })
+        return {
+            count,
+            questions: _.map(rows, (r: any) => {
+                return {
+                    name: r.user.name,
+                    title: r.title,
+                    content: r.content,
+                    answer: r.answer,
+                    asked_at: r.created_at,
+                    answered_at: r.updated_at,
+                    admin: r.admin
+                }
+            })
+        }
 
     }
 

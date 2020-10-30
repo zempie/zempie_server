@@ -30,14 +30,15 @@ class AdminLogModel extends Model {
     }
 
 
-    async getLogs({admin_id, limit = 50, offset = 0}: any) {
+    async getLogs({ admin_id, limit = 50, offset = 0, sort = 'id', dir = 'desc' }: any) {
         const where: any = {};
         if ( admin_id ) where.admin_id = admin_id;
-        return this.model.findAll({
+        return this.model.findAndCountAll({
             where,
             include: [{
                 model: dbs.Admin.model,
             }],
+            order: [[sort, dir]],
             limit: _.toNumber(limit),
             offset: _.toNumber(offset),
         })
