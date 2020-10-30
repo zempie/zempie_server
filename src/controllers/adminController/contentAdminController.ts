@@ -94,9 +94,10 @@ class ContentAdminController {
         const { count, rows } = await dbs.AdminLog.getLogs({ admin_id, limit, offset, sort, dir });
         return {
             count,
-            logs: _.map(rows, (l: any) => {
-                const admin = l.admin;
+            logs: _.map(rows, (row: any) => {
+                const admin = row.admin;
                 return {
+                    id: row.id,
                     admin: {
                         id: admin.id,
                         account: admin.account,
@@ -104,8 +105,8 @@ class ContentAdminController {
                         level: admin.level,
                         sub_level: admin.sub_level,
                     },
-                    path: l.path,
-                    body: JSON.parse(l.body),
+                    path: row.path,
+                    body: JSON.parse(row.body),
                 }
             })
         }
