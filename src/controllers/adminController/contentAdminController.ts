@@ -90,7 +90,7 @@ class ContentAdminController {
     /**
      * 관리자
      */
-    async getAdminLogs({ admin_id, limit = 50, offset = 0, sort = 'id', dir = 'desc' }: any, admin: IAdmin) {
+    async getAdminLogs({ admin_id, limit = 50, offset = 0, sort = 'id', dir = 'asc' }: any, admin: IAdmin) {
         const { count, rows } = await dbs.AdminLog.getLogs({ admin_id, limit, offset, sort, dir });
         return {
             count,
@@ -112,7 +112,7 @@ class ContentAdminController {
         }
     }
 
-    async getAdmins({ limit = 50, offset = 0, sort = 'id', dir = 'desc' }, admin: IAdmin) {
+    async getAdmins({ limit = 50, offset = 0, sort = 'id', dir = 'asc' }, admin: IAdmin) {
         const { count, rows } = await dbs.Admin.findAndCountAll({}, {
             attributes: {
                 exclude: ['password']
@@ -209,7 +209,7 @@ class ContentAdminController {
     /**
      * 사용자
      */
-    async getUsers({ limit = 50, offset = 0, sort = 'id', dir = 'desc' }, admin: IAdmin) {
+    async getUsers({ limit = 50, offset = 0, sort = 'id', dir = 'asc' }, admin: IAdmin) {
         const { count, rows } = await dbs.User.getProfileAll({ limit, offset, sort, dir });
         return {
             count,
@@ -217,7 +217,7 @@ class ContentAdminController {
         }
     }
 
-    async getUserProfile({ id, sort = 'id', dir = 'desc' }: any, admin: IAdmin) {
+    async getUserProfile({ id, sort = 'id', dir = 'asc' }: any, admin: IAdmin) {
         const user = await dbs.UserProfile.findAndCountAll({ user_id: id }, {
             order: [[sort, dir]],
         });
@@ -241,7 +241,7 @@ class ContentAdminController {
         user.save();
     }
 
-    async getUserQuestions({ user_id, no_answer, limit = 50, offset = 0, sort = 'id', dir = 'desc' }: any) {
+    async getUserQuestions({ user_id, no_answer, limit = 50, offset = 0, sort = 'id', dir = 'asc' }: any) {
         const { count, questions } = await dbs.UserQuestion.getList({ user_id, no_answer, limit, offset, sort, dir });
         return {
             count,
@@ -265,7 +265,7 @@ class ContentAdminController {
     /**
      * 고객지원
      */
-    async getSupportQuestions({ no_answer, limit = 50, offset = 0, sort = 'id', dir = 'desc' }: any, admin: IAdmin) {
+    async getSupportQuestions({ no_answer, limit = 50, offset = 0, sort = 'id', dir = 'asc' }: any, admin: IAdmin) {
         const { count, questions } = await dbs.UserQuestion.getList({ no_answer, limit, offset, sort, dir });
         return {
             count,
@@ -274,7 +274,7 @@ class ContentAdminController {
     }
 
 
-    async getNotices({ limit = 50, offset = 0, sort = 'id', dir = 'desc' }) {
+    async getNotices({ limit = 50, offset = 0, sort = 'id', dir = 'asc' }) {
         const { count, rows } = await dbs.Notice.findAndCountAll({}, {
             order: [[sort, dir]],
             limit: _.toNumber(limit),

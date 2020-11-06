@@ -112,14 +112,14 @@ class UserController {
             }
 
             // 이름 변경
-            if ( params.display_name ) {
+            if ( params.name ) {
                 // 이름 검사 해야함 - 불량 단어
-                user.display_name = params.display_name;
+                user.name = params.name;
             }
 
             // 상태 메시지 변경
             if ( params.state_msg ) {
-                const profile = await dbs.UserProfile.findOne({ user_uid: uid }, transaction);
+                const profile = await dbs.UserProfile.findOne({ user_id: user.id }, transaction);
                 if ( profile ) {
                     profile.state_msg = params.state_msg;
                     await profile.save({ transaction });

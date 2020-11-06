@@ -81,11 +81,12 @@ class GameController {
         }
     }
 
-    getGameList = async ({}, user: IUser) => {
+    getGameList = async ({ limit = 50, offset = 0, sort = 'id', dir = 'asc' }, user: IUser) => {
         // const games = await gameCache.get()
-        const games = await dbs.Game.getList();
+        const { count, rows } = await dbs.Game.getList({limit, offset, sort, dir});
         return {
-            games: _.map(games, (game: any) => {
+            count,
+            games: _.map(rows, (game: any) => {
                 const { developer } = game;
                 return {
                     game_uid: game.uid,

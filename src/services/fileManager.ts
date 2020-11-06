@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import * as _ from 'lodash';
 import * as path from 'path';
 import * as fs from 'fs';
@@ -9,13 +9,16 @@ import * as imageminWebp from 'imagemin-webp';
 import { IUser } from '../controllers/_interfaces';
 import { Fields, Files, IncomingForm } from 'formidable';
 import Opt from '../../config/opt';
-import {getContentType} from "../commons/utils";
+import { getContentType } from "../commons/utils";
+import { ManagedUpload } from 'aws-sdk/lib/s3/managed_upload';
+import SendData = ManagedUpload.SendData;
+import { logger } from '../commons/logger';
 
 AWS.config.loadFromPath('config/aws/credentials.json');
 const s3 = new AWS.S3({ apiVersion: '2006-03-01' });
 
 class FileManager {
-    uploadImage = async (req: Request, res: Response, next: Function) => {
+    uploadImage = async (req: Request, res: Response, next: NextFunction) => {
         try {
             const { user } = req;
             const { params, files }: any = await this.formidable(req, user);
@@ -45,7 +48,7 @@ class FileManager {
             } as any);
 
             form.parse(req, async (err: any, fields: Fields, files: Files) => {
-                console.log('fields:', fields);
+                logger.debug('fields:', fields);
 
                 // const webps = await this.convertToWebp(_.map(files), 80);
 
@@ -70,7 +73,7 @@ class FileManager {
             ]
         });
         fs.unlink(file.path, (err) => {
-            console.log('.jpg 삭제')
+            logger.debug('.jpg 삭제');
         })
         return webp;
     }
@@ -81,14 +84,13 @@ class FileManager {
             const params = {
                 Bucket: `${Opt.AWS.Bucket}/${uid}/p`,
                 Key,
-                'ContentType': 'image/*',
                 // ACL: 'public-read',
+                ContentType: getContentType(filePath),
                 Body: fs.createReadStream(filePath),
             };
-            const upload = new AWS.S3.ManagedUpload({ service: s3, params });
-            upload.send((err, data) => {
+            s3.upload(params, (err: Error, data: SendData) => {
                 fs.unlink(filePath, (err) => {
-                    console.log('.webp 삭제')
+                    logger.debug('.webp 삭제');
                 });
 
                 if (err) {
@@ -97,6 +99,18 @@ class FileManager {
                 }
                 resolve(data);
             })
+            // const upload = new AWS.S3.ManagedUpload({ service: s3, params });
+            // upload.send((err, data) => {
+            //     fs.unlink(filePath, (err) => {
+            //         console.log('.webp 삭제')
+            //     });
+            //
+            //     if (err) {
+            //         console.error(err);
+            //         return reject(err);
+            //     }
+            //     resolve(data);
+            // })
         })
     }
 

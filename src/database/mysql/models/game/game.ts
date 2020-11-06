@@ -43,8 +43,8 @@ class GameModel extends Model {
     }
 
 
-    async getList() {
-        return this.model.findAll({
+    async getList({ limit = 50, offset = 0, sort = 'id', dir = 'asc' }) {
+        return await this.model.findAndCountAll({
             where: {
                 activated: true,
                 enabled: true,
@@ -54,7 +54,10 @@ class GameModel extends Model {
             },
             include: [{
                 model: dbs.Developer.model,
-            }]
+            }],
+            order: [[sort, dir]],
+            limit: _.toNumber(limit),
+            offset: _.toNumber(offset),
         })
 
         // return _.map(records, (record: any) => record.get({ plain: true }))

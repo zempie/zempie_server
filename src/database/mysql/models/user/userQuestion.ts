@@ -36,7 +36,7 @@ class UserQuestionModel extends Model {
         this.model.belongsTo(dbs.Admin.model);
     }
 
-    async getList({ user_id, no_answer, limit = 50, offset = 0, sort = 'id', dir = 'desc' }: IUserQuestionParams) {
+    async getList({ user_id, no_answer, limit = 50, offset = 0, sort = 'id', dir = 'asc' }: IUserQuestionParams) {
         const where: any = {};
         if ( user_id ) {
             where.user_id = user_id;

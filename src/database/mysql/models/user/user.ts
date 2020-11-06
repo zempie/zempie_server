@@ -149,7 +149,7 @@ class UserModel extends Model {
     }
 
 
-    async getProfileAll({limit = 50, offset = 0, sort = 'id', dir = 'desc'}, transaction?: Transaction) {
+    async getProfileAll({limit = 50, offset = 0, sort = 'id', dir = 'asc'}, transaction?: Transaction) {
         return await this.model.findAndCountAll({
             where: {
                 is_admin: {
