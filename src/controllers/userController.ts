@@ -1,5 +1,5 @@
 import * as _ from 'lodash';
-import { IRoute, IUser } from './_interfaces';
+import { IFirebaseUser, IRoute, IUser } from './_interfaces';
 import { dbs, caches } from '../commons/globals';
 import admin from 'firebase-admin';
 import { Transaction, Op } from 'sequelize';
@@ -8,6 +8,7 @@ const replaceExt = require('replace-ext');
 import { gameCache } from '../database/redis/models/games';
 import Opt from '../../config/opt'
 import { CreateError, ErrorCodes } from '../commons/errorCodes';
+import DecodedIdToken = admin.auth.DecodedIdToken;
 const { Url, Deploy } = Opt;
 
 class UserController {
@@ -15,7 +16,7 @@ class UserController {
      * 사용자 정보 가져오기
      * - 정보가 없을 경우 firebase 에서 가져와서 저장
      */
-    getInfo = async ({registration_token}: any, _user: any) => {
+    getInfo = async ({registration_token}: any, _user: DecodedIdToken) => {
         return dbs.User.getTransaction(async (transaction: Transaction) => {
             let profile, setting;
             const { uid } = _user;
@@ -104,6 +105,31 @@ class UserController {
     }
 
 
+    async verifyEmail ({}, user: DecodedIdToken) {
+        const userRecord = await admin.auth().getUser(user.uid)
+        if ( userRecord.emailVerified && !user.email_verified ) {
+            await admin.auth().updateUser(user.uid, {
+                emailVerified: true,
+            });
+            await dbs.User.update({ email_verified: true }, { uid: user.uid });
+        }
+        const r = await admin.auth().setCustomUserClaims(user.uid, {
+            jw: true,
+            admin: true
+        })
+        const custom_token = await admin.auth().createCustomToken(user.uid, {
+            jw: true,
+            admin: true
+        })
+
+        return {
+            user,
+            userRecord,
+            custom_token,
+        }
+    }
+
+
     setInfo = async (params: any, {uid}: IUser, {req: {files: {file}}}: IRoute) => {
         return dbs.User.getTransaction(async (transaction: Transaction) => {
             const user = await dbs.User.getInfo({ uid }, transaction);
@@ -181,6 +207,16 @@ class UserController {
     }
 
 
+    leaveZempie = async ({ num, text }: { num: number, text: string }, { uid }: IUser) => {
+        await dbs.UserLeftLog.getTransaction(async (transaction: Transaction) => {
+            await dbs.UserLeftLog.create({
+                user_uid: uid,
+                reason_num: num,
+                reason_text: text,
+            })
+            await dbs.User.destroy({ uid });
+        })
+    }
 }
 
 

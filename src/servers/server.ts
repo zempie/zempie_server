@@ -122,7 +122,7 @@ export default class Server {
         const serviceAccount = require('../../config/firebase/service-account.json');
         admin.initializeApp({
             credential: admin.credential.cert(serviceAccount),
-            databaseURL: 'https://zemini.firebaseio.com'
+            databaseURL: 'https://zempie.firebaseio.com'
         });
 
         firebase.admin = admin;

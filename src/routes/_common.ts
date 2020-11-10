@@ -144,3 +144,9 @@ export const adminTracking = async (req: Request, res: Response, next: NextFunct
     })
     return next();
 }
+
+
+const verifyCustomToken = async (req: Request, res: Response, next: NextFunction) => {
+    const idToken = getIdToken(req);
+
+}

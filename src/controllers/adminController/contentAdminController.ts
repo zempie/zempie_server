@@ -80,6 +80,7 @@ class ContentAdminController {
 
     async verifyToken({}, admin: IAdmin) {
         return {
+            id: admin.id,
             name: admin.name,
             level: admin.level,
             sub_level: admin.sub_level,

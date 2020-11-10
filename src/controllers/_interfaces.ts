@@ -43,6 +43,17 @@ export interface IUser extends IDecoded {
     name?: string,
     picture?: string,
 }
+export interface IFirebaseUser {
+    uid: string,
+    name: string,
+    picture: string,
+    firebase: {
+        identities: { email: string },
+        sign_in_provider: string,
+    },
+    email: string,
+    emailVerified: boolean,
+}
 
 
 /**

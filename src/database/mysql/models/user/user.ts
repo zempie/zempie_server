@@ -77,9 +77,9 @@ class UserModel extends Model {
         })
     }
 
-    async getProfile({ id }: IUser, transaction?: Transaction) {
+    async getProfile({ uid }: IUser, transaction?: Transaction) {
         const user = await this.model.findOne({
-            where: { id },
+            where: { uid },
             include: [{
                 model: dbs.UserProfile.model,
                 as: 'profile',
