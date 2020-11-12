@@ -1,12 +1,10 @@
 import * as admin from 'firebase-admin';
-import { google } from 'googleapis';
-import * as _ from 'lodash';
 import { NextFunction, Request, Response } from 'express';
 import { verifyJWT } from '../commons/utils';
 import { dbs } from '../commons/globals';
 import { Transaction } from 'sequelize';
-import { CreateError } from '../commons/errorCodes';
 import cfgOption from '../../config/opt';
+import { logger } from '../commons/logger';
 
 const serviceAccount = require('../../config/firebase/service-account.json');
 
@@ -87,7 +85,7 @@ declare global {
 const getIdToken = (req: Request) => {
     if ((!req.headers.authorization || !req.headers.authorization.startsWith('Bearer ')) &&
         !(req.cookies && req.cookies.__session)) {
-        console.error('No Firebase ID token was passed as a Bearer token in the Authorization header.',
+        logger.debug('No Firebase ID token was passed as a Bearer token in the Authorization header.',
             'Make sure you authorize your request by providing the following HTTP header:',
             'Authorization: Bearer <Firebase ID Token>',
             'or by passing a "__session" cookie.');
@@ -115,14 +113,11 @@ const getIdToken = (req: Request) => {
 export const validateFirebaseIdToken = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const idToken = getIdToken(req);
-        // const decodedIdToken = await admin.auth().verifyIdToken(idToken);
-        // console.log('ID Token correctly decoded', decodedIdToken);
         if ( idToken ) {
             req.user = await admin.auth().verifyIdToken(idToken);
         }
         return next();
     } catch (error) {
-        // console.error('Error while verifying Firebase ID token:', error);
         return throwError(res, 'Unauthorized', 403)
     }
 };
@@ -146,23 +141,4 @@ export const adminTracking = async (req: Request, res: Response, next: NextFunct
         body: JSON.stringify(req.body)
     })
     return next();
-}
-
-
-const verifyCustomToken = async (req: Request, res: Response, next: NextFunction) => {
-    const idToken = getIdToken(req);
-
-    const jwtClient = new google.auth.JWT(
-        serviceAccount.client_email,
-        undefined,
-        serviceAccount.private_key,
-        [
-            'email',
-            'profile',
-            'https://www.googleapis.com/auth/firebase',
-            'https://www.googleapis.com/auth/cloud-platform',
-        ],
-        undefined
-    );
-    const tokens = await jwtClient.authorize();
 }
