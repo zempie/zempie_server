@@ -58,6 +58,16 @@ export const ErrorCodes = {
         message: '관리자 파라미터 오류'
     },
 
+
+    USER_ALREADY_VERIFIED_EMAIL: {
+        code: 2101,
+        message: '이미 인증된 메일'
+    },
+    USER_INVALID_VERIFIED_EMAIL: {
+        code: 2102,
+        message: '이메일 인증 안됨'
+    },
+
     INVALID_TIMELINE_USER_UID: {
         code: 1210,
         message: '타임라인 유저 아이디 오류'

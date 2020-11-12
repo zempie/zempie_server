@@ -1,16 +1,17 @@
 import * as _ from 'lodash'
 import * as uniqid from 'uniqid';
-import { v4 as uuid } from 'uuid';
-import { ITimelineParams, IUser } from "./_interfaces";
+import { ITimelineParams } from "./_interfaces";
 import { dbs } from "../commons/globals";
 import { Transaction } from "sequelize";
 import { eTimeline } from "../commons/enums";
 import { CreateError, ErrorCodes } from "../commons/errorCodes";
-import { gameCache } from "../database/redis/models/games";
+import admin from 'firebase-admin';
+import DecodedIdToken = admin.auth.DecodedIdToken;
+
 
 class TimelineController {
 
-    async getList({user_uid, limit = 50, offset = 0}: ITimelineParams, user: IUser) {
+    async getList({user_uid, limit = 50, offset = 0}: ITimelineParams, user: DecodedIdToken) {
         user_uid = user_uid || user.uid;
 
         const userRecord = await dbs.User.findOne({uid: user_uid});
@@ -37,7 +38,7 @@ class TimelineController {
     }
 
 
-    async doPosting({type, score, follower_ids, game_uid, game_id, user_id, achievement_id, battle_id}: ITimelineParams, user: IUser, transaction?: Transaction) {
+    async doPosting({type, score, follower_ids, game_uid, game_id, user_id, achievement_id, battle_id}: ITimelineParams, user: DecodedIdToken, transaction?: Transaction) {
         const uid = uniqid();
         let extra;
         switch ( type ) {
@@ -65,7 +66,7 @@ class TimelineController {
         }
     }
 
-    async deletePosting({uid}: ITimelineParams, user: IUser) {
+    async deletePosting({uid}: ITimelineParams, user: DecodedIdToken) {
         return dbs.Timeline.getTransaction(async (transaction: Transaction) => {
             const posting = await dbs.Timeline.findOne({ uid }, transaction);
             if ( !posting ) {

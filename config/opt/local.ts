@@ -64,12 +64,5 @@ export default {
                 issuer    : 'from the red'
             },
         },
-        firebase: {
-            options: {
-                algorithm: 'RS256',
-                kid: '2f8b557c1cd1e1ec680ce92aafce45211e1e4b41',
-                issuer: ''
-            }
-        },
     },
 }

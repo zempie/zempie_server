@@ -1,10 +1,12 @@
-import { IUser } from './_interfaces';
 import { dbs } from '../commons/globals';
 import { CreateError, ErrorCodes } from '../commons/errorCodes';
 import * as _ from 'lodash';
+import admin from 'firebase-admin';
+import DecodedIdToken = admin.auth.DecodedIdToken;
+
 
 class PublishingController {
-    getList = async ({}, { uid }: IUser) => {
+    getList = async ({}, { uid }: DecodedIdToken) => {
         const user = await dbs.User.getPublishing({ uid });
         if ( !user ) {
             throw CreateError(ErrorCodes.INVALID_USER_UID)

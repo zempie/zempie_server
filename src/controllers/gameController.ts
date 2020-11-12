@@ -1,21 +1,18 @@
 import * as _ from 'lodash';
-import { Request, Response } from 'express';
-import { IGameParams, IGamePlayParams, IRoute, IUser } from './_interfaces';
+import admin from 'firebase-admin';
+import DecodedIdToken = admin.auth.DecodedIdToken;
+import { IGameParams, IGamePlayParams, IRoute } from './_interfaces';
 import { Op, Sequelize, Transaction } from 'sequelize';
 import { dbs } from '../commons/globals';
-import TimelineController from './timelineController';
-import { ePubType, eTimeline } from '../commons/enums';
-import Opt from '../../config/opt';
 import { CreateError, ErrorCodes } from '../commons/errorCodes';
 import { Producer } from '../services/kafkaService';
-
-
+import Opt from '../../config/opt';
 const { Url, Deploy } = Opt;
 
 
 class GameController {
 
-    gameStart = async ({game_uid}: IGameParams, user: IUser) => {
+    gameStart = async ({game_uid}: IGameParams, user: DecodedIdToken) => {
         // const user_uid = user.uid;
         // await dbs.GameLog.create({
         //     user_uid: uid,
@@ -28,7 +25,7 @@ class GameController {
     }
 
 
-    gameOver = async ({ game_uid, score, pid }: IGameParams, user: IUser) => {
+    gameOver = async ({ game_uid, score, pid }: IGameParams, user: DecodedIdToken) => {
         const { uid: user_uid } = user;
         // const user_uid = user.uid;
         // const userRecord = await dbs.User.findOne({ uid: user_uid });
@@ -72,7 +69,7 @@ class GameController {
     }
 
 
-    getGame = async ({pathname}: any, user: IUser, transaction?: Transaction) => {
+    getGame = async ({pathname}: any, user: DecodedIdToken, transaction?: Transaction) => {
         // const games = await gameCache.get();
         // const game = _.find(games, (obj:any) => obj.pathname === pathname)
         const game = await dbs.Game.findOne({ pathname }, transaction);
@@ -81,7 +78,7 @@ class GameController {
         }
     }
 
-    getGameList = async ({ limit = 50, offset = 0, sort = 'id', dir = 'asc' }, user: IUser) => {
+    getGameList = async ({ limit = 50, offset = 0, sort = 'id', dir = 'asc' }, user: DecodedIdToken) => {
         // const games = await gameCache.get()
         const { count, rows } = await dbs.Game.getList({limit, offset, sort, dir});
         return {
@@ -146,7 +143,7 @@ class GameController {
     /**
      * 랭킹
      */
-    getGlobalRanking = async ({ game_uid, limit = 50, offset = 0 }: IGameParams, {uid: user_uid}: IUser) => {
+    getGlobalRanking = async ({ game_uid, limit = 50, offset = 0 }: IGameParams, {uid: user_uid}: DecodedIdToken) => {
         let score, rank;
 
         // const userRecord = await dbs.User.findOne({ uid });
@@ -207,28 +204,19 @@ class GameController {
     }
 
 
-    getFollowingRanking = async ({game_uid, limit = 50, offset = 0}: IGameParams, {uid}: IUser, transaction?: Transaction) => {
+    getFollowingRanking = async ({game_uid, limit = 50, offset = 0}: IGameParams, {uid: user_uid}: DecodedIdToken, transaction?: Transaction) => {
         let score, rank;
 
-        const userRecord = await dbs.User.findOne({ uid });
-        const game = await dbs.Game.findOne({ uid: game_uid });
-        if ( !game ) {
-            throw CreateError(ErrorCodes.INVALID_GAME_UID);
-        }
-
-        const user_id = userRecord.id;
-        const game_id = game.id;
-
-        const gameRecord = await dbs.UserGame.findOne({game_id, user_id}, transaction);
+        const gameRecord = await dbs.UserGame.findOne({game_uid, user_uid}, transaction);
         if( gameRecord ) {
             score = gameRecord.score;
             rank = await dbs.Follow.model.count({
-                where: { user_id },
+                where: { user_uid },
                 include: [{
                     model: dbs.UserGame.model,
                     as: 'gameRecord',
                     where: {
-                        game_id,
+                        game_uid,
                         score: {
                             [Op.gt]: score,
                         }
@@ -239,11 +227,11 @@ class GameController {
         }
 
         const { count, rows } = await dbs.Follow.model.findAndCountAll({
-            where: { user_id },
+            where: { user_uid },
             include: [{
                 model: dbs.UserGame.model,
                 as: 'gameRecord',
-                where: { game_id },
+                where: { game_uid },
             }, {
                 model: dbs.User.model,
                 as: 'target',

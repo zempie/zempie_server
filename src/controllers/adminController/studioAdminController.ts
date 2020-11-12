@@ -1,10 +1,11 @@
-import { IUser } from '../_interfaces';
 import { dbs } from '../../commons/globals';
 import {Transaction} from "sequelize";
+import admin from 'firebase-admin';
+import DecodedIdToken = admin.auth.DecodedIdToken;
 
 
 class StudioAdminController {
-    getVersions = async  ( params : any, {uid}: IUser )=>{
+    getVersions = async  ( params : any, {uid}: DecodedIdToken )=>{
         return await dbs.ProjectVersion.findAll( params.where, {
             include : [{
                 model: dbs.Project.model,
@@ -12,7 +13,7 @@ class StudioAdminController {
         });
     }
 
-    getVersion = async ({ version_id } : any, {uid}: IUser ) => {
+    getVersion = async ({ version_id } : any, {uid}: DecodedIdToken ) => {
         const version = await dbs.ProjectVersion.findOne( {
             id : version_id
         });
@@ -30,7 +31,7 @@ class StudioAdminController {
         }
     }
 
-    setVersion = async ( params : any, {uid}: IUser )=>{
+    setVersion = async ( params : any, {uid}: DecodedIdToken )=>{
         return dbs.ProjectVersion.getTransaction( async (transaction : Transaction)=>{
             if( params.state === 'passed' ) {
                 const version = await dbs.ProjectVersion.findOne( { id : params.id } );

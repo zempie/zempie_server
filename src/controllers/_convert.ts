@@ -1,6 +1,5 @@
 import { NextFunction, Response } from 'express';
 import * as _ from 'lodash';
-import { IUser } from './_interfaces';
 
 
 

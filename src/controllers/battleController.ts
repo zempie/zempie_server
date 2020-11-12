@@ -1,10 +1,12 @@
 import * as uniqid from 'uniqid';
 import { dbs } from '../commons/globals';
-import { IBattleParams, IUser, IGamePlayParams, IGameKey, IBattlePlayParams } from './_interfaces';
+import { IBattleParams, IBattlePlayParams } from './_interfaces';
 import { Transaction } from 'sequelize';
 import { signJWT, verifyJWT } from '../commons/utils';
 import { CreateError, ErrorCodes } from '../commons/errorCodes';
 import { Producer } from '../services/kafkaService';
+import admin from 'firebase-admin';
+import DecodedIdToken = admin.auth.DecodedIdToken;
 
 
 class BattleController {
@@ -27,7 +29,7 @@ class BattleController {
     }
 
 
-    hostBattle = async ({ game_uid, is_infinity }: any, user: IUser) => {
+    hostBattle = async ({ game_uid, is_infinity }: any, user: DecodedIdToken) => {
         const uid = uniqid();
 
         await dbs.Battle.create({
@@ -45,7 +47,7 @@ class BattleController {
     }
 
 
-    gameStart = async ({ battle_uid, battle_key }: IBattleParams, user: IUser) => {
+    gameStart = async ({ battle_uid, battle_key }: IBattleParams, user: DecodedIdToken) => {
         return dbs.BattleLog.getTransaction(async (transaction: Transaction) => {
             const battle = await dbs.Battle.findOne({uid: battle_uid}, transaction);
             if ( new Date(battle.end_at) < new Date() ) {
@@ -93,7 +95,7 @@ class BattleController {
     }
 
 
-    gameOver = async ({ battle_key, score }: IBattlePlayParams, user: IUser) => {
+    gameOver = async ({ battle_key, score }: IBattlePlayParams, user: DecodedIdToken) => {
         const decoded = verifyJWT(battle_key);
         const { uid: battle_uid, game_uid, user_uid, secret_id, best_score } = decoded;
 
@@ -119,7 +121,7 @@ class BattleController {
     }
 
 
-    updateUserName = async ({ battle_key, name }: any, user: IUser) => {
+    updateUserName = async ({ battle_key, name }: any, user: DecodedIdToken) => {
         const decoded = verifyJWT(battle_key);
         const { uid: battle_uid, game_uid, user_uid, secret_id, best_score } = decoded;
 
@@ -128,7 +130,7 @@ class BattleController {
 
 
 
-    getRanking = async ({ battle_uid }: any, user: IUser) => {
+    getRanking = async ({ battle_uid }: any, user: DecodedIdToken) => {
         const ranking = await dbs.BattleUser.getRanking({ battle_uid });
         return {
             ranking

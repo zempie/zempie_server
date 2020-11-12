@@ -1,15 +1,16 @@
 import { dbs } from '../commons/globals';
-import { IUser } from './_interfaces';
 import { CreateError, ErrorCodes } from '../commons/errorCodes';
 import { eItemUsingType } from '../commons/enums';
 import { Transaction } from 'sequelize';
+import admin from 'firebase-admin';
+import DecodedIdToken = admin.auth.DecodedIdToken;
 
 
 interface IShopParams {
     item_id: number
 }
 class ShopController {
-    async buyItem ({ item_id }: IShopParams, user: IUser) {
+    async buyItem ({ item_id }: IShopParams, user: DecodedIdToken) {
         const item = await dbs.Item.findOne({ item_id });
         if ( !item ) {
             throw CreateError(ErrorCodes.INVALID_ITEM_ID);
@@ -37,7 +38,7 @@ class ShopController {
     }
 
 
-    async useItem({ item_id }: IShopParams, user: IUser) {
+    async useItem({ item_id }: IShopParams, user: DecodedIdToken) {
         const userRecord = await dbs.User.findOne({ uid: user.uid });
         const user_id = userRecord.id;
         await dbs.Inventory.getTransaction(async (transaction: Transaction) => {

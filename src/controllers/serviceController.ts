@@ -1,6 +1,8 @@
-import { IAdmin, IUser } from './_interfaces';
+import { IAdmin } from './_interfaces';
 import { dbs } from '../commons/globals';
 import { CreateError, ErrorCodes } from '../commons/errorCodes';
+import admin from 'firebase-admin';
+import DecodedIdToken = admin.auth.DecodedIdToken;
 
 
 interface IQnaParams {
@@ -16,7 +18,7 @@ interface IQnaAdminParams {
 }
 
 class ServiceController {
-    async askQuestion({ title, content }: IQnaParams, { uid }: IUser) {
+    async askQuestion({ title, content }: IQnaParams, { uid }: DecodedIdToken) {
         if ( !title || title.length < 1 ) {
             throw CreateError(ErrorCodes.INVALID_QNA_PARAMS);
         }
@@ -30,7 +32,7 @@ class ServiceController {
     }
 
 
-    async getMyQuestionList({}, { uid }: IUser) {
+    async getMyQuestionList({}, { uid }: DecodedIdToken) {
         const user = await dbs.User.findOne({ uid });
         const questions = await dbs.QnaQuestion.getList({ user_id: user.id });
         return {

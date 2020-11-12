@@ -1,9 +1,11 @@
-import { IRoute, IUser } from '../_interfaces';
+import { IRoute } from '../_interfaces';
 import { dbs, caches } from '../../commons/globals';
 import {Transaction} from "sequelize";
 import {CreateError, ErrorCodes} from "../../commons/errorCodes";
 import FileManager from "../../services/fileManager";
 import { v4 as uuid } from 'uuid';
+import admin from 'firebase-admin';
+import DecodedIdToken = admin.auth.DecodedIdToken;
 
 const replaceExt = require('replace-ext');
 
@@ -61,7 +63,7 @@ interface IVersion {
 }
 
 class StudioController {
-    getDeveloper = async (params: any, {uid}: IUser)=>{
+    getDeveloper = async (params: any, {uid}: DecodedIdToken)=>{
         const user = await dbs.User.findOne({ uid });
         if( !user ) {
             throw CreateError(ERROR_STUDIO.NOT_FIND_USER)
@@ -74,7 +76,7 @@ class StudioController {
         }
     }
 
-    createDeveloper = async (params: any, { uid }: IUser, {req: {files: {file}}}: IRoute) =>{
+    createDeveloper = async (params: any, { uid }: DecodedIdToken, {req: {files: {file}}}: IRoute) =>{
         return dbs.Developer.getTransaction( async (transaction : Transaction) => {
             const user = await dbs.User.findOne({ uid });
             const dev = await dbs.Developer.findOne( { user_id : user.id } );
@@ -100,7 +102,7 @@ class StudioController {
         })
     }
 
-    updateDeveloper = async  (params: any, { uid }: IUser, {req: {files: {file}}}: IRoute) =>{
+    updateDeveloper = async  (params: any, { uid }: DecodedIdToken, {req: {files: {file}}}: IRoute) =>{
         return dbs.Developer.getTransaction( async (transaction : Transaction)=>{
             params = params || {};
             params.user_uid = uid;
@@ -115,7 +117,7 @@ class StudioController {
         })
     }
 
-    getProjects = async ( params : any, {uid}: IUser )=>{
+    getProjects = async ( params : any, {uid}: DecodedIdToken )=>{
         // const user = await dbs.User.findOne({ uid });
         const dev = await dbs.Developer.findOne( { user_uid : uid } );
         if( !dev ) {
@@ -126,7 +128,7 @@ class StudioController {
         return await dbs.Project.getProjects( { developer_id : dev.id } );
     }
 
-    getProject = async ( params : any, { uid }: IUser )=>{
+    getProject = async ( params : any, { uid }: DecodedIdToken )=>{
 
         if( !params.id ) {
             throw CreateError(ErrorCodes.INVALID_PARAMS);
@@ -135,7 +137,7 @@ class StudioController {
         return await dbs.Project.getProject( { id : params.id } );
     }
 
-    verifyGamePathname = async ( params : any, { uid }: IUser ) => {
+    verifyGamePathname = async ( params : any, { uid }: DecodedIdToken ) => {
         const path = await dbs.Game.findOne( {
             pathname : params.pathname
         } );
@@ -153,7 +155,7 @@ class StudioController {
     }
 
 
-    createProject = async ( params : ICreateProject, {uid}: IUser, {req:{files}}: IRoute) => {
+    createProject = async ( params : ICreateProject, {uid}: DecodedIdToken, {req:{files}}: IRoute) => {
         return dbs.Project.getTransaction( async (transaction : Transaction)=>{
             const dev = await dbs.Developer.findOne( {user_uid : uid} );
             params.developer_id = dev.id;
@@ -207,7 +209,7 @@ class StudioController {
         })
     }
 
-    deleteProject = async ( params : any, {uid}: IUser ) => {
+    deleteProject = async ( params : any, {uid}: DecodedIdToken ) => {
         if( !params.id ) {
             throw CreateError(ErrorCodes.INVALID_PARAMS);
         }
@@ -229,7 +231,7 @@ class StudioController {
      url_game, url_thumb, url_title
      activated
      */
-    updateProject = async ( params : any, {uid}: IUser, {req: {files: {file}}}: IRoute)=>{
+    updateProject = async ( params : any, {uid}: DecodedIdToken, {req: {files: {file}}}: IRoute)=>{
 
         return dbs.Project.getTransaction( async (transaction : Transaction) => {
             const project = await dbs.Project.findOne( { id : params.id } );
@@ -278,7 +280,7 @@ class StudioController {
         })
     }
 
-    createVersion = async ( params : any, {uid}: IUser, files: any ) => {
+    createVersion = async ( params : any, {uid}: DecodedIdToken, {req: {files}}: IRoute ) => {
 
         const project_id = params.project_id;
         const versionPath = `${project_id}/${uuid()}`;
@@ -315,19 +317,19 @@ class StudioController {
         })
     }
 
-    // getVersions = async  ( params : any, {uid}: IUser )=>{
+    // getVersions = async  ( params : any, {uid}: DecodedIdToken )=>{
     //     return await dbs.ProjectVersion.findAll( {
     //         project_id : params.project_id
     //     } )
     // }
 
-    // getVersion = async  ( params : any, {uid}: IUser )=>{
+    // getVersion = async  ( params : any, {uid}: DecodedIdToken )=>{
     //     return await dbs.ProjectVersion.findOne( {
     //         id : params.id
     //     } );
     // }
 
-    deleteVersion = async  ( params : any, {uid}: IUser )=>{
+    deleteVersion = async  ( params : any, {uid}: DecodedIdToken )=>{
 
         return dbs.ProjectVersion.getTransaction( async (transaction : Transaction)=>{
             const version = await dbs.ProjectVersion.findOne( { id : params.id } );
@@ -350,7 +352,7 @@ class StudioController {
 
     }
 
-    // updateVersion = async  ( params : any, {uid}: IUser )=>{
+    // updateVersion = async  ( params : any, {uid}: DecodedIdToken )=>{
     //     return dbs.ProjectVersion.getTransaction( async (transaction : Transaction)=>{
     //         return await dbs.ProjectVersion.updateVersion( params, transaction );
     //     });

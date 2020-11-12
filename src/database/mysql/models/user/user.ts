@@ -1,9 +1,10 @@
 import Model from '../../model';
 import { DataTypes, Op, Sequelize, Transaction } from 'sequelize';
 import { dbs } from '../../../../commons/globals';
-import { IUser } from '../../../../controllers/_interfaces';
 import { eNotify } from '../../../../commons/enums';
 import * as _ from 'lodash';
+import admin from 'firebase-admin';
+import DecodedIdToken = admin.auth.DecodedIdToken;
 
 
 /**
@@ -39,7 +40,7 @@ class UserModel extends Model {
         this.model.hasMany(dbs.UserPublishing.model, { sourceKey: 'uid', foreignKey: 'user_uid', as: 'publishing' });
     }
 
-    async getInfo({uid}: IUser, transaction?: Transaction) {
+    async getInfo({uid}: DecodedIdToken, transaction?: Transaction) {
         return this.model.findOne({
             where: {
                 is_admin: {
@@ -77,7 +78,7 @@ class UserModel extends Model {
         })
     }
 
-    async getProfile({ uid }: IUser, transaction?: Transaction) {
+    async getProfile({ uid }: DecodedIdToken, transaction?: Transaction) {
         const user = await this.model.findOne({
             where: { uid },
             include: [{
@@ -103,7 +104,7 @@ class UserModel extends Model {
         }
     }
 
-    async getSetting({uid}: IUser, transaction?: Transaction) {
+    async getSetting({uid}: DecodedIdToken, transaction?: Transaction) {
         const user = await this.model.findOne({
             where: {
                 is_admin: {
@@ -134,7 +135,7 @@ class UserModel extends Model {
     }
 
 
-    async getPublishing({ uid }: IUser, transaction?: Transaction) {
+    async getPublishing({ uid }: DecodedIdToken, transaction?: Transaction) {
         return this.model.findOne({
             where: { uid },
             include: [{

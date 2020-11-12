@@ -6,7 +6,6 @@ import * as AWS from 'aws-sdk';
 import * as formidable from 'formidable';
 import * as imagemin from 'imagemin';
 import * as imageminWebp from 'imagemin-webp';
-import { IUser } from '../controllers/_interfaces';
 import { Fields, Files, IncomingForm } from 'formidable';
 import Opt from '../../config/opt';
 import { getContentType } from "../commons/utils";
@@ -32,7 +31,7 @@ class FileManager {
     }
 
 
-    private formidable = (req: Request, user: IUser) => {
+    private formidable = (req: Request) => {
         const uploadDir = path.join(__dirname, '..', '..', 'upload');
         if( !fs.existsSync(uploadDir) ) {
             fs.mkdirSync(uploadDir);

@@ -5,7 +5,6 @@ import { dbs } from '../../../../commons/globals';
 
 
 interface ISharedParams {
-    uid: string,
     user_uid: string,
     game_uid: string,
 }

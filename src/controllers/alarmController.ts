@@ -1,11 +1,12 @@
 import * as _ from 'lodash';
-import { IUser } from "./_interfaces";
 import { dbs } from "../commons/globals";
-import { gameCache } from "../database/redis/models/games";
+import admin from 'firebase-admin';
+import DecodedIdToken = admin.auth.DecodedIdToken;
+
 
 class AlarmController {
 
-    getList = async ({limit = 50, offset = 0}, user: IUser) => {
+    getList = async ({limit = 50, offset = 0}, user: DecodedIdToken) => {
         const alarms = await dbs.Alarm.getList({ user_uid: user.uid, limit, offset });
         // const games = await gameCache.get();
         const games = await dbs.Game.findAll({});

@@ -1,7 +1,8 @@
-import { IUser } from './_interfaces';
 import { dbs } from '../commons/globals';
 import { CreateError, ErrorCodes } from '../commons/errorCodes';
 import { ePubType } from '../commons/enums';
+import admin from 'firebase-admin';
+import DecodedIdToken = admin.auth.DecodedIdToken;
 
 
 interface IAdControlParams {
@@ -11,7 +12,7 @@ interface IAdControlParams {
 
 
 class AdController {
-    async onRewardedVideoCompleted ({ pathname, pid }: IAdControlParams, user: IUser) {
+    async onRewardedVideoCompleted ({ pathname, pid }: IAdControlParams, user: DecodedIdToken) {
         const game = await dbs.Game.findOne({ title: pathname });
         if ( !game ) {
             throw CreateError(ErrorCodes.INVALID_GAME_UID);

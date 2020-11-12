@@ -1,6 +1,7 @@
 import * as uniqid from 'uniqid';
 import { dbs } from '../commons/globals';
-import { IUser } from './_interfaces';
+import admin from 'firebase-admin';
+import DecodedIdToken = admin.auth.DecodedIdToken;
 import Opt from '../../config/opt';
 const { Url, Deploy } = Opt;
 
@@ -51,7 +52,7 @@ class LauncherController {
     /**
      *
      */
-    async getSharedUrl({ game_uid }: ILauncherParams, { uid: user_uid }: IUser) {
+    async getSharedUrl({ game_uid }: ILauncherParams, { uid: user_uid }: DecodedIdToken) {
         const uid = await dbs.SharedGame.getSharedUid({ user_uid, game_uid });
 
         return {
@@ -61,7 +62,7 @@ class LauncherController {
     }
 
 
-    async getBattleUrl({ game_uid }: ILauncherParams, { uid: user_uid }: IUser) {
+    async getBattleUrl({ game_uid }: ILauncherParams, { uid: user_uid }: DecodedIdToken) {
         const uid = uniqid();
 
         await dbs.Battle.create({

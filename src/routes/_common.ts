@@ -1,4 +1,5 @@
 import * as admin from 'firebase-admin';
+import { google } from 'googleapis';
 import * as _ from 'lodash';
 import { NextFunction, Request, Response } from 'express';
 import { verifyJWT } from '../commons/utils';
@@ -6,6 +7,8 @@ import { dbs } from '../commons/globals';
 import { Transaction } from 'sequelize';
 import { CreateError } from '../commons/errorCodes';
 import cfgOption from '../../config/opt';
+
+const serviceAccount = require('../../config/firebase/service-account.json');
 
 
 export function throwError(res: Response, e: string, statusCode = 401) {
@@ -149,4 +152,17 @@ export const adminTracking = async (req: Request, res: Response, next: NextFunct
 const verifyCustomToken = async (req: Request, res: Response, next: NextFunction) => {
     const idToken = getIdToken(req);
 
+    const jwtClient = new google.auth.JWT(
+        serviceAccount.client_email,
+        undefined,
+        serviceAccount.private_key,
+        [
+            'email',
+            'profile',
+            'https://www.googleapis.com/auth/firebase',
+            'https://www.googleapis.com/auth/cloud-platform',
+        ],
+        undefined
+    );
+    const tokens = await jwtClient.authorize();
 }

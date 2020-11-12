@@ -1,15 +1,13 @@
 import * as _ from 'lodash';
-import { IFirebaseUser, IRoute, IUser } from './_interfaces';
+import { IRoute, IZempieClaims } from './_interfaces';
 import { dbs, caches } from '../commons/globals';
 import admin from 'firebase-admin';
+import DecodedIdToken = admin.auth.DecodedIdToken;
 import { Transaction, Op } from 'sequelize';
 import FileManager from '../services/fileManager';
 const replaceExt = require('replace-ext');
-import { gameCache } from '../database/redis/models/games';
-import Opt from '../../config/opt'
 import { CreateError, ErrorCodes } from '../commons/errorCodes';
-import DecodedIdToken = admin.auth.DecodedIdToken;
-const { Url, Deploy } = Opt;
+
 
 class UserController {
     /**
@@ -56,7 +54,7 @@ class UserController {
     }
 
 
-    getTargetInfo = async ({target_uid}: any, {uid}: IUser) => {
+    getTargetInfo = async ({target_uid}: any, {uid}: DecodedIdToken) => {
         const user = await dbs.User.getProfile({uid: target_uid});
         const target = await this.getUserDetailInfo(user);
         return {
@@ -106,31 +104,32 @@ class UserController {
 
 
     async verifyEmail ({}, user: DecodedIdToken) {
-        const userRecord = await admin.auth().getUser(user.uid)
-        if ( userRecord.emailVerified && !user.email_verified ) {
-            await admin.auth().updateUser(user.uid, {
-                emailVerified: true,
-            });
-            await dbs.User.update({ email_verified: true }, { uid: user.uid });
+        if ( user.email_verified ) {
+            throw CreateError(ErrorCodes.USER_ALREADY_VERIFIED_EMAIL);
         }
-        const r = await admin.auth().setCustomUserClaims(user.uid, {
-            jw: true,
-            admin: true
-        })
-        const custom_token = await admin.auth().createCustomToken(user.uid, {
-            jw: true,
-            admin: true
-        })
 
-        return {
-            user,
-            userRecord,
-            custom_token,
+        const userRecord = await admin.auth().getUser(user.uid)
+        if ( !userRecord.emailVerified ) {
+            throw CreateError(ErrorCodes.USER_INVALID_VERIFIED_EMAIL);
         }
+
+        await admin.auth().updateUser(user.uid, {
+            emailVerified: true,
+        });
+        await dbs.User.update({ email_verified: true }, { uid: user.uid });
     }
 
 
-    setInfo = async (params: any, {uid}: IUser, {req: {files: {file}}}: IRoute) => {
+    async verifyToken ({}, user: DecodedIdToken) {
+        await admin.auth().setCustomUserClaims(user.uid, {
+            zempie: {
+                developer_id: 1,
+            }
+        } as IZempieClaims);
+    }
+
+
+    setInfo = async (params: any, {uid}: DecodedIdToken, {req: {files: {file}}}: IRoute) => {
         return dbs.User.getTransaction(async (transaction: Transaction) => {
             const user = await dbs.User.getInfo({ uid }, transaction);
             if ( !user ) {
@@ -164,7 +163,7 @@ class UserController {
     }
 
 
-    signOut = async ({}, {uid}: IUser) => {
+    signOut = async ({}, {uid}: DecodedIdToken) => {
         return dbs.User.getTransaction(async (transaction: Transaction) => {
             const user = await dbs.User.getInfo({uid}, transaction);
             await admin.messaging().unsubscribeFromTopic(user.fcm_token, 'test-topic');
@@ -174,7 +173,7 @@ class UserController {
     }
 
 
-    updateSetting = async (params: any, {uid}: IUser) => {
+    updateSetting = async (params: any, {uid}: DecodedIdToken) => {
         return dbs.UserSetting.getTransaction(async (transaction: Transaction) => {
             const setting = await dbs.UserSetting.findOne({user_uid: uid}, transaction);
 
@@ -193,7 +192,7 @@ class UserController {
     }
 
 
-    searchUser = async ({ search_name, limit = 100, offset = 0 }: any, {uid}: IUser) => {
+    searchUser = async ({ search_name, limit = 100, offset = 0 }: any, {uid}: DecodedIdToken) => {
         const users = await dbs.User.search({ search_name, limit, offset });
         return {
             users: _.map(users, (user: any) => {
@@ -207,7 +206,7 @@ class UserController {
     }
 
 
-    leaveZempie = async ({ num, text }: { num: number, text: string }, { uid }: IUser) => {
+    leaveZempie = async ({ num, text }: { num: number, text: string }, { uid }: DecodedIdToken) => {
         await dbs.UserLeftLog.getTransaction(async (transaction: Transaction) => {
             await dbs.UserLeftLog.create({
                 user_uid: uid,

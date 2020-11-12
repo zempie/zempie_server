@@ -1,13 +1,15 @@
-import { ISocialMedia, IUser } from './_interfaces';
+import { ISocialMedia } from './_interfaces';
 import { dbs } from '../commons/globals';
 import { Sequelize, Transaction } from 'sequelize';
 import { CreateError, ErrorCodes } from '../commons/errorCodes';
 import NotifyService from '../services/notifyService';
 import { eAlarm, eNotify } from '../commons/enums';
+import admin from 'firebase-admin';
+import DecodedIdToken = admin.auth.DecodedIdToken;
+
 
 class SocialMediaController {
-
-    follow = async ({target_uid}: ISocialMedia, user: IUser) => {
+    follow = async ({target_uid}: ISocialMedia, user: DecodedIdToken) => {
         return dbs.Follow.getTransaction(async (transaction: Transaction) => {
             const user_uid = user.uid;
             const { user_id, target_id } = await this.getIds({ user_uid, target_uid }, transaction);
@@ -23,7 +25,7 @@ class SocialMediaController {
     }
 
 
-    unFollow = ({target_uid}: ISocialMedia, user: IUser) => {
+    unFollow = ({target_uid}: ISocialMedia, user: DecodedIdToken) => {
         return dbs.Follow.getTransaction(async (transaction: Transaction) => {
             const user_uid = user.uid;
             const { user_id, target_id } = await this.getIds({ user_uid, target_uid }, transaction);
@@ -54,7 +56,7 @@ class SocialMediaController {
     }
 
 
-    async following({user_uid}: ISocialMedia, user: IUser) {
+    async following({user_uid}: ISocialMedia, user: DecodedIdToken) {
         user_uid = user_uid || user.uid;
         const userRecord = await dbs.User.findOne({ uid: user_uid });
         const user_id = userRecord.id;
@@ -70,7 +72,7 @@ class SocialMediaController {
         }
     }
 
-    async followers({user_uid}: ISocialMedia, user: IUser) {
+    async followers({user_uid}: ISocialMedia, user: DecodedIdToken) {
         user_uid = user_uid || user.uid;
         const userRecord = await dbs.User.findOne({ uid: user_uid });
         const user_id = userRecord.id;

@@ -38,22 +38,17 @@ export interface IAdmin extends IDecoded {
 export interface IPublisher extends IDecoded {
     domain: string,
 }
-export interface IUser extends IDecoded {
-    id?: number,
-    name?: string,
-    picture?: string,
+
+
+/**
+ * decoded idToken + zempie claims
+ */
+export interface IZempieClaims {
+    zempie: {
+        developer_id: number,
+    }
 }
-export interface IFirebaseUser {
-    uid: string,
-    name: string,
-    picture: string,
-    firebase: {
-        identities: { email: string },
-        sign_in_provider: string,
-    },
-    email: string,
-    emailVerified: boolean,
-}
+
 
 
 /**
