@@ -97,7 +97,7 @@ const getIdToken = (req: Request) => {
         // Read the ID Token from the Authorization header.
         idToken = req.headers.authorization.split('Bearer ')[1];
     } else if(req.cookies) {
-        console.log('Found "__session" cookie');
+        logger.debug('Found "__session" cookie');
         // Read the ID Token from cookie.
         idToken = req.cookies.__session;
     } else {
