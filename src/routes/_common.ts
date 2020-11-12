@@ -6,8 +6,6 @@ import { Transaction } from 'sequelize';
 import cfgOption from '../../config/opt';
 import { logger } from '../commons/logger';
 
-const serviceAccount = require('../../config/firebase/service-account.json');
-
 
 export function throwError(res: Response, e: string, statusCode = 401) {
     res.statusCode = statusCode;
