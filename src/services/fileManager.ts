@@ -19,8 +19,8 @@ const s3 = new AWS.S3({ apiVersion: '2006-03-01' });
 class FileManager {
     uploadImage = async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const { user } = req;
-            const { params, files }: any = await this.formidable(req, user);
+            // const { user } = req;
+            const { params, files }: any = await this.formidable(req);
             req.params = params;
             req.files = files;
             next();

@@ -3,7 +3,6 @@ import * as express from 'express';
 import * as bodyParser from 'body-parser';
 import * as cors from 'cors';
 import * as path from 'path';
-import * as fs from 'fs';
 import * as ejs from 'ejs';
 import * as getPort from 'get-port';
 
@@ -15,7 +14,6 @@ import Redis from '../database/redis';
 
 import { IMessageQueueOptions, IServerOptions } from '../commons/interfaces';
 import * as Pkg from '../../package.json';
-import deployApp from '../services/deployApp';
 
 import { Sequelize } from 'sequelize';
 import { dbs } from '../commons/globals';
@@ -58,7 +56,7 @@ export default class Server {
     protected app?: express.Application;
 
 
-    public initialize = async (options : IServerOptions) => {
+    public initialize = async (options: IServerOptions) => {
         this.options = options;
 
         // this.setFirebase();
@@ -75,6 +73,17 @@ export default class Server {
         // if ( !!this.app ) {
         //     this.routes(this.app);
         // }
+    }
+    public initialize2 = async (options: IServerOptions) => {
+        this.options = options;
+
+        options.firebase && this.setFirebase();
+        this.setExpress(options);
+        options.rdb && await this.setRDB();
+        options.mdb && await this.setMDB();
+        options.ejs && this.setEJS();
+        options.swagger && this.setSwagger();
+        options.graphql && this.setGraphQL();
     }
 
 
@@ -179,12 +188,13 @@ export default class Server {
 
 
 
-    protected static async setRDB() {
+    protected async setRDB() {
         await MySql.initialize();
-        logger.info('mysql is ready.'.cyan)
+    }
 
-        // await Redis.initialize();
-        // console.log('redis is ready.'.cyan);
+
+    protected async setMDB() {
+        await Redis.initialize();
     }
 
 

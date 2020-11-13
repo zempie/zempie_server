@@ -3,7 +3,13 @@ import { Message } from 'kafka-node';
 export interface IServerOptions {
     tcp: boolean,
     port: number,
-    static_path?: any,
+    static_path?: Array<{path: string, route: string}>,
+    ejs?: boolean,
+    swagger?: boolean,
+    graphql?: boolean,
+    firebase?: boolean,
+    rdb?: boolean,
+    mdb?: boolean,
     messageQueue?: {
         groupId: string,
         autoCommit: boolean,

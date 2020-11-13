@@ -4,7 +4,6 @@ import adminRoute from '../routes/adminRoute'
 import contentRoute from '../routes/contentRoute';
 import userRoute from '../routes/userRoute';
 import gameRoute from "../routes/gameRoute";
-import ExchangeManager from '../services/exchangeManager';
 import launcherRoute from '../routes/launcherRoute';
 import { IMessageQueueOptions, IServerOptions } from '../commons/interfaces';
 import mq from '../controllers/messageQueues/apiMQ';
@@ -18,7 +17,8 @@ class ApiServer extends Server {
 
         this.setFirebase();
         this.setExpress(options);
-        await ApiServer.setRDB();
+        await this.setRDB();
+        await this.setMDB();
 
         // this.setEJS();
         this.setSwagger();

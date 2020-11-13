@@ -3,7 +3,7 @@ import admin from 'firebase-admin';
 import DecodedIdToken = admin.auth.DecodedIdToken;
 import { IGameParams, IGamePlayParams, IRoute } from './_interfaces';
 import { Op, Sequelize, Transaction } from 'sequelize';
-import { dbs } from '../commons/globals';
+import { caches, dbs } from '../commons/globals';
 import { CreateError, ErrorCodes } from '../commons/errorCodes';
 import { Producer } from '../services/kafkaService';
 import Opt from '../../config/opt';
@@ -48,7 +48,6 @@ class GameController {
         }])
 
         return await dbs.UserGame.getTransaction(async (transaction: Transaction) => {
-            // const record = await dbs.UserGame.findOne({user_id, game_id}, transaction);
             const record = await dbs.UserGame.findOne({user_uid, game_uid}, transaction);
             const previous_score = record? record.score : 0;
             const new_record = score > previous_score;
@@ -271,6 +270,23 @@ class GameController {
         }]);
         console.log(data)
         console.log('sent')
+    }
+
+    cacheTest = async () => {
+        caches.hashtag.addTag('arcade', 'papa', JSON.stringify({
+            uid: 'papa123',
+            title: 'basketball papa',
+        }))
+        caches.hashtag.addTag(['#arcade', 'puzzle'], 'shark', JSON.stringify({
+            uid: 'shark000',
+            title: 'shark frenzy',
+        }))
+    }
+    cacheTest2 = async ({k}: any) => {
+        const records = await caches.hashtag.getTag(k);
+        return {
+            records: _.map(records, JSON.parse)
+        };
     }
 }
 

@@ -1,7 +1,9 @@
 import * as _ from 'lodash';
+import { v4 as uuid } from 'uuid';
 import Model from '../../model';
 import { DataTypes, Sequelize } from 'sequelize';
 import { dbs } from '../../../../commons/globals';
+
 
 class GameModel extends Model {
     protected initialize(): void {
@@ -24,10 +26,11 @@ class GameModel extends Model {
             // min_ratio:          { type: DataTypes.SMALLINT, defaultValue: 1 },
             control_type:       { type: DataTypes.SMALLINT, defaultValue: 0 },
 
-            genre_arcade:       { type: DataTypes.BOOLEAN, defaultValue: false },
-            genre_puzzle:       { type: DataTypes.BOOLEAN, defaultValue: false },
-            genre_sports:       { type: DataTypes.BOOLEAN, defaultValue: false },
-            genre_racing:       { type: DataTypes.BOOLEAN, defaultValue: false },
+            // genre_arcade:       { type: DataTypes.BOOLEAN, defaultValue: false },
+            // genre_puzzle:       { type: DataTypes.BOOLEAN, defaultValue: false },
+            // genre_sports:       { type: DataTypes.BOOLEAN, defaultValue: false },
+            // genre_racing:       { type: DataTypes.BOOLEAN, defaultValue: false },
+            hashtags:           { type: DataTypes.STRING, allowNull: false },
 
             count_start:        { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0 },
             count_over:         { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0 },
@@ -40,6 +43,19 @@ class GameModel extends Model {
 
     async afterSync(): Promise<void> {
         this.model.belongsTo(dbs.Developer.model, { foreignKey: 'developer_id', targetKey: 'id' });
+
+        if ( await this.model.count() < 1 ) {
+            const sampleGames: any = [
+                {
+                    uid: uuid(),
+                    developer_id: 1,
+                    pathname: 'test-path',
+                    title: 'test-title',
+                    genre_tags: 'arcade,puzzle,knight',
+                }
+            ];
+            await this.bulkCreate(sampleGames);
+        }
     }
 
 

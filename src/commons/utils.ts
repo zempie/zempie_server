@@ -1,3 +1,4 @@
+import * as fs from 'fs';
 import * as crypto from 'crypto';
 import cfgOption from '../../config/opt';
 import * as jwt from 'jsonwebtoken';
@@ -68,6 +69,26 @@ export function updateZempieClaims(user: DecodedIdToken, claims: any) {
             ...claims,
         }
     } as IZempieClaims)
+}
+
+
+/**
+ * get files
+ */
+export function getFiles(dir: string, callback: Function) {
+    fs.readdirSync(dir)
+        .filter((file) => {
+            return ( file.indexOf('_') !== 0 && file.indexOf('.ts') < 0 && file.indexOf('.js.map') < 0 );
+        })
+        .forEach((file) => {
+            const name = path.join(dir, file);
+            if( fs.statSync(name).isDirectory() ) {
+                return getFiles(name, callback);
+            }
+            else {
+                callback(dir, file);
+            }
+        });
 }
 
 

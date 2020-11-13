@@ -43,7 +43,8 @@ namespace KafkaService {
                     return logger.error(err)
                 }
 
-                logger.debug(data)
+                // logger.debug(data)
+                console.log('[kafka-produce]', data)
             })
         }
     }

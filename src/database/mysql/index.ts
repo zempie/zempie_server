@@ -4,10 +4,11 @@ import { logger } from '../../commons/logger';
 import { Sequelize } from 'sequelize';
 import { dbs } from "../../commons/globals";
 import Model from './model';
-import { capitalize } from '../../commons/utils';
+import { capitalize, getFiles } from '../../commons/utils';
 import db_options from '../../../config/dbs';
 const mysqlOpt = db_options.mysql;
 const MYSQL = require('mysql2/promise');
+
 
 class MySql {
     private db: Sequelize | undefined;
@@ -30,6 +31,7 @@ class MySql {
 
             await this.db.authenticate();
             await this.syncDefine();
+            logger.info('mysql is ready.'.cyan)
         }
         catch (e) {
             console.error(e.stack);
@@ -42,9 +44,8 @@ class MySql {
         const dir = path.join(__dirname, '/models/');
 
         getFiles(dir, (dir: string, file: string) => {
-            const seq = this.db;
-            if ( !!seq ) {
-                const model: any = seq.import(path.join(dir, file));
+            if ( !!this.db ) {
+                const model: any = this.db.import(path.join(dir, file));
                 models[capitalize(model.getName())] = model;
             }
         });
@@ -64,9 +65,6 @@ class MySql {
                 }
             }
         }
-
-        // console.log(`[${mysqlOpt.conn.dialect}] loading completed.`.cyan);
-        logger.info(`[${mysqlOpt.conn.dialect.toUpperCase()}] loading completed.`);
     }
 
 }
@@ -75,18 +73,18 @@ class MySql {
 export default new MySql();
 
 
-function getFiles(dir: string, callback: Function) {
-    fs.readdirSync(dir)
-        .filter((file) => {
-            return ( file.indexOf('_') !== 0 && file.indexOf('.ts') < 0 && file.indexOf('.js.map') < 0 );
-        })
-        .forEach((file) => {
-            const name = path.join(dir, file);
-            if( fs.statSync(name).isDirectory() ) {
-                return getFiles(name, callback);
-            }
-            else {
-                callback(dir, file);
-            }
-        });
-}
+// function getFiles(dir: string, callback: Function) {
+//     fs.readdirSync(dir)
+//         .filter((file) => {
+//             return ( file.indexOf('_') !== 0 && file.indexOf('.ts') < 0 && file.indexOf('.js.map') < 0 );
+//         })
+//         .forEach((file) => {
+//             const name = path.join(dir, file);
+//             if( fs.statSync(name).isDirectory() ) {
+//                 return getFiles(name, callback);
+//             }
+//             else {
+//                 callback(dir, file);
+//             }
+//         });
+// }

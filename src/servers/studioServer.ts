@@ -11,7 +11,7 @@ class StudioServer extends Server {
 
         this.setExpress(options);
         this.setFirebase();
-        await StudioServer.setRDB();
+        await this.setRDB();
     }
 
     routes(app: Router) {

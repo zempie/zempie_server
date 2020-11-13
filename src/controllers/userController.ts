@@ -156,6 +156,9 @@ class UserController {
                 const data: any = await FileManager.s3upload(replaceExt(file.name, '.webp'), webp[0].destinationPath, uid);
                 // const data: any = await FileManager.s3upload(file.name, file.path, uid);
                 user.picture = data.Location;
+                await admin.auth().updateUser(uid, {
+                    photoURL: data.Location
+                })
             }
 
             await user.save({ transaction });
@@ -212,8 +215,8 @@ class UserController {
                 user_uid: uid,
                 reason_num: num,
                 reason_text: text,
-            })
-            await dbs.User.destroy({ uid });
+            }, transaction)
+            await dbs.User.destroy({ uid }, transaction);
         })
     }
 }

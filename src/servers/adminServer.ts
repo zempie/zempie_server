@@ -8,7 +8,7 @@ class AdminServer extends Server {
         this.options = options;
 
         this.setExpress(options);
-        await AdminServer.setRDB();
+        await this.setRDB();
     }
 
     routes(app: Router) {

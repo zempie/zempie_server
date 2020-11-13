@@ -22,8 +22,8 @@ export default function convert(func: Function, middleware: boolean = false) {
     return async (req: any, res: Response, next: NextFunction) => {
         try {
             const params = _.assignIn({}, req.body, req.query, req.params);
-            const user = _.assignIn({}, req.user);
-            const result = await func(params, user, { req, res });
+            // const user = req.user? _.assignIn({}, req.user) : null
+            const result = await func(params, req.user, { req, res });
             if ( middleware ) {
                 return next();
             }
