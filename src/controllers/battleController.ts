@@ -48,50 +48,51 @@ class BattleController {
 
 
     gameStart = async ({ battle_uid, battle_key }: IBattleParams, user: DecodedIdToken) => {
-        return dbs.BattleLog.getTransaction(async (transaction: Transaction) => {
-            const battle = await dbs.Battle.findOne({uid: battle_uid}, transaction);
-            if ( new Date(battle.end_at) < new Date() ) {
-                throw CreateError(ErrorCodes.BATTLE_OVER);
-            }
-            battle.user_count += 1;
-            await battle.save({transaction});
+        const battle = await dbs.Battle.findOne({uid: battle_uid});
+        if ( !battle ) {
+            throw CreateError(ErrorCodes.INVALID_BATTLE);
+        }
+        if ( new Date(battle.end_at) < new Date() ) {
+            throw CreateError(ErrorCodes.BATTLE_OVER);
+        }
+        // battle.user_count += 1;
+        // await battle.save({transaction});
 
 
-            let decoded = battle_key && battle_key !== ''? verifyJWT(battle_key) : {
-                user_uid: uniqid(),
-                best_score: -1
-            };
-            let user_uid = user? user.uid : decoded.user_uid;
+        let decoded = battle_key && battle_key !== ''? verifyJWT(battle_key) : {
+            user_uid: uniqid(),
+            best_score: -1
+        };
+        let user_uid = user? user.uid : decoded.user_uid;
 
 
-            const battle_user = await dbs.BattleUser.findOrCreate({
-                battle_uid,
-                user_uid,
-            }, transaction);
-            decoded.best_score = battle_user.best_score;
+        const { record: battle_user, isNew } = await dbs.BattleUser.findOrCreate({
+            battle_uid,
+            user_uid,
+        }, undefined);
+        decoded.best_score = battle_user.best_score;
 
 
-            const record = await dbs.BattleLog.create({
-                battle_uid,
-                battle_user_id: battle_user.id,
-                score: -1
-            }, transaction);
+        const record = await dbs.BattleLog.create({
+            battle_uid,
+            battle_user_id: battle_user.id,
+            score: -1
+        });
 
 
-            const new_battle_key = signJWT({
-                uid: battle_uid,
-                game_uid: battle.game_uid,
-                user_uid,
-                secret_id: record.id,
-                best_score: decoded.best_score,
-            }, '10m');
+        const new_battle_key = signJWT({
+            uid: battle_uid,
+            game_uid: battle.game_uid,
+            user_uid,
+            secret_id: record.id,
+            best_score: decoded.best_score,
+        }, '10m');
 
 
-            return {
-                battle_key: new_battle_key,
-                user_uid
-            }
-        })
+        return {
+            battle_key: new_battle_key,
+            user_uid
+        }
     }
 
 
@@ -112,6 +113,7 @@ class BattleController {
                 secret_id,
                 best_score,
                 score,
+                new_record,
             })
         }])
 
@@ -121,7 +123,7 @@ class BattleController {
     }
 
 
-    updateUserName = async ({ battle_key, name }: any, user: DecodedIdToken) => {
+    updateUserName = async ({ battle_key, name }: IBattlePlayParams, user: DecodedIdToken) => {
         const decoded = verifyJWT(battle_key);
         const { uid: battle_uid, game_uid, user_uid, secret_id, best_score } = decoded;
 
@@ -130,7 +132,7 @@ class BattleController {
 
 
 
-    getRanking = async ({ battle_uid }: any, user: DecodedIdToken) => {
+    getRanking = async ({ battle_uid }: IBattlePlayParams, user: DecodedIdToken) => {
         const ranking = await dbs.BattleUser.getRanking({ battle_uid });
         return {
             ranking

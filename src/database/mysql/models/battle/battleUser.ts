@@ -22,18 +22,6 @@ class BattleUserModel extends Model {
     }
 
 
-    async findOrCreate(where: any, transaction?: Transaction) {
-        let record = await this.model.findOne({
-            where,
-            transaction,
-        });
-        if ( !record ) {
-            record = await this.model.create(where, {transaction});
-        }
-
-        return record
-    }
-
 
     async updateBestScore({ battle_uid, user_uid, best_score }: any, transaction?: Transaction) {
         return this.update({ best_score }, {

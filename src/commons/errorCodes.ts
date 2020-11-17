@@ -91,6 +91,10 @@ export const ErrorCodes = {
         code: 1401,
         message: '배틀 끝났다'
     },
+    INVALID_BATTLE: {
+        code: 1402,
+        message: '배틀 오류'
+    },
 
     INVALID_ITEM_ID: {
         code: 2101,

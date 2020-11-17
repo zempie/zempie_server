@@ -49,7 +49,8 @@ abstract class Model {
     public async findOne(where: object, transaction?: Transaction) { return this.model.findOne({ where, transaction }) }
     public async findAll(where: object, options?: object, transaction?: Transaction) { return this.model.findAll({ where, ...options, transaction }) }
     public async findAndCountAll(where: object, options?: object, transaction?: Transaction) { return this.model.findAndCountAll({ where, ...options, transaction }) }
-    public async findOrCreate({findOption, createOption}: {findOption: object, createOption?: object}, transaction?: Transaction) {
+    public async findOrCreate(findOption: object, createOption?: object, transaction?: Transaction) {
+        let isNew = false;
         let record = await this.model.findOne({
             where: {
                 ...findOption
@@ -60,9 +61,13 @@ abstract class Model {
             record = await this.model.create({
                 ...(createOption || findOption)
             }, {transaction});
+            isNew = true;
         }
 
-        return record;
+        return {
+            record,
+            isNew,
+        };
     }
 
     public async bulkCreate(bulk: [], transaction?: Transaction) {

@@ -157,6 +157,8 @@ export interface IBattleParams {
 }
 export interface IBattlePlayParams {
     battle_key: string,
+    battle_uid?: string,
+    name?: string,
     score: number,
 }
 export interface IGameKey {

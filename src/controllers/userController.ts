@@ -10,43 +10,82 @@ import { CreateError, ErrorCodes } from '../commons/errorCodes';
 
 
 class UserController {
+    signUp = async ({ registration_token }: any, _user: DecodedIdToken) => {
+        const record = await dbs.User.findOne({ uid: _user.uid });
+        if ( record ) {
+            throw CreateError(ErrorCodes.INVALID_USER_UID);
+        }
+
+        return dbs.User.getTransaction(async (transaction: Transaction) => {
+            const user = await dbs.User.create({
+                uid: _user.uid,
+                name: _user.name,
+                picture: _user.picture,
+                provider: _user.firebase.sign_in_provider,
+                email: _user.email,
+                email_verified: _user.emailVerified,
+                fcm_token: registration_token,
+            }, transaction);
+
+            const user_id = user.id;
+            const profile = await dbs.UserProfile.create({ user_id }, transaction);
+            const setting = await dbs.UserSetting.create({ user_id }, transaction);
+
+            // following 에 자신 추가 - 나중을 위해...
+            await dbs.Follow.create({ user_id, target_id: user_id }, transaction);
+
+            const udi = await this.getUserDetailInfo(user, profile, setting);
+            return {
+                user: udi,
+            }
+        })
+    }
     /**
      * 사용자 정보 가져오기
      * - 정보가 없을 경우 firebase 에서 가져와서 저장
      */
     getInfo = async ({registration_token}: any, _user: DecodedIdToken) => {
         return dbs.User.getTransaction(async (transaction: Transaction) => {
-            let profile, setting;
             const { uid } = _user;
             let user = await dbs.User.getInfo({uid}, transaction);
             if ( !user ) {
-                // user = await admin.auth().getUser(uid);
-                user = await dbs.User.create({
-                    uid,
-                    name: _user.name,
-                    picture: _user.picture,
-                    provider: _user.firebase.sign_in_provider,
-                    email: _user.email,
-                    email_verified: _user.emailVerified,
-                    fcm_token: registration_token,
-                }, transaction);
-
-                const user_id = user.id;
-                profile = await dbs.UserProfile.create({ user_id }, transaction);
-                setting = await dbs.UserSetting.create({ user_id }, transaction);
-
-                // following 에 자신 추가 - 나중을 위해...
-                await dbs.Follow.create({ user_id, target_id: user_id }, transaction);
+                throw CreateError(ErrorCodes.INVALID_USER_UID);
             }
-            else {
-                if ( registration_token ) {
-                    await admin.messaging().subscribeToTopic(registration_token, 'test-topic');
-                    user.fcm_token = registration_token;
-                    await user.save({transaction});
-                }
+            // let profile, setting;
+            // if ( !user ) {
+            //     // user = await admin.auth().getUser(uid);
+            //     user = await dbs.User.create({
+            //         uid,
+            //         name: _user.name,
+            //         picture: _user.picture,
+            //         provider: _user.firebase.sign_in_provider,
+            //         email: _user.email,
+            //         email_verified: _user.emailVerified,
+            //         fcm_token: registration_token,
+            //     }, transaction);
+            //
+            //     const user_id = user.id;
+            //     profile = await dbs.UserProfile.create({ user_id }, transaction);
+            //     setting = await dbs.UserSetting.create({ user_id }, transaction);
+            //
+            //     // following 에 자신 추가 - 나중을 위해...
+            //     await dbs.Follow.create({ user_id, target_id: user_id }, transaction);
+            // }
+            // else {
+            //     if ( registration_token ) {
+            //         await admin.messaging().subscribeToTopic(registration_token, 'test-topic');
+            //         user.fcm_token = registration_token;
+            //         await user.save({transaction});
+            //     }
+            // }
+
+            if ( registration_token ) {
+                await admin.messaging().subscribeToTopic(registration_token, 'test-topic');
+                user.fcm_token = registration_token;
+                await user.save({transaction});
             }
 
-            const udi = await this.getUserDetailInfo(user, profile, setting);
+            const udi = await this.getUserDetailInfo(user);
             return {
                 user: udi,
             }

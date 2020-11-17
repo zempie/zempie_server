@@ -27,11 +27,10 @@ class UserPublishingModel extends Model {
 
 
     async updateCount({ user_id, game_id, pub_type }: { user_id: number, game_id: number, pub_type: ePubType }, transaction?: Transaction) {
-        const publishing = await this.findOrCreate({
-            findOption: {
-                user_id,
-                game_id,
-            }}, transaction);
+        const { record, isNew } = await this.findOrCreate({
+            user_id,
+            game_id,
+        }, undefined, transaction);
 
         let type = ''
         switch (pub_type) {
@@ -44,8 +43,8 @@ class UserPublishingModel extends Model {
                 type = 'ad';
                 break;
         }
-        publishing[`count_${type}`] += 1;
-        await publishing.save({ transaction });
+        record[`count_${type}`] += 1;
+        await record.save({ transaction });
     }
 }
 
