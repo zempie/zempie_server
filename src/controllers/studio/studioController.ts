@@ -199,6 +199,7 @@ class StudioController {
                 pathname : params.pathname,
                 title : project.name,
                 description : project.description,
+                hashtags : '',
                 // version : version.version,
                 // url_game : version.url,
                 url_thumb : project.picture,
