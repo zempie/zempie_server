@@ -30,7 +30,7 @@ export default {
         host: '192.168.0.10',
         port: 16379,
         family: 4,
-        password: '',
+        password: 'fromthered2020#!',
         db: 0,
     }
 }
