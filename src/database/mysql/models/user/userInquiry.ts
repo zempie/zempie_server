@@ -1,11 +1,10 @@
 import * as _ from 'lodash';
 import Model from '../../model';
 import { DataTypes, Sequelize, Op } from 'sequelize';
-import { CreateError, ErrorCodes } from '../../../../commons/errorCodes';
 import { dbs } from '../../../../commons/globals';
 
 
-interface IUserQuestionParams {
+interface IUserInquiryParams {
     user_id: number
     title?: string
     content?: string
@@ -16,15 +15,15 @@ interface IUserQuestionParams {
     offset: number
 }
 
-class UserQuestionModel extends Model {
+class UserInquiryModel extends Model {
     protected initialize(): void {
-        this.name = 'userQuestion';
+        this.name = 'userInquiry';
         this.attributes = {
             user_id:    { type: DataTypes.INTEGER, allowNull: false },
-            category:   { type: DataTypes.STRING(10), allowNull: false },
+            category:   { type: DataTypes.SMALLINT, allowNull: false },
             title:      { type: DataTypes.STRING(100), allowNull: false },
-            content:    { type: DataTypes.STRING(500), allowNull: false },
-            answer:     { type: DataTypes.STRING(500) },
+            text:       { type: DataTypes.STRING(500), allowNull: false },
+            response:   { type: DataTypes.STRING(500) },
             admin_id:   { type: DataTypes.INTEGER },
         }
     }
@@ -36,7 +35,7 @@ class UserQuestionModel extends Model {
         this.model.belongsTo(dbs.Admin.model);
     }
 
-    async getList({ user_id, no_answer, limit = 50, offset = 0, sort = 'id', dir = 'asc' }: IUserQuestionParams) {
+    async getList({ user_id, no_answer, limit = 50, offset = 0, sort = 'id', dir = 'asc' }: IUserInquiryParams) {
         const where: any = {};
         if ( user_id ) {
             where.user_id = user_id;
@@ -60,15 +59,15 @@ class UserQuestionModel extends Model {
 
         return {
             count,
-            questions: _.map(rows, (r: any) => {
+            inquiries: _.map(rows, (r: any) => {
                 return {
                     id: r.id,
                     name: r.user.name,
                     title: r.title,
-                    content: r.content,
-                    answer: r.answer,
+                    text: r.text,
+                    response: r.response,
                     asked_at: r.created_at,
-                    answered_at: r.updated_at,
+                    responded_at: r.updated_at,
                     admin: r.admin
                 }
             })
@@ -77,14 +76,7 @@ class UserQuestionModel extends Model {
     }
 
 
-    async askQuestion({user_id, title, content}: IUserQuestionParams) {
-        await this.create({
-            user_id,
-            title,
-            content,
-        })
-    }
 }
 
 
-export default (rdb: Sequelize) => new UserQuestionModel(rdb)
+export default (rdb: Sequelize) => new UserInquiryModel(rdb)

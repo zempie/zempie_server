@@ -27,8 +27,8 @@ class ServiceController {
             throw CreateError(ErrorCodes.INVALID_QNA_PARAMS);
         }
 
-        const user = await dbs.User.findOne({ uid });
-        await dbs.QnaQuestion.askQuestion({ user_id: user.id, title, content});
+        // const user = await dbs.User.findOne({ uid });
+        // await dbs.QnaQuestion.askQuestion({ user_id: user.id, title, content});
     }
 
 

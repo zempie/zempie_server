@@ -130,7 +130,7 @@ export interface INotify {
 
 export interface INoticeParams {
     id: number,
-    type: eNotice,
+    category: eNotice,
     title: string,
     content: string,
     img_link: string,

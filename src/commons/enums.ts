@@ -1,3 +1,19 @@
+export enum eNotice {
+    Etc,
+    Normal,
+    Suspend,
+    Update,
+    Event,
+}
+export enum eInquiry {
+    Etc,
+    Game,
+    Environment,
+    Personality,
+    Studio,
+}
+
+
 export enum eTimeline {
     PR = 1,
     PRW,
@@ -20,12 +36,6 @@ export enum eAlarm {
     Reply,
     Like,
     Beaten,
-}
-
-export enum eNotice {
-    Stable,
-    Once,
-    Event,
 }
 
 export enum eRedis {
