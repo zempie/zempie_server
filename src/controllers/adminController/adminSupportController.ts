@@ -45,7 +45,7 @@ class AdminSupportController {
     }
 
 
-    async updateNotice({id}: INoticeParams) {
+    async updateNotice({id, category, title, content, img_link, start_at, end_at}: INoticeParams) {
         return dbs.Notice.getTransaction(async (transaction: Transaction) => {
             const notice = await dbs.Notice.findOne({id}, transaction);
             if( !notice ) {
@@ -53,6 +53,12 @@ class AdminSupportController {
             }
 
             // 수정수정
+            category? notice.category = category : null;
+            title? notice.title = title : null;
+            content? notice.content = content : null;
+            img_link? notice.img_link = img_link : null;
+            start_at? notice.start_at = new Date(start_at) : null;
+            end_at? notice.end_at = new Date(end_at) : null;
 
             await notice.save({transaction});
         })
