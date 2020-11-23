@@ -124,6 +124,7 @@ class GameController {
                 const { developer } = game;
                 return {
                     game_uid: game.uid,
+                    official: game.official,
                     title: game.title,
                     pathname: game.pathname,
                     version: game.version,

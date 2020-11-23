@@ -1,3 +1,4 @@
+import * as _ from 'lodash';
 import admin from 'firebase-admin';
 import DecodedIdToken = admin.auth.DecodedIdToken;
 import { CreateError, ErrorCodes } from '../commons/errorCodes';
@@ -30,7 +31,21 @@ class SupportController {
     }
 
 
-    async getNotices () {}
+    async getNotices () {
+        const { count, rows } = await dbs.Notice.findAndCountAll({ activated: true })
+        return {
+            count,
+            notices: _.map(rows, (row) => {
+                return {
+                    id: row.id,
+                    category: row.category,
+                    title: row.title,
+                    content: row.content,
+                    created_at: row.created_at,
+                }
+            })
+        }
+    }
 
 
     async getQna () {}

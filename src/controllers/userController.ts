@@ -130,6 +130,8 @@ class UserController {
             }
         });
 
+        const dev_games = user.developer? user.developer.games : undefined;
+
         return {
             uid: user.uid,
             name: user.name,
@@ -152,6 +154,9 @@ class UserController {
                 reply: setting.notify_reply,
             } : undefined,
             game_records,
+            developed_games: _.map(dev_games, (game) => {
+                return game.get({plain: true })
+            })
         }
     }
 
@@ -204,13 +209,18 @@ class UserController {
                 }
             }
 
+            let data: any;
             if ( file ) {
                 const webp = await FileManager.convertToWebp(file, 80);
-                const data: any = await FileManager.s3upload(replaceExt(file.name, '.webp'), webp[0].destinationPath, uid);
+                data = await FileManager.s3upload(replaceExt(file.name, '.webp'), webp[0].destinationPath, uid);
                 // const data: any = await FileManager.s3upload(file.name, file.path, uid);
                 user.picture = data.Location;
+            }
+
+            if ( params.name || data ) {
                 await admin.auth().updateUser(uid, {
-                    photoURL: data.Location
+                    displayName: params.name? params.name : undefined,
+                    photoURL: data? data.Location : undefined,
                 })
             }
 

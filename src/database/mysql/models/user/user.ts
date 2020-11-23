@@ -39,6 +39,7 @@ class UserModel extends Model {
         this.model.hasOne(dbs.UserSetting.model, { sourceKey: 'id', foreignKey: 'user_id', as: 'setting' });
         this.model.hasMany(dbs.UserGame.model, { sourceKey: 'uid', foreignKey: 'user_uid', as: 'gameRecords' });
         this.model.hasMany(dbs.UserPublishing.model, { sourceKey: 'uid', foreignKey: 'user_uid', as: 'publishing' });
+        this.model.hasOne(dbs.Developer.model);
     }
 
     async getInfo({uid}: DecodedIdToken, transaction?: Transaction) {
@@ -70,6 +71,12 @@ class UserModel extends Model {
                     attributes: {
                         exclude: ['created_at', 'updated_at', 'deleted_at'],
                     },
+                    include: [{
+                        model: dbs.Game.model,
+                    }]
+                },
+                {
+                    model: dbs.Developer.model,
                     include: [{
                         model: dbs.Game.model,
                     }]
