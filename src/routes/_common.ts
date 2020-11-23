@@ -80,6 +80,13 @@ declare global {
 }
 
 
+export const isAuthenticated = (req: Request, res: Response, next: NextFunction) => {
+    if ( !req.user ) {
+        return throwError(res, '^_^ㅗ');
+    }
+    next();
+}
+
 const getIdToken = (req: Request) => {
     if ((!req.headers.authorization || !req.headers.authorization.startsWith('Bearer ')) &&
         !(req.cookies && req.cookies.__session)) {

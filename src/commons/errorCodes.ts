@@ -26,6 +26,11 @@ export const ErrorCodes = {
         code: 1111,
         message: '게임 UID 오류'
     },
+    INVALID_CHANNEL_ID: {
+        code: 1112,
+        message: '채널 ID 오류'
+    },
+
     INVALID_FCM_TOKEN: {
         code: 1121,
         message: '사용자 FCM 토큰 오류'

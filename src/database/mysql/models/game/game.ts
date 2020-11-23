@@ -60,7 +60,7 @@ class GameModel extends Model {
 
 
     async getList({ limit = 50, offset = 0, sort = 'id', dir = 'asc' }) {
-        return await this.model.findAndCountAll({
+        return await this.model.findAll({
             where: {
                 activated: true,
                 enabled: true,
@@ -75,8 +75,6 @@ class GameModel extends Model {
             limit: _.toNumber(limit),
             offset: _.toNumber(offset),
         })
-
-        // return _.map(records, (record: any) => record.get({ plain: true }))
     }
 
 

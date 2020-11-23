@@ -4,16 +4,11 @@ import LauncherController from '../controllers/launcherController';
 import convert from '../controllers/_convert';
 import GameController from '../controllers/gameController';
 import BattleController from '../controllers/battleController';
-import { throwError, validateFirebaseIdToken } from './_common';
+import RankingController from '../controllers/rankingController';
+import { isAuthenticated, validateFirebaseIdToken } from './_common';
 
 
 const apiVer = `/api/v1`
-const isAuthenticated = (req: Request, res: Response, next: NextFunction) => {
-    if ( !req.user ) {
-        return throwError(res, '^_^ㅗ');
-    }
-    next();
-}
 export default (router: Router) => {
     // 게임 실행
     router.get(`${apiVer}/launch/game/:uid`,    convert(LauncherController.getGame));
@@ -29,7 +24,7 @@ export default (router: Router) => {
     // 젬파이
     router.post(`${apiVer}/launch/game-start`,  validateFirebaseIdToken,   convert(GameController.gameStart));
     router.post(`${apiVer}/launch/game-over`,   validateFirebaseIdToken,   convert(GameController.gameOver));
-    router.get(`${apiVer}/launch/game-ranking/:game_uid`,   validateFirebaseIdToken,     convert(GameController.getGlobalRanking));
+    router.get(`${apiVer}/launch/game-ranking/:game_uid`,   validateFirebaseIdToken,     convert(RankingController.getGlobalRanking));
 
 
     // 배틀

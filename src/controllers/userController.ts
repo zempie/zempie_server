@@ -20,6 +20,7 @@ class UserController {
             const user = await dbs.User.create({
                 uid: _user.uid,
                 name: _user.name,
+                channel_id: _user.uid,
                 picture: _user.picture,
                 provider: _user.firebase.sign_in_provider,
                 email: _user.email,
@@ -32,7 +33,7 @@ class UserController {
             const setting = await dbs.UserSetting.create({ user_id }, transaction);
 
             // following 에 자신 추가 - 나중을 위해...
-            await dbs.Follow.create({ user_id, target_id: user_id }, transaction);
+            await dbs.Follow.create({ user_uid: _user.uid, target_id: _user.uid }, transaction);
 
             const udi = await this.getUserDetailInfo(user, profile, setting);
             return {
@@ -93,8 +94,20 @@ class UserController {
     }
 
 
-    getTargetInfo = async ({target_uid}: any, {uid}: DecodedIdToken) => {
-        const user = await dbs.User.getProfile({uid: target_uid});
+    getTargetInfoByUid = async ({target_uid}: any, {uid}: DecodedIdToken) => {
+        const user = await dbs.User.getProfileByUid({ uid: target_uid });
+        const target = await this.getUserDetailInfo(user);
+        return {
+            target,
+        }
+    }
+
+
+    getTargetInfoByChannelId = async ({channel_id}: {channel_id: string}, {}) => {
+        const user = await dbs.User.getProfileByChannelId({ channel_id });
+        if ( !user ) {
+            throw CreateError(ErrorCodes.INVALID_CHANNEL_ID);
+        }
         const target = await this.getUserDetailInfo(user);
         return {
             target,
@@ -120,6 +133,7 @@ class UserController {
         return {
             uid: user.uid,
             name: user.name,
+            channel_id: user.channel_id,
             picture: user.picture,
             level: profile.level,
             exp: profile.exp,

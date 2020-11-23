@@ -1,4 +1,5 @@
 import { Message } from 'kafka-node';
+import { KafkaMessage } from 'kafkajs';
 
 export interface IServerOptions {
     tcp: boolean,
@@ -23,4 +24,5 @@ export interface IMessageQueueOptions {
     autoCommit: boolean,
     onMessage: (message: Message) => void,
     addTopics: string[],
+    eachMessage: ({ topic, partition, message }: { topic: string, partition: number, message: KafkaMessage }) => Promise<any>,
 }

@@ -31,7 +31,7 @@ class HashtagCache extends CacheModel {
         this.redis.hdel(key, field);
     }
 
-    async getTag(key: string) {
+    async findAll(key: string) {
         key = key.trim();
         if ( key.indexOf('#') !== 0 ) {
             key = '#' + key;

@@ -5,16 +5,17 @@ import RpcController from '../controllers/rpcController';
 import GameController from '../controllers/gameController';
 import BattleController from '../controllers/battleController';
 import AdController from '../controllers/adController';
+import RankingController from '../controllers/rankingController';
 
 
 const apiVer = `/api/v1`;
 
 export default (router: Router) => {
-
     router.get(`/game/:pathname/:pid`,          convert(GameController.playGame, true),    convert(GameController.redirectGame));
     router.get(`${apiVer}/games`,               validateFirebaseIdToken,    convert(GameController.getGameList));
-    router.get(`${apiVer}/games/ranking/g`,     validateFirebaseIdToken,    convert(GameController.getGlobalRanking));
-    router.get(`${apiVer}/games/ranking/f`,     validateFirebaseIdToken,    convert(GameController.getFollowingRanking));
+    router.get(`${apiVer}/games/s/:tag`,        validateFirebaseIdToken,    convert(GameController.getGameListByHashtag));
+    router.get(`${apiVer}/games/ranking/g`,     validateFirebaseIdToken,    convert(RankingController.getGlobalRanking));
+    router.get(`${apiVer}/games/ranking/f`,     validateFirebaseIdToken,    convert(RankingController.getFollowingRanking));
 
 
 
@@ -40,8 +41,8 @@ RpcController.generator('get-game',             GameController.getGame);
 RpcController.generator('get-games',            GameController.getGameList);
 RpcController.generator('game-start',           GameController.gameStart, true);
 RpcController.generator('game-over',            GameController.gameOver, true);
-RpcController.generator('get-ranking-global',   GameController.getGlobalRanking, true);
-RpcController.generator('get-ranking-follow',   GameController.getFollowingRanking, true);
+RpcController.generator('get-ranking-global',   RankingController.getGlobalRanking, true);
+RpcController.generator('get-ranking-follow',   RankingController.getFollowingRanking, true);
 
 RpcController.generator('ad-completed',         AdController.onRewardedVideoCompleted);
 

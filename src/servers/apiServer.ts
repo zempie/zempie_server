@@ -44,6 +44,7 @@ class ApiServer extends Server {
             autoCommit: true,
             onMessage: mq.onMessage.bind(mq),
             addTopics: mq.addTopics(),
+            eachMessage: mq.eachMessage.bind(mq),
         }
         await this.setMessageQueue(options);
     }

@@ -21,8 +21,8 @@ class ContentServer extends Server {
     protected afterStart = async (): Promise<void> => {
         const options: IMessageQueueOptions = {
             groupId: 'content-server',
-            autoCommit: false,
-            onMessage: mq.onMessage.bind(mq),
+            autoCommit: true,
+            onMessage: mq.onMessage,
             addTopics: mq.addTopics(),
         }
         await this.setMessageQueue(options);

@@ -24,6 +24,7 @@ class UserModel extends Model {
             banned:             { type: DataTypes.SMALLINT, allowNull: false, defaultValue: EBan.not },
             is_admin:           { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false },
             name:               { type: DataTypes.STRING(50), allowNull: true },
+            channel_id:         { type: DataTypes.STRING(100), allowNull: false },
             picture:            { type: DataTypes.STRING(250), allowNull: true },
             provider:           { type: DataTypes.STRING(20), allowNull: true, defaultValue: 'password' },
             email:              { type: DataTypes.STRING(50), allowNull: true },
@@ -78,9 +79,9 @@ class UserModel extends Model {
         })
     }
 
-    async getProfile({ uid }: DecodedIdToken, transaction?: Transaction) {
+    private getProfile = async (where: object, transaction?: Transaction) => {
         const user = await this.model.findOne({
-            where: { uid },
+            where,
             include: [{
                 model: dbs.UserProfile.model,
                 as: 'profile',
@@ -102,6 +103,14 @@ class UserModel extends Model {
         if( user ) {
             return user.get({plain: true});
         }
+    }
+
+    getProfileByUid = async ({ uid }: { uid: string }) => {
+        return this.getProfile({ uid });
+    }
+
+    getProfileByChannelId = async ({ channel_id }: { channel_id: string }) => {
+        return this.getProfile({ channel_id });
     }
 
     async getSetting({uid}: DecodedIdToken, transaction?: Transaction) {
