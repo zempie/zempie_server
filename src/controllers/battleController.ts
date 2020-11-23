@@ -5,6 +5,7 @@ import { Transaction } from 'sequelize';
 import { signJWT, verifyJWT } from '../commons/utils';
 import { CreateError, ErrorCodes } from '../commons/errorCodes';
 import { Producer } from '../services/kafkaService';
+import MQ from '../services/messageQueueService';
 import admin from 'firebase-admin';
 import DecodedIdToken = admin.auth.DecodedIdToken;
 
@@ -105,17 +106,19 @@ class BattleController {
             await dbs.BattleUser.updateBestScore({ battle_uid, user_uid, best_score: score });
         }
 
-        Producer.send([{
+        MQ.send({
             topic: 'battle_gameOver',
-            messages: JSON.stringify({
-                battle_uid,
-                user_uid,
-                secret_id,
-                best_score,
-                score,
-                new_record,
-            })
-        }])
+            messages: [{
+                value: JSON.stringify({
+                    battle_uid,
+                    user_uid,
+                    secret_id,
+                    best_score,
+                    score,
+                    new_record,
+                })
+            }]
+        })
 
         return {
             new_record

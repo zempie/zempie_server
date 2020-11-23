@@ -11,7 +11,7 @@ export class SrvMQ {
         return this[func](message)
     }
 
-    eachMessage = async ({ topic, partition, message }: { topic: string, partition: number, message: KafkaMessage }): Promise<any> => {
+    eachMessage = async (topic: string, message: any): Promise<any> => {
         const func = _.camelCase(topic);
 
         // @ts-ignore

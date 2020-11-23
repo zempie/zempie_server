@@ -31,6 +31,7 @@ class ContentMQ extends SrvMQ {
     }
 
     async gameOver(message: Message) {
+        // console.log('message:'.yellow, message);
         const { user_uid, game_uid, score }: any = message;
         // const user = await dbs.User.findOne({ id: user_id });
         // const game = await dbs.Game.findOne({ game_id });

@@ -34,7 +34,8 @@ import swaggerDef from './swaggerDef';
 // colors
 import * as colors from 'colors';
 import { logger } from '../commons/logger';
-import { Producer, Consumer } from '../services/kafkaService';
+import Kafka from '../services/messageQueueService';
+
 colors.setTheme({
     silly: 'rainbow',
     input: 'grey',
@@ -50,8 +51,6 @@ colors.setTheme({
 
 
 export default class Server {
-    // protected producer?: Producer;
-    // protected consumer?: Consumer;
     protected options!: IServerOptions;
     protected app?: express.Application;
 
@@ -147,9 +146,12 @@ export default class Server {
 
 
     protected async setMessageQueue(options: IMessageQueueOptions) {
-        await Producer.connect()
-        await Consumer.connect(options.groupId, options.autoCommit, options.onMessage)
-        Consumer.addTopic(options.addTopics);
+        // await Producer.connect()
+        // await Consumer.connect(options.groupId, options.autoCommit, options.onMessage)
+        // Consumer.addTopic(options.addTopics);
+        await Kafka.initialize(options.groupId);
+        await Kafka.addTopics(options.addTopics);
+        await Kafka.run(options.eachMessage);
     }
 
 

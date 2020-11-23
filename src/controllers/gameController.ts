@@ -5,7 +5,7 @@ import { IGameParams, IGamePlayParams, IRoute } from './_interfaces';
 import { Transaction } from 'sequelize';
 import { caches, dbs } from '../commons/globals';
 import { CreateError, ErrorCodes } from '../commons/errorCodes';
-import { Producer } from '../services/kafkaService';
+import MQ from '../services/messageQueueService';
 import Opt from '../../config/opt';
 const { Url } = Opt;
 
@@ -16,13 +16,15 @@ class GameController {
             return;
         }
 
-        Producer.send([{
+        MQ.send({
             topic: 'pubPlayGame',
-            messages: JSON.stringify({
-                pathname,
-                user_uid,
-            })
-        }])
+            messages: [{
+                value: JSON.stringify({
+                    pathname,
+                    user_uid,
+                })
+            }]
+        })
     }
 
     redirectGame = ({ pathname, pid }: any, user: any, { req, res }: IRoute) => {
@@ -68,15 +70,17 @@ class GameController {
         // const user_id = userRecord.id;
         // const game_id = game.id;
 
-        Producer.send([{
+        MQ.send({
             topic: 'gameOver',
-            messages: JSON.stringify({
-                user_uid,
-                game_uid,
-                score,
-                pid,
-            }),
-        }])
+            messages: [{
+                value: JSON.stringify({
+                    user_uid,
+                    game_uid,
+                    score,
+                    pid,
+                }),
+            }]
+        })
 
         if ( !user_uid ) {
             return ;
@@ -186,13 +190,15 @@ class GameController {
 
 
     sampleTest = async ({}, user: {}) => {
-        const data = await Producer.send([{
+        const data = await MQ.send({
             topic: 'gameOver',
-            messages: JSON.stringify({
-                key1: 'value1',
-                key2: 'value2',
-            }),
-        }]);
+            messages: [{
+                value: JSON.stringify({
+                    key1: 'value1',
+                    key2: 'value2',
+                }),
+            }]
+        });
         console.log(data)
         console.log('sent')
     }

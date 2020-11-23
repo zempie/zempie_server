@@ -22,7 +22,7 @@ export interface IServerOptions {
 export interface IMessageQueueOptions {
     groupId: string,
     autoCommit: boolean,
-    onMessage: (message: Message) => void,
+    // onMessage: (message: Message) => void,
     addTopics: string[],
-    eachMessage: ({ topic, partition, message }: { topic: string, partition: number, message: KafkaMessage }) => Promise<any>,
+    eachMessage: (topic: string, message: string ) => Promise<any>,
 }
