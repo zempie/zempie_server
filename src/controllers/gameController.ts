@@ -129,10 +129,6 @@ class GameController {
                     pathname: game.pathname,
                     version: game.version,
                     control_type: game.control_type,
-                    // genre_arcade: game.genre_arcade,
-                    // genre_puzzle: game.genre_puzzle,
-                    // genre_racing: game.genre_racing,
-                    // genre_sports: game.genre_sports,
                     hashtags: game.hashtags,
                     url_game: game.url_game,
                     url_thumb: game.url_thumb,
@@ -151,34 +147,6 @@ class GameController {
         return {
             games
         }
-
-        // const { count, rows } = await dbs.Game.getList({limit, offset, sort, dir});
-        // return {
-        //     count,
-        //     games: _.map(rows, (game: any) => {
-        //         const { developer } = game;
-        //         return {
-        //             game_uid: game.uid,
-        //             title: game.title,
-        //             pathname: game.pathname,
-        //             version: game.version,
-        //             control_type: game.control_type,
-        //             // genre_arcade: game.genre_arcade,
-        //             // genre_puzzle: game.genre_puzzle,
-        //             // genre_racing: game.genre_racing,
-        //             // genre_sports: game.genre_sports,
-        //             hashtags: game.hashtags,
-        //             url_game: game.url_game,
-        //             url_thumb: game.url_thumb,
-        //             share_url: user? `${Url.Redirect}/${game.pathname}/${user.uid}` : undefined,
-        //             developer: developer? {
-        //                 uid: developer.uid,
-        //                 name: developer.name,
-        //                 picture: developer.picture,
-        //             } : null
-        //         }
-        //     })
-        // }
     }
 
     getGameListByHashtag = async ({ tag }: { tag: string }, user: DecodedIdToken) => {

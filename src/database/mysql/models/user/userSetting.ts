@@ -7,7 +7,7 @@ class UserSetting extends Model {
     protected initialize(): void {
         this.name = 'userSetting';
         this.attributes = {
-            user_id:            { type: DataTypes.INTEGER, allowNull: false },
+            user_id:            { type: DataTypes.INTEGER, allowNull: false, unique: true },
             app_theme:          { type: DataTypes.SMALLINT, allowNull: false, defaultValue: eAppTheme.Default },
             app_theme_extra:    { type: DataTypes.SMALLINT },
             app_language:       { type: DataTypes.SMALLINT, allowNull: false, defaultValue: eAppLang.KO },

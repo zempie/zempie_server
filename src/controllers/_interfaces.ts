@@ -45,7 +45,6 @@ export interface IPublisher extends IDecoded {
  */
 export interface IZempieClaims {
     zempie: {
-        developer_id: number,
     }
 }
 

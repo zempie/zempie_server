@@ -15,21 +15,12 @@ class GameModel extends Model {
 
             official:           { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false },
 
-            developer_id:       { type: DataTypes.INTEGER, allowNull: false },
-            // developer_type:     { type: DataTypes.SMALLINT, defaultValue: 0 },
-
             pathname:           { type: DataTypes.STRING(50), allowNull: false, unique: true },
             title:              { type: DataTypes.STRING(50), allowNull: false, defaultValue: '' },
             description:        { type: DataTypes.STRING(200), defaultValue: '' },
             version:            { type: DataTypes.STRING(20), defaultValue: '0.0.1' },
 
-            // min_ratio:          { type: DataTypes.SMALLINT, defaultValue: 1 },
             control_type:       { type: DataTypes.SMALLINT, defaultValue: 0 },
-
-            // genre_arcade:       { type: DataTypes.BOOLEAN, defaultValue: false },
-            // genre_puzzle:       { type: DataTypes.BOOLEAN, defaultValue: false },
-            // genre_sports:       { type: DataTypes.BOOLEAN, defaultValue: false },
-            // genre_racing:       { type: DataTypes.BOOLEAN, defaultValue: false },
             hashtags:           { type: DataTypes.STRING, allowNull: false },
 
             count_start:        { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0 },
@@ -42,13 +33,10 @@ class GameModel extends Model {
     }
 
     async afterSync(): Promise<void> {
-        this.model.belongsTo(dbs.Developer.model, { foreignKey: 'developer_id', targetKey: 'id' });
-
         if ( await this.model.count() < 1 ) {
             const sampleGames: any = [
                 {
                     uid: uuid(),
-                    developer_id: 1,
                     pathname: 'test-path',
                     title: 'test-title',
                     genre_tags: 'arcade,puzzle,knight',
