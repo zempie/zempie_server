@@ -19,6 +19,7 @@ class DeveloperModel extends Model {
         await super.afterSync()
         this.model.belongsTo(dbs.User.model);
         this.model.hasMany(dbs.Project.model);
+        this.model.hasMany(dbs.Game.model);
     }
 
     async create({ user_id, user_uid, name, picture, mileages } : any, transaction?: Transaction) {
