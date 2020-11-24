@@ -10,6 +10,8 @@ class ContentServer extends Server {
         this.options = options;
 
         this.setExpress(options)
+        await this.setRDB();
+        await this.setMDB();
     }
 
     protected routes(app: Router) {

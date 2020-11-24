@@ -131,6 +131,7 @@ class GameController {
                     version: game.version,
                     control_type: game.control_type,
                     hashtags: game.hashtags,
+                    count_over: game.count_over,
                     url_game: game.url_game,
                     url_thumb: game.url_thumb,
                     share_url: user? `${Url.Redirect}/${game.pathname}/${user.uid}` : undefined,
