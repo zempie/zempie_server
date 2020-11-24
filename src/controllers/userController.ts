@@ -84,7 +84,7 @@ class UserController {
     }
 
 
-    getTargetInfoByChannelId = async ({channel_id}: {channel_id: string}, _user: DecodedIdToken) => {
+    getTargetInfoByChannelId = async ({channel_id}: {channel_id: string}, _: DecodedIdToken) => {
         const user = await dbs.User.getProfileByChannelId({ channel_id });
         if ( !user ) {
             throw CreateError(ErrorCodes.INVALID_CHANNEL_ID);
@@ -137,7 +137,7 @@ class UserController {
                 like: setting.notify_like,
                 reply: setting.notify_reply,
             } : undefined,
-            developed_games: user.is_developer? _.map(user.devGames, (game) => {
+            dev_games: user.is_developer? _.map(user.devGames, (game) => {
                 return game.get({plain: true })
             }) : undefined,
             game_records: user.game_records? _.map(user.gameRecords, (gr: any) => {
