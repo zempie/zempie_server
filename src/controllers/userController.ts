@@ -116,6 +116,7 @@ class UserController {
             name: user.name,
             channel_id: user.channel_id,
             picture: user.picture,
+            is_developer: user.is_developer,
             profile: {
                 level: profile.level,
                 exp: profile.exp,
@@ -261,6 +262,19 @@ class UserController {
             await setting.save({transaction});
         });
     }
+
+
+    updateExternalLink = async (params: any, { uid }: DecodedIdToken) => {
+
+    }
+
+
+    deleteExternalLink = async ({ id }: { id: number}, { uid }: DecodedIdToken) => {
+        const user = await dbs.User.findOne({ uid });
+        await dbs.UserExternalLink.destroy({ user_id: user.id, id })
+    }
+
+
 
 
     searchUser = async ({ search_name, limit = 100, offset = 0 }: any, {uid}: DecodedIdToken) => {

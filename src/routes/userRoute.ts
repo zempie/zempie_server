@@ -20,9 +20,11 @@ export default (router: Router) => {
     router.post(`${apiVer}/user/update/info`,       validateFirebaseIdToken,    FileManager.uploadImage,    convert(UserController.setInfo));
     router.post(`${apiVer}/user/update/banner`,     validateFirebaseIdToken,    FileManager.uploadImage,    convert(UserController.setBanner));
     router.post(`${apiVer}/user/update/setting`,    validateFirebaseIdToken,    convert(UserController.updateSetting));
+    router.post(`${apiVer}/user/update/e-link`,     validateFirebaseIdToken,    convert(UserController.updateExternalLink));
+    router.post(`${apiVer}/user/delete/e-link`,     validateFirebaseIdToken,    convert(UserController.deleteExternalLink));
 
     router.get(`${apiVer}/user/info`,               validateFirebaseIdToken,    convert(UserController.getInfo));
-    router.get(`${apiVer}/user/info/:channel_id`,   convert(UserController.getTargetInfoByChannelId));
+    router.get(`${apiVer}/channel/:channel_id`,     convert(UserController.getTargetInfoByChannelId));
 
     router.get(`${apiVer}/user/search`,             validateFirebaseIdToken,    convert(UserController.searchUser));
     router.get(`${apiVer}/user/alarm`,              validateFirebaseIdToken,    convert(AlarmController.getList));

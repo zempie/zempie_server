@@ -39,6 +39,7 @@ class UserModel extends Model {
         this.model.hasOne(dbs.UserSetting.model, { sourceKey: 'id', foreignKey: 'user_id', as: 'setting' });
         this.model.hasMany(dbs.UserGame.model, { sourceKey: 'uid', foreignKey: 'user_uid', as: 'gameRecords' });
         this.model.hasMany(dbs.UserPublishing.model, { sourceKey: 'uid', foreignKey: 'user_uid', as: 'publishing' });
+        this.model.hasMany(dbs.UserExternalLink.model, { as: 'externalLink' });
         this.model.hasMany(dbs.Game.model, { as: 'devGames' });
     }
 
@@ -70,10 +71,10 @@ class UserModel extends Model {
                 //         model: dbs.Game.model,
                 //     }]
                 // },
-                {
-                    model: dbs.Game.model,
-                    as: 'devGames',
-                }
+                // {
+                //     model: dbs.Game.model,
+                //     as: 'devGames',
+                // }
             ],
             transaction
         })
