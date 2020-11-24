@@ -1,6 +1,6 @@
 export default {
     mysql: {
-        database: 'platform',
+        database: 'zempie',
         username: 'loki',
         password: 'wjddnjs',
         conn: {
