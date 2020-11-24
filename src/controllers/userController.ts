@@ -10,7 +10,7 @@ import { CreateError, ErrorCodes } from '../commons/errorCodes';
 
 
 class UserController {
-    signUp = async ({ registration_token }: any, _user: DecodedIdToken) => {
+    signUp = async ({ name, registration_token }: any, _user: DecodedIdToken) => {
         const record = await dbs.User.findOne({ uid: _user.uid });
         if ( record ) {
             throw CreateError(ErrorCodes.INVALID_USER_UID);
@@ -19,7 +19,7 @@ class UserController {
         return dbs.User.getTransaction(async (transaction: Transaction) => {
             const user = await dbs.User.create({
                 uid: _user.uid,
-                name: _user.name,
+                name: name || _user.name,
                 channel_id: _user.uid,
                 picture: _user.picture,
                 provider: _user.firebase.sign_in_provider,
@@ -175,15 +175,6 @@ class UserController {
             emailVerified: true,
         });
         await dbs.User.update({ email_verified: true }, { uid: user.uid });
-    }
-
-
-    async verifyToken ({}, user: DecodedIdToken) {
-        await admin.auth().setCustomUserClaims(user.uid, {
-            zempie: {
-                developer_id: 1,
-            }
-        } as IZempieClaims);
     }
 
 

@@ -26,14 +26,3 @@ export default (router: Router) => {
     router.get(`${apiVer}/user/alarm`,              validateFirebaseIdToken,    convert(AlarmController.getList));
     router.get(`${apiVer}/user/publishing`,         validateFirebaseIdToken,    convert(PublishingController.getList));
 }
-
-RpcController.generator('sign-out',         UserController.signOut, true);
-RpcController.generator('set-user-info',    UserController.setInfo, true);
-RpcController.generator('get-user-info',    UserController.getInfo, true);
-RpcController.generator('get-target-info',  UserController.getTargetInfoByUid, true);
-RpcController.generator('get-search-user',  UserController.searchUser, true);
-RpcController.generator('set-user-setting', UserController.updateSetting, true);
-RpcController.generator('get-alarms',       AlarmController.getList, true);
-
-
-RpcController.generator('get-publishing',   PublishingController.getList, true);

@@ -22,7 +22,6 @@ class UserModel extends Model {
             uid:                { type: DataTypes.STRING(36), allowNull: false, unique: true },
             activated:          { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: true },
             banned:             { type: DataTypes.SMALLINT, allowNull: false, defaultValue: EBan.not },
-            is_admin:           { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false },
             name:               { type: DataTypes.STRING(50), allowNull: true },
             channel_id:         { type: DataTypes.STRING(100), allowNull: false },
             picture:            { type: DataTypes.STRING(250), allowNull: true },
@@ -30,6 +29,8 @@ class UserModel extends Model {
             email:              { type: DataTypes.STRING(50), allowNull: true },
             email_verified:     { type: DataTypes.BOOLEAN, defaultValue: false },
             fcm_token:          { type: DataTypes.STRING },
+            is_developer:       { type: DataTypes.BOOLEAN, defaultValue: false },
+            banner:             { type: DataTypes.STRING(250) },
         };
     }
 
@@ -75,12 +76,6 @@ class UserModel extends Model {
                         model: dbs.Game.model,
                     }]
                 },
-                {
-                    model: dbs.Developer.model,
-                    include: [{
-                        model: dbs.Game.model,
-                    }]
-                }
             ],
             transaction
         })
