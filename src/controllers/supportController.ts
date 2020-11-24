@@ -31,8 +31,12 @@ class SupportController {
     }
 
 
-    async getNotices () {
-        const { count, rows } = await dbs.Notice.findAndCountAll({ activated: true })
+    async getNotices ({ limit = 50, offset = 0, sort = 'id', dir = 'asc' }) {
+        const { count, rows } = await dbs.Notice.findAndCountAll({ activated: true }, {
+            order: [[sort, dir]],
+            limit: _.toNumber(limit),
+            offset: _.toNumber(offset),
+        })
         return {
             count,
             notices: _.map(rows, (row) => {
