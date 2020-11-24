@@ -14,11 +14,11 @@ class UserProfileModel extends Model {
             user_id:        { type: DataTypes.INTEGER, allowNull: false },
             level:          { type: DataTypes.MEDIUMINT, allowNull: false, defaultValue: 1 },
             exp:            { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0 },
+            following_cnt:  { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0 },
+            followers_cnt:  { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0 },
             state_msg:      { type: DataTypes.STRING(100) },
             description:    { type: DataTypes.STRING(500) },
             url_banner:     { type: DataTypes.STRING(250) },
-            following_cnt:  { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0 },
-            followers_cnt:  { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0 },
             // points:         { type: DataTypes.INTEGER.UNSIGNED, allowNull: false, defaultValue: 0 },
         };
     }
