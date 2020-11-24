@@ -24,7 +24,7 @@ class UserController {
                 picture: _user.picture,
                 provider: _user.firebase.sign_in_provider,
                 email: _user.email,
-                email_verified: _user.emailVerified,
+                email_verified: _user.email_verified,
                 fcm_token: registration_token,
             }, transaction);
 
@@ -119,7 +119,7 @@ class UserController {
                 followers_cnt: profile.followers_cnt,
                 state_msg: profile.state_msg,
                 description: profile.description,
-                banner_url: profile.banner_url,
+                url_banner: profile.url_banner,
             },
             setting: setting? {
                 theme: setting.app_theme,
