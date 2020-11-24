@@ -15,6 +15,8 @@ export default (router: Router) => {
     // router.patch(`${apiVer}/studio/developer`,    validateFirebaseIdToken, FileManager.uploadImage, convert(StudioController.updateDeveloper));
     // router.get( `${apiVer}/studio/developer`, validateFirebaseIdToken, convert(StudioController.getDeveloper) );
 
+    router.post(`${apiVer}/studio/developer`,    validateFirebaseIdToken, convert(StudioController.signupDeveloper));
+
     router.post(`${apiVer}/studio/project`,     validateFirebaseIdToken, FileManager.uploadImage, convert(StudioController.createProject));
     router.get( `${apiVer}/studio/project`,     validateFirebaseIdToken, convert(StudioController.getProjects));
     router.get( `${apiVer}/studio/project/:id`, validateFirebaseIdToken, convert(StudioController.getProject));

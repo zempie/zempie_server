@@ -20,14 +20,14 @@ class StudioAdminController {
         const project = await dbs.Project.findOne( {
             id : version.project_id
         });
-        const developer = await dbs.Developer.findOne( {
-            id : project.developer_id
-        });
+        // const developer = await dbs.Developer.findOne( {
+        //     id : project.developer_id
+        // });
 
         return  {
             version,
             project,
-            developer
+            // developer
         }
     }
 

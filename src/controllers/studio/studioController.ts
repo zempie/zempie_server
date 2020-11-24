@@ -120,9 +120,14 @@ class StudioController {
     signupDeveloper = async  (params: any, {uid}: DecodedIdToken) =>{
         return dbs.User.getTransaction( async (transaction : Transaction)=>{
             //권한 추가
-            
-            // return await dbs.Developer.updateDeveloper( params, transaction ) ;
 
+            const user = await dbs.User.findOne({uid}, transaction);
+            user.is_developer = true;
+            user.save({transaction});
+            
+            return {
+                success : true
+            };
         })
     }
 
