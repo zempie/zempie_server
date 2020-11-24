@@ -52,33 +52,6 @@ class UserController {
             if ( !user ) {
                 throw CreateError(ErrorCodes.INVALID_USER_UID);
             }
-            // let profile, setting;
-            // if ( !user ) {
-            //     // user = await admin.auth().getUser(uid);
-            //     user = await dbs.User.create({
-            //         uid,
-            //         name: _user.name,
-            //         picture: _user.picture,
-            //         provider: _user.firebase.sign_in_provider,
-            //         email: _user.email,
-            //         email_verified: _user.emailVerified,
-            //         fcm_token: registration_token,
-            //     }, transaction);
-            //
-            //     const user_id = user.id;
-            //     profile = await dbs.UserProfile.create({ user_id }, transaction);
-            //     setting = await dbs.UserSetting.create({ user_id }, transaction);
-            //
-            //     // following 에 자신 추가 - 나중을 위해...
-            //     await dbs.Follow.create({ user_id, target_id: user_id }, transaction);
-            // }
-            // else {
-            //     if ( registration_token ) {
-            //         await admin.messaging().subscribeToTopic(registration_token, 'test-topic');
-            //         user.fcm_token = registration_token;
-            //         await user.save({transaction});
-            //     }
-            // }
 
             if ( registration_token ) {
                 await admin.messaging().subscribeToTopic(registration_token, 'test-topic');
@@ -130,18 +103,20 @@ class UserController {
             }
         });
 
-        const dev_games = user.developer? user.developer.games : undefined;
-
         return {
             uid: user.uid,
             name: user.name,
             channel_id: user.channel_id,
             picture: user.picture,
-            level: profile.level,
-            exp: profile.exp,
-            state_msg: profile.state_msg,
-            following_cnt: profile.following_cnt,
-            followers_cnt: profile.followers_cnt,
+            profile: {
+                level: profile.level,
+                exp: profile.exp,
+                following_cnt: profile.following_cnt,
+                followers_cnt: profile.followers_cnt,
+                state_msg: profile.state_msg,
+                description: profile.description,
+                banner_url: profile.banner_url,
+            },
             setting: setting? {
                 theme: setting.app_theme,
                 theme_extra: setting.app_theme_extra,
@@ -153,10 +128,10 @@ class UserController {
                 like: setting.notify_like,
                 reply: setting.notify_reply,
             } : undefined,
-            game_records,
-            developed_games: _.map(dev_games, (game) => {
+            developed_games: user.is_developer? _.map(user.devGames, (game) => {
                 return game.get({plain: true })
-            })
+            }) : undefined,
+            game_records,
         }
     }
 

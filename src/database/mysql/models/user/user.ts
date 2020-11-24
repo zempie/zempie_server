@@ -30,27 +30,21 @@ class UserModel extends Model {
             email_verified:     { type: DataTypes.BOOLEAN, defaultValue: false },
             fcm_token:          { type: DataTypes.STRING },
             is_developer:       { type: DataTypes.BOOLEAN, defaultValue: false },
-            // banner:             { type: DataTypes.STRING(250) },
         };
     }
 
     async afterSync(): Promise<void> {
         await super.afterSync()
-        this.model.hasOne(dbs.UserProfile.model, { sourceKey: 'id', foreignKey: 'user_id', as: 'profile' });
-        this.model.hasOne(dbs.UserSetting.model, { sourceKey: 'id', foreignKey: 'user_id', as: 'setting' });
-        this.model.hasMany(dbs.UserGame.model, { sourceKey: 'uid', foreignKey: 'user_uid', as: 'gameRecords' });
+        this.model.hasOne(dbs.UserProfile.model, { as: 'profile' });
+        this.model.hasOne(dbs.UserSetting.model, { as: 'setting' });
+        this.model.hasMany(dbs.UserGame.model, { as: 'gameRecords' });
         this.model.hasMany(dbs.UserPublishing.model, { sourceKey: 'uid', foreignKey: 'user_uid', as: 'publishing' });
         this.model.hasMany(dbs.Game.model, { as: 'devGames' });
     }
 
     async getInfo({uid}: DecodedIdToken, transaction?: Transaction) {
         return this.model.findOne({
-            where: {
-                is_admin: {
-                    [Op.ne]: true
-                },
-                uid
-            },
+            where: { uid },
             include: [
                 {
                     model: dbs.UserProfile.model,
@@ -66,16 +60,16 @@ class UserModel extends Model {
                         exclude: ['created_at', 'updated_at', 'deleted_at'],
                     }
                 },
-                {
-                    model: dbs.UserGame.model,
-                    as: 'gameRecords',
-                    attributes: {
-                        exclude: ['created_at', 'updated_at', 'deleted_at'],
-                    },
-                    include: [{
-                        model: dbs.Game.model,
-                    }]
-                },
+                // {
+                //     model: dbs.UserGame.model,
+                //     as: 'gameRecords',
+                //     attributes: {
+                //         exclude: ['created_at', 'updated_at', 'deleted_at'],
+                //     },
+                //     include: [{
+                //         model: dbs.Game.model,
+                //     }]
+                // },
                 {
                     model: dbs.Game.model,
                     as: 'devGames',
@@ -121,12 +115,7 @@ class UserModel extends Model {
 
     async getSetting({uid}: DecodedIdToken, transaction?: Transaction) {
         const user = await this.model.findOne({
-            where: {
-                is_admin: {
-                    [Op.ne]: true
-                },
-                uid
-            },
+            where: { uid },
             include: [{
                 model: dbs.UserSetting.model,
                 as: 'setting',
@@ -167,13 +156,9 @@ class UserModel extends Model {
 
     async getProfileAll({limit = 50, offset = 0, sort = 'id', dir = 'asc'}, transaction?: Transaction) {
         return await this.model.findAndCountAll({
-            where: {
-                is_admin: {
-                    [Op.ne]: true
-                }
-            },
+            where: {},
             attributes: {
-                exclude: ['is_admin', 'deleted_at'],
+                exclude: ['deleted_at'],
             },
             include: [{
                 as: 'profile',
@@ -194,10 +179,7 @@ class UserModel extends Model {
     search = async ({ search_name, limit = 100, offset = 0 }: any, transaction?: Transaction) => {
         return this.model.findAll({
             where: {
-                is_admin: {
-                    [Op.ne]: true
-                },
-                display_name: {
+                name: {
                     [Op.substring]: `%${search_name}%`,
                 }
             },
