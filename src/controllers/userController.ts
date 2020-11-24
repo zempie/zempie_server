@@ -101,15 +101,15 @@ class UserController {
         setting = setting || user.setting;
 
         // todo: 나중에 읽는 횟수 줄여야함
-        const game_records = _.map(user.gameRecords, (gr: any) => {
-            const game = gr.game;
-            return {
-                game_uid: game.uid,
-                title: game.title,
-                url_thumb: game.url_thumb,
-                score: gr.score,
-            }
-        });
+        // const game_records = _.map(user.gameRecords, (gr: any) => {
+        //     const game = gr.game;
+        //     return {
+        //         game_uid: game.uid,
+        //         title: game.title,
+        //         url_thumb: game.url_thumb,
+        //         score: gr.score,
+        //     }
+        // });
 
         return {
             uid: user.uid,
@@ -140,7 +140,15 @@ class UserController {
             developed_games: user.is_developer? _.map(user.devGames, (game) => {
                 return game.get({plain: true })
             }) : undefined,
-            game_records,
+            game_records: user.game_records? _.map(user.gameRecords, (gr: any) => {
+                const game = gr.game;
+                return {
+                    game_uid: game.uid,
+                    title: game.title,
+                    url_thumb: game.url_thumb,
+                    score: gr.score,
+                }
+            }) : undefined,
         }
     }
 
