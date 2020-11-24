@@ -37,7 +37,11 @@ class UserController {
 
             const udi = await this.getUserDetailInfo(user, profile, setting);
             return {
-                user: udi,
+                user: {
+                    ...udi,
+                    email: user.email,
+                    email_verified: user.email_verified,
+                },
             }
         })
     }
