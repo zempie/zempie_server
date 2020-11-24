@@ -72,6 +72,10 @@ export const ErrorCodes = {
         code: 2102,
         message: '이메일 인증 안됨'
     },
+    USER_DUPLICATED_CHANNEL_ID: {
+        code: 2103,
+        message: 'Channel ID 중복'
+    },
 
     INVALID_TIMELINE_USER_UID: {
         code: 1210,

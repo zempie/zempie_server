@@ -50,7 +50,6 @@ class UserInquiryModel extends Model {
                 model: dbs.User.model,
             }, {
                 model: dbs.Admin.model,
-                attributes: ['id', 'account', 'name', 'level', 'activated'],
             }],
             order: [[sort, dir]],
             limit: _.toNumber(limit),
@@ -62,13 +61,14 @@ class UserInquiryModel extends Model {
             inquiries: _.map(rows, (r: any) => {
                 return {
                     id: r.id,
-                    name: r.user.name,
                     title: r.title,
                     text: r.text,
                     response: r.response,
                     asked_at: r.created_at,
                     responded_at: r.updated_at,
-                    admin: r.admin
+                    admin: {
+                        name: r.admin.name
+                    }
                 }
             })
         }

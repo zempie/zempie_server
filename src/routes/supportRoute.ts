@@ -8,8 +8,10 @@ const apiVer = `/api/v1`;
 
 export default (router: Router) => {
     router.get(`${apiVer}/support/notices`,         convert(SupportController.getNotices));
+    router.get(`${apiVer}/support/notice/:id`,      convert(SupportController.getNotice));
     router.get(`${apiVer}/support/qna`,             convert(SupportController.getQna));
 
     router.get(`${apiVer}/support/inquiries`,       validateFirebaseIdToken,    convert(SupportController.getMyInquiries));
+    router.get(`${apiVer}/support/inquiry/:id`,     validateFirebaseIdToken,    convert(SupportController.getMyInquiry));
     router.post(`${apiVer}/support/inquiry`,        validateFirebaseIdToken,    convert(SupportController.askInquiry));
 }

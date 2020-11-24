@@ -31,6 +31,31 @@ class SupportController {
     }
 
 
+    async getMyInquiry ({ id }: { id: number }, { uid }: DecodedIdToken) {
+        const user = await dbs.User.findOne({ uid });
+        const inquiry = await dbs.UserInquiry.model.findOne({
+            where: { user_id: user.id, id },
+            include: [{
+                model: dbs.Admin.model,
+            }]
+        });
+        return {
+            inquiry: {
+                id: inquiry.id,
+                category: inquiry.category,
+                title: inquiry.title,
+                text: inquiry.text,
+                response: inquiry.response,
+                created_at: inquiry.created_at,
+                updated_at: inquiry.updated_at,
+                admin: {
+                    name: inquiry.admin.name,
+                }
+            }
+        }
+    }
+
+
     async getNotices ({ limit = 50, offset = 0, sort = 'id', dir = 'asc' }) {
         const { count, rows } = await dbs.Notice.findAndCountAll({ activated: true }, {
             order: [[sort, dir]],
@@ -44,10 +69,23 @@ class SupportController {
                     id: row.id,
                     category: row.category,
                     title: row.title,
-                    content: row.content,
+                    // content: row.content,
                     created_at: row.created_at,
                 }
             })
+        }
+    }
+
+
+    async getNotice ({ id }: { id: number }) {
+        const notice = await dbs.Notice.model.findOne({
+            where: { id },
+            attributes: {
+                exclude: ['updated_at', 'deleted_at']
+            }
+        });
+        return {
+            notice: notice.get({ plain: true })
         }
     }
 

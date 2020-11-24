@@ -15,12 +15,13 @@ export default (router: Router) => {
     router.post(`${apiVer}/user/sign-out`,          validateFirebaseIdToken,    convert(UserController.signOut));
     router.post(`${apiVer}/user/leave-zempie`,      validateFirebaseIdToken,    convert(UserController.leaveZempie))
     router.post(`${apiVer}/user/verify-email`,      validateFirebaseIdToken,    convert(UserController.verifyEmail));
+    router.post(`${apiVer}/user/verify-channel`,    validateFirebaseIdToken,    convert(UserController.verifyChannelId));
 
     router.post(`${apiVer}/user/update/info`,       validateFirebaseIdToken,    FileManager.uploadImage,    convert(UserController.setInfo));
+    router.post(`${apiVer}/user/update/banner`,     validateFirebaseIdToken,    FileManager.uploadImage,    convert(UserController.setBanner));
     router.post(`${apiVer}/user/update/setting`,    validateFirebaseIdToken,    convert(UserController.updateSetting));
 
     router.get(`${apiVer}/user/info`,               validateFirebaseIdToken,    convert(UserController.getInfo));
-    // router.get(`${apiVer}/user/info/:target_uid`,   validateFirebaseIdToken,    convert(UserController.getTargetInfoByUid));
     router.get(`${apiVer}/user/info/:channel_id`,   convert(UserController.getTargetInfoByChannelId));
 
     router.get(`${apiVer}/user/search`,             validateFirebaseIdToken,    convert(UserController.searchUser));

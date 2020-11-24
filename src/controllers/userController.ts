@@ -161,11 +161,28 @@ class UserController {
     }
 
 
+    async verifyChannelId ({ channel_id }: { channel_id: string }, user: DecodedIdToken) {
+        // 규칙 확인
+
+        // if ok
+        const dup = await dbs.User.findOne({ channel_id });
+        if ( dup ) {
+            throw CreateError(ErrorCodes.USER_DUPLICATED_CHANNEL_ID);
+        }
+
+        // await dbs.User.update({ channel_id }, { uid: user.uid });
+    }
+
+
     setInfo = async (params: any, {uid}: DecodedIdToken, {req: {files: {file}}}: IRoute) => {
         return dbs.User.getTransaction(async (transaction: Transaction) => {
             const user = await dbs.User.getInfo({ uid }, transaction);
             if ( !user ) {
                 throw CreateError(ErrorCodes.INVALID_USER_UID);
+            }
+
+            if ( params.channel_id ) {
+                user.channel_id = params.channel_id;
             }
 
             // 이름 변경
@@ -200,6 +217,20 @@ class UserController {
 
             await user.save({ transaction });
         })
+    }
+
+
+    setBanner = async ({}, { uid }: DecodedIdToken, {req: {files: {file}}}: IRoute) => {
+        if ( !file ) {
+            throw CreateError(ErrorCodes.INVALID_PARAMS)
+        }
+        const user = await dbs.User.findOne({ uid });
+        const webp = await FileManager.convertToWebp(file, 80);
+        const data: any = await FileManager.s3upload('banner.webp', webp[0].destinationPath, uid);
+        await dbs.UserProfile.update({ url_banner: data.Location }, { user_id: user.id })
+        return {
+            url_banner: data.Location
+        }
     }
 
 
