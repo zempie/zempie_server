@@ -40,13 +40,13 @@ const ERROR_STUDIO = {
     },
 }
 
-interface ICreateProject extends IVersion, IProject{
+interface ICreateProject extends IVersion, IProject {
 
 }
 
 interface IProject {
     name : string,
-    developer_id? : number,
+    user_id? : number,
     description? : string,
     picture? : string,
     pathname : string,
@@ -63,69 +63,78 @@ interface IVersion {
 }
 
 class StudioController {
-    getDeveloper = async (params: any, {uid}: DecodedIdToken)=>{
-        const user = await dbs.User.findOne({ uid });
-        if( !user ) {
-            throw CreateError(ERROR_STUDIO.NOT_FIND_USER)
-        }
+    // getDeveloper = async (params: any, {uid}: DecodedIdToken)=>{
+    //     const user = await dbs.User.findOne({ uid });
+    //     if( !user ) {
+    //         throw CreateError(ERROR_STUDIO.NOT_FIND_USER)
+    //     }
+    //
+    //     const developer = await dbs.Developer.findOne( {user_id : user.id} );
+    //     return {
+    //         developer,
+    //         user,
+    //     }
+    // }
 
-        const developer = await dbs.Developer.findOne( {user_id : user.id} );
-        return {
-            developer,
-            user,
-        }
-    }
+    // createDeveloper = async (params: any, { uid }: DecodedIdToken, {req: {files: {file}}}: IRoute) =>{
+    //     return dbs.Developer.getTransaction( async (transaction : Transaction) => {
+    //         const user = await dbs.User.findOne({ uid });
+    //         const dev = await dbs.Developer.findOne( { user_id : user.id } );
+    //         if( dev ) {
+    //             return dev;
+    //         }
+    //         else {
+    //
+    //             let picture = params.picture || user.picture;
+    //             if( file ) {
+    //                 const webp = await FileManager.convertToWebp(file, 80);
+    //                 const data: any = await FileManager.s3upload(replaceExt(file.name, '.webp'), webp[0].destinationPath, uid);
+    //                 picture = data.Location;
+    //             }
+    //
+    //             return await dbs.Developer.create( {
+    //                 user_id : user.id,
+    //                 user_uid : uid,
+    //                 name : params.name || user.name,
+    //                 picture,
+    //             }, transaction );
+    //         }
+    //     })
+    // }
 
-    createDeveloper = async (params: any, { uid }: DecodedIdToken, {req: {files: {file}}}: IRoute) =>{
-        return dbs.Developer.getTransaction( async (transaction : Transaction) => {
-            const user = await dbs.User.findOne({ uid });
-            const dev = await dbs.Developer.findOne( { user_id : user.id } );
-            if( dev ) {
-                return dev;
-            }
-            else {
+    // updateDeveloper = async  (params: any, { uid }: DecodedIdToken, {req: {files: {file}}}: IRoute) =>{
+    //     return dbs.Developer.getTransaction( async (transaction : Transaction)=>{
+    //         params = params || {};
+    //         params.user_uid = uid;
+    //
+    //         if ( file ) {
+    //             const webp = await FileManager.convertToWebp(file, 80);
+    //             const data: any = await FileManager.s3upload(replaceExt(file.name, '.webp'), webp[0].destinationPath, uid);
+    //             params.picture = data.Location;
+    //         }
+    //
+    //         return await dbs.Developer.updateDeveloper( params, transaction ) ;
+    //     })
+    // }
 
-                let picture = params.picture || user.picture;
-                if( file ) {
-                    const webp = await FileManager.convertToWebp(file, 80);
-                    const data: any = await FileManager.s3upload(replaceExt(file.name, '.webp'), webp[0].destinationPath, uid);
-                    picture = data.Location;
-                }
+    signupDeveloper = async  (params: any, {uid}: DecodedIdToken) =>{
+        return dbs.User.getTransaction( async (transaction : Transaction)=>{
+            //권한 추가
+            
+            // return await dbs.Developer.updateDeveloper( params, transaction ) ;
 
-                return await dbs.Developer.create( {
-                    user_id : user.id,
-                    user_uid : uid,
-                    name : params.name || user.name,
-                    picture,
-                }, transaction );
-            }
-        })
-    }
-
-    updateDeveloper = async  (params: any, { uid }: DecodedIdToken, {req: {files: {file}}}: IRoute) =>{
-        return dbs.Developer.getTransaction( async (transaction : Transaction)=>{
-            params = params || {};
-            params.user_uid = uid;
-
-            if ( file ) {
-                const webp = await FileManager.convertToWebp(file, 80);
-                const data: any = await FileManager.s3upload(replaceExt(file.name, '.webp'), webp[0].destinationPath, uid);
-                params.picture = data.Location;
-            }
-
-            return await dbs.Developer.updateDeveloper( params, transaction ) ;
         })
     }
 
     getProjects = async ( params : any, {uid}: DecodedIdToken )=>{
         // const user = await dbs.User.findOne({ uid });
-        const dev = await dbs.Developer.findOne( { user_uid : uid } );
-        if( !dev ) {
+        const user = await dbs.User.findOne( { uid } );
+        if( !user ) {
             //등록된 개발자 찾을수 없음
             throw CreateError(ERROR_STUDIO.NOT_FIND_DEVELOPER);
         }
 
-        return await dbs.Project.getProjects( { developer_id : dev.id } );
+        return await dbs.Project.getProjects( { user_id : user.id } );
     }
 
     getProject = async ( params : any, { uid }: DecodedIdToken )=>{
@@ -157,8 +166,11 @@ class StudioController {
 
     createProject = async ( params : ICreateProject, {uid}: DecodedIdToken, {req:{files}}: IRoute) => {
         return dbs.Project.getTransaction( async (transaction : Transaction)=>{
-            const dev = await dbs.Developer.findOne( {user_uid : uid} );
-            params.developer_id = dev.id;
+            // const dev = await dbs.Developer.findOne( {user_uid : uid} );
+            // params.developer_id = dev.id;
+
+            const user = await dbs.User.findOne( { uid } );
+            params.user_id = user.id;
 
             const picFile = files && files[ 'project_picture' ] || undefined;
             files[ 'project_picture' ] = undefined;
@@ -195,7 +207,7 @@ class StudioController {
                 uid : uuid(),
                 activated : 0,
                 enabled : 0,
-                developer_id : project.developer_id,
+                user_id : user.id,
                 pathname : params.pathname,
                 title : project.name,
                 description : project.description,

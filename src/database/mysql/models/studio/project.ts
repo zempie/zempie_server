@@ -7,7 +7,7 @@ class ProjectModel extends Model {
     protected initialize() {
         this.name = 'project';
         this.attributes = {
-            developer_id:       { type: DataTypes.INTEGER, allowNull: false },
+            user_id:            { type: DataTypes.INTEGER, allowNull: false },
             name:               { type: DataTypes.STRING(50), allowNull: true },
             picture:            { type: DataTypes.STRING(250), allowNull: true },
             control_type:       { type: DataTypes.SMALLINT, defaultValue: 0 },
@@ -20,16 +20,16 @@ class ProjectModel extends Model {
 
     async afterSync(): Promise<void> {
         this.model.hasMany(dbs.ProjectVersion.model);
-        this.model.belongsTo(dbs.Developer.model);
+        // this.model.belongsTo(dbs.Developer.model);
 
         this.model.belongsTo( dbs.Game.model );
         this.model.hasOne(dbs.ProjectVersion.model, { sourceKey : 'deploy_version_id'});
         this.model.hasOne(dbs.ProjectVersion.model, { sourceKey : 'update_version_id'});
     }
 
-    async create({ developer_id, name, description, picture } : any, transaction?: Transaction) {
+    async create({ user_id, name, description, picture } : any, transaction?: Transaction) {
         const value : any = {
-            developer_id,
+            user_id,
             name,
             description,
         }
@@ -42,9 +42,9 @@ class ProjectModel extends Model {
         return super.create( value, transaction );
     }
 
-    async getProjects({ developer_id } : any, transaction?: Transaction) {
+    async getProjects({ user_id } : any, transaction?: Transaction) {
         return this.model.findAll( {
-            where: { developer_id },
+            where: { user_id },
             include: [{
                 model: dbs.Game.model,
             },{

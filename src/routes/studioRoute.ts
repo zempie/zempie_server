@@ -11,9 +11,9 @@ import StudioAdminController from '../controllers/adminController/studioAdminCon
 const apiVer = `/api/v1`;
 
 export default (router: Router) => {
-    router.post(`${apiVer}/studio/developer`,   validateFirebaseIdToken, FileManager.uploadImage, convert(StudioController.createDeveloper));
-    router.patch(`${apiVer}/studio/developer`,    validateFirebaseIdToken, FileManager.uploadImage, convert(StudioController.updateDeveloper));
-    router.get( `${apiVer}/studio/developer`, validateFirebaseIdToken, convert(StudioController.getDeveloper) );
+    // router.post(`${apiVer}/studio/developer`,   validateFirebaseIdToken, FileManager.uploadImage, convert(StudioController.createDeveloper));
+    // router.patch(`${apiVer}/studio/developer`,    validateFirebaseIdToken, FileManager.uploadImage, convert(StudioController.updateDeveloper));
+    // router.get( `${apiVer}/studio/developer`, validateFirebaseIdToken, convert(StudioController.getDeveloper) );
 
     router.post(`${apiVer}/studio/project`,     validateFirebaseIdToken, FileManager.uploadImage, convert(StudioController.createProject));
     router.get( `${apiVer}/studio/project`,     validateFirebaseIdToken, convert(StudioController.getProjects));
