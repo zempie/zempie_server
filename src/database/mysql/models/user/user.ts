@@ -76,12 +76,6 @@ class UserModel extends Model {
                         model: dbs.Game.model,
                     }]
                 },
-                {
-                    model: dbs.Developer.model,
-                    include: [{
-                        model: dbs.Game.model,
-                    }]
-                }
             ],
             transaction
         })
