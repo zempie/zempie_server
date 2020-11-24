@@ -7,6 +7,8 @@ import { Transaction, Op } from 'sequelize';
 import FileManager from '../services/fileManager';
 const replaceExt = require('replace-ext');
 import { CreateError, ErrorCodes } from '../commons/errorCodes';
+import Opt from '../../config/opt';
+const { Url } = Opt;
 
 
 class UserController {
@@ -137,8 +139,20 @@ class UserController {
                 like: setting.notify_like,
                 reply: setting.notify_reply,
             } : undefined,
-            dev_games: user.is_developer? _.map(user.devGames, (game) => {
-                return game.get({plain: true })
+            dev_games: user.is_developer? _.map(user.devGames, (game: any) => {
+                return {
+                    game_uid: game.uid,
+                    official: game.official,
+                    title: game.title,
+                    pathname: game.pathname,
+                    version: game.version,
+                    control_type: game.control_type,
+                    hashtags: game.hashtags,
+                    count_over: game.count_over,
+                    url_game: game.url_game,
+                    url_thumb: game.url_thumb,
+                    share_url: user? `${Url.Redirect}/${game.pathname}/${user.uid}` : undefined,
+                }
             }) : undefined,
             game_records: user.game_records? _.map(user.gameRecords, (gr: any) => {
                 const game = gr.game;
