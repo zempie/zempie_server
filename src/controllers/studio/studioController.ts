@@ -123,7 +123,7 @@ class StudioController {
 
             const user = await dbs.User.findOne({uid}, transaction);
             user.is_developer = true;
-            user.save({transaction});
+            await user.save({transaction});
             
             return {
                 success : true
