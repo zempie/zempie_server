@@ -84,7 +84,7 @@ class UserController {
     }
 
 
-    getTargetInfoByChannelId = async ({channel_id}: {channel_id: string}, {}) => {
+    getTargetInfoByChannelId = async ({channel_id}: {channel_id: string}, _user: DecodedIdToken) => {
         const user = await dbs.User.getProfileByChannelId({ channel_id });
         if ( !user ) {
             throw CreateError(ErrorCodes.INVALID_CHANNEL_ID);

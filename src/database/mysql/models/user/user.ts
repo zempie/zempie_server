@@ -97,7 +97,6 @@ class UserModel extends Model {
                 },
                 include: [{
                     model: dbs.Game.model,
-                    as: 'devGames',
                 }]
             }],
             transaction
