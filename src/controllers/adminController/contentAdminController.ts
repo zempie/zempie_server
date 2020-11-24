@@ -39,7 +39,7 @@ class ContentAdminController {
     async getGames({ limit = 50, offset = 0 }) {
         const { count, rows } = await dbs.Games.findAndCountAll({}, {
             include: [{
-                model: dbs.Developer.model,
+                model: dbs.User.model,
             }],
             limit: _.toNumber(limit),
             offset: _.toNumber(offset),
