@@ -117,11 +117,12 @@ class GameController {
     }
 
     getGameList = async ({ limit = 50, offset = 0, sort = 'id', dir = 'asc' }, user: DecodedIdToken) => {
-        let games = await caches.game.getList();
+        // let games = await caches.game.getList();
+        let games;
         if ( !games ) {
             const rows = await dbs.Game.getList({});
             games = _.map(rows, (game: any) => {
-                const { developer } = game;
+                const { user } = game;
                 return {
                     game_uid: game.uid,
                     official: game.official,
@@ -133,10 +134,10 @@ class GameController {
                     url_game: game.url_game,
                     url_thumb: game.url_thumb,
                     share_url: user? `${Url.Redirect}/${game.pathname}/${user.uid}` : undefined,
-                    developer: developer? {
-                        uid: developer.uid,
-                        name: developer.name,
-                        picture: developer.picture,
+                    user: user? {
+                        uid: user.uid,
+                        name: user.name,
+                        picture: user.picture,
                     } : null
                 }
             })
