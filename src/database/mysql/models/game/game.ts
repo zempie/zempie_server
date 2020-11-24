@@ -14,6 +14,7 @@ class GameModel extends Model {
             enabled:            { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false },
 
             official:           { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false },
+            user_id:            { type: DataTypes.INTEGER },
 
             pathname:           { type: DataTypes.STRING(50), allowNull: false, unique: true },
             title:              { type: DataTypes.STRING(50), allowNull: false, defaultValue: '' },
@@ -33,6 +34,8 @@ class GameModel extends Model {
     }
 
     async afterSync(): Promise<void> {
+        this.model.belongsTo(dbs.User.model);
+
         if ( await this.model.count() < 1 ) {
             const sampleGames: any = [
                 {
@@ -57,7 +60,7 @@ class GameModel extends Model {
                 include: [['uid', 'game_uid']]
             },
             include: [{
-                model: dbs.Developer.model,
+                model: dbs.User.model,
             }],
             order: [[sort, dir]],
             limit: _.toNumber(limit),
@@ -73,7 +76,7 @@ class GameModel extends Model {
                 exclude: ['id', 'created_at', 'updated_at', 'deleted_at']
             },
             include: [{
-                model: dbs.Developer.model,
+                model: dbs.User.model,
                 attributes: {
                     exclude: ['id', 'created_at', 'updated_at', 'deleted_at']
                 },

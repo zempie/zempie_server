@@ -30,7 +30,7 @@ class UserModel extends Model {
             email_verified:     { type: DataTypes.BOOLEAN, defaultValue: false },
             fcm_token:          { type: DataTypes.STRING },
             is_developer:       { type: DataTypes.BOOLEAN, defaultValue: false },
-            banner:             { type: DataTypes.STRING(250) },
+            // banner:             { type: DataTypes.STRING(250) },
         };
     }
 
@@ -40,7 +40,7 @@ class UserModel extends Model {
         this.model.hasOne(dbs.UserSetting.model, { sourceKey: 'id', foreignKey: 'user_id', as: 'setting' });
         this.model.hasMany(dbs.UserGame.model, { sourceKey: 'uid', foreignKey: 'user_uid', as: 'gameRecords' });
         this.model.hasMany(dbs.UserPublishing.model, { sourceKey: 'uid', foreignKey: 'user_uid', as: 'publishing' });
-        this.model.hasOne(dbs.Developer.model);
+        this.model.hasMany(dbs.Game.model, { as: 'devGames' });
     }
 
     async getInfo({uid}: DecodedIdToken, transaction?: Transaction) {
@@ -76,6 +76,10 @@ class UserModel extends Model {
                         model: dbs.Game.model,
                     }]
                 },
+                {
+                    model: dbs.Game.model,
+                    as: 'devGames',
+                }
             ],
             transaction
         })
