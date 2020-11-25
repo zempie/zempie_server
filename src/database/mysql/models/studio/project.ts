@@ -68,7 +68,7 @@ class ProjectModel extends Model {
     }
 
     async updateProject({ id, name, picture, control_type, description, game_id, deploy_version_id, update_version_id } : any, transaction?: Transaction) {
-        const project = await this.model.findOne( { id }, transaction );
+        const project = await this.findOne( { id }, transaction );
 
         if( name ) {
             project.name = name;

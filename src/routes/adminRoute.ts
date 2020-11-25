@@ -3,7 +3,7 @@ import convert from '../controllers/_convert';
 import AdminController from '../controllers/adminController/adminController';
 import AdminUserController from '../controllers/adminController/adminUserController';
 import AdminSupportController from '../controllers/adminController/adminSupportController';
-import StudioAdminController from '../controllers/adminController/studioAdminController';
+import AdminStudioController from '../controllers/adminController/adminStudioController';
 import { adminTracking, validateAdminIdToken } from './_common';
 
 
@@ -64,4 +64,14 @@ export default (router: Router) => {
      *
      */
     // router.post(`${apiVer}/admin/notify`,   validateAdminIdToken,    convert(AdminController.notify));
+
+
+    /**
+     * 스튜디오
+     *
+     */
+
+    router.get(`${apiVer}/admin/studio/version`,       validateAdminIdToken,   convert(AdminStudioController.getVersion));
+    router.post(`${apiVer}/admin/studio/versions`,       validateAdminIdToken,   convert(AdminStudioController.getVersions));
+    router.post(`${apiVer}/admin/studio/version`,       validateAdminIdToken,   convert(AdminStudioController.setVersion));
 }
