@@ -5,7 +5,7 @@
 module.exports = {
     apps: [
         {
-            name: 'platform-server',
+            name: 'zempie-api-server',
             script: './dist/src/run.js',
             watch: false,
             ignore_watch : ["node_modules", "public"],
