@@ -116,6 +116,10 @@ export function Yesterday() {
     const now = new Date()
     return new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1)
 }
+export function afterHours(hour: number) {
+    const now = new Date();
+    return new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours() + hour)
+}
 
 export function getContentType(file : any) {
     const ext = path.extname(file);
