@@ -155,6 +155,7 @@ class UserController {
             uid: user.uid,
             name: user.name,
             channel_id: user.channel_id,
+            email: user.email,
             picture: user.picture,
             is_developer: user.is_developer,
             profile: {
@@ -206,15 +207,6 @@ class UserController {
 
 
     async verifyEmail ({}, user: DecodedIdToken) {
-        if ( user.email_verified ) {
-            throw CreateError(ErrorCodes.USER_ALREADY_VERIFIED_EMAIL);
-        }
-
-        const userRecord = await admin.auth().getUser(user.uid)
-        if ( !userRecord.emailVerified ) {
-            throw CreateError(ErrorCodes.USER_INVALID_VERIFIED_EMAIL);
-        }
-
         await admin.auth().updateUser(user.uid, {
             emailVerified: true,
         });
