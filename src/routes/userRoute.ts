@@ -11,7 +11,7 @@ import PublishingController from '../controllers/publishingController';
 const apiVer = `/api/v1`;
 
 export default (router: Router) => {
-    router.get(`/__cookie`, convert(UserController.setCookie))
+    router.get(`${apiVer}/__cookie`, convert(UserController.setCookie))
     router.get(`${apiVer}/user/verify-session`,     convert(UserController.getCustomToken));
     router.post(`${apiVer}/user/sign-up`,           validateFirebaseIdToken,    convert(UserController.signUp));
     router.post(`${apiVer}/user/sign-out`,          validateFirebaseIdToken,    convert(UserController.signOut));

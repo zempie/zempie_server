@@ -21,8 +21,8 @@ class UserController {
 
         if ( req.headers.origin && CORS.allowedOrigin.includes(req.headers.origin) ) {
             res.setHeader('Access-Control-Allow-Origin', req.headers.origin);
-            res.setHeader('Access-Control-Allow-Credentials', true);
-            const { uid } = cookie.parse(req.headers.cookie);
+            res.setHeader('Access-Control-Allow-Credentials', 'true');
+            const { _Zid: uid } = cookie.parse(req.headers.cookie);
             const customToken = await admin.auth().createCustomToken(uid);
             return {
                 customToken,
@@ -32,10 +32,12 @@ class UserController {
     setCookie = async (_: any, user: DecodedIdToken, { req, res }: any) => {
         if ( req.headers.origin && CORS.allowedOrigin.includes(req.headers.origin) ) {
             res.setHeader('Access-Control-Allow-Origin', req.headers.origin);
-            res.setHeader('Access-Control-Allow-Credentials', true);
-            res.setHeader('Set-Cookie', cookie.serialize('uid', user.uid, {
+            res.setHeader('Access-Control-Allow-Credentials', 'true');
+            res.setHeader('Access-Control-Allow-Headers', 'Authorization');
+            res.setHeader('Set-Cookie', cookie.serialize('_Zid', user.uid, {
                 domain: CORS.domain,
-                maxAge: 0,
+                path: '/',
+                maxAge: 60 * 60,
                 httpOnly: true,
                 secure: CORS.secure,
             }));
@@ -43,7 +45,7 @@ class UserController {
     }
 
 
-    signUp = async ({ name, registration_token }: any, _user: DecodedIdToken) => {
+    signUp = async ({ name, registration_token }: any, _user: DecodedIdToken, {req, res}: any) => {
         const record = await dbs.User.findOne({ uid: _user.uid });
         if ( record ) {
             throw CreateError(ErrorCodes.INVALID_USER_UID);
@@ -67,6 +69,8 @@ class UserController {
 
             // following 에 자신 추가 - 나중을 위해...
             await dbs.Follow.create({ user_uid: _user.uid, target_uid: _user.uid }, transaction);
+
+            await this.setCookie(null, _user, { req, res });
 
             const udi = await this.getUserDetailInfo(user, profile, setting);
             return {
@@ -300,7 +304,7 @@ class UserController {
 
             if ( req.headers.origin && CORS.allowedOrigin.includes(req.headers.origin) ) {
                 res.setHeader('Access-Control-Allow-Origin', req.headers.origin);
-                res.setHeader('Access-Control-Allow-Credentials', true);
+                res.setHeader('Access-Control-Allow-Credentials', 'true');
                 res.setHeader('Set-Cookie', cookie.serialize('uid', '', {
                     domain: CORS.domain,
                     maxAge: 0,

@@ -69,6 +69,7 @@ export default {
     CORS: {
         allowedOrigin: [
             'http://gtest.fromthered.com',
+            'http://zempie.fromthered.com',
         ],
         secure: false,
         domain: '.fromthered.com',

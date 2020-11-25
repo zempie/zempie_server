@@ -19,6 +19,7 @@ import { Sequelize } from 'sequelize';
 import { dbs } from '../commons/globals';
 import { Router, Response } from 'express';
 import cfgOption from '../../config/opt';
+const { CORS } = cfgOption;
 
 import RpcController from '../controllers/rpcController';
 
@@ -180,7 +181,8 @@ export default class Server {
             //     // origin: 'http://localhost:8443'
             // };
 
-            this.app.use(cors());
+
+            this.app.use(cors({credentials: true, origin: CORS.allowedOrigin}));
             this.app.use(bodyParser.json());
             this.app.use(bodyParser.urlencoded({extended:false}));
 

@@ -1,7 +1,7 @@
 export default {
     Server: {
         http: {
-            port: 9280,
+            port: 8280,
         },
         ws: {
             port: 8280,
@@ -70,9 +70,10 @@ export default {
         allowedOrigin: [
             'http://gtest.fromthered.com',
             'http://zempie.fromthered.com',
+            'http://localhost:8080',
         ],
         secure: false,
-        domain: '.fromthered.com',
+        domain: '.localhost',
     },
 
     Kafka: {
