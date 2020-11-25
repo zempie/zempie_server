@@ -72,6 +72,6 @@ export default (router: Router) => {
      */
 
     router.get(`${apiVer}/admin/studio/version`,       validateAdminIdToken,   convert(AdminStudioController.getVersion));
-    router.post(`${apiVer}/admin/studio/versions`,       validateAdminIdToken,   convert(AdminStudioController.getVersions));
+    router.get(`${apiVer}/admin/studio/versions`,       validateAdminIdToken,   convert(AdminStudioController.getVersions));
     router.post(`${apiVer}/admin/studio/version`,       validateAdminIdToken,   convert(AdminStudioController.setVersion));
 }
