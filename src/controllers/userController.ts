@@ -1,4 +1,6 @@
 import * as _ from 'lodash';
+import * as cookie from 'cookie';
+import { Request, Response } from 'express';
 import { IRoute, IZempieClaims } from './_interfaces';
 import { dbs, caches } from '../commons/globals';
 import admin from 'firebase-admin';
@@ -12,6 +14,20 @@ const { Url } = Opt;
 
 
 class UserController {
+    getCustomToken = async (_: any, __: any, { req }: any) => {
+        if( req.headers.cookie === null ) {
+            throw CreateError(ErrorCodes.INVALID_SESSION)
+        }
+
+        const cookies = cookie.parse(req.headers.cookie);
+        const { uid } = cookies;
+        const customToken = await admin.auth().createCustomToken(uid);
+        return {
+            customToken,
+        }
+    }
+
+
     signUp = async ({ name, registration_token }: any, _user: DecodedIdToken) => {
         const record = await dbs.User.findOne({ uid: _user.uid });
         if ( record ) {
@@ -51,7 +67,7 @@ class UserController {
      * 사용자 정보 가져오기
      * - 정보가 없을 경우 firebase 에서 가져와서 저장
      */
-    getInfo = async ({registration_token}: any, _user: DecodedIdToken) => {
+    getInfo = async ({registration_token}: any, _user: DecodedIdToken, { res }: { res: Response }) => {
         return dbs.User.getTransaction(async (transaction: Transaction) => {
             const { uid } = _user;
             let user = await dbs.User.getInfo({uid}, transaction);
@@ -65,7 +81,13 @@ class UserController {
                 await user.save({transaction});
             }
 
-            const customToken = await admin.auth().createCustomToken(user.uid);
+
+            res.setHeader('Set-Cookie', cookie.serialize('uid', uid, {
+                domain: '.zempie.com',
+                maxAge: 1000 * 60 * 60,
+            }));
+
+
             const udi = await this.getUserDetailInfo(user);
             return {
                 user: {
@@ -73,7 +95,6 @@ class UserController {
                     email: user.email,
                     email_verified: user.email_verified,
                 },
-                customToken,
             }
         });
     }

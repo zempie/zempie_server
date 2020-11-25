@@ -6,6 +6,12 @@ export const ErrorCodes = {
         code: 1001,
         message: 'Unauthorized'
     },
+    INVALID_SESSION: {
+        code: 1002,
+        message: 'invalid session'
+    },
+
+
     INVALID_PARAMS: {
         code: 1030,
         message: '파라미터 오류'
