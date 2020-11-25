@@ -70,6 +70,8 @@ export default {
         allowedOrigin: [
             'http://gtest.fromthered.com',
             'http://zempie.fromthered.com',
+            'http://studio.fromthered.com',
+            'http://launcher.fromthered.com',
         ],
         secure: false,
         domain: '.fromthered.com',
