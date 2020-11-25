@@ -1,7 +1,7 @@
 export default {
     Server: {
         http: {
-            port: 8280,
+            port: 9280,
         },
         ws: {
             port: 8280,
@@ -64,6 +64,15 @@ export default {
                 issuer    : 'from the red'
             },
         },
+    },
+
+    CORS: {
+        allowedOrigin: [
+            'http://gtest.fromthered.com',
+            'http://zempie.fromthered.com',
+        ],
+        secure: false,
+        domain: '.fromthered.com',
     },
 
     Kafka: {

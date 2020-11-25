@@ -11,9 +11,10 @@ import PublishingController from '../controllers/publishingController';
 const apiVer = `/api/v1`;
 
 export default (router: Router) => {
-    router.get(`/__session`,    convert(UserController.getCustomToken));
+    router.get(`/__cookie`, convert(UserController.setCookie))
+    router.get(`${apiVer}/user/verify-session`,     convert(UserController.getCustomToken));
     router.post(`${apiVer}/user/sign-up`,           validateFirebaseIdToken,    convert(UserController.signUp));
-    router.post(`${apiVer}/user/sign-out`,          validateFirebaseIdToken,    convert(UserController.signOut));
+    router.get(`${apiVer}/user/sign-out`,          validateFirebaseIdToken,    convert(UserController.signOut));
     router.post(`${apiVer}/user/leave-zempie`,      validateFirebaseIdToken,    convert(UserController.leaveZempie))
     router.post(`${apiVer}/user/verify-email`,      validateFirebaseIdToken,    convert(UserController.verifyEmail));
     router.post(`${apiVer}/user/verify-channel`,    validateFirebaseIdToken,    convert(UserController.verifyChannelId));

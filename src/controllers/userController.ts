@@ -10,20 +10,35 @@ import FileManager from '../services/fileManager';
 const replaceExt = require('replace-ext');
 import { CreateError, ErrorCodes } from '../commons/errorCodes';
 import Opt from '../../config/opt';
-const { Url } = Opt;
+const { Url, CORS } = Opt;
 
 
 class UserController {
-    getCustomToken = async (_: any, __: any, { req }: any) => {
-        if( req.headers.cookie === null ) {
+    getCustomToken = async (_: any, __: any, { req, res }: any) => {
+        if( !req.headers.cookie ) {
             throw CreateError(ErrorCodes.INVALID_SESSION)
         }
 
-        const cookies = cookie.parse(req.headers.cookie);
-        const { uid } = cookies;
-        const customToken = await admin.auth().createCustomToken(uid);
-        return {
-            customToken,
+        if ( req.headers.origin && CORS.allowedOrigin.includes(req.headers.origin) ) {
+            res.setHeader('Access-Control-Allow-Origin', req.headers.origin);
+            res.setHeader('Access-Control-Allow-Credentials', true);
+            const { uid } = cookie.parse(req.headers.cookie);
+            const customToken = await admin.auth().createCustomToken(uid);
+            return {
+                customToken,
+            }
+        }
+    }
+    setCookie = async (_: any, user: DecodedIdToken, { req, res }: any) => {
+        if ( req.headers.origin && CORS.allowedOrigin.includes(req.headers.origin) ) {
+            res.setHeader('Access-Control-Allow-Origin', req.headers.origin);
+            res.setHeader('Access-Control-Allow-Credentials', true);
+            res.setHeader('Set-Cookie', cookie.serialize('uid', user.uid, {
+                domain: CORS.domain,
+                maxAge: 0,
+                httpOnly: true,
+                secure: CORS.secure,
+            }));
         }
     }
 
@@ -67,7 +82,7 @@ class UserController {
      * 사용자 정보 가져오기
      * - 정보가 없을 경우 firebase 에서 가져와서 저장
      */
-    getInfo = async ({registration_token}: any, _user: DecodedIdToken, { res }: { res: Response }) => {
+    getInfo = async ({registration_token}: any, _user: DecodedIdToken, { req, res }: any) => {
         return dbs.User.getTransaction(async (transaction: Transaction) => {
             const { uid } = _user;
             let user = await dbs.User.getInfo({uid}, transaction);
@@ -81,11 +96,7 @@ class UserController {
                 await user.save({transaction});
             }
 
-
-            res.setHeader('Set-Cookie', cookie.serialize('uid', uid, {
-                domain: '.zempie.com',
-                maxAge: 1000 * 60 * 60,
-            }));
+            await this.setCookie(null, _user, { req, res });
 
 
             const udi = await this.getUserDetailInfo(user);
@@ -280,17 +291,23 @@ class UserController {
     }
 
 
-    signOut = async ({}, {uid}: DecodedIdToken, {res}: any) => {
+    signOut = async (_: any, _user: DecodedIdToken, { req, res }: any) => {
         return dbs.User.getTransaction(async (transaction: Transaction) => {
-            const user = await dbs.User.getInfo({uid}, transaction);
+            const user = await dbs.User.getInfo({uid: _user.uid}, transaction);
             await admin.messaging().unsubscribeFromTopic(user.fcm_token, 'test-topic');
             user.fcm_token = null;
             await user.save({transaction});
 
-            res.setHeader('Set-Cookie', cookie.serialize('uid', '', {
-                domain: '.zempie.com',
-                maxAge: 0,
-            }));
+            if ( req.headers.origin && CORS.allowedOrigin.includes(req.headers.origin) ) {
+                res.setHeader('Access-Control-Allow-Origin', req.headers.origin);
+                res.setHeader('Access-Control-Allow-Credentials', true);
+                res.setHeader('Set-Cookie', cookie.serialize('uid', '', {
+                    domain: CORS.domain,
+                    maxAge: 0,
+                    httpOnly: true,
+                    secure: CORS.secure,
+                }));
+            }
         })
     }
 

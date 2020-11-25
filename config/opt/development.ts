@@ -66,6 +66,14 @@ export default {
         }
     },
 
+    CORS: {
+        allowedOrigin: [
+            'http://gtest.fromthered.com',
+        ],
+        secure: false,
+        domain: '.fromthered.com',
+    },
+
     Kafka: {
         clientId: 'zempie',
         brokers: ['localhost:9092']
