@@ -207,10 +207,13 @@ class UserController {
 
 
     async verifyEmail ({}, user: DecodedIdToken) {
-        await admin.auth().updateUser(user.uid, {
-            emailVerified: true,
-        });
-        await dbs.User.update({ email_verified: true }, { uid: user.uid });
+        const userRecord = await admin.auth().getUser(user.uid)
+        if ( userRecord.emailVerified ) {
+            await admin.auth().updateUser(user.uid, {
+                emailVerified: true,
+            });
+            await dbs.User.update({ email_verified: true }, { uid: user.uid });
+        }
     }
 
 
