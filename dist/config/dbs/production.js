@@ -2,11 +2,11 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = {
     mysql: {
-        database: 'database_production',
+        database: 'zempie',
         username: 'root',
-        password: '1324',
+        password: 'ftred2020#!',
         conn: {
-            host: 'localhost',
+            host: 'mariadb.cggj5wwsn3fn.ap-northeast-2.rds.amazonaws.com',
             port: 3306,
             dialect: 'mysql',
             pool: {
