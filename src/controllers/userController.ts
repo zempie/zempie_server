@@ -280,12 +280,17 @@ class UserController {
     }
 
 
-    signOut = async ({}, {uid}: DecodedIdToken) => {
+    signOut = async ({}, {uid}: DecodedIdToken, {res}: any) => {
         return dbs.User.getTransaction(async (transaction: Transaction) => {
             const user = await dbs.User.getInfo({uid}, transaction);
             await admin.messaging().unsubscribeFromTopic(user.fcm_token, 'test-topic');
             user.fcm_token = null;
             await user.save({transaction});
+
+            res.setHeader('Set-Cookie', cookie.serialize('uid', '', {
+                domain: '.zempie.com',
+                maxAge: 0,
+            }));
         })
     }
 
