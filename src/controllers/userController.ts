@@ -65,6 +65,7 @@ class UserController {
                 await user.save({transaction});
             }
 
+            const customToken = await admin.auth().createCustomToken(user.uid);
             const udi = await this.getUserDetailInfo(user);
             return {
                 user: {
@@ -72,6 +73,7 @@ class UserController {
                     email: user.email,
                     email_verified: user.email_verified,
                 },
+                customToken,
             }
         });
     }
