@@ -1,5 +1,4 @@
 node_modules
-/dist
 
 # local env files
 /config/dbs/local.ts
