@@ -58,7 +58,6 @@
     "moment": "^2.27.0",
     "mysql2": "^2.1.0",
     "node-fetch": "^2.6.0",
-    "node-rdkafka": "^2.9.1",
     "p-queue": "^6.3.0",
     "replace-ext": "^2.0.0",
     "sequelize": "^5.21.4",
