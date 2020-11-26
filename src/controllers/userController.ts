@@ -302,9 +302,11 @@ class UserController {
     signOut = async (_: any, _user: DecodedIdToken, { req, res }: any) => {
         return dbs.User.getTransaction(async (transaction: Transaction) => {
             const user = await dbs.User.getInfo({uid: _user.uid}, transaction);
-            await admin.messaging().unsubscribeFromTopic(user.fcm_token, 'test-topic');
-            user.fcm_token = null;
-            await user.save({transaction});
+            if ( user.fcm_token ) {
+                await admin.messaging().unsubscribeFromTopic(user.fcm_token, 'test-topic');
+                user.fcm_token = null;
+                await user.save({transaction});
+            }
 
             if ( req.headers.origin && CORS.allowedOrigin.includes(req.headers.origin) ) {
                 res.setHeader('Access-Control-Allow-Origin', req.headers.origin);

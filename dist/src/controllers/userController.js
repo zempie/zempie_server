@@ -241,9 +241,11 @@ class UserController {
         this.signOut = (_, _user, { req, res }) => __awaiter(this, void 0, void 0, function* () {
             return globals_1.dbs.User.getTransaction((transaction) => __awaiter(this, void 0, void 0, function* () {
                 const user = yield globals_1.dbs.User.getInfo({ uid: _user.uid }, transaction);
-                yield firebase_admin_1.default.messaging().unsubscribeFromTopic(user.fcm_token, 'test-topic');
-                user.fcm_token = null;
-                yield user.save({ transaction });
+                if (user.fcm_token) {
+                    yield firebase_admin_1.default.messaging().unsubscribeFromTopic(user.fcm_token, 'test-topic');
+                    user.fcm_token = null;
+                    yield user.save({ transaction });
+                }
                 if (req.headers.origin && CORS.allowedOrigin.includes(req.headers.origin)) {
                     res.setHeader('Access-Control-Allow-Origin', req.headers.origin);
                     res.setHeader('Access-Control-Allow-Credentials', 'true');

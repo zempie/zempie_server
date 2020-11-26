@@ -49,7 +49,7 @@ class SupportController {
                 created_at: inquiry.created_at,
                 updated_at: inquiry.updated_at,
                 admin: {
-                    name: inquiry.admin.name,
+                    name: inquiry.admin? inquiry.admin.name : undefined,
                 }
             }
         }

@@ -67,7 +67,7 @@ class UserInquiryModel extends model_1.default {
                         asked_at: r.created_at,
                         responded_at: r.updated_at,
                         admin: {
-                            name: r.admin.name
+                            name: r.admin ? r.admin.name : undefined,
                         }
                     };
                 })
