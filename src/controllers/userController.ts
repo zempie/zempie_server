@@ -237,6 +237,8 @@ class UserController {
                 throw CreateError(ErrorCodes.INVALID_USER_UID);
             }
 
+            const updateRequest: any = {};
+
             if ( params.channel_id ) {
                 user.channel_id = params.channel_id;
             }
@@ -245,6 +247,7 @@ class UserController {
             if ( params.name ) {
                 // 이름 검사 해야함 - 불량 단어
                 user.name = params.name;
+                updateRequest.displayName = params.name;
             }
 
 
@@ -271,14 +274,23 @@ class UserController {
                 data = await FileManager.s3upload(replaceExt(file.name, '.webp'), webp[0].destinationPath, uid);
                 // const data: any = await FileManager.s3upload(file.name, file.path, uid);
                 user.picture = data.Location;
+                updateRequest.photoURL = data.Location;
+            }
+            else if ( params.rm_picture ) {
+                user.picture = null;
+                updateRequest.photoURL = null;
             }
 
-            if ( params.name || data ) {
-                await admin.auth().updateUser(uid, {
-                    displayName: params.name? params.name : undefined,
-                    photoURL: data? data.Location : undefined,
-                })
+            if ( Object.keys(updateRequest).length > 0 ) {
+                await admin.auth().updateUser(uid, updateRequest);
             }
+
+            // if ( params.name || data ) {
+            //     await admin.auth().updateUser(uid, {
+            //         displayName: params.name? params.name : undefined,
+            //         photoURL: data? data.Location : undefined,
+            //     })
+            // }
 
             await user.save({ transaction });
         })
