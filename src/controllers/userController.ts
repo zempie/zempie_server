@@ -381,13 +381,15 @@ class UserController {
 
 
     leaveZempie = async ({ num, text }: { num: number, text: string }, { uid }: DecodedIdToken) => {
-        await dbs.UserLeftLog.getTransaction(async (transaction: Transaction) => {
-            await dbs.UserLeftLog.create({
-                user_uid: uid,
-                reason_num: num,
-                reason_text: text,
-            }, transaction)
-            await dbs.User.destroy({ uid }, transaction);
+        admin.auth().deleteUser(uid).then(async () => {
+            await dbs.UserLeftLog.getTransaction(async (transaction: Transaction) => {
+                await dbs.UserLeftLog.create({
+                    user_uid: uid,
+                    reason_num: num,
+                    reason_text: text,
+                }, transaction)
+                await dbs.User.destroy({ uid }, transaction);
+            })
         })
     }
 }

@@ -71,6 +71,7 @@ export default {
             'http://gtest.fromthered.com',
             'http://zempie.fromthered.com',
             'http://localhost:8080',
+            'http://localhost:8081',
         ],
         secure: false,
         domain: '.localhost',
