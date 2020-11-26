@@ -61,6 +61,7 @@ class UserInquiryModel extends Model {
             inquiries: _.map(rows, (r: any) => {
                 return {
                     id: r.id,
+                    category: r.category,
                     title: r.title,
                     text: r.text,
                     response: r.response,

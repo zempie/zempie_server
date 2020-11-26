@@ -9,6 +9,29 @@ import { CreateError, ErrorCodes } from '../../commons/errorCodes';
  * 고객지원
  */
 class AdminSupportController {
+    async getUserInquiry ({ id }: any) {
+        const inquiry = await dbs.UserInquiry.model.findOne({
+            where: { id },
+            include: [{
+                model: dbs.Admin.model,
+            }]
+        });
+        return {
+            inquiry: {
+                id: inquiry.id,
+                category: inquiry.category,
+                title: inquiry.title,
+                text: inquiry.text,
+                response: inquiry.response,
+                created_at: inquiry.created_at,
+                updated_at: inquiry.updated_at,
+                admin: {
+                    name: inquiry.admin? inquiry.admin.name : undefined,
+                }
+            }
+        }
+    }
+
     async getUserInquiries({ user_id, no_answer, limit = 50, offset = 0, sort = 'id', dir = 'asc' }: any) {
         return await dbs.UserInquiry.getList({ user_id, no_answer, limit, offset, sort, dir });
     }

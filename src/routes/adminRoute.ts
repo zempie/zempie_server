@@ -39,6 +39,7 @@ export default (router: Router) => {
     /**
      * 1:1 문의
      */
+    router.get(`${apiVer}/admin/support/inquiry`,       validateAdminIdToken,   convert(AdminSupportController.getUserInquiry));
     router.get(`${apiVer}/admin/support/inquiries`,     validateAdminIdToken,   convert(AdminSupportController.getUserInquiries));
     router.post(`${apiVer}/admin/support/response`,     validateAdminIdToken,   adminTracking,  convert(AdminSupportController.respondInquiry))
 
