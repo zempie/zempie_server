@@ -196,13 +196,19 @@ class UserController {
                     // 이름 검사 해야함 - 불량 단어
                     user.name = params.name;
                 }
+                let profile;
                 // 상태 메시지 변경
                 if (params.state_msg) {
-                    const profile = yield globals_1.dbs.UserProfile.findOne({ user_id: user.id }, transaction);
-                    if (profile) {
-                        profile.state_msg = params.state_msg;
-                        yield profile.save({ transaction });
-                    }
+                    profile = yield globals_1.dbs.UserProfile.findOne({ user_id: user.id }, transaction);
+                    profile.state_msg = params.state_msg;
+                }
+                // 채널 설명
+                if (params.description) {
+                    profile = profile || (yield globals_1.dbs.UserProfile.findOne({ user_id: user.id }, transaction));
+                    profile.description = params.description;
+                }
+                if (profile) {
+                    yield profile.save({ transaction });
                 }
                 let data;
                 if (file) {

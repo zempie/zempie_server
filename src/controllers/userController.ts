@@ -247,13 +247,22 @@ class UserController {
                 user.name = params.name;
             }
 
+
+            let profile;
             // 상태 메시지 변경
             if ( params.state_msg ) {
-                const profile = await dbs.UserProfile.findOne({ user_id: user.id }, transaction);
-                if ( profile ) {
-                    profile.state_msg = params.state_msg;
-                    await profile.save({ transaction });
-                }
+                profile = await dbs.UserProfile.findOne({ user_id: user.id }, transaction);
+                profile.state_msg = params.state_msg;
+            }
+
+            // 채널 설명
+            if ( params.description ) {
+                profile = profile || await dbs.UserProfile.findOne({ user_id: user.id }, transaction);
+                profile.description = params.description;
+            }
+
+            if ( profile ) {
+                await profile.save({ transaction });
             }
 
             let data: any;
