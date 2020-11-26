@@ -48,6 +48,7 @@ class UserInquiryModel extends Model {
         const { count, rows } = await this.findAndCountAll(where, {
             include: [{
                 model: dbs.User.model,
+                required: true,
             }, {
                 model: dbs.Admin.model,
             }],

@@ -61,6 +61,7 @@ class GameModel extends Model {
             },
             include: [{
                 model: dbs.User.model,
+                required: true,
             }],
             order: [[sort, dir]],
             limit: _.toNumber(limit),
@@ -80,6 +81,7 @@ class GameModel extends Model {
                 attributes: {
                     exclude: ['id', 'created_at', 'updated_at', 'deleted_at']
                 },
+                required: true,
             }],
         })
 

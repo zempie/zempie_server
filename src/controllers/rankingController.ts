@@ -40,6 +40,7 @@ class RankingController {
             where: { game_uid },
             include: [{
                 model: dbs.User.model,
+                required: true,
             }],
             attributes: {
                 include: [
@@ -99,6 +100,7 @@ class RankingController {
             }, {
                 model: dbs.User.model,
                 as: 'target',
+                required: true,
             }],
             attributes: {
                 include: [

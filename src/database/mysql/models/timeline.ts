@@ -39,7 +39,8 @@ class TimelineModel extends Model {
             order: [['id', 'desc']],
             include: [{
                 model: dbs.User.model,
-                attributes: [['uid', 'user_uid'], 'name', 'picture']
+                attributes: [['uid', 'user_uid'], 'name', 'picture'],
+                required: true,
             }, {
                 model: dbs.Game.model,
                 attributes: {

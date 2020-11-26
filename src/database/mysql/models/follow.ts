@@ -51,6 +51,7 @@ class FollowModel extends Model {
             include: [{
                 model: dbs.User.model,
                 as: 'target',
+                required: true,
             }],
             transaction
         });
@@ -69,6 +70,7 @@ class FollowModel extends Model {
             include: [{
                 model: dbs.User.model,
                 as: 'user',
+                required: true,
             }],
             transaction
         })
