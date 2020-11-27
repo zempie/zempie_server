@@ -269,7 +269,7 @@ class StudioController {
             }
 
             if( params.name ) {
-                game.name = params.name;
+                game.title = params.name;
             }
 
             if( params.deploy_version_id ) {
