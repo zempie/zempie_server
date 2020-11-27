@@ -68,6 +68,12 @@ class UserInquiryModel extends Model {
                     response: r.response,
                     asked_at: r.created_at,
                     responded_at: r.updated_at,
+                    user: {
+                        id: r.user.id,
+                        uid: r.user.uid,
+                        name: r.user.name,
+                        picture: r.user.picture,
+                    },
                     admin: {
                         name: r.admin? r.admin.name : undefined,
                     }
