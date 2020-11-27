@@ -11,6 +11,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const _ = require("lodash");
 const cookie = require("cookie");
+const urlencode = require("urlencode");
 const globals_1 = require("../commons/globals");
 const firebase_admin_1 = require("firebase-admin");
 const fileManager_1 = require("../services/fileManager");
@@ -190,7 +191,7 @@ class UserController {
                 }
                 const updateRequest = {};
                 if (params.channel_id) {
-                    user.channel_id = params.channel_id;
+                    user.channel_id = urlencode(params.channel_id);
                 }
                 // 이름 변경
                 if (params.name) {
@@ -337,8 +338,16 @@ class UserController {
     verifyChannelId({ channel_id }, user) {
         return __awaiter(this, void 0, void 0, function* () {
             // 규칙 확인
+            if (channel_id.search(/\s/) !== -1) {
+                throw errorCodes_1.CreateError(errorCodes_1.ErrorCodes.INVALID_CHANNEL_ID);
+            }
+            const regExp = /[\{\}\[\]\/?.,;:|\)*~`!^\+<>@\#$%&\\\=\(\'\"]/gi;
+            if (regExp.test(channel_id)) {
+                throw errorCodes_1.CreateError(errorCodes_1.ErrorCodes.INVALID_CHANNEL_ID);
+            }
             // if ok
-            const dup = yield globals_1.dbs.User.findOne({ channel_id });
+            const encoded = urlencode(channel_id);
+            const dup = yield globals_1.dbs.User.findOne({ channel_id: encoded });
             if (dup) {
                 throw errorCodes_1.CreateError(errorCodes_1.ErrorCodes.USER_DUPLICATED_CHANNEL_ID);
             }

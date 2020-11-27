@@ -220,10 +220,17 @@ class UserController {
 
     async verifyChannelId ({ channel_id }: { channel_id: string }, user: DecodedIdToken) {
         // 규칙 확인
+        if ( channel_id.search(/\s/) !== -1 ) {
+            throw CreateError(ErrorCodes.INVALID_CHANNEL_ID);
+        }
+        const regExp = /[\{\}\[\]\/?.,;:|\)*~`!^\+<>@\#$%&\\\=\(\'\"]/gi;
+        if ( regExp.test(channel_id) ) {
+            throw CreateError(ErrorCodes.INVALID_CHANNEL_ID);
+        }
 
         // if ok
         const encoded = urlencode(channel_id)
-        const dup = await dbs.User.findOne({ channel_id });
+        const dup = await dbs.User.findOne({ channel_id: encoded });
         if ( dup ) {
             throw CreateError(ErrorCodes.USER_DUPLICATED_CHANNEL_ID);
         }
@@ -242,7 +249,7 @@ class UserController {
             const updateRequest: any = {};
 
             if ( params.channel_id ) {
-                user.channel_id = params.channel_id;
+                user.channel_id = urlencode(params.channel_id);
             }
 
             // 이름 변경
