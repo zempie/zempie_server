@@ -126,7 +126,7 @@ class GameController {
                         count_over: game.count_over,
                         url_game: game.url_game,
                         url_thumb: game.url_thumb,
-                        share_url: user ? `${Url.Redirect}/${game.pathname}/${user.uid}` : undefined,
+                        // share_url: user? `${Url.Redirect}/${game.pathname}/${user.uid}` : undefined,
                         user: user ? {
                             uid: user.uid,
                             name: user.name,

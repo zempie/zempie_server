@@ -191,7 +191,7 @@ class UserController {
                     count_over: game.count_over,
                     url_game: game.url_game,
                     url_thumb: game.url_thumb,
-                    share_url: user? `${Url.Redirect}/${game.pathname}/${user.uid}` : undefined,
+                    // share_url: user? `${Url.Redirect}/${game.pathname}/${user.uid}` : undefined,
                 }
             }) : undefined,
             game_records: user.game_records? _.map(user.gameRecords, (gr: any) => {

@@ -19,6 +19,12 @@ exports.default = {
             port: 8299,
         },
     },
+    Url: {
+        Host: 'https://zempie.com',
+        GameClient: 'http://zempie.com/#/play',
+        Redirect: 'https://zempie.com/share',
+        Launcher: 'https://launcher.zempie.com/#',
+    },
     AWS: {
         Bucket: 'zempie-rsc/v1',
     },
