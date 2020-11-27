@@ -21,6 +21,8 @@ class AdminSupportController {
             const inquiry = yield globals_1.dbs.UserInquiry.model.findOne({
                 where: { id },
                 include: [{
+                        model: globals_1.dbs.User.model,
+                    }, {
                         model: globals_1.dbs.Admin.model,
                     }]
             });
@@ -33,6 +35,12 @@ class AdminSupportController {
                     response: inquiry.response,
                     created_at: inquiry.created_at,
                     updated_at: inquiry.updated_at,
+                    user: {
+                        id: inquiry.user.id,
+                        uid: inquiry.user.uid,
+                        name: inquiry.user.name,
+                        picture: inquiry.user.picture,
+                    },
                     admin: {
                         name: inquiry.admin ? inquiry.admin.name : undefined,
                     }

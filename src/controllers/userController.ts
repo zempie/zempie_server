@@ -1,5 +1,6 @@
 import * as _ from 'lodash';
 import * as cookie from 'cookie';
+import * as urlencode from 'urlencode';
 import { Request, Response } from 'express';
 import { IRoute, IZempieClaims } from './_interfaces';
 import { dbs, caches } from '../commons/globals';
@@ -221,6 +222,7 @@ class UserController {
         // 규칙 확인
 
         // if ok
+        const encoded = urlencode(channel_id)
         const dup = await dbs.User.findOne({ channel_id });
         if ( dup ) {
             throw CreateError(ErrorCodes.USER_DUPLICATED_CHANNEL_ID);
