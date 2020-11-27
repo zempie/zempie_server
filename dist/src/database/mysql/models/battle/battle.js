@@ -66,6 +66,13 @@ class BattleModel extends model_1.default {
                         attributes: {
                             exclude: ['id', 'created_at', 'updated_at', 'deleted_at']
                         },
+                        include: [{
+                                model: globals_1.dbs.User.model,
+                                attributes: {
+                                    exclude: ['id', 'created_at', 'updated_at', 'deleted_at']
+                                },
+                                required: true,
+                            }],
                     }]
             });
             return record.get({ plain: true });

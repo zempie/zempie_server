@@ -47,6 +47,13 @@ class SharedGameModel extends Model {
                 attributes: {
                     exclude: ['created_at', 'updated_at', 'deleted_at'],
                 },
+                include: [{
+                    model: dbs.User.model,
+                    attributes: {
+                        exclude: ['id', 'created_at', 'updated_at', 'deleted_at']
+                    },
+                    required: true,
+                }],
             }]
         })
 
