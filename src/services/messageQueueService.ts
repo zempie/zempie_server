@@ -4,6 +4,7 @@ import config from '../../config/opt';
 
 
 class KafkaService {
+    private _isRunning: boolean = false;
     private producer!: Producer
     private consumer!: Consumer
 
@@ -19,7 +20,11 @@ class KafkaService {
 
         await this.producer.connect();
         await this.consumer.connect();
+
+        this._isRunning = true;
     }
+
+    get isRunning () { return this._isRunning }
 
     async addTopics (topics: Array<string>) {
         _.forEach(topics, async (topic: string) => {

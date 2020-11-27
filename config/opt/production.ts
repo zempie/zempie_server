@@ -23,7 +23,7 @@ export default {
     },
 
     AWS: {
-        Bucket: 'zemini',
+        Bucket: 'zempie-rsc/v1',
     },
 
     password: {

@@ -11,7 +11,6 @@ import mq from '../controllers/messageQueues/apiMQ';
 
 
 class ApiServer extends Server {
-    private timer: any;
 
     initialize = async (options: IServerOptions) => {
         this.options = options;
