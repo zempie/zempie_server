@@ -18,8 +18,8 @@ class KafkaService {
         this.producer = kafka.producer();
         this.consumer = kafka.consumer({ groupId });
 
-        await this.producer.connect();
-        await this.consumer.connect();
+        const p = await this.producer.connect();
+        const c = await this.consumer.connect();
 
         this._isRunning = true;
     }

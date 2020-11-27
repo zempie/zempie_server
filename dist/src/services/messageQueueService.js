@@ -25,8 +25,8 @@ class KafkaService {
             });
             this.producer = kafka.producer();
             this.consumer = kafka.consumer({ groupId });
-            yield this.producer.connect();
-            yield this.consumer.connect();
+            const p = yield this.producer.connect();
+            const c = yield this.consumer.connect();
             this._isRunning = true;
         });
     }

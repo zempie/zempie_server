@@ -44,7 +44,8 @@ class FileManager {
                     encoding: 'utf-8',
                     uploadDir,
                     keepExtensions: true,
-                    maxFileSize: 1024 * 1024 * 10,
+                    maxFileSize: 1024 * 1024 * 100,
+                    maxFieldsSize: 1024 * 1024 * 20,
                     multiples: false,
                 });
                 form.parse(req, (err, fields, files) => __awaiter(this, void 0, void 0, function* () {
