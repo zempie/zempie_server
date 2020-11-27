@@ -227,6 +227,9 @@ class UserController {
         if ( regExp.test(channel_id) ) {
             throw CreateError(ErrorCodes.INVALID_CHANNEL_ID);
         }
+        if ( channel_id.length > 20 ) {
+            throw CreateError(ErrorCodes.INVALID_CHANNEL_ID);
+        }
 
         // if ok
         const encoded = urlencode(channel_id)

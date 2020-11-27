@@ -345,6 +345,9 @@ class UserController {
             if (regExp.test(channel_id)) {
                 throw errorCodes_1.CreateError(errorCodes_1.ErrorCodes.INVALID_CHANNEL_ID);
             }
+            if (channel_id.length > 20) {
+                throw errorCodes_1.CreateError(errorCodes_1.ErrorCodes.INVALID_CHANNEL_ID);
+            }
             // if ok
             const encoded = urlencode(channel_id);
             const dup = yield globals_1.dbs.User.findOne({ channel_id: encoded });
