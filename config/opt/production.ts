@@ -52,7 +52,7 @@ export default {
 
     CORS: {
         allowedOrigin: [
-            'http://www.zempie.com', 'https://www.zempie.com',
+            'http://zempie.com', 'https://zempie.com',
             'http://launcher.zempie.com', 'https://launcher.zempie.com',
             'http://studio.zempie.com', 'https://studio.zempie.com',
             'http://support.zempie.com', 'https://support.zempie.com',
