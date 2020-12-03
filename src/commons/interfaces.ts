@@ -14,7 +14,7 @@ export interface IServerOptions {
     messageQueue?: {
         groupId: string,
         autoCommit: boolean,
-        onMessage: (message: Message) => void,
+        // onMessage: (message: Message) => void,
         addTopics: string[],
     },
 }

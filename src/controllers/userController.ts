@@ -83,36 +83,32 @@ class UserController {
             }
         })
     }
-    /**
-     * 사용자 정보 가져오기
-     * - 정보가 없을 경우 firebase 에서 가져와서 저장
-     */
+
+
     getInfo = async ({registration_token}: any, _user: DecodedIdToken, { req, res }: any) => {
-        return dbs.User.getTransaction(async (transaction: Transaction) => {
-            const { uid } = _user;
-            let user = await dbs.User.getInfo({uid}, transaction);
+        const { uid } = _user;
+        let user = await caches.user.getInfo(uid);
+        if ( !user ) {
+            user = await dbs.User.getInfo({uid});
             if ( !user ) {
                 throw CreateError(ErrorCodes.INVALID_USER_UID);
             }
 
-            if ( registration_token ) {
-                await admin.messaging().subscribeToTopic(registration_token, 'test-topic');
-                user.fcm_token = registration_token;
-                await user.save({transaction});
-            }
-
             await this.setCookie(null, _user, { req, res });
 
-
             const udi = await this.getUserDetailInfo(user);
-            return {
-                user: {
-                    ...udi,
-                    email: user.email,
-                    email_verified: user.email_verified,
-                },
-            }
-        });
+            user = {
+                ...udi,
+                email: user.email,
+                email_verified: user.email_verified,
+            };
+
+            caches.user.setInfo(uid, user);
+        }
+
+        return {
+            user
+        }
     }
 
 
@@ -126,14 +122,26 @@ class UserController {
 
 
     getTargetInfoByChannelId = async ({channel_id}: {channel_id: string}, _: DecodedIdToken) => {
-        const user = await dbs.User.getProfileByChannelId({ channel_id });
-        if ( !user ) {
-            throw CreateError(ErrorCodes.INVALID_CHANNEL_ID);
+        let channel = await caches.user.getChannel(channel_id);
+        if ( !channel ) {
+            const user = await dbs.User.getProfileByChannelId({ channel_id });
+            if ( !user ) {
+                throw CreateError(ErrorCodes.INVALID_CHANNEL_ID);
+            }
+            channel = await this.getUserDetailInfo(user)
+            caches.user.setChannel(channel_id, channel);
         }
-        const target = await this.getUserDetailInfo(user);
         return {
-            target,
+            target: channel
         }
+        // const user = await dbs.User.getProfileByChannelId({ channel_id });
+        // if ( !user ) {
+        //     throw CreateError(ErrorCodes.INVALID_CHANNEL_ID);
+        // }
+        // const target = await this.getUserDetailInfo(user);
+        // return {
+        //     target,
+        // }
     }
 
 
@@ -142,15 +150,6 @@ class UserController {
         setting = setting || user.setting;
 
         // todo: 나중에 읽는 횟수 줄여야함
-        // const game_records = _.map(user.gameRecords, (gr: any) => {
-        //     const game = gr.game;
-        //     return {
-        //         game_uid: game.uid,
-        //         title: game.title,
-        //         url_thumb: game.url_thumb,
-        //         score: gr.score,
-        //     }
-        // });
 
         return {
             uid: user.uid,
@@ -255,6 +254,11 @@ class UserController {
                 user.channel_id = urlencode(params.channel_id);
             }
 
+            if ( params.registration_token ) {
+                await admin.messaging().subscribeToTopic(params.registration_token, 'broadcast-topic');
+                user.fcm_token = params.registration_token;
+            }
+
             // 이름 변경
             if ( params.name ) {
                 // 이름 검사 해야함 - 불량 단어
@@ -305,6 +309,8 @@ class UserController {
             // }
 
             await user.save({ transaction });
+
+            caches.user.delInfo(uid);
         })
     }
 
@@ -317,6 +323,9 @@ class UserController {
         const webp = await FileManager.convertToWebp(file, 80);
         const data: any = await FileManager.s3upload('banner.webp', webp[0].destinationPath, uid);
         await dbs.UserProfile.update({ url_banner: data.Location }, { user_id: user.id })
+
+        caches.user.delInfo(uid);
+
         return {
             url_banner: data.Location
         }
