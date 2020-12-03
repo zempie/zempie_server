@@ -283,7 +283,7 @@ class UserController {
             let data: any;
             if ( file ) {
                 const webp = await FileManager.convertToWebp(file, 80);
-                data = await FileManager.s3upload(replaceExt(file.name, '.webp'), webp[0].destinationPath, uid);
+                data = await FileManager.s3upload(replaceExt(/*file.name*/'profile', '.webp'), webp[0].destinationPath, uid);
                 // const data: any = await FileManager.s3upload(file.name, file.path, uid);
                 user.picture = data.Location;
                 updateRequest.photoURL = data.Location;

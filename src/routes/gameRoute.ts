@@ -34,24 +34,3 @@ export default (router: Router) => {
     router.post(`${apiVer}/battle/start`,       convert(BattleController.gameStart));
     router.post(`${apiVer}/battle/over`,        convert(BattleController.gameOver));
 }
-
-
-
-RpcController.generator('get-game',             GameController.getGame);
-RpcController.generator('get-games',            GameController.getGameList);
-RpcController.generator('game-start',           GameController.gameStart, true);
-RpcController.generator('game-over',            GameController.gameOver, true);
-RpcController.generator('get-ranking-global',   RankingController.getGlobalRanking, true);
-RpcController.generator('get-ranking-follow',   RankingController.getFollowingRanking, true);
-
-RpcController.generator('ad-completed',         AdController.onRewardedVideoCompleted);
-
-RpcController.generator('get-battles',          BattleController.getBattleList);
-RpcController.generator('get-ranking-battle',   BattleController.getRanking);
-RpcController.generator('battle',               BattleController.getInfo);
-RpcController.generator('battle-host',          BattleController.hostBattle, true);
-RpcController.generator('battle-start',         BattleController.gameStart);
-RpcController.generator('battle-over',          BattleController.gameOver);
-RpcController.generator('battle-update-name',   BattleController.updateUserName);
-
-RpcController.generator('sample-test',          GameController.sampleTest);

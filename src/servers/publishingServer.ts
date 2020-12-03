@@ -8,7 +8,8 @@ class PublishingServer extends Server {
         const options: IMessageQueueOptions = {
             groupId: 'pub-server',
             autoCommit: true,
-            addTopics: mq.addTopics(),
+            // addTopics: mq.addTopics(),
+            addGateways: mq.addGateway(),
             eachMessage: mq.eachMessage.bind(mq),
         }
         await this.setMessageQueue(options)

@@ -128,7 +128,13 @@ export default class Server {
 
 
     protected setFirebase() {
-        const serviceAccount = require('../../config/firebase/service-account.json');
+        let serviceAccount;
+        if ( process.env.NODE_ENV === 'production' ) {
+            serviceAccount = require('../../config/firebase/service-account.json');
+        }
+        else {
+            serviceAccount = require('../../config/firebase/zempie-dev-firebase-adminsdk-mt5jv-9e05cbc8f2.json');
+        }
         admin.initializeApp({
             credential: admin.credential.cert(serviceAccount),
             databaseURL: 'https://zempie.firebaseio.com'
@@ -137,21 +143,18 @@ export default class Server {
         firebase.admin = admin;
     }
 
-    protected setDeployApp() {
-        // const da = deployApp.initialize({
-        //     type: 'service_account',
-        //     project_id: 1,
-        //     api_key: '5b94uen0k99mxn4t',
-        // })
-    }
-
 
     protected async setMessageQueue(options: IMessageQueueOptions) {
         // await Producer.connect()
         // await Consumer.connect(options.groupId, options.autoCommit, options.onMessage)
         // Consumer.addTopic(options.addTopics);
         await Kafka.initialize(options.groupId);
-        await Kafka.addTopics(options.addTopics);
+        if ( options.addTopics ) {
+            await Kafka.addTopics(options.addTopics);
+        }
+        if ( options.addGateways ) {
+            await Kafka.addGateways(options.addGateways);
+        }
         await Kafka.run(options.eachMessage);
     }
 
@@ -167,20 +170,6 @@ export default class Server {
                     }
                 })
             }
-
-            // const whiteList: any = ['http://localhost:8444'];
-            // const corsOptions: any = {
-            //     origin: (origin: any, callback: Function) => {
-            //         if ( whiteList.indexOf(origin) !== -1 ) {
-            //             callback(null, true);
-            //         }
-            //         else {
-            //             callback(new Error('not allowed by CORS'))
-            //         }
-            //     },
-            //     // origin: 'http://localhost:8443'
-            // };
-
 
             this.app.use(cors({credentials: true, origin: CORS.allowedOrigin}));
             this.app.use(bodyParser.json());
@@ -204,10 +193,9 @@ export default class Server {
 
 
     protected routes(app: Router) {
-        app.use((req, res, next) => {
-            // req.dbs = MySql.getDBS();
-            next();
-        });
+        // app.use((req, res, next) => {
+        //     next();
+        // });
 
         app.get('/test', (req, res) => {
             res.send('hi');

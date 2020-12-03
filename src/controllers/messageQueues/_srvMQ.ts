@@ -25,4 +25,19 @@ export class SrvMQ {
         })
         return topics;
     }
+
+    addGateway = (): any => {
+        const names = Object.getOwnPropertyNames(Object.getPrototypeOf(this))
+        const gateways = names.filter((name) => {
+            return name !== 'constructor'
+        }).map((topic) => {
+            return {
+                topic,
+                // @ts-ignore
+                func: this[topic],
+            }
+        });
+
+        return gateways;
+    }
 }

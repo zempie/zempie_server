@@ -4,7 +4,7 @@ import { SrvMQ } from './_srvMQ';
 
 
 class ApiMQ extends SrvMQ {
-    // gameOver(message: Message) {
+    // gameOver (message: Message) {
     //     console.log('[api - gameOver]', message)
     // }
 }
