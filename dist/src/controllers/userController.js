@@ -88,7 +88,7 @@ class UserController {
                     }
                     yield this.setCookie(null, _user, { req, res });
                     const udi = yield this.getUserDetailInfo(userRecord);
-                    user = Object.assign(Object.assign({}, udi), { email: user.email, email_verified: user.email_verified });
+                    user = Object.assign(Object.assign({}, udi), { email: userRecord.email, email_verified: userRecord.email_verified });
                     userRecord.save({ transaction });
                     globals_1.caches.user.setInfo(uid, user);
                 }));

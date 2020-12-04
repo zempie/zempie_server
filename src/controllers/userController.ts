@@ -100,8 +100,8 @@ class UserController {
                 const udi = await this.getUserDetailInfo(userRecord);
                 user = {
                     ...udi,
-                    email: user.email,
-                    email_verified: user.email_verified,
+                    email: userRecord.email,
+                    email_verified: userRecord.email_verified,
                 };
 
                 userRecord.save({ transaction });
