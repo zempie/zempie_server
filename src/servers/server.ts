@@ -137,7 +137,7 @@ export default class Server {
         }
         admin.initializeApp({
             credential: admin.credential.cert(serviceAccount),
-            databaseURL: 'https://zempie.firebaseio.com'
+            // databaseURL: 'https://zempie.firebaseio.com'
         });
 
         firebase.admin = admin;
@@ -210,7 +210,8 @@ export default class Server {
     public start = async () : Promise<void> => {
         await this.beforeStart();
 
-        const port = await getPort({ port: getPort.makeRange(this.options.port, this.options.port+100)});
+        // const port = await getPort({ port: getPort.makeRange(this.options.port, this.options.port+100)});
+        const port = this.options.port;
         const errorCallback: any = (err: Error) => {
             if ( err ) {
                 console.error(err.stack);
