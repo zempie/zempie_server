@@ -81,14 +81,17 @@ class UserController {
             const { uid } = _user;
             let user = yield globals_1.caches.user.getInfo(uid);
             if (!user) {
-                user = yield globals_1.dbs.User.getInfo({ uid });
-                if (!user) {
-                    throw errorCodes_1.CreateError(errorCodes_1.ErrorCodes.INVALID_USER_UID);
-                }
-                yield this.setCookie(null, _user, { req, res });
-                const udi = yield this.getUserDetailInfo(user);
-                user = Object.assign(Object.assign({}, udi), { email: user.email, email_verified: user.email_verified });
-                globals_1.caches.user.setInfo(uid, user);
+                yield globals_1.dbs.User.getTransaction((transaction) => __awaiter(this, void 0, void 0, function* () {
+                    const userRecord = yield globals_1.dbs.User.getInfo({ uid });
+                    if (!userRecord) {
+                        throw errorCodes_1.CreateError(errorCodes_1.ErrorCodes.INVALID_USER_UID);
+                    }
+                    yield this.setCookie(null, _user, { req, res });
+                    const udi = yield this.getUserDetailInfo(userRecord);
+                    user = Object.assign(Object.assign({}, udi), { email: user.email, email_verified: user.email_verified });
+                    userRecord.save({ transaction });
+                    globals_1.caches.user.setInfo(uid, user);
+                }));
             }
             return {
                 user

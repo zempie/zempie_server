@@ -16,6 +16,7 @@ exports.default = (router) => {
     router.get(`${apiVer}/studio/project`, _common_1.validateFirebaseIdToken, _convert_1.default(studioController_1.default.getProjects));
     router.get(`${apiVer}/studio/project/:id`, _common_1.validateFirebaseIdToken, _convert_1.default(studioController_1.default.getProject));
     router.patch(`${apiVer}/studio/project/:id`, _common_1.validateFirebaseIdToken, fileManager_1.default.uploadImage, _convert_1.default(studioController_1.default.updateProject));
+    router.post(`${apiVer}/studio/project/:id`, _common_1.validateFirebaseIdToken, fileManager_1.default.uploadImage, _convert_1.default(studioController_1.default.updateProject));
     router.delete(`${apiVer}/studio/project/:id`, _common_1.validateFirebaseIdToken, _convert_1.default(studioController_1.default.deleteProject));
     router.post(`${apiVer}/studio/version`, _common_1.validateFirebaseIdToken, fileManager_1.default.uploadImage, _convert_1.default(studioController_1.default.createVersion));
     router.delete(`${apiVer}/studio/version/:id`, _common_1.validateFirebaseIdToken, _convert_1.default(studioController_1.default.deleteVersion));

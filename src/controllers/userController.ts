@@ -89,21 +89,24 @@ class UserController {
         const { uid } = _user;
         let user = await caches.user.getInfo(uid);
         if ( !user ) {
-            user = await dbs.User.getInfo({uid});
-            if ( !user ) {
-                throw CreateError(ErrorCodes.INVALID_USER_UID);
-            }
+            await dbs.User.getTransaction(async (transaction: Transaction) => {
+                const userRecord = await dbs.User.getInfo({uid});
+                if ( !userRecord ) {
+                    throw CreateError(ErrorCodes.INVALID_USER_UID);
+                }
 
-            await this.setCookie(null, _user, { req, res });
+                await this.setCookie(null, _user, { req, res });
 
-            const udi = await this.getUserDetailInfo(user);
-            user = {
-                ...udi,
-                email: user.email,
-                email_verified: user.email_verified,
-            };
+                const udi = await this.getUserDetailInfo(userRecord);
+                user = {
+                    ...udi,
+                    email: user.email,
+                    email_verified: user.email_verified,
+                };
 
-            caches.user.setInfo(uid, user);
+                userRecord.save({ transaction });
+                caches.user.setInfo(uid, user);
+            })
         }
 
         return {
