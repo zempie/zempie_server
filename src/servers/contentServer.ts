@@ -24,7 +24,8 @@ class ContentServer extends Server {
         const options: IMessageQueueOptions = {
             groupId: 'content-server',
             autoCommit: true,
-            addTopics: mq.addTopics(),
+            // addTopics: mq.addTopics(),
+            addGateways: mq.addGateway(),
             eachMessage: mq.eachMessage.bind(mq),
         }
         await this.setMessageQueue(options);

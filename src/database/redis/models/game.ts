@@ -1,4 +1,3 @@
-import * as _ from 'lodash';
 import CacheModel from './_cache';
 
 
@@ -16,9 +15,11 @@ class GameCache extends CacheModel {
     }
 
     setList(games: any) {
-        this.redis.set(Key, JSON.stringify(games), () => {
-            this.redis.expire(Key, 1000 * 60, () => {});
-        });
+        if ( games.length > 0 ) {
+            this.redis.set(Key, JSON.stringify(games), () => {
+                this.redis.expire(Key, 60, () => {});
+            });
+        }
     }
 }
 

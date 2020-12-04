@@ -5,7 +5,7 @@
 module.exports = {
     apps: [
         {
-            name: 'platform-server-studio',
+            name: 'zempie-studio',
             script: './dist/src/runStudio.js',
             watch: false,
             ignore_watch : ["node_modules", "public"],

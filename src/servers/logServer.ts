@@ -7,7 +7,8 @@ class LogServer extends Server {
         const options: IMessageQueueOptions = {
             groupId: 'log-server',
             autoCommit: false,
-            addTopics: mq.addTopics(),
+            // addTopics: mq.addTopics(),
+            addGateways: mq.addGateway(),
             eachMessage: mq.eachMessage.bind(mq),
         }
         await this.setMessageQueue(options);

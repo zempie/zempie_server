@@ -35,17 +35,18 @@ class GameModel extends Model {
 
     async afterSync(): Promise<void> {
         this.model.belongsTo(dbs.User.model);
-
-        if ( await this.model.count() < 1 ) {
-            const sampleGames: any = [
-                {
-                    uid: uuid(),
-                    pathname: 'test-path',
-                    title: 'test-title',
-                    genre_tags: 'arcade,puzzle,knight',
-                }
-            ];
-            await this.bulkCreate(sampleGames);
+        if ( process.env.NODE_ENV !== 'production' ) {
+            if ( await this.model.count() < 1 ) {
+                const sampleGames: any = [
+                    {
+                        uid: uuid(),
+                        pathname: 'test-path',
+                        title: 'test-title',
+                        genre_tags: 'arcade,puzzle,knight',
+                    }
+                ];
+                await this.bulkCreate(sampleGames);
+            }
         }
     }
 

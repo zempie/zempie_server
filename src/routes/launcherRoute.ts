@@ -33,12 +33,3 @@ export default (router: Router) => {
     router.post(`${apiVer}/launch/battle-update-name`,  convert(BattleController.updateUserName));
     router.get(`${apiVer}/launch/battle-ranking/:battle_uid`,   convert(BattleController.getRanking));
 }
-
-
-RpcController.generator('launcher-game',        LauncherController.getGame);
-RpcController.generator('launcher-battle',      LauncherController.getBattleGame);
-RpcController.generator('launcher-share',       LauncherController.getSharedGame);
-
-
-RpcController.generator('get-battle-url',       LauncherController.getBattleUrl);
-RpcController.generator('get-shared-url',       LauncherController.getSharedUrl);

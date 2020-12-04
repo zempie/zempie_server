@@ -5,7 +5,7 @@
 module.exports = {
     apps: [
         {
-            name: 'platform-server-admin',
+            name: 'zempie-admin',
             script: './dist/src/runAdmin.js',
             watch: false,
             ignore_watch : ["node_modules", "public"],

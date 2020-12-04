@@ -13,6 +13,8 @@ class AdminSupportController {
         const inquiry = await dbs.UserInquiry.model.findOne({
             where: { id },
             include: [{
+                model: dbs.User.model,
+            }, {
                 model: dbs.Admin.model,
             }]
         });
@@ -25,6 +27,12 @@ class AdminSupportController {
                 response: inquiry.response,
                 created_at: inquiry.created_at,
                 updated_at: inquiry.updated_at,
+                user: {
+                    id: inquiry.user.id,
+                    uid: inquiry.user.uid,
+                    name: inquiry.user.name,
+                    picture: inquiry.user.picture,
+                },
                 admin: {
                     name: inquiry.admin? inquiry.admin.name : undefined,
                 }

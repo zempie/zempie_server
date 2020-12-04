@@ -22,6 +22,13 @@ export default {
         },
     },
 
+    Url: {
+        Host: 'https://zempie.com',
+        GameClient: 'http://zempie.com/#/play',
+        Redirect: 'https://zempie.com/share',
+        Launcher: 'https://launcher.zempie.com/#',
+    },
+
     AWS: {
         Bucket: 'zempie-rsc/v1',
     },
@@ -52,10 +59,11 @@ export default {
 
     CORS: {
         allowedOrigin: [
-            'http://www.zempie.com', 'https://www.zempie.com',
+            'http://zempie.com', 'https://zempie.com',
             'http://launcher.zempie.com', 'https://launcher.zempie.com',
             'http://studio.zempie.com', 'https://studio.zempie.com',
             'http://support.zempie.com', 'https://support.zempie.com',
+            'http://admin.zempie.com', 'https://admin.zempie.com',
         ],
         secure: false,
         domain: '.zempie.com',

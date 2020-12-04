@@ -43,7 +43,8 @@ class ApiServer extends Server {
         const options: IMessageQueueOptions = {
             groupId: 'api-server',
             autoCommit: true,
-            addTopics: mq.addTopics(),
+            // addTopics: mq.addTopics(),
+            addGateways: mq.addGateway(),
             eachMessage: mq.eachMessage.bind(mq),
         }
         await this.setMessageQueue(options);
