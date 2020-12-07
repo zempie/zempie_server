@@ -50,7 +50,7 @@ interface IProject {
     description? : string,
     picture? : string,
     pathname : string,
-    hashtags : string,
+    hashtags? : string,
 }
 
 interface IVersion {

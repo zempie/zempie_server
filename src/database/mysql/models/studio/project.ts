@@ -12,7 +12,7 @@ class ProjectModel extends Model {
             picture:            { type: DataTypes.STRING(250), allowNull: true },
             control_type:       { type: DataTypes.SMALLINT, defaultValue: 0 },
             description:        { type: DataTypes.STRING, defaultValue: '' },
-            hashtags:           { type: DataTypes.STRING, allowNull: false },
+            hashtags:           { type: DataTypes.STRING, defaultValue: '' },
             game_id:            { type: DataTypes.INTEGER, allowNull: true },
             deploy_version_id:  { type: DataTypes.INTEGER, allowNull: true },
             update_version_id:  { type: DataTypes.INTEGER, allowNull: true },
