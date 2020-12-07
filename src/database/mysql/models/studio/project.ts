@@ -28,11 +28,12 @@ class ProjectModel extends Model {
         this.model.hasOne(dbs.ProjectVersion.model, { sourceKey : 'update_version_id'});
     }
 
-    async create({ user_id, name, description, picture } : any, transaction?: Transaction) {
+    async create({ user_id, name, description, picture, hashtags } : any, transaction?: Transaction) {
         const value : any = {
             user_id,
             name,
             description,
+            hashtags,
         }
 
         if( picture ) {
