@@ -12,6 +12,7 @@ class ProjectModel extends Model {
             picture:            { type: DataTypes.STRING(250), allowNull: true },
             control_type:       { type: DataTypes.SMALLINT, defaultValue: 0 },
             description:        { type: DataTypes.STRING, defaultValue: '' },
+            hashtags:           { type: DataTypes.STRING, allowNull: false },
             game_id:            { type: DataTypes.INTEGER, allowNull: true },
             deploy_version_id:  { type: DataTypes.INTEGER, allowNull: true },
             update_version_id:  { type: DataTypes.INTEGER, allowNull: true },
@@ -67,7 +68,7 @@ class ProjectModel extends Model {
         });
     }
 
-    async updateProject({ id, name, picture, control_type, description, game_id, deploy_version_id, update_version_id } : any, transaction?: Transaction) {
+    async updateProject({ id, name, picture, control_type, description, hashtags, game_id, deploy_version_id, update_version_id } : any, transaction?: Transaction) {
         const project = await this.findOne( { id }, transaction );
 
         if( name ) {
@@ -88,6 +89,10 @@ class ProjectModel extends Model {
 
         if( game_id ) {
             project.game_id = game_id;
+        }
+
+        if( hashtags ) {
+            project.hashtags = hashtags;
         }
 
         if( deploy_version_id ) {

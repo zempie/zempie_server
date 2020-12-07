@@ -50,6 +50,7 @@ interface IProject {
     description? : string,
     picture? : string,
     pathname : string,
+    hashtags : string,
 }
 
 interface IVersion {
@@ -186,6 +187,7 @@ class StudioController {
                 params.picture = data.Location;
             }
 
+            params.hashtags = params.hashtags || '';
             const project = await dbs.Project.create( params, transaction );
 
 
@@ -216,7 +218,7 @@ class StudioController {
                 pathname : params.pathname,
                 title : project.name,
                 description : project.description,
-                hashtags : '',
+                hashtags : project.hashtags,
                 // version : version.version,
                 // url_game : version.url,
                 url_thumb : project.picture,
@@ -270,6 +272,10 @@ class StudioController {
 
             if( params.name ) {
                 game.title = params.name;
+            }
+
+            if( params.hashtags ) {
+                game.hashtags = params.hashtags;
             }
 
             if( params.deploy_version_id ) {
