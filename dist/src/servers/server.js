@@ -11,20 +11,20 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const _ = require("lodash");
 const express = require("express");
+const expressWs = require("express-ws");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const path = require("path");
 const ejs = require("ejs");
+const sequelize_1 = require("sequelize");
 const admin = require("firebase-admin");
 const globals_1 = require("../commons/globals");
 const mysql_1 = require("../database/mysql");
 const redis_1 = require("../database/redis");
 const Pkg = require("../../package.json");
-const sequelize_1 = require("sequelize");
 const globals_2 = require("../commons/globals");
 const opt_1 = require("../../config/opt");
 const { CORS } = opt_1.default;
-const rpcController_1 = require("../controllers/rpcController");
 // graph-ql
 const graphql_1 = require("graphql");
 const graphqlHTTP = require("express-graphql");
@@ -85,6 +85,7 @@ class Server {
                     console.error(err.stack);
                     return;
                 }
+                this.started_at = new Date();
                 logger_1.logger.info(`Api Server [ver.${Pkg.version}] has started. (port: ${port})`.cyan.bold);
             };
             if (!!this.app) {
@@ -172,6 +173,7 @@ class Server {
             this.app.use(cors({ credentials: true, origin: CORS.allowedOrigin }));
             this.app.use(bodyParser.json());
             this.app.use(bodyParser.urlencoded({ extended: false }));
+            options.tcp && this.setTcp();
             this.routes(this.app);
         }
     }
@@ -185,15 +187,24 @@ class Server {
             yield redis_1.default.initialize();
         });
     }
+    setTcp() {
+        if (this.app) {
+            const instance = expressWs(this.app);
+            this.wss = instance.getWss();
+        }
+    }
     routes(app) {
         // app.use((req, res, next) => {
         //     next();
         // });
         app.get('/test', (req, res) => {
-            res.send('hi');
+            const status = {
+                Started_At: this.started_at.toLocaleString()
+            };
+            res.send(status);
         });
-        const apiVer = '/api/v1';
-        app.post(`${apiVer}/rpc`, rpcController_1.default.routeRpc);
+        // const apiVer = '/api/v1';
+        // app.post(`${apiVer}/rpc`, RpcController.routeRpc);
     }
 }
 exports.default = Server;

@@ -16,6 +16,7 @@ const userRoute_1 = require("../routes/userRoute");
 const gameRoute_1 = require("../routes/gameRoute");
 const launcherRoute_1 = require("../routes/launcherRoute");
 const supportRoute_1 = require("../routes/supportRoute");
+const tcpRoute_1 = require("../routes/tcpRoute");
 const apiMQ_1 = require("../controllers/messageQueues/apiMQ");
 class ApiServer extends server_1.default {
     constructor() {
@@ -49,6 +50,7 @@ class ApiServer extends server_1.default {
         gameRoute_1.default(app);
         launcherRoute_1.default(app);
         supportRoute_1.default(app);
+        tcpRoute_1.default(app);
         // scheduleService.start()
         // ExchangeManager.start()
     }
