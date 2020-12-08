@@ -62,6 +62,11 @@ class GameModel extends Model {
             },
             include: [{
                 model: dbs.User.model,
+                where: {
+                    activated: true,
+                    banned: false,
+                    deleted_at: null,
+                },
                 required: true,
             }],
             order: [[sort, dir]],

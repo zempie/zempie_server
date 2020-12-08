@@ -1,7 +1,6 @@
 import { Router } from 'express';
 import convert from '../controllers/_convert';
 import { validateFirebaseIdToken } from './_common';
-import RpcController from '../controllers/rpcController';
 import GameController from '../controllers/gameController';
 import BattleController from '../controllers/battleController';
 import AdController from '../controllers/adController';

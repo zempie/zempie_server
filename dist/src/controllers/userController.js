@@ -159,6 +159,7 @@ class UserController {
                 } : undefined,
                 dev_games: user.is_developer ? _.map(user.devGames, (game) => {
                     return {
+                        activated: game.activated,
                         game_uid: game.uid,
                         official: game.official,
                         title: game.title,

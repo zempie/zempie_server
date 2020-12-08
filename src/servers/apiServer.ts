@@ -6,6 +6,7 @@ import userRoute from '../routes/userRoute';
 import gameRoute from "../routes/gameRoute";
 import launcherRoute from '../routes/launcherRoute';
 import supportRoute from '../routes/supportRoute';
+import tcpRoute from '../routes/tcpRoute';
 import { IMessageQueueOptions, IServerOptions } from '../commons/interfaces';
 import mq from '../controllers/messageQueues/apiMQ';
 
@@ -34,6 +35,8 @@ class ApiServer extends Server {
         gameRoute(app);
         launcherRoute(app);
         supportRoute(app);
+
+        tcpRoute(app);
 
         // scheduleService.start()
         // ExchangeManager.start()

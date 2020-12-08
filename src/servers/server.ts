@@ -1,10 +1,16 @@
 import * as _ from 'lodash';
 import * as express from 'express';
+import * as expressWs from 'express-ws';
 import * as bodyParser from 'body-parser';
 import * as cors from 'cors';
 import * as path from 'path';
 import * as ejs from 'ejs';
+import * as ws from 'ws';
 import * as getPort from 'get-port';
+
+import { Request, Response, Router } from 'express';
+import {  } from 'express-ws'
+import { Sequelize } from 'sequelize';
 
 import * as admin from 'firebase-admin';
 import { firebase } from '../commons/globals';
@@ -15,9 +21,7 @@ import Redis from '../database/redis';
 import { IMessageQueueOptions, IServerOptions } from '../commons/interfaces';
 import * as Pkg from '../../package.json';
 
-import { Sequelize } from 'sequelize';
 import { dbs } from '../commons/globals';
-import { Router, Response } from 'express';
 import cfgOption from '../../config/opt';
 const { CORS } = cfgOption;
 
@@ -54,6 +58,8 @@ colors.setTheme({
 export default class Server {
     protected options!: IServerOptions;
     protected app?: express.Application;
+    protected wss?: ws.Server;
+    private started_at!: Date;
 
 
     public initialize = async (options: IServerOptions) => {
@@ -175,6 +181,7 @@ export default class Server {
             this.app.use(bodyParser.json());
             this.app.use(bodyParser.urlencoded({extended:false}));
 
+            options.tcp && this.setTcp();
             this.routes(this.app);
         }
     }
@@ -191,6 +198,14 @@ export default class Server {
     }
 
 
+    protected setTcp() {
+        if ( this.app ) {
+            const instance = expressWs(this.app);
+            this.wss = instance.getWss()
+        }
+    }
+
+
 
     protected routes(app: Router) {
         // app.use((req, res, next) => {
@@ -198,11 +213,14 @@ export default class Server {
         // });
 
         app.get('/test', (req, res) => {
-            res.send('hi');
+            const status = {
+                Started_At: this.started_at.toLocaleString()
+            }
+            res.send(status);
         });
 
-        const apiVer = '/api/v1';
-        app.post(`${apiVer}/rpc`, RpcController.routeRpc);
+        // const apiVer = '/api/v1';
+        // app.post(`${apiVer}/rpc`, RpcController.routeRpc);
     }
 
 
@@ -218,6 +236,7 @@ export default class Server {
                 return
             }
 
+            this.started_at = new Date();
             logger.info(`Api Server [ver.${Pkg.version}] has started. (port: ${port})`.cyan.bold)
         };
 

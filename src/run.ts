@@ -5,13 +5,17 @@ import cfgOption from '../config/opt';
 
 (async () => {
     const options: IServerOptions = {
-        tcp: false,
+        tcp: true,
         port: cfgOption.Server.http.port,
         static_path: [
             { path: '/', route: 'public' },
         ],
+        firebase: true,
+        rdb: true,
+        mdb: true,
+        swagger: true,
     }
     const apiServer = new APIServer();
-    await apiServer.initialize(options);
+    await apiServer.initialize2(options);
     await apiServer.start()
 })();

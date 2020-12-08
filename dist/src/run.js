@@ -13,14 +13,18 @@ const apiServer_1 = require("./servers/apiServer");
 const opt_1 = require("../config/opt");
 (() => __awaiter(void 0, void 0, void 0, function* () {
     const options = {
-        tcp: false,
+        tcp: true,
         port: opt_1.default.Server.http.port,
         static_path: [
             { path: '/', route: 'public' },
         ],
+        firebase: true,
+        rdb: true,
+        mdb: true,
+        swagger: true,
     };
     const apiServer = new apiServer_1.default();
-    yield apiServer.initialize(options);
+    yield apiServer.initialize2(options);
     yield apiServer.start();
 }))();
 //# sourceMappingURL=run.js.map
