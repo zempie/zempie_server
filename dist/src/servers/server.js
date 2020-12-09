@@ -208,16 +208,4 @@ class Server {
     }
 }
 exports.default = Server;
-this.started_at = new Date();
-logger_1.logger.info(`Api Server [ver.${Pkg.version}] has started. (port: ${port})`.cyan.bold);
-;
-if (!!this.app) {
-    this.app.listen(port, errorCallback);
-}
-await this.afterStart();
-beforeStart = () => __awaiter(void 0, void 0, void 0, function* () {
-});
-afterStart = () => __awaiter(void 0, void 0, void 0, function* () {
-    //
-});
 //# sourceMappingURL=server.js.map

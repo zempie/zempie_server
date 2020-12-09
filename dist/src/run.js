@@ -27,8 +27,4 @@ const opt_1 = require("../config/opt");
     yield apiServer.initialize2(options);
     yield apiServer.start();
 }))();
-const apiServer = new apiServer_1.default();
-await apiServer.initialize2(options);
-await apiServer.start();
-();
 //# sourceMappingURL=run.js.map

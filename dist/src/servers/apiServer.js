@@ -56,5 +56,4 @@ class ApiServer extends server_1.default {
     }
 }
 exports.default = ApiServer;
-exports.default = ApiServer;
 //# sourceMappingURL=apiServer.js.map
