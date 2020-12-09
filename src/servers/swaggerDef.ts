@@ -3,21 +3,21 @@ import * as swaggerJSDoc from 'swagger-jsdoc'
 const swaggerDefinition = {
     swagger: '2.0',
     info: {
-        title: 'Deploy',
-        version: '0.1.1',
-        description: 'for Testing',
+        title: 'Zempie APIs',
+        version: '1.0.0',
+        description: '이거슨 쩸파이 API들이닷',
         termsOfService: '',
         contact: {
             email: 'jw.park@fromthered.com',
         },
         license: {
-            name: 'none',
-            url: '',
+            name: 'Apache 2.0',
+            url: 'http://www.apache.org/licenses/LICENSE-2.0.html',
         }
     },
-    // host: 'localhost:22525',
-    // basePath: '/api/v1',
-    basePath: '/',
+    host: 'localhost:8280',
+    basePath: '/api/v1',
+    // basePath: '/',
     schemes: ['http', 'https'],
     securityDefinitions: {
         token: {
