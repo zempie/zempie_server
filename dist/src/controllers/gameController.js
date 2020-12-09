@@ -101,28 +101,33 @@ class GameController {
             }));
         });
         this.getGame = ({ pathname }, _user) => __awaiter(this, void 0, void 0, function* () {
-            // const games = await gameCache.get();
-            // const game = _.find(games, (obj:any) => obj.pathname === pathname)
-            const game = yield globals_1.dbs.Game.getInfo({ pathname });
-            const { user } = game;
+            let game = yield globals_1.caches.game.get(pathname);
+            if (!game) {
+                game = yield globals_1.dbs.Game.getInfo({ pathname });
+                const { user } = game;
+                game = {
+                    game_uid: game.uid,
+                    official: game.official,
+                    title: game.title,
+                    pathname: game.pathname,
+                    version: game.version,
+                    control_type: game.control_type,
+                    hashtags: game.hashtags,
+                    count_over: game.count_over,
+                    url_game: game.url_game,
+                    url_thumb: game.url_thumb,
+                    // share_url: user? `${Url.Redirect}/${game.pathname}/${user.uid}` : undefined,
+                    user: user ? {
+                        uid: user.uid,
+                        name: user.name,
+                        picture: user.picture,
+                        channel_id: user.channel_id,
+                    } : null
+                };
+                globals_1.caches.game.set(game);
+            }
             return {
-                game_uid: game.uid,
-                official: game.official,
-                title: game.title,
-                pathname: game.pathname,
-                version: game.version,
-                control_type: game.control_type,
-                hashtags: game.hashtags,
-                count_over: game.count_over,
-                url_game: game.url_game,
-                url_thumb: game.url_thumb,
-                // share_url: user? `${Url.Redirect}/${game.pathname}/${user.uid}` : undefined,
-                user: user ? {
-                    uid: user.uid,
-                    name: user.name,
-                    picture: user.picture,
-                    channel_id: user.channel_id,
-                } : null
+                game
             };
         });
         this.getGameList = ({ limit = 50, offset = 0, official }, user, { req }) => __awaiter(this, void 0, void 0, function* () {
@@ -152,7 +157,7 @@ class GameController {
                         } : null
                     };
                 });
-                // caches.game.setList(games, query);
+                globals_1.caches.game.setList(games, query);
             }
             return {
                 games
