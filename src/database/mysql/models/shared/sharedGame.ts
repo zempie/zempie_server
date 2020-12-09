@@ -31,9 +31,9 @@ class SharedGameModel extends Model {
     }
 
 
-    async getInfo(uid: string) {
+    async getInfo(where: object) {
         const record = await this.model.findOne({
-            where: { uid },
+            where,
             attributes: {
                 exclude: ['id', 'created_at', 'updated_at', 'deleted_at'],
             },

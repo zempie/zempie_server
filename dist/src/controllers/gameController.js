@@ -100,19 +100,36 @@ class GameController {
                 };
             }));
         });
-        this.getGame = ({ pathname }, user, transaction) => __awaiter(this, void 0, void 0, function* () {
+        this.getGame = ({ pathname }, _user) => __awaiter(this, void 0, void 0, function* () {
             // const games = await gameCache.get();
             // const game = _.find(games, (obj:any) => obj.pathname === pathname)
-            const game = yield globals_1.dbs.Game.findOne({ pathname }, transaction);
+            const game = yield globals_1.dbs.Game.getInfo({ pathname });
+            const { user } = game;
             return {
-                game
+                game_uid: game.uid,
+                official: game.official,
+                title: game.title,
+                pathname: game.pathname,
+                version: game.version,
+                control_type: game.control_type,
+                hashtags: game.hashtags,
+                count_over: game.count_over,
+                url_game: game.url_game,
+                url_thumb: game.url_thumb,
+                // share_url: user? `${Url.Redirect}/${game.pathname}/${user.uid}` : undefined,
+                user: user ? {
+                    uid: user.uid,
+                    name: user.name,
+                    picture: user.picture,
+                    channel_id: user.channel_id,
+                } : null
             };
         });
-        this.getGameList = ({ limit = 50, offset = 0, sort = 'id', dir = 'asc' }, user) => __awaiter(this, void 0, void 0, function* () {
-            // let games = await caches.game.getList();
-            let games;
+        this.getGameList = ({ limit = 50, offset = 0, official }, user, { req }) => __awaiter(this, void 0, void 0, function* () {
+            const query = JSON.stringify(req.query);
+            let games = yield globals_1.caches.game.getList(query);
             if (!games) {
-                const rows = yield globals_1.dbs.Game.getList({});
+                const rows = yield globals_1.dbs.Game.getList({ limit, offset, official });
                 games = _.map(rows, (game) => {
                     const { user } = game;
                     return {
@@ -135,7 +152,7 @@ class GameController {
                         } : null
                     };
                 });
-                globals_1.caches.game.setList(games);
+                // caches.game.setList(games, query);
             }
             return {
                 games

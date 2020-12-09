@@ -35,10 +35,10 @@ class SharedGameModel extends model_1.default {
             this.model.belongsTo(globals_1.dbs.Game.model, { foreignKey: 'game_uid', targetKey: 'uid' });
         });
     }
-    getInfo(uid) {
+    getInfo(where) {
         return __awaiter(this, void 0, void 0, function* () {
             const record = yield this.model.findOne({
-                where: { uid },
+                where,
                 attributes: {
                     exclude: ['id', 'created_at', 'updated_at', 'deleted_at'],
                 },

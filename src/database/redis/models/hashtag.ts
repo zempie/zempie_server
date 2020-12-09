@@ -15,6 +15,7 @@ class HashtagCache extends CacheModel {
         games = _.map(games, game => game.get({plain: true}));
         _.forEach(games, (game: any) => {
             if ( game.hashtags !== null && game.hashtags !== '' ) {
+                this.addTag(game.title, game.title, JSON.stringify(game));
                 this.addTag(game.hashtags, game.title, JSON.stringify(game));
             }
         })

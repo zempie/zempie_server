@@ -27,12 +27,15 @@ export function capitalize(str: string, lowercaseRest: boolean = false) : string
 /**
  *
  */
-export function parseBoolean(str: string) {
+export function parseBoolean(str?: string) {
+    if ( !str ) {
+        return undefined
+    }
+
     str = str.toLowerCase();
     if ( str === '1' ) return true;
     else if ( str === 'true' ) return true;
     return false
-
 }
 
 /**

@@ -18,7 +18,7 @@ class ContentMQ extends _srvMQ_1.SrvMQ {
         super();
         this.game_over = {};
         this.processBulk = () => __awaiter(this, void 0, void 0, function* () {
-            const games = yield globals_1.caches.game.getList();
+            // const games = await caches.game.getList();
             _.forEach(this.game_over, (count, uid) => __awaiter(this, void 0, void 0, function* () {
                 if (count > 0) {
                     globals_1.dbs.Game.update({
@@ -26,13 +26,13 @@ class ContentMQ extends _srvMQ_1.SrvMQ {
                     }, { uid });
                     this.game_over[uid] = 0;
                     console.log('[gameOver] uid:', uid);
-                    const game = _.find(games, game => game.game_uid === uid);
-                    if (game) {
-                        game.count_over += count;
-                    }
+                    // const game = _.find(games, game => game.game_uid === uid);
+                    // if ( game ) {
+                    //     game.count_over += count;
+                    // }
                 }
             }));
-            globals_1.caches.game.setList(games);
+            // caches.game.setList(games);
         });
         this.interval = setInterval(() => {
             this.processBulk();

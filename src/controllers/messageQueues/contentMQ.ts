@@ -17,7 +17,7 @@ class ContentMQ extends SrvMQ {
     }
 
     private processBulk = async () =>{
-        const games = await caches.game.getList();
+        // const games = await caches.game.getList();
         _.forEach(this.game_over, async (count, uid) => {
             if ( count > 0 ) {
                 dbs.Game.update({
@@ -25,13 +25,13 @@ class ContentMQ extends SrvMQ {
                 }, { uid })
                 this.game_over[uid] = 0;
                 console.log('[gameOver] uid:', uid)
-                const game = _.find(games, game => game.game_uid === uid);
-                if ( game ) {
-                    game.count_over += count;
-                }
+                // const game = _.find(games, game => game.game_uid === uid);
+                // if ( game ) {
+                //     game.count_over += count;
+                // }
             }
         })
-        caches.game.setList(games);
+        // caches.game.setList(games);
     }
 
     async gameOver(message: string) {

@@ -76,6 +76,13 @@ export interface IGamePlayParams {
     user_uid: string,
     score?: number,
 }
+export interface IGameListParams {
+    limit: number,
+    offset: number,
+    sort: string,
+    dir: string,
+    official?: string
+}
 
 export interface IGame {
     uid: string,
