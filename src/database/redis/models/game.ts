@@ -1,8 +1,10 @@
 import CacheModel from './_cache';
 
 
-const Key = `zempie:game:i:`;
+const PathnameKey = `zempie:game:p:`;
 const ListKey = 'zempie:games:';
+const GameKey = `zempie:game:g:`;
+const BattleKey = `zempie:game:b:`;
 const SharedKey = `zempie:game:s:`;
 
 class GameCache extends CacheModel {
@@ -23,19 +25,54 @@ class GameCache extends CacheModel {
         }
     }
 
-    async get(pathname: string) {
-        const game = await this.redis.get(Key + pathname);
+    async getByPathname(pathname: string) {
+        const game = await this.redis.get(PathnameKey + pathname);
         if ( game ) {
             return JSON.parse(game)
         }
         return game;
     }
-    set(game: any) {
-        this.redis.set(Key + game.pathname, JSON.stringify(game), () => {
-            this.redis.expire(Key + game.pathname, 60, () => {});
+    setByPathname(game: any) {
+        this.redis.set(PathnameKey + game.pathname, JSON.stringify(game), () => {
+            this.redis.expire(PathnameKey + game.pathname, 60, () => {});
         })
     }
 
+    /**
+     * launcher - game (zempie)
+     */
+    async getByUid(uid: string) {
+        const ret = await this.redis.get(GameKey + uid);
+        if ( ret ) {
+            return JSON.parse(ret)
+        }
+        return ret;
+    }
+    setByUid(ret: any, uid: string) {
+        this.redis.set(GameKey + uid, JSON.stringify(ret), () => {
+            this.redis.expire(GameKey + uid, 60, () => {});
+        })
+    }
+
+    /**
+     * launcher - battle
+     */
+    async getBattle(uid: string) {
+        const ret = await this.redis.get(BattleKey + uid);
+        if ( ret ) {
+            return JSON.parse(ret)
+        }
+        return ret;
+    }
+    setBattle(ret: any, uid: string) {
+        this.redis.set(BattleKey + uid, JSON.stringify(ret), () => {
+            this.redis.expire(BattleKey + uid, 60 * 10, () => {});
+        })
+    }
+
+    /**
+     * launcher - shared
+     */
     async getShared(uid: string) {
         const ret = await this.redis.get(SharedKey + uid);
         if ( ret ) {

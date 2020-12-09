@@ -108,7 +108,7 @@ class GameController {
 
 
     getGame = async ({pathname}: any, _user: DecodedIdToken) => {
-        let game = await caches.game.get(pathname);
+        let game = await caches.game.getByPathname(pathname);
         if ( !game ) {
             game = await dbs.Game.getInfo({ pathname });
             const { user } = game;
@@ -131,7 +131,7 @@ class GameController {
                     channel_id: user.channel_id,
                 } : null
             }
-            caches.game.set(game);
+            caches.game.setByPathname(game);
         }
         return {
             game
