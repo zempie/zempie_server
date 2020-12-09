@@ -3,6 +3,8 @@ import { v4 as uuid } from 'uuid';
 import Model from '../../model';
 import { DataTypes, Sequelize } from 'sequelize';
 import { dbs } from '../../../../commons/globals';
+import { parseBoolean } from '../../../../commons/utils';
+import { IGameListParams } from '../../../../controllers/_interfaces';
 
 
 class GameModel extends Model {
@@ -51,12 +53,17 @@ class GameModel extends Model {
     }
 
 
-    async getList({ limit = 50, offset = 0, sort = 'id', dir = 'asc' }) {
+    async getList({ limit = 50, offset = 0, official, sort = 'id', dir = 'asc' }: IGameListParams) {
+        const where: any = {
+            activated: true,
+            enabled: true,
+        }
+        if ( official ) {
+            where.official = parseBoolean(official)
+        }
+
         return await this.model.findAll({
-            where: {
-                activated: true,
-                enabled: true,
-            },
+            where,
             attributes: {
                 include: [['uid', 'game_uid']]
             },
@@ -76,16 +83,18 @@ class GameModel extends Model {
     }
 
 
-    async getInfo(uid: string) {
+    async getInfo(where: object) {
         const record = await this.model.findOne({
-            where: { uid },
+            where,
             attributes: {
                 exclude: ['id', 'created_at', 'updated_at', 'deleted_at']
             },
             include: [{
                 model: dbs.User.model,
-                attributes: {
-                    exclude: ['id', 'created_at', 'updated_at', 'deleted_at']
+                where: {
+                    activated: true,
+                    banned: false,
+                    deleted_at: null,
                 },
                 required: true,
             }],

@@ -16,7 +16,7 @@ const { Url, Deploy } = opt_1.default;
 class LauncherController {
     getGame({ uid }) {
         return __awaiter(this, void 0, void 0, function* () {
-            const game = yield globals_1.dbs.Game.getInfo(uid);
+            const game = yield globals_1.dbs.Game.getInfo({ uid });
             return {
                 game: {
                     uid: game.uid,
@@ -76,7 +76,7 @@ class LauncherController {
     }
     getSharedGame({ uid }) {
         return __awaiter(this, void 0, void 0, function* () {
-            const sg = yield globals_1.dbs.SharedGame.getInfo(uid);
+            const sg = yield globals_1.dbs.SharedGame.getInfo({ uid });
             const { game, user } = sg;
             return {
                 user: {

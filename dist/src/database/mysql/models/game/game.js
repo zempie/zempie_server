@@ -14,6 +14,7 @@ const uuid_1 = require("uuid");
 const model_1 = require("../../model");
 const sequelize_1 = require("sequelize");
 const globals_1 = require("../../../../commons/globals");
+const utils_1 = require("../../../../commons/utils");
 class GameModel extends model_1.default {
     initialize() {
         this.name = 'game';
@@ -54,13 +55,17 @@ class GameModel extends model_1.default {
             }
         });
     }
-    getList({ limit = 50, offset = 0, sort = 'id', dir = 'asc' }) {
+    getList({ limit = 50, offset = 0, official, sort = 'id', dir = 'asc' }) {
         return __awaiter(this, void 0, void 0, function* () {
+            const where = {
+                activated: true,
+                enabled: true,
+            };
+            if (official) {
+                where.official = utils_1.parseBoolean(official);
+            }
             return yield this.model.findAll({
-                where: {
-                    activated: true,
-                    enabled: true,
-                },
+                where,
                 attributes: {
                     include: [['uid', 'game_uid']]
                 },
@@ -79,17 +84,19 @@ class GameModel extends model_1.default {
             });
         });
     }
-    getInfo(uid) {
+    getInfo(where) {
         return __awaiter(this, void 0, void 0, function* () {
             const record = yield this.model.findOne({
-                where: { uid },
+                where,
                 attributes: {
                     exclude: ['id', 'created_at', 'updated_at', 'deleted_at']
                 },
                 include: [{
                         model: globals_1.dbs.User.model,
-                        attributes: {
-                            exclude: ['id', 'created_at', 'updated_at', 'deleted_at']
+                        where: {
+                            activated: true,
+                            banned: false,
+                            deleted_at: null,
                         },
                         required: true,
                     }],

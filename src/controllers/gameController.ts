@@ -1,7 +1,7 @@
 import * as _ from 'lodash';
 import admin from 'firebase-admin';
 import DecodedIdToken = admin.auth.DecodedIdToken;
-import { IGameParams, IGamePlayParams, IRoute } from './_interfaces';
+import { IGameListParams, IGameParams, IGamePlayParams, IRoute } from './_interfaces';
 import { Transaction } from 'sequelize';
 import { caches, dbs } from '../commons/globals';
 import { CreateError, ErrorCodes } from '../commons/errorCodes';
@@ -107,20 +107,37 @@ class GameController {
     }
 
 
-    getGame = async ({pathname}: any, user: DecodedIdToken, transaction?: Transaction) => {
+    getGame = async ({pathname}: any, _user: DecodedIdToken) => {
         // const games = await gameCache.get();
         // const game = _.find(games, (obj:any) => obj.pathname === pathname)
-        const game = await dbs.Game.findOne({ pathname }, transaction);
+        const game = await dbs.Game.getInfo({ pathname });
+        const { user } = game;
         return {
-            game
+            game_uid: game.uid,
+            official: game.official,
+            title: game.title,
+            pathname: game.pathname,
+            version: game.version,
+            control_type: game.control_type,
+            hashtags: game.hashtags,
+            count_over: game.count_over,
+            url_game: game.url_game,
+            url_thumb: game.url_thumb,
+            // share_url: user? `${Url.Redirect}/${game.pathname}/${user.uid}` : undefined,
+            user: user? {
+                uid: user.uid,
+                name: user.name,
+                picture: user.picture,
+                channel_id: user.channel_id,
+            } : null
         }
     }
 
-    getGameList = async ({ limit = 50, offset = 0, sort = 'id', dir = 'asc' }, user: DecodedIdToken) => {
-        // let games = await caches.game.getList();
-        let games;
+    getGameList = async ({ limit = 50, offset = 0, official }: IGameListParams, user: DecodedIdToken, { req }: IRoute) => {
+        const query = JSON.stringify(req.query);
+        let games = await caches.game.getList(query);
         if ( !games ) {
-            const rows = await dbs.Game.getList({});
+            const rows = await dbs.Game.getList({limit, offset, official});
             games = _.map(rows, (game: any) => {
                 const { user } = game;
                 return {
@@ -144,7 +161,7 @@ class GameController {
                 }
             })
 
-            caches.game.setList(games);
+            // caches.game.setList(games, query);
         }
 
         return {

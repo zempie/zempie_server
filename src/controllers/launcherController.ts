@@ -15,7 +15,7 @@ interface ILauncherParams {
 
 class LauncherController {
     async getGame({ uid }: ILauncherParams) {
-        const game = await dbs.Game.getInfo(uid);
+        const game = await dbs.Game.getInfo({uid});
 
         return {
             game: {
@@ -76,7 +76,7 @@ class LauncherController {
 
 
     async getSharedGame({ uid }: ILauncherParams) {
-        const sg = await dbs.SharedGame.getInfo(uid);
+        const sg = await dbs.SharedGame.getInfo({uid});
         const { game, user } = sg;
         return {
             user: {

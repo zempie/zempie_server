@@ -25,6 +25,9 @@ exports.capitalize = capitalize;
  *
  */
 function parseBoolean(str) {
+    if (!str) {
+        return undefined;
+    }
     str = str.toLowerCase();
     if (str === '1')
         return true;

@@ -8,6 +8,7 @@ const rankingController_1 = require("../controllers/rankingController");
 const apiVer = `/api/v1`;
 exports.default = (router) => {
     router.get(`/game/:pathname/:pid`, _convert_1.default(gameController_1.default.playGame, true), _convert_1.default(gameController_1.default.redirectGame));
+    router.get(`${apiVer}/game/:pathname`, _common_1.validateFirebaseIdToken, _convert_1.default(gameController_1.default.getGame));
     router.get(`${apiVer}/games`, _common_1.validateFirebaseIdToken, _convert_1.default(gameController_1.default.getGameList));
     router.get(`${apiVer}/games/s/:tag`, _common_1.validateFirebaseIdToken, _convert_1.default(gameController_1.default.getGameListByHashtag));
     router.get(`${apiVer}/games/ranking/g`, _common_1.validateFirebaseIdToken, _convert_1.default(rankingController_1.default.getGlobalRanking));
