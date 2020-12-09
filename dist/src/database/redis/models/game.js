@@ -10,7 +10,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const _cache_1 = require("./_cache");
-const Key = 'zempie:games:';
+const Key = 'zempie:game:i:';
+const ListKey = 'zempie:games:';
 class GameCache extends _cache_1.default {
     constructor() {
         super(...arguments);
@@ -18,7 +19,7 @@ class GameCache extends _cache_1.default {
     }
     getList(query) {
         return __awaiter(this, void 0, void 0, function* () {
-            const games = yield this.redis.get(Key + query);
+            const games = yield this.redis.get(ListKey + query);
             if (games) {
                 return JSON.parse(games);
             }
@@ -27,10 +28,24 @@ class GameCache extends _cache_1.default {
     }
     setList(games, query = '') {
         if (games.length > 0) {
-            this.redis.set(Key + query, JSON.stringify(games), () => {
-                this.redis.expire(Key, 60, () => { });
+            this.redis.set(ListKey + query, JSON.stringify(games), () => {
+                this.redis.expire(ListKey, 60, () => { });
             });
         }
+    }
+    get(pathname) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const game = yield this.redis.get(Key + pathname);
+            if (game) {
+                return JSON.parse(game);
+            }
+            return game;
+        });
+    }
+    set(game) {
+        this.redis.set(Key + game.pathname, JSON.stringify(game), () => {
+            this.redis.expire(Key + game.pathname, 60, () => { });
+        });
     }
 }
 exports.default = new GameCache();
