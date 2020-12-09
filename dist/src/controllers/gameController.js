@@ -126,7 +126,9 @@ class GameController {
                 };
                 globals_1.caches.game.set(game);
             }
-            return game;
+            return {
+                game
+            };
         });
         this.getGameList = ({ limit = 50, offset = 0, official }, user, { req }) => __awaiter(this, void 0, void 0, function* () {
             const query = JSON.stringify(req.query);

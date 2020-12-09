@@ -133,7 +133,9 @@ class GameController {
             }
             caches.game.set(game);
         }
-        return game;
+        return {
+            game
+        };
     }
 
     getGameList = async ({ limit = 50, offset = 0, official }: IGameListParams, user: DecodedIdToken, { req }: IRoute) => {
