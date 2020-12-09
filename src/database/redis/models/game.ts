@@ -1,8 +1,9 @@
 import CacheModel from './_cache';
 
 
-const Key = 'zempie:game:i:';
+const Key = `zempie:game:i:`;
 const ListKey = 'zempie:games:';
+const SharedKey = `zempie:game:s:`;
 
 class GameCache extends CacheModel {
     public readonly name = 'game';
@@ -14,7 +15,6 @@ class GameCache extends CacheModel {
         }
         return null
     }
-
     setList(games: any, query = '') {
         if ( games.length > 0 ) {
             this.redis.set(ListKey + query, JSON.stringify(games), () => {
@@ -30,10 +30,22 @@ class GameCache extends CacheModel {
         }
         return game;
     }
-
     set(game: any) {
         this.redis.set(Key + game.pathname, JSON.stringify(game), () => {
             this.redis.expire(Key + game.pathname, 60, () => {});
+        })
+    }
+
+    async getShared(uid: string) {
+        const ret = await this.redis.get(SharedKey + uid);
+        if ( ret ) {
+            return JSON.parse(ret)
+        }
+        return ret;
+    }
+    setShared(ret: any, uid: string) {
+        this.redis.set(SharedKey + uid, JSON.stringify(ret), () => {
+            this.redis.expire(SharedKey + uid, 60, () => {});
         })
     }
 }

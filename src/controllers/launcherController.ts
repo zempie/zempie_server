@@ -1,5 +1,5 @@
 import * as uniqid from 'uniqid';
-import { dbs } from '../commons/globals';
+import { caches, dbs } from '../commons/globals';
 import admin from 'firebase-admin';
 import DecodedIdToken = admin.auth.DecodedIdToken;
 import Opt from '../../config/opt';
@@ -76,32 +76,39 @@ class LauncherController {
 
 
     async getSharedGame({ uid }: ILauncherParams) {
-        const sg = await dbs.SharedGame.getInfo({uid});
-        const { game, user } = sg;
-        return {
-            user: {
-                uid: user.uid,
-                name: user.name,
-                channel_id: user.channel_id,
-                picture: user.picture,
-            },
-            game: {
-                uid: game.uid,
-                pathname: game.pathname,
-                title: game.title,
-                description: game.description,
-                control_type: game.control_type,
-                hashtags: game.hashtags,
-                url_game: game.url_game,
-                url_thumb: game.url_thumb,
+        let ret = await caches.game.getShared(uid);
+        if ( !ret ) {
+            const sg = await dbs.SharedGame.getInfo({uid});
+            const { game, user } = sg;
+            ret = {
                 user: {
-                    uid: game.user.uid,
-                    name: game.user.name,
-                    channel_id: game.user.channel_id,
-                    picture: game.user.picture,
-                }
-            },
+                    uid: user.uid,
+                    name: user.name,
+                    channel_id: user.channel_id,
+                    picture: user.picture,
+                },
+                game: {
+                    uid: game.uid,
+                    pathname: game.pathname,
+                    title: game.title,
+                    description: game.description,
+                    control_type: game.control_type,
+                    hashtags: game.hashtags,
+                    url_game: game.url_game,
+                    url_thumb: game.url_thumb,
+                    user: {
+                        uid: game.user.uid,
+                        name: game.user.name,
+                        channel_id: game.user.channel_id,
+                        picture: game.user.picture,
+                    }
+                },
+            }
+
+            caches.game.setShared(ret, uid);
         }
+
+        return ret;
     }
 
 
