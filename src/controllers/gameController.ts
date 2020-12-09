@@ -164,7 +164,7 @@ class GameController {
                 }
             })
 
-            // caches.game.setList(games, query);
+            caches.game.setList(games, query);
         }
 
         return {

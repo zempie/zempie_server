@@ -31,7 +31,7 @@ exports.default = {
         DeployApiV1: 'http://192.168.0.196:8288/api/v1',
         GameClient: 'http://localhost:8080/#/play',
         Redirect: 'http://localhost:8280/game',
-        Launcher: 'http://launcher.zempie.com',
+        Launcher: 'http://localhost:8080/#',
     },
     Deploy: {
         url_v1: 'http://192.168.0.196:8288/api/v1',

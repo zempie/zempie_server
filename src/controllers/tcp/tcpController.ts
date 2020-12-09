@@ -1,4 +1,3 @@
-import * as ws from 'ws';
 import WSController, { zWS } from './wsController';
 import tcpRoomManager from '../../services/tcpRoomManager';
 import { SendPacket } from '../../services/packetService';

@@ -155,7 +155,7 @@ class GameController {
                         } : null
                     };
                 });
-                // caches.game.setList(games, query);
+                globals_1.caches.game.setList(games, query);
             }
             return {
                 games
