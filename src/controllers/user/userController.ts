@@ -293,8 +293,15 @@ class UserController {
             let data: any;
             if ( file ) {
                 const webp = await FileManager.convertToWebp(file, 80);
-                data = await FileManager.s3upload(replaceExt(/*file.name*/'profile', '.webp'), webp[0].destinationPath, uid);
+                // data = await FileManager.s3upload(replaceExt(/*file.name*/'profile', '.webp'), webp[0].destinationPath, uid);
                 // const data: any = await FileManager.s3upload(file.name, file.path, uid);
+                data = await FileManager.s3upload3({
+                    key: replaceExt('profile', '.webp'),
+                    filePath: webp[0].destinationPath,
+                    uid,
+                    bucket: '/profile',
+                });
+
                 user.picture = data.Location;
                 updateRequest.photoURL = data.Location;
             }
@@ -327,7 +334,13 @@ class UserController {
         }
         const user = await dbs.User.findOne({ uid });
         const webp = await FileManager.convertToWebp(file, 80);
-        const data: any = await FileManager.s3upload('banner.webp', webp[0].destinationPath, uid);
+        // const data: any = await FileManager.s3upload('banner.webp', webp[0].destinationPath, uid);
+        const data: any = await FileManager.s3upload3({
+            key: 'banner.webp',
+            filePath: webp[0].destinationPath,
+            uid,
+            bucket: '/channel'
+        });
         await dbs.UserProfile.update({ url_banner: data.Location }, { user_id: user.id })
 
         caches.user.delInfo(uid);

@@ -84,6 +84,13 @@ export interface IGameListParams {
     official?: string
 }
 
+export interface IS3Upload {
+    key: string,
+    filePath: string,
+    uid: string,
+    bucket: string,
+}
+
 export interface IGame {
     uid: string,
     official: boolean,

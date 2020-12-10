@@ -12,6 +12,7 @@ import { getContentType } from "../commons/utils";
 import { ManagedUpload } from 'aws-sdk/lib/s3/managed_upload';
 import SendData = ManagedUpload.SendData;
 import { logger } from '../commons/logger';
+import { IS3Upload } from '../controllers/_interfaces';
 
 AWS.config.loadFromPath('config/aws/credentials.json');
 const s3 = new AWS.S3({ apiVersion: '2006-03-01' });
@@ -76,6 +77,31 @@ class FileManager {
             logger.debug('.jpg 삭제');
         })
         return webp;
+    }
+
+
+    s3upload3 = ({ key, filePath, uid, bucket }: IS3Upload) => {
+        return new Promise((resolve, reject) => {
+            const params = {
+                Bucket: `${Opt.AWS.Bucket}/${uid}${bucket}`,
+                Key: key,
+                // ACL: 'public-read',
+                ContentType: getContentType(filePath),
+                Body: fs.createReadStream(filePath),
+            };
+
+            s3.upload(params, (err: Error, data: SendData) => {
+                fs.unlink(filePath, (err) => {
+                    logger.debug(`${filePath} 삭제`);
+                });
+
+                if (err) {
+                    logger.error(err);
+                    return reject(err);
+                }
+                resolve(data);
+            })
+        })
     }
 
 
