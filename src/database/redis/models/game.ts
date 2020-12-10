@@ -20,7 +20,7 @@ class GameCache extends CacheModel {
     setList(games: any, query = '') {
         if ( games.length > 0 ) {
             this.redis.set(ListKey + query, JSON.stringify(games), () => {
-                this.redis.expire(ListKey, 60, () => {});
+                this.redis.expire(ListKey + query, 60, () => {});
             });
         }
     }
