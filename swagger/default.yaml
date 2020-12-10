@@ -1,0 +1,9 @@
+tags:
+  - name: 'Zempie'
+    description: '젬파이 API'
+  - name: 'Launcher'
+    description: '런쳐 API'
+  - name: 'Admin'
+    description: '관리자 API'
+  - name: 'Studio'
+    description: '스튜디오 API'

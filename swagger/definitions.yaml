@@ -1,0 +1,14 @@
+definitions:
+  Deploy:
+    type: "object"
+    properties:
+      publisher_uid:
+        type: "string"
+      game_uid:
+        type: "string"
+    xml:
+      name: "Deploy"
+#
+#tags:
+#  - name: "Deploy"
+#    description: "배포"

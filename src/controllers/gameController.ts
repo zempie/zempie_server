@@ -7,6 +7,7 @@ import { caches, dbs } from '../commons/globals';
 import { CreateError, ErrorCodes } from '../commons/errorCodes';
 import MQ from '../services/messageQueueService';
 import Opt from '../../config/opt';
+import { getGameData } from './_common';
 const { Url } = Opt;
 
 
@@ -111,26 +112,7 @@ class GameController {
         let game = await caches.game.getByPathname(pathname);
         if ( !game ) {
             game = await dbs.Game.getInfo({ pathname });
-            const { user } = game;
-            game = {
-                game_uid: game.uid,
-                official: game.official,
-                title: game.title,
-                pathname: game.pathname,
-                version: game.version,
-                control_type: game.control_type,
-                hashtags: game.hashtags,
-                count_over: game.count_over,
-                url_game: game.url_game,
-                url_thumb: game.url_thumb,
-                // share_url: user? `${Url.Redirect}/${game.pathname}/${user.uid}` : undefined,
-                user: user? {
-                    uid: user.uid,
-                    name: user.name,
-                    picture: user.picture,
-                    channel_id: user.channel_id,
-                } : null
-            }
+            game = getGameData(game);
             caches.game.setByPathname(game);
         }
         return {
@@ -143,28 +125,7 @@ class GameController {
         let games = await caches.game.getList(query);
         if ( !games ) {
             const rows = await dbs.Game.getList({limit, offset, official});
-            games = _.map(rows, (game: any) => {
-                const { user } = game;
-                return {
-                    game_uid: game.uid,
-                    official: game.official,
-                    title: game.title,
-                    pathname: game.pathname,
-                    version: game.version,
-                    control_type: game.control_type,
-                    hashtags: game.hashtags,
-                    count_over: game.count_over,
-                    url_game: game.url_game,
-                    url_thumb: game.url_thumb,
-                    // share_url: user? `${Url.Redirect}/${game.pathname}/${user.uid}` : undefined,
-                    user: user? {
-                        uid: user.uid,
-                        name: user.name,
-                        picture: user.picture,
-                        channel_id: user.channel_id,
-                    } : null
-                }
-            })
+            games = _.map(rows, game => getGameData(game))
 
             caches.game.setList(games, query);
         }

@@ -1,0 +1,20 @@
+paths:
+  /games:
+    get:
+      tags:
+        -"Zempie"
+      parameters:
+        - name: "limit"
+          in: "query"
+          type: "number"
+          description: "몇 개 가져올거냐? - offset이랑 같이 써라"
+          required: false
+
+        - name: "offset"
+          in: "query"
+          type: "number"
+          description: "몇 페이지? - limit이랑 같이 써라"
+          required: false
+      responses:
+        "200":
+          description: "ㅇㅋ"

@@ -1,0 +1,14 @@
+paths:
+  /admin:
+    post:
+      tags:
+        - "Admin"
+      parameters:
+        - in: "body"
+          name: "authorization"
+          type: "string"
+          required: true
+
+      responses:
+        default:
+          description: "ok"
