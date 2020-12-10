@@ -1,4 +1,4 @@
-import { DataTypes, Sequelize } from 'sequelize';
+import { DataTypes, Sequelize, Transaction } from 'sequelize';
 import Model from '../../model';
 import { dbs } from '../../../../commons/globals';
 
@@ -17,6 +17,8 @@ class UserPlayListGameModel extends Model {
 
         this.model.belongsTo(dbs.Game.model);
     }
+
+
 }
 
 
