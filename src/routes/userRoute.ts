@@ -1,7 +1,8 @@
 import { Router } from 'express';
 import convert from '../controllers/_convert';
-import { validateFirebaseIdToken } from './_common';
-import UserController from '../controllers/userController';
+import { isAuthenticated, validateFirebaseIdToken } from './_common';
+import UserController from '../controllers/user/userController';
+import UserPlayListController from '../controllers/user/userPlayListController';
 import AlarmController from '../controllers/alarmController';
 import RpcController from '../controllers/rpcController';
 import FileManager from '../services/fileManager';
@@ -27,7 +28,11 @@ export default (router: Router) => {
 
     router.get(`${apiVer}/user/info`,               validateFirebaseIdToken,    convert(UserController.getInfo));
     router.get(`${apiVer}/channel/:channel_id`,     validateFirebaseIdToken,    convert(UserController.getTargetInfoByChannelId));
-    router.get(`${apiVer}/play-list/:uid`,          validateFirebaseIdToken,    convert(UserController.getPlayList));
+
+    router.get(`${apiVer}/play-list/:uid`,          validateFirebaseIdToken,    convert(UserPlayListController.getPlayList));
+    router.post(`${apiVer}/play-list`,              validateFirebaseIdToken,    isAuthenticated,    convert(UserPlayListController.createPlaylist));
+    router.put(`${apiVer}/play-list`,               validateFirebaseIdToken,    isAuthenticated,    convert(UserPlayListController.updatePlaylist));
+    router.delete(`${apiVer}/play-list/`,           validateFirebaseIdToken,    isAuthenticated,    convert(UserPlayListController.deletePlaylist));
 
     router.get(`${apiVer}/user/search`,             validateFirebaseIdToken,    convert(UserController.searchUser));
     router.get(`${apiVer}/user/alarm`,              validateFirebaseIdToken,    convert(AlarmController.getList));

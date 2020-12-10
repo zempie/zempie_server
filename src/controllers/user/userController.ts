@@ -2,16 +2,16 @@ import * as _ from 'lodash';
 import * as cookie from 'cookie';
 import * as urlencode from 'urlencode';
 import { Request, Response } from 'express';
-import { IRoute, IZempieClaims } from './_interfaces';
-import { dbs, caches } from '../commons/globals';
+import { IRoute, IZempieClaims } from '../_interfaces';
+import { dbs, caches } from '../../commons/globals';
 import admin from 'firebase-admin';
 import DecodedIdToken = admin.auth.DecodedIdToken;
 import { Transaction, Op } from 'sequelize';
-import FileManager from '../services/fileManager';
+import FileManager from '../../services/fileManager';
 const replaceExt = require('replace-ext');
-import { CreateError, ErrorCodes } from '../commons/errorCodes';
-import Opt from '../../config/opt';
-import { getGameData } from './_common';
+import { CreateError, ErrorCodes } from '../../commons/errorCodes';
+import Opt from '../../../config/opt';
+import { getGameData } from '../_common';
 const { Url, CORS } = Opt;
 
 
@@ -417,30 +417,6 @@ class UserController {
                 await dbs.User.destroy({ uid }, transaction);
             })
         })
-    }
-
-
-    getPlayList = async ({ uid }: { uid: string }, _user: DecodedIdToken) => {
-        const playlist = await dbs.UserPlayList.getPlayList({ uid });
-        if ( !playlist ) {
-            throw CreateError(ErrorCodes.INVALID_PLAYLIST_UID);
-        }
-
-        const { user } = playlist;
-        return {
-            uid: playlist.uid,
-            title: playlist.title,
-            url_bg: playlist.url_bg,
-            user: {
-                uid: user.uid,
-                name: user.name,
-                picture: user.picture,
-            },
-            games: _.map(playlist.games, (obj: any) => {
-                const { game } = obj;
-                return getGameData(game);
-            }),
-        }
     }
 }
 

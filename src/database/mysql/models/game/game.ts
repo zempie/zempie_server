@@ -31,6 +31,7 @@ class GameModel extends Model {
 
             url_game:           { type: DataTypes.STRING },
             url_thumb:          { type: DataTypes.STRING },
+            url_thumb_gif:      { type: DataTypes.STRING },
             url_title:          { type: DataTypes.STRING },
         }
     }
@@ -49,6 +50,14 @@ class GameModel extends Model {
                 ];
                 await this.bulkCreate(sampleGames);
             }
+        }
+
+        const desc = await this.model.sequelize.queryInterface.describeTable(this.model.tableName);
+        if ( !desc['url_thumb_gif'] ) {
+            this.model.sequelize.queryInterface.addColumn(this.model.tableName, 'url_thumb_gif', {
+                type: DataTypes.STRING,
+                after: 'url_thumb'
+            })
         }
     }
 

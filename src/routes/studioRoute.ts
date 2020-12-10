@@ -3,7 +3,7 @@ import RpcController from '../controllers/rpcController';
 import {validateFirebaseIdToken} from "./_common";
 import FileManager from "../services/fileManager";
 import convert from "../controllers/_convert";
-import UserController from "../controllers/userController";
+import UserController from "../controllers/user/userController";
 import StudioController  from '../controllers/studio/studioController';
 import StudioAdminController from '../controllers/adminController/studioAdminController';
 
