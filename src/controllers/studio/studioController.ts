@@ -185,23 +185,31 @@ class StudioController {
             const picFile2 = files && files[ 'project_picture2' ] || undefined;
             files[ 'project_picture2' ] = undefined;
 
-            if( picFile ) {
-                const webp = await FileManager.convertToWebp(picFile, 80);
-                const data: any = await FileManager.s3upload(replaceExt(picFile.name, '.webp'), webp[0].destinationPath, uid);
-                params.picture = data.Location;
-            }
 
-            if( picFile2 ) {
-                // const webp = await FileManager.convertToWebp(picFile, 80);
-                // file.name, file.path, uid, versionPath
-
-                const data: any = await FileManager.s3upload( picFile2.name, picFile2.path, uid);
-                params.picture2 = data.Location;
-            }
 
             params.hashtags = params.hashtags || '';
             const project = await dbs.Project.create( params, transaction );
 
+            if( picFile ) {
+                const webp = await FileManager.convertToWebp(picFile, 80);
+                const data: any = await FileManager.s3upload3({
+                    key : replaceExt(picFile.name, '.webp'),
+                    filePath : webp[0].destinationPath,
+                    uid,
+                    bucket: `/project/${project.id}/thumb`
+                })
+                project.picture = data.Location;
+            }
+
+            if( picFile2 ) {
+                const data: any = await FileManager.s3upload3({
+                    key : picFile2.name,
+                    filePath : picFile2.path,
+                    uid,
+                    bucket: `/project/${project.id}/thumb`
+                });
+                project.picture2 = data.Location;
+            }
 
             const versionParams : IVersion = {};
 
@@ -214,8 +222,8 @@ class StudioController {
 
             const versionFiles = files;
             if( versionFiles && versionParams.startFile ) {
-                const versionPath = `${project.id}/${uuid()}`;
-                versionParams.url = await uploadVersionFile( versionFiles, uid, versionPath, versionParams.startFile );
+                const bucket = `/project/${project.id}/${uuid()}`;
+                versionParams.url = await uploadVersionFile( versionFiles, uid, bucket, versionParams.startFile );
                 versionParams.state = 'process';
             }
 
@@ -274,13 +282,23 @@ class StudioController {
 
             if ( file ) {
                 const webp = await FileManager.convertToWebp(file, 80);
-                const data: any = await FileManager.s3upload(replaceExt(file.name, '.webp'), webp[0].destinationPath, uid);
+                const data: any = await FileManager.s3upload3({
+                    key : replaceExt(file.name, '.webp'),
+                    filePath : webp[0].destinationPath,
+                    uid,
+                    bucket: `/project/${project.id}/thumb`
+                });
                 params.picture = data.Location;
                 game.url_thumb = params.picture;
             }
 
             if ( file2 ) {
-                const data: any = await FileManager.s3upload( file2.name, file2.path, uid);
+                const data: any = await FileManager.s3upload3({
+                    key : file2.name,
+                    filePath : file2.path,
+                    uid,
+                    bucket: `/project/${project.id}/thumb`
+                });
                 params.picture2 = data.Location;
                 game.url_thumb_gif = params.picture2;
             }
@@ -326,7 +344,6 @@ class StudioController {
     createVersion = async ( params : any, {uid}: DecodedIdToken, {req: {files}}: IRoute ) => {
 
         const project_id = params.project_id;
-        const versionPath = `${project_id}/${uuid()}`;
 
         // const data: any = await FileManager.s3upload(replaceExt(file.name, '.webp'), webp[0].destinationPath, uid);
         return dbs.ProjectVersion.getTransaction( async (transaction : Transaction)=>{
@@ -348,7 +365,8 @@ class StudioController {
                 maxNum = lastVersion.number;
             }
 
-            const url = await uploadVersionFile( files, uid, versionPath, params.startFile );
+            const bucket = `/project/${project_id}/${uuid()}`;
+            const url = await uploadVersionFile( files, uid, bucket, params.startFile );
             params.number = maxNum + 1;
             params.state = 'process';
             params.url = url;
@@ -432,15 +450,18 @@ class Version {
 
 }
 
-async function uploadVersionFile( files : any, uid : string, versionPath : string, startFile : string ) : Promise<string> {
+async function uploadVersionFile( files : any, uid : string, bucket : string, startFile : string ) : Promise<string> {
 
     let url = '';
     for( let key in files ) {
         const file = files[key];
         if( file ) {
-            const data = await FileManager.s3upload2(
-                file.name, file.path, uid, versionPath
-            ) as any;
+            const data = await FileManager.s3upload3( {
+                key : file.name,
+                filePath : file.path,
+                uid,
+                bucket,
+            }) as any;
 
             if( file.name === startFile ) {
                 url = data.Location;
