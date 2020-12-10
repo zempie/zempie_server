@@ -27,6 +27,7 @@ export default (router: Router) => {
 
     router.get(`${apiVer}/user/info`,               validateFirebaseIdToken,    convert(UserController.getInfo));
     router.get(`${apiVer}/channel/:channel_id`,     validateFirebaseIdToken,    convert(UserController.getTargetInfoByChannelId));
+    router.get(`${apiVer}/play-list/:uid`,          validateFirebaseIdToken,    convert(UserController.getPlayList));
 
     router.get(`${apiVer}/user/search`,             validateFirebaseIdToken,    convert(UserController.searchUser));
     router.get(`${apiVer}/user/alarm`,              validateFirebaseIdToken,    convert(AlarmController.getList));

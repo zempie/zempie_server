@@ -11,6 +11,7 @@ import FileManager from '../services/fileManager';
 const replaceExt = require('replace-ext');
 import { CreateError, ErrorCodes } from '../commons/errorCodes';
 import Opt from '../../config/opt';
+import { getGameData } from './_common';
 const { Url, CORS } = Opt;
 
 
@@ -416,6 +417,30 @@ class UserController {
                 await dbs.User.destroy({ uid }, transaction);
             })
         })
+    }
+
+
+    getPlayList = async ({ uid }: { uid: string }, _user: DecodedIdToken) => {
+        const playlist = await dbs.UserPlayList.getPlayList({ uid });
+        if ( !playlist ) {
+            throw CreateError(ErrorCodes.INVALID_PLAYLIST_UID);
+        }
+
+        const { user } = playlist;
+        return {
+            uid: playlist.uid,
+            title: playlist.title,
+            url_bg: playlist.url_bg,
+            user: {
+                uid: user.uid,
+                name: user.name,
+                picture: user.picture,
+            },
+            games: _.map(playlist.games, (obj: any) => {
+                const { game } = obj;
+                return getGameData(game);
+            }),
+        }
     }
 }
 

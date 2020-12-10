@@ -127,7 +127,13 @@ export const ErrorCodes = {
 
     INVALID_QNA_PARAMS: {
         message: 'QnA 파라미터 오류'
-    }
+    },
+
+
+    INVALID_PLAYLIST_UID: {
+        code: 3101,
+        message: 'PlayList UID 오류'
+    },
 };
 
 
