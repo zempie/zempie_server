@@ -49,6 +49,7 @@ interface IProject {
     user_id? : number,
     description? : string,
     picture? : string,
+    picture2? : string,
     pathname : string,
     hashtags? : string,
 }
@@ -181,10 +182,21 @@ class StudioController {
             const picFile = files && files[ 'project_picture' ] || undefined;
             files[ 'project_picture' ] = undefined;
 
+            const picFile2 = files && files[ 'project_picture2' ] || undefined;
+            files[ 'project_picture2' ] = undefined;
+
             if( picFile ) {
                 const webp = await FileManager.convertToWebp(picFile, 80);
                 const data: any = await FileManager.s3upload(replaceExt(picFile.name, '.webp'), webp[0].destinationPath, uid);
                 params.picture = data.Location;
+            }
+
+            if( picFile2 ) {
+                // const webp = await FileManager.convertToWebp(picFile, 80);
+                // file.name, file.path, uid, versionPath
+
+                const data: any = await FileManager.s3upload( picFile2.name, picFile2.path, uid);
+                params.picture2 = data.Location;
             }
 
             params.hashtags = params.hashtags || '';
@@ -222,6 +234,7 @@ class StudioController {
                 // version : version.version,
                 // url_game : version.url,
                 url_thumb : project.picture,
+                url_thumb_gif : project.picture2,
             }, transaction );
             project.game_id = game.id;
 
@@ -251,7 +264,7 @@ class StudioController {
      url_game, url_thumb, url_title
      activated
      */
-    updateProject = async ( params : any, {uid}: DecodedIdToken, {req: {files: {file}}}: IRoute)=>{
+    updateProject = async ( params : any, {uid}: DecodedIdToken, {req: {files: {file, file2}}}: IRoute)=>{
 
         return dbs.Project.getTransaction( async (transaction : Transaction) => {
             const project = await dbs.Project.findOne( { id : params.id } );
@@ -264,6 +277,12 @@ class StudioController {
                 const data: any = await FileManager.s3upload(replaceExt(file.name, '.webp'), webp[0].destinationPath, uid);
                 params.picture = data.Location;
                 game.url_thumb = params.picture;
+            }
+
+            if ( file2 ) {
+                const data: any = await FileManager.s3upload( file2.name, file2.path, uid);
+                params.picture2 = data.Location;
+                game.url_thumb_gif = params.picture2;
             }
 
             if( params.description ) {
