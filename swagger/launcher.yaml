@@ -1,0 +1,28 @@
+paths:
+  /launch/game/{game_uid}:
+    get:
+      tags:
+        - "Launcher"
+      parameters:
+        - name: "game_uid"
+          in: "path"
+          description: "uid of a game"
+          type: "string"
+          required: true
+      responses:
+        "200":
+          description: "OK"
+
+  /launch/game/game-start:
+    post:
+      tags:
+        - "Launcher"
+      parameters:
+        - name: "game_uid"
+          in: "body"
+          description: "uid of a game"
+          tyep: "string"
+          required: true
+      responses:
+        "200":
+          description: 'OK'
