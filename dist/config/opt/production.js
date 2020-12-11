@@ -18,6 +18,9 @@ exports.default = {
         admin: {
             port: 8299,
         },
+        content: {
+            port: 8283,
+        }
     },
     Url: {
         Host: 'https://zempie.com',
