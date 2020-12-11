@@ -18,13 +18,13 @@ class ContentMQ extends SrvMQ {
 
     private processBulk = async () =>{
         // const games = await caches.game.getList();
-        _.forEach(this.game_over, async (count, uid) => {
+        _.forEach(this.game_over, async (count, id) => {
             if ( count > 0 ) {
                 dbs.Game.update({
                     count_over: Sequelize.literal(`count_over + ${count}`)
-                }, { uid })
-                this.game_over[uid] = 0;
-                console.log('[gameOver] uid:', uid)
+                }, { id })
+                this.game_over[id] = 0;
+                console.log('[gameOver] id:', id)
                 // const game = _.find(games, game => game.game_uid === uid);
                 // if ( game ) {
                 //     game.count_over += count;
@@ -36,16 +36,16 @@ class ContentMQ extends SrvMQ {
 
     async gameOver(message: string) {
         // console.log('message:'.yellow, message);
-        const { user_uid, game_uid, score }: any = JSON.parse(message);
+        const { user_uid, game_id, score }: any = JSON.parse(message);
         // const user = await dbs.User.findOne({ id: user_id });
         // const game = await dbs.Game.findOne({ game_id });
         // const game_uid = game.uid;
 
         // await TimelineController.doPosting({type: eTimeline.PR, score, game_uid, game_id, user_id}, user);
-        this.game_over[game_uid] = this.game_over[game_uid] || 0;
-        this.game_over[game_uid] += 1;
+        this.game_over[game_id] = this.game_over[game_id] || 0;
+        this.game_over[game_id] += 1;
 
-        console.log('consume:', game_uid);
+        console.log('consume:', game_id);
     }
 }
 

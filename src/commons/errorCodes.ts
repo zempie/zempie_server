@@ -28,9 +28,9 @@ export const ErrorCodes = {
         code: 1110,
         message: '잘 못 된 유저 아이디입니다'
     },
-    INVALID_GAME_UID: {
+    INVALID_GAME_ID: {
         code: 1111,
-        message: '게임 UID 오류'
+        message: '게임 ID 오류'
     },
     INVALID_CHANNEL_ID: {
         code: 1112,

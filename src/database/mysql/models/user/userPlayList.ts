@@ -7,8 +7,8 @@ class UserPlayListModel extends Model {
     protected initialize(): void {
         this.name = 'userPlayList';
         this.attributes = {
-            user_id:    { type: DataTypes.INTEGER, allowNull: false },
             uid:        { type: DataTypes.STRING(36), allowNull: false },
+            user_uid:   { type: DataTypes.STRING(36), allowNull: false },
 
             title:      { type: DataTypes.STRING(100), allowNull: false },
             url_bg:     { type: DataTypes.STRING(250) },

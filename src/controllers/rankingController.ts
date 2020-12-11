@@ -7,7 +7,7 @@ import DecodedIdToken = admin.auth.DecodedIdToken;
 
 
 class RankingController {
-    getGlobalRanking = async ({ game_uid, limit = 50, offset = 0 }: IGameParams, {uid: user_uid}: DecodedIdToken) => {
+    getGlobalRanking = async ({ game_id, limit = 50, offset = 0 }: IGameParams, {uid: user_uid}: DecodedIdToken) => {
         let score, rank;
 
         // const userRecord = await dbs.User.findOne({ uid });
@@ -20,12 +20,12 @@ class RankingController {
         // const game_id = game.id;
 
         if ( user_uid ) {
-            const gameRecord = await dbs.UserGame.findOne({game_uid, user_uid});
+            const gameRecord = await dbs.UserGame.findOne({game_id, user_uid});
             if ( gameRecord ) {
                 score = gameRecord.score;
                 rank = await dbs.UserGame.model.count({
                     where: {
-                        game_uid,
+                        game_id,
                         score: {
                             [Op.gt]: score
                         },
@@ -37,7 +37,7 @@ class RankingController {
         }
 
         const { count, rows } = await dbs.UserGame.model.findAndCountAll({
-            where: { game_uid },
+            where: { game_id },
             include: [{
                 model: dbs.User.model,
                 required: true,
@@ -69,10 +69,10 @@ class RankingController {
     }
 
 
-    getFollowingRanking = async ({game_uid, limit = 50, offset = 0}: IGameParams, {uid: user_uid}: DecodedIdToken, transaction?: Transaction) => {
+    getFollowingRanking = async ({game_id, limit = 50, offset = 0}: IGameParams, {uid: user_uid}: DecodedIdToken, transaction?: Transaction) => {
         let score, rank;
 
-        const gameRecord = await dbs.UserGame.findOne({game_uid, user_uid}, transaction);
+        const gameRecord = await dbs.UserGame.findOne({game_id, user_uid}, transaction);
         if( gameRecord ) {
             score = gameRecord.score;
             rank = await dbs.Follow.model.count({
@@ -81,7 +81,7 @@ class RankingController {
                     model: dbs.UserGame.model,
                     as: 'gameRecord',
                     where: {
-                        game_uid,
+                        game_id,
                         score: {
                             [Op.gt]: score,
                         }
@@ -96,7 +96,7 @@ class RankingController {
             include: [{
                 model: dbs.UserGame.model,
                 as: 'gameRecord',
-                where: { game_uid },
+                where: { game_id },
             }, {
                 model: dbs.User.model,
                 as: 'target',

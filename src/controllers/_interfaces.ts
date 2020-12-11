@@ -64,7 +64,7 @@ export interface ISocialMedia {
 }
 
 export interface IGameParams {
-    game_uid: string,
+    game_id: number,
     user_uid: string,
     score: number,
     limit: number,
@@ -117,7 +117,7 @@ export interface ITimelineParams {
     user_id?: number,
     game_id?: number,
     user_uid?: string,
-    game_uid?: string,
+    // game_uid?: string,
     limit?: number,
     offset?: number,
     type?: eTimeline,

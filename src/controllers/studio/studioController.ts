@@ -126,7 +126,7 @@ class StudioController {
             const user = await dbs.User.findOne({uid}, transaction);
             user.is_developer = true;
             await user.save({transaction});
-            
+
             return {
                 success : true
             };
@@ -223,7 +223,7 @@ class StudioController {
             project.update_version_id = version.id;
 
             const game = await dbs.Game.create( {
-                uid : uuid(),
+                // uid : uuid(),
                 activated : 0,
                 enabled : 0,
                 user_id : user.id,

@@ -42,7 +42,7 @@ class GameModel extends Model {
             if ( await this.model.count() < 1 ) {
                 const sampleGames: any = [
                     {
-                        uid: uuid(),
+                        // uid: uuid(),
                         pathname: 'test-path',
                         title: 'test-title',
                         genre_tags: 'arcade,puzzle,knight',
@@ -73,9 +73,9 @@ class GameModel extends Model {
 
         return await this.model.findAll({
             where,
-            attributes: {
-                include: [['uid', 'game_uid']]
-            },
+            // attributes: {
+            //     include: [['uid', 'game_uid']]
+            // },
             include: [{
                 model: dbs.User.model,
                 where: {
@@ -95,9 +95,9 @@ class GameModel extends Model {
     async getInfo(where: object) {
         const record = await this.model.findOne({
             where,
-            attributes: {
-                exclude: ['id', 'created_at', 'updated_at', 'deleted_at']
-            },
+            // attributes: {
+            //     exclude: ['id', 'created_at', 'updated_at', 'deleted_at']
+            // },
             include: [{
                 model: dbs.User.model,
                 where: {

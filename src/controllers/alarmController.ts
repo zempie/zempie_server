@@ -14,8 +14,8 @@ class AlarmController {
         return {
             alarms: _.map(alarms, (alarm: any) => {
                 const extra = JSON.parse(alarm.extra);
-                if (extra.game_uid) {
-                    extra.game = _.find(games, (g: any) => g.uid === extra.game_uid);
+                if (extra.game_id) {
+                    extra.game = _.find(games, (g: any) => g.uid === extra.game_id);
                 }
 
                 return {
