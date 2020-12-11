@@ -14,7 +14,7 @@ class UserGameModel extends Model {
         this.name = 'userGame';
         this.attributes = {
             user_uid:       { type: DataTypes.STRING(36), allowNull: false, unique: 'compositeIndex' },
-            game_uid:       { type: DataTypes.STRING(36), allowNull: false, unique: 'compositeIndex' },
+            // game_uid:       { type: DataTypes.STRING(36), allowNull: false, unique: 'compositeIndex' },
             game_id:        { type: DataTypes.INTEGER, allowNull: false, unique: 'compositeIndex' },
             score:          { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0 },
         };
