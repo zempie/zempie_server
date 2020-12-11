@@ -32,9 +32,9 @@ class GameCache extends CacheModel {
         }
         return game;
     }
-    setByPathname(game: any) {
-        this.redis.set(PathnameKey + game.pathname, JSON.stringify(game), () => {
-            this.redis.expire(PathnameKey + game.pathname, 60, () => {});
+    setByPathname(ret: any, pathname: string) {
+        this.redis.set(PathnameKey + pathname, JSON.stringify(ret), () => {
+            this.redis.expire(PathnameKey + pathname, 60, () => {});
         })
     }
 

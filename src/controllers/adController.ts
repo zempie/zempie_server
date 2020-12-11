@@ -15,7 +15,7 @@ class AdController {
     async onRewardedVideoCompleted ({ pathname, pid }: IAdControlParams, user: DecodedIdToken) {
         const game = await dbs.Game.findOne({ title: pathname });
         if ( !game ) {
-            throw CreateError(ErrorCodes.INVALID_GAME_UID);
+            throw CreateError(ErrorCodes.INVALID_GAME_ID);
         }
 
         const { id: game_id, developer } = game;

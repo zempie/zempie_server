@@ -45,7 +45,7 @@ class GameController {
     //     res.redirect(url);
     // }
 
-    gameStart = async ({game_uid}: IGameParams, user: DecodedIdToken) => {
+    gameStart = async ({game_id}: IGameParams, user: DecodedIdToken) => {
         // const user_uid = user.uid;
         // await dbs.GameLog.create({
         //     user_uid: uid,
@@ -58,7 +58,7 @@ class GameController {
     }
 
 
-    gameOver = async ({ game_uid, score, pid }: IGameParams, user: DecodedIdToken) => {
+    gameOver = async ({ game_id, score, pid }: IGameParams, user: DecodedIdToken) => {
         const user_uid = user? user.uid : null;
         // const { uid: user_uid } = user;
         // const user_uid = user.uid;
@@ -76,7 +76,7 @@ class GameController {
             messages: [{
                 value: JSON.stringify({
                     user_uid,
-                    game_uid,
+                    game_id,
                     score,
                     pid,
                 }),
@@ -88,7 +88,7 @@ class GameController {
         }
 
         return await dbs.UserGame.getTransaction(async (transaction: Transaction) => {
-            const record = await dbs.UserGame.findOne({user_uid, game_uid}, transaction);
+            const record = await dbs.UserGame.findOne({user_uid, game_id}, transaction);
             const previous_score = record? record.score : 0;
             const new_record = score > previous_score;
 
@@ -97,7 +97,7 @@ class GameController {
                     record.score = score;
                     await record.save({transaction});
                 } else {
-                    await dbs.UserGame.create({user_uid, game_uid, score}, transaction);
+                    await dbs.UserGame.create({user_uid, game_id, score}, transaction);
                 }
             }
 
@@ -109,15 +109,29 @@ class GameController {
 
 
     getGame = async ({pathname}: any, _user: DecodedIdToken) => {
-        let game = await caches.game.getByPathname(pathname);
-        if ( !game ) {
-            game = await dbs.Game.getInfo({ pathname });
-            game = getGameData(game);
-            caches.game.setByPathname(game);
+        // let game = await caches.game.getByPathname(pathname);
+        // if ( !game ) {
+        //     game = await dbs.Game.getInfo({ pathname });
+        //     game = getGameData(game);
+        //     caches.game.setByPathname(game);
+        //     caches.game.setByPathname(ret, pathname);
+        // }
+        // return {
+        //     game
+        // };
+        let ret = await caches.game.getByPathname(pathname);
+        if ( !ret ) {
+            const game = await dbs.Game.getInfo({ pathname });
+            ret = {
+                game: getGameData(game),
+            }
+            caches.game.setByPathname(ret, pathname);
         }
-        return {
-            game
-        };
+        // const game = await dbs.Game.getInfo({ pathname });
+        // const ret = {
+        //     game: getGameData(game),
+        // }
+        return ret;
     }
 
     getGameList = async ({ limit = 50, offset = 0, official }: IGameListParams, user: DecodedIdToken, { req }: IRoute) => {

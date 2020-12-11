@@ -11,7 +11,7 @@ import { isAuthenticated, validateFirebaseIdToken } from './_common';
 const apiVer = `/api/v1`
 export default (router: Router) => {
     // 게임 실행
-    router.get(`${apiVer}/launch/game/:uid`,    convert(LauncherController.getGame));
+    router.get(`${apiVer}/launch/game/:pathname`,    convert(LauncherController.getGame));
     router.get(`${apiVer}/launch/battle/:uid`,  convert(LauncherController.getBattleGame));
     router.get(`${apiVer}/launch/shared/:uid`,  convert(LauncherController.getSharedGame));
 
@@ -24,7 +24,7 @@ export default (router: Router) => {
     // 젬파이
     router.post(`${apiVer}/launch/game-start`,  validateFirebaseIdToken,   convert(GameController.gameStart));
     router.post(`${apiVer}/launch/game-over`,   validateFirebaseIdToken,   convert(GameController.gameOver));
-    router.get(`${apiVer}/launch/game-ranking/:game_uid`,   validateFirebaseIdToken,     convert(RankingController.getGlobalRanking));
+    router.get(`${apiVer}/launch/game-ranking/:game_id`,    validateFirebaseIdToken,     convert(RankingController.getGlobalRanking));
 
 
     // 배틀

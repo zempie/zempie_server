@@ -3,41 +3,32 @@ import { caches, dbs } from '../commons/globals';
 import admin from 'firebase-admin';
 import DecodedIdToken = admin.auth.DecodedIdToken;
 import Opt from '../../config/opt';
+import { getGameData } from './_common';
 const { Url, Deploy } = Opt;
 
 
 interface ILauncherParams {
     uid: string
     game_id: number
-    game_uid: string
+    // game_uid: string
+    pathname: string
 }
 
 
 class LauncherController {
-    async getGame({ uid }: ILauncherParams) {
-        let ret = await caches.game.getByUid(uid);
+    async getGame({ pathname }: ILauncherParams) {
+        let ret = await caches.game.getByPathname(pathname);
         if ( !ret ) {
-            const game = await dbs.Game.getInfo({uid});
+            const game = await dbs.Game.getInfo({ pathname });
             ret = {
-                game: {
-                    uid: game.uid,
-                    pathname: game.pathname,
-                    title: game.title,
-                    description: game.description,
-                    control_type: game.control_type,
-                    hashtags: game.hashtags,
-                    url_game: game.url_game,
-                    url_thumb: game.url_thumb,
-                    user: {
-                        uid: game.user.uid,
-                        name: game.user.name,
-                        channel_id: game.user.channel_id,
-                        picture: game.user.picture,
-                    }
-                },
+                game: getGameData(game),
             }
-            caches.game.setByUid(ret, uid);
+            caches.game.setByPathname(ret, pathname);
         }
+        // const game = await dbs.Game.getInfo({ pathname });
+        // const ret = {
+        //     game: getGameData(game),
+        // }
         return ret;
     }
 
@@ -55,22 +46,7 @@ class LauncherController {
                     user_count: battle.user_count,
                     end_at: battle.end_at,
                 },
-                game: {
-                    uid: game.uid,
-                    pathname: game.pathname,
-                    title: game.title,
-                    description: game.description,
-                    control_type: game.control_type,
-                    hashtags: game.hashtags,
-                    url_game: game.url_game,
-                    url_thumb: game.url_thumb,
-                    user: {
-                        uid: game.user.uid,
-                        name: game.user.name,
-                        channel_id: game.user.channel_id,
-                        picture: game.user.picture,
-                    }
-                },
+                game: getGameData(game),
                 host: {
                     uid: host.uid,
                     name: host.name,
@@ -96,22 +72,7 @@ class LauncherController {
                     channel_id: user.channel_id,
                     picture: user.picture,
                 },
-                game: {
-                    uid: game.uid,
-                    pathname: game.pathname,
-                    title: game.title,
-                    description: game.description,
-                    control_type: game.control_type,
-                    hashtags: game.hashtags,
-                    url_game: game.url_game,
-                    url_thumb: game.url_thumb,
-                    user: {
-                        uid: game.user.uid,
-                        name: game.user.name,
-                        channel_id: game.user.channel_id,
-                        picture: game.user.picture,
-                    }
-                },
+                game: getGameData(game),
             }
             caches.game.setShared(ret, uid);
         }
@@ -122,8 +83,8 @@ class LauncherController {
     /**
      *
      */
-    async getSharedUrl({ game_uid }: ILauncherParams, { uid: user_uid }: DecodedIdToken) {
-        const uid = await dbs.SharedGame.getSharedUid({ user_uid, game_uid });
+    async getSharedUrl({ game_id }: ILauncherParams, { uid: user_uid }: DecodedIdToken) {
+        const uid = await dbs.SharedGame.getSharedUid({ user_uid, game_id });
 
         return {
             shared_uid: uid,
@@ -132,13 +93,13 @@ class LauncherController {
     }
 
 
-    async getBattleUrl({ game_uid }: ILauncherParams, { uid: user_uid }: DecodedIdToken) {
+    async getBattleUrl({ game_id }: ILauncherParams, { uid: user_uid }: DecodedIdToken) {
         const uid = uniqid();
 
         await dbs.Battle.create({
             uid,
             user_uid,
-            game_uid,
+            game_id,
             end_at: Date.now() + (1000 * 60 * 10),
         })
 

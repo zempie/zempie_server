@@ -50,10 +50,9 @@ class UserPlayListController {
             });
         }
 
-        const userRecord = await dbs.User.findOne({ uid: user.uid });
         const playlist = await dbs.UserPlayList.create({
-            user_id: userRecord.id,
             uid: playlist_uid,
+            user_uid: user.uid,
             title,
             url_bg: data.Location,
         });
@@ -71,8 +70,7 @@ class UserPlayListController {
 
     updatePlaylist = async ({ uid, title }: any, user: DecodedIdToken, {req:{files:{file}}}: IRoute) => {
         await dbs.UserPlayList.getTransaction(async (transaction: Transaction) => {
-            const userRecord = await dbs.User.findOne({ uid: user.uid });
-            const playlist = await dbs.UserPlayList.findOne({ uid, user_id: userRecord.id }, transaction);
+            const playlist = await dbs.UserPlayList.findOne({ uid, user_uid: user.uid }, transaction);
             if ( !playlist ) {
                 throw CreateError(ErrorCodes.INVALID_PLAYLIST_UID);
             }
@@ -104,19 +102,38 @@ class UserPlayListController {
     }
 
     deletePlaylist = async ({ uid }: any, user: DecodedIdToken) => {
-        const userRecord = await dbs.User.findOne({ uid: user.uid });
-        await dbs.UserPlayList.destroy({ uid, user_id: userRecord.id });
+        await dbs.UserPlayList.destroy({ uid, user_uid: user.uid });
     }
 
 
     /**
      * game in a playlist
      */
-    addGame = async () => {
+    addGame = async ({ uid, game_id }: any, user: DecodedIdToken) => {
+        const playlist = await dbs.UserPlayList.findOne({ uid, user_uid: user.uid });
+        if ( !playlist ) {
+            throw CreateError(ErrorCodes.INVALID_PLAYLIST_UID);
+        }
 
+        const game = await dbs.Game.findOne({ game_id });
+        if ( !game ) {
+            throw CreateError(ErrorCodes.INVALID_GAME_ID);
+        }
+
+        const count = await dbs.UserPlayListGame.count({ userPlayList_id: playlist.id });
+        await dbs.UserPlayListGame.create({
+            userPlayList_id: playlist.id,
+            num: count + 1,
+            game_id: game.id,
+        });
     }
 
-    delGame = async () => {
+    delGame = async ({ uid, game_id }: any, user: DecodedIdToken) => {
+        const playlist = await dbs.UserPlayList.findOne({ uid, user_uid: user.uid });
+        if ( !playlist ) {
+            throw CreateError(ErrorCodes.INVALID_PLAYLIST_UID);
+        }
+
 
     }
 

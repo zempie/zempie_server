@@ -38,13 +38,13 @@ class TimelineController {
     }
 
 
-    async doPosting({type, score, follower_ids, game_uid, game_id, user_id, achievement_id, battle_id}: ITimelineParams, user: DecodedIdToken, transaction?: Transaction) {
+    async doPosting({type, score, follower_ids, game_id, user_id, achievement_id, battle_id}: ITimelineParams, user: DecodedIdToken, transaction?: Transaction) {
         const uid = uniqid();
         let extra;
         switch ( type ) {
             case eTimeline.PR:          extra = JSON.stringify({ score }); break;
             case eTimeline.PRW:         extra = JSON.stringify({ score, follower_ids }); break;
-            case eTimeline.Share:       extra = JSON.stringify({ game_uid }); break;
+            case eTimeline.Share:       extra = JSON.stringify({ game_id }); break;
             case eTimeline.Achievement: extra = JSON.stringify({ achievement_id }); break;
             case eTimeline.Battle_1st:  extra = JSON.stringify({ battle_id }); break;
         }
