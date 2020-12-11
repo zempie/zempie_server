@@ -11,7 +11,7 @@ class GameModel extends Model {
     protected initialize(): void {
         this.name = 'game';
         this.attributes = {
-            // uid:                { type: DataTypes.UUID, allowNull: false },
+            uid:                { type: DataTypes.UUID, allowNull: false },
             activated:          { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false },
             enabled:            { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false },
 
