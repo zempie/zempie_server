@@ -18,7 +18,7 @@ class GameModel extends model_1.default {
     initialize() {
         this.name = 'game';
         this.attributes = {
-            uid: { type: sequelize_1.DataTypes.UUID, allowNull: false },
+            // uid:                { type: DataTypes.UUID, allowNull: false },
             activated: { type: sequelize_1.DataTypes.BOOLEAN, allowNull: false, defaultValue: false },
             enabled: { type: sequelize_1.DataTypes.BOOLEAN, allowNull: false, defaultValue: false },
             official: { type: sequelize_1.DataTypes.BOOLEAN, allowNull: false, defaultValue: false },

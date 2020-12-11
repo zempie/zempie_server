@@ -22,7 +22,7 @@ class UserGameModel extends model_1.default {
         this.name = 'userGame';
         this.attributes = {
             user_uid: { type: sequelize_1.DataTypes.STRING(36), allowNull: false, unique: 'compositeIndex' },
-            game_uid: { type: sequelize_1.DataTypes.STRING(36), allowNull: false, unique: 'compositeIndex' },
+            // game_uid:       { type: DataTypes.STRING(36), allowNull: false, unique: 'compositeIndex' },
             game_id: { type: sequelize_1.DataTypes.INTEGER, allowNull: false, unique: 'compositeIndex' },
             score: { type: sequelize_1.DataTypes.INTEGER, allowNull: false, defaultValue: 0 },
         };
