@@ -1,0 +1,14 @@
+paths:
+  /play-list:
+    post:
+      tags:
+        - "Zempie"
+      parameters:
+        - name: "title"
+          in: "body"
+          type: "string"
+          description: '이름'
+          required: true
+      responses:
+        "200":
+          description: 'ㅇㅋ'

@@ -1,9 +1,10 @@
 export function getGameData (game: any) {
     const { user } = game;
     return {
-        game_uid: game.uid,
+        id: game.id,
         official: game.official,
         title: game.title,
+        description: game.description,
         pathname: game.pathname,
         version: game.version,
         control_type: game.control_type,

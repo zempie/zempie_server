@@ -59,6 +59,7 @@ export enum eAppLang {
 }
 
 export enum ePubType {
+    Open,
     GamePlay,     // game play
     PubGamePlay,    // published game play
     AD,     // AD

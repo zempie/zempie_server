@@ -8,7 +8,7 @@ class BattleModel extends Model {
         this.attributes = {
             uid:        { type: DataTypes.STRING(36), allowNull: false },
             user_uid:   { type: DataTypes.STRING(36), allowNull: false },
-            game_uid:   { type: DataTypes.STRING(36), allowNull: false },
+            game_id:    { type: DataTypes.INTEGER, allowNull: false },
             title:      { type: DataTypes.STRING(50) },
             activated:  { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: true },
             user_count: { type: DataTypes.MEDIUMINT, allowNull: false, defaultValue: 0 },
@@ -18,7 +18,7 @@ class BattleModel extends Model {
 
     async afterSync(): Promise<void> {
         this.model.belongsTo(dbs.User.model, { foreignKey: 'user_uid', targetKey: 'uid', as: 'host' });
-        this.model.belongsTo(dbs.Game.model, { foreignKey: 'game_uid', targetKey: 'uid' });
+        this.model.belongsTo(dbs.Game.model, { foreignKey: 'game_id', targetKey: 'id' });
     }
 
 

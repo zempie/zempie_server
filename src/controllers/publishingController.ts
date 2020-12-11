@@ -17,7 +17,7 @@ class PublishingController {
             publishing: _.map(publishing, (obj: any) => {
                 const { game } = obj;
                 return {
-                    game_uid: game.uid,
+                    game_id: game.id,
                     title: game.title,
                     count_open: obj.count_open,
                 }

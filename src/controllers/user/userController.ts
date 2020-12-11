@@ -202,7 +202,7 @@ class UserController {
             game_records: user.game_records? _.map(user.gameRecords, (gr: any) => {
                 const game = gr.game;
                 return {
-                    game_uid: game.uid,
+                    game_id: game.id,
                     title: game.title,
                     url_thumb: game.url_thumb,
                     score: gr.score,

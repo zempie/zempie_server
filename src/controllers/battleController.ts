@@ -30,13 +30,13 @@ class BattleController {
     }
 
 
-    hostBattle = async ({ game_uid, is_infinity }: any, user: DecodedIdToken) => {
+    hostBattle = async ({ game_id, is_infinity }: any, user: DecodedIdToken) => {
         const uid = uniqid();
 
         await dbs.Battle.create({
             uid,
             user_uid: user.uid,
-            game_uid,
+            game_id,
             // end_at: is_infinity ? null : new Date()
             end_at: Date.now() + (1000 * 60 * 10)
         });
@@ -83,7 +83,7 @@ class BattleController {
 
         const new_battle_key = signJWT({
             uid: battle_uid,
-            game_uid: battle.game_uid,
+            game_id: battle.game_id,
             user_uid,
             secret_id: record.id,
             best_score: decoded.best_score,
@@ -99,7 +99,7 @@ class BattleController {
 
     gameOver = async ({ battle_key, score }: IBattlePlayParams, user: DecodedIdToken) => {
         const decoded = verifyJWT(battle_key);
-        const { uid: battle_uid, game_uid, user_uid, secret_id, best_score } = decoded;
+        const { uid: battle_uid, game_id, user_uid, secret_id, best_score } = decoded;
 
         const new_record = score > best_score;
         if ( new_record ) {
@@ -128,7 +128,7 @@ class BattleController {
 
     updateUserName = async ({ battle_key, name }: IBattlePlayParams, user: DecodedIdToken) => {
         const decoded = verifyJWT(battle_key);
-        const { uid: battle_uid, game_uid, user_uid, secret_id, best_score } = decoded;
+        const { uid: battle_uid, game_id, user_uid, secret_id, best_score } = decoded;
 
         await dbs.BattleUser.updateUserName({ battle_uid, user_uid, name})
     }
