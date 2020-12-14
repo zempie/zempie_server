@@ -22,9 +22,9 @@ namespace KafkaService {
                     const client = new kafka.KafkaClient();
                     client.createTopics(topics, (error: any, result: CreateTopicResponse[]) => {
                         this.producer = new kafka.Producer(client, this.options);
-                        this.producer.on('ready', resolve);
+                        this.producer.on('ready', () => { resolve(this.producer)});
                         this.producer.on('error', this.onError);
-                        resolve(this.producer);
+                        // resolve(this.producer);
                     })
                 }
                 catch (e) {

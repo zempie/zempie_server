@@ -31,7 +31,7 @@ class UserGameModel extends Model {
             await this.model.sequelize.queryInterface.addColumn(this.model.tableName, 'game_id', {
                 type: DataTypes.INTEGER,
                 // allowNull: false,
-                unique: 'compositeIndex',
+                // unique: 'compositeIndex',
                 after: 'user_uid'
             })
         }
