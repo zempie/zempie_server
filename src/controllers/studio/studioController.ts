@@ -6,6 +6,7 @@ import FileManager from "../../services/fileManager";
 import { v4 as uuid } from 'uuid';
 import admin from 'firebase-admin';
 import DecodedIdToken = admin.auth.DecodedIdToken;
+import * as path from "path";
 
 const replaceExt = require('replace-ext');
 
@@ -52,6 +53,7 @@ interface IProject {
     picture2? : string,
     pathname : string,
     hashtags? : string,
+    size? : number,
 }
 
 interface IVersion {
@@ -61,7 +63,8 @@ interface IVersion {
     url? : string,
     number? : number,
     state? : string,
-    autoDeploy? : boolean
+    autoDeploy? : boolean,
+    size? : number,
 }
 
 class StudioController {
@@ -193,7 +196,7 @@ class StudioController {
             if( picFile ) {
                 const webp = await FileManager.convertToWebp(picFile, 80);
                 const data: any = await FileManager.s3upload3({
-                    key : replaceExt(picFile.name, '.webp'),
+                    key : replaceExt('thumb', '.webp'),
                     filePath : webp[0].destinationPath,
                     uid,
                     bucket: `/project/${project.id}/thumb`
@@ -203,7 +206,7 @@ class StudioController {
 
             if( picFile2 ) {
                 const data: any = await FileManager.s3upload3({
-                    key : picFile2.name,
+                    key : replaceExt( 'thumb2', path.extname(picFile2.name) ),
                     filePath : picFile2.path,
                     uid,
                     bucket: `/project/${project.id}/thumb`
@@ -218,6 +221,7 @@ class StudioController {
             versionParams.autoDeploy = params.autoDeploy || true;
             versionParams.version = params.version || '1.0.0';
             versionParams.startFile = params.startFile || '';
+            versionParams.size = params.size || 0;
 
 
             const versionFiles = files;
@@ -283,7 +287,7 @@ class StudioController {
             if ( file ) {
                 const webp = await FileManager.convertToWebp(file, 80);
                 const data: any = await FileManager.s3upload3({
-                    key : replaceExt(file.name, '.webp'),
+                    key : replaceExt('thumb', '.webp'),
                     filePath : webp[0].destinationPath,
                     uid,
                     bucket: `/project/${project.id}/thumb`
@@ -294,7 +298,8 @@ class StudioController {
 
             if ( file2 ) {
                 const data: any = await FileManager.s3upload3({
-                    key : file2.name,
+                    // key : file2.name,
+                    key : replaceExt( 'thumb2', path.extname(file2.name) ),
                     filePath : file2.path,
                     uid,
                     bucket: `/project/${project.id}/thumb`

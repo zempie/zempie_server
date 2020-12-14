@@ -15,6 +15,7 @@ class ProjectVersionModel extends Model {
             version:            { type: DataTypes.STRING(20), defaultValue: '0.0.1' },
             state:              { type: DataTypes.STRING(20), allowNull: false, defaultValue: 'none' },
             url:                { type: DataTypes.STRING, allowNull: true },
+            size:               { type: DataTypes.FLOAT, defaultValue: 0 },
             description:        { type: DataTypes.STRING, allowNull: true },
             reason:             { type: DataTypes.STRING, allowNull: true },
             autoDeploy:         { type: DataTypes.BOOLEAN, defaultValue: false },
@@ -23,9 +24,18 @@ class ProjectVersionModel extends Model {
 
     async afterSync(): Promise<void> {
         this.model.belongsTo(dbs.Project.model);
+
+        const desc = await this.model.sequelize.queryInterface.describeTable(this.model.tableName);
+        if ( !desc['size'] ) {
+            this.model.sequelize.queryInterface.addColumn(this.model.tableName, 'size', {
+                type: DataTypes.FLOAT,
+                defaultValue: 0,
+                after: 'url'
+            })
+        }
     }
 
-    async create( { project_id, version, url, description, number, state, autoDeploy } : any, transaction?: Transaction ) {
+    async create( { project_id, version, url, description, number, state, autoDeploy, size } : any, transaction?: Transaction ) {
 
         const value : any = {
             project_id,
@@ -44,6 +54,10 @@ class ProjectVersionModel extends Model {
 
         if( autoDeploy === false || autoDeploy ) {
             value.autoDeploy = autoDeploy
+        }
+
+        if( size ) {
+            value.size = size;
         }
 
         return super.create( value, transaction );
