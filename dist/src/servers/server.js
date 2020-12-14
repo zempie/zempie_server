@@ -86,7 +86,7 @@ class Server {
                     return;
                 }
                 this.started_at = new Date();
-                logger_1.logger.info(`Api Server [ver.${Pkg.version}] has started. (port: ${port})`.cyan.bold);
+                logger_1.logger.info(`[${process.env.NODE_ENV}] Api Server [ver.${Pkg.version}] has started. (port: ${port})`.cyan.bold);
             };
             if (!!this.app) {
                 this.app.listen(port, errorCallback);
