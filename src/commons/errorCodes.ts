@@ -10,6 +10,14 @@ export const ErrorCodes = {
         code: 1002,
         message: 'invalid session'
     },
+    MAX_FILE_SIZE_EXCEEDED: {
+        code: 1010,
+        message: '전체 파일 용량 초과'
+    },
+    MAX_FIELDS_SIZE_EXCEEDED: {
+        code: 1011,
+        message: '개별 파일 용량 초과'
+    },
 
 
     INVALID_PARAMS: {
@@ -132,7 +140,7 @@ export const ErrorCodes = {
 
     INVALID_PLAYLIST_UID: {
         code: 3101,
-        message: 'PlayList UID 오류'
+        message: 'Playlist UID 오류'
     },
 };
 

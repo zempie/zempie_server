@@ -13,6 +13,8 @@ import { ManagedUpload } from 'aws-sdk/lib/s3/managed_upload';
 import SendData = ManagedUpload.SendData;
 import { logger } from '../commons/logger';
 import { IS3Upload } from '../controllers/_interfaces';
+import { CreateError, ErrorCodes } from '../commons/errorCodes';
+import { responseError } from '../controllers/_convert';
 
 AWS.config.loadFromPath('config/aws/credentials.json');
 const s3 = new AWS.S3({ apiVersion: '2006-03-01' });
@@ -27,12 +29,35 @@ class FileManager {
             next();
         }
         catch(e) {
-            console.error(e);
+            responseError(res, e);
+        }
+    }
+    uploadImage2 = (maxFileSizeMB = 100, maxFieldsSizeMB = 20) => {
+        return async (req: Request, res: Response, next: NextFunction) => {
+            try {
+                const { err, params, files }: any = await this.formidable(req, maxFileSizeMB, maxFieldsSizeMB);
+                if ( err ) {
+                    if ( err.message.includes('maxFileSize') ) {
+                        responseError(res, CreateError(ErrorCodes.MAX_FILE_SIZE_EXCEEDED));
+                    }
+                    else if ( err.message.includes('maxFieldsSize') ) {
+                        responseError(res, CreateError(ErrorCodes.MAX_FIELDS_SIZE_EXCEEDED));
+                    }
+                }
+                else {
+                    req.params = params;
+                    req.files = files;
+                    next();
+                }
+            }
+            catch(e) {
+                responseError(res, e);
+            }
         }
     }
 
 
-    private formidable = (req: Request) => {
+    private formidable = (req: Request, maxFileSizeMB = 100, maxFieldsSizeMB = 20) => {
         const uploadDir = path.join(__dirname, '..', '..', 'upload');
         if( !fs.existsSync(uploadDir) ) {
             fs.mkdirSync(uploadDir);
@@ -43,8 +68,8 @@ class FileManager {
                 encoding: 'utf-8',
                 uploadDir,
                 keepExtensions: true,
-                maxFileSize: 1024 * 1024 * 100,
-                maxFieldsSize: 1024 * 1024 * 20,
+                maxFileSize: 1024 * 1024 * maxFileSizeMB,
+                maxFieldsSize: 1024 * 1024 * maxFieldsSizeMB,
                 multiples: false,
             } as any);
 
@@ -54,6 +79,7 @@ class FileManager {
                 // const webps = await this.convertToWebp(_.map(files), 80);
 
                 resolve({
+                    err,
                     params: fields,
                     files
                 });
