@@ -3,11 +3,11 @@ import Model from '../model';
 import { DataTypes, Op,Sequelize } from 'sequelize';
 
 
-class FilterStringModel extends Model {
+class BadWordModel extends Model {
     private filters: any = [];
 
     protected initialize(): void {
-        this.name = 'filterString';
+        this.name = 'badWords';
         this.attributes = {
             activated:  { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: true },
             word:       { type: DataTypes.STRING(50), allowNull: false },
@@ -27,4 +27,4 @@ class FilterStringModel extends Model {
 }
 
 
-export default (rdb: Sequelize) => new FilterStringModel(rdb)
+export default (rdb: Sequelize) => new BadWordModel(rdb)

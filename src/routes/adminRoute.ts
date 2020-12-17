@@ -52,6 +52,13 @@ export default (router: Router) => {
     router.post(`${apiVer}/admin/support/notice/mod`,   validateAdminIdToken,   adminTracking,  convert(AdminSupportController.updateNotice));
     router.post(`${apiVer}/admin/support/notice/del`,   validateAdminIdToken,   adminTracking,  convert(AdminSupportController.deleteNotice));
 
+    /**
+     * 비속어
+     */
+    router.get(`${apiVer}/admin/filter/bad-words`,      validateAdminIdToken,   convert(AdminUserController.getBadWords));
+    router.post(`${apiVer}/admin/filter/bad-word/c`,    validateAdminIdToken,   convert(AdminUserController.addBadWord));
+    router.post(`${apiVer}/admin/filter/bad-word/u`,    validateAdminIdToken,   convert(AdminUserController.setBadWord));
+    router.post(`${apiVer}/admin/filter/bad-word/d`,    validateAdminIdToken,   convert(AdminUserController.delBadWord));
 
     /**
      * 게임

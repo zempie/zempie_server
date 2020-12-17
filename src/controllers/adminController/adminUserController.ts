@@ -41,6 +41,34 @@ class AdminUserController {
         user.save();
     }
 
+
+
+    async getBadWords ({ limit = 50, offset = 0 }) {
+        const records = await dbs.BadWord.findAll({}, {
+            limit,
+            offset,
+        });
+        return {
+            bad_words: _.map(records, (r: any) => {
+                return {
+                    activated: r.activated,
+                    word: r.word,
+                }
+            })
+        }
+    }
+
+    async addBadWord ({ word }: { word: string }, admin: IAdmin) {
+        await dbs.BadWord.create({ word });
+    }
+
+    async delBadWord ({ id }: { id: number }, admin: IAdmin) {
+        await dbs.BadWord.destroy({ id });
+    }
+
+    async setBadWord ({ id, activated }: { id: number, activated: boolean }, admin: IAdmin) {
+        await dbs.BadWord.update({ id }, { activated });
+    }
 }
 
 

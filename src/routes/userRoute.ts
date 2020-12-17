@@ -26,7 +26,7 @@ export default (router: Router) => {
     router.post(`${apiVer}/user/update/e-link`,     validateFirebaseIdToken,    convert(UserController.updateExternalLink));
     router.post(`${apiVer}/user/delete/e-link`,     validateFirebaseIdToken,    convert(UserController.deleteExternalLink));
 
-    router.get(`${apiVer}/user/filter/name`,        validateFirebaseIdToken,    convert(UserController.filterName));
+    router.get(`${apiVer}/user/filter/bad-word`,    validateFirebaseIdToken,    convert(UserController.filterBadWord));
 
     router.get(`${apiVer}/user/info`,               validateFirebaseIdToken,    convert(UserController.getInfo));
     router.get(`${apiVer}/channel/:channel_id`,     validateFirebaseIdToken,    convert(UserController.getTargetInfoByChannelId));

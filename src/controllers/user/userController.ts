@@ -55,7 +55,7 @@ class UserController {
         }
 
         return dbs.User.getTransaction(async (transaction: Transaction) => {
-            const { isOk } = await this.filterName({w: name || _user.name });
+            const { isOk } = await this.filterBadWord({ w: name || _user.name });
             if ( !isOk ) {
                 throw CreateError(ErrorCodes.FORBIDDEN_STRING);
             }
@@ -270,7 +270,7 @@ class UserController {
 
             // 이름 변경
             if ( params.name ) {
-                const { isOk } = await this.filterName({w: params.name });
+                const { isOk } = await this.filterBadWord({w: params.name });
                 if ( !isOk ) {
                     throw CreateError(ErrorCodes.FORBIDDEN_STRING);
                 }
@@ -411,8 +411,8 @@ class UserController {
 
 
 
-    filterName = async ({ w }: { w: string }) => {
-        const nope = dbs.FilterString.isOk(w);
+    filterBadWord = async ({ w }: { w: string }) => {
+        const nope = dbs.BadWords.isOk(w);
         return {
             isOk: !nope,
         }
