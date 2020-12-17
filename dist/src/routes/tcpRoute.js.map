@@ -1,1 +1,0 @@
-{"version":3,"file":"tcpRoute.js","sourceRoot":"","sources":["../../../src/routes/tcpRoute.ts"],"names":[],"mappings":";;AACA,oEAA6D;AAG7D,kBAAe,CAAC,MAAkB,EAAE,EAAE;IAClC,MAAM,CAAC,EAAE,CAAC,gBAAgB,EAAU,uBAAa,CAAC,SAAS,CAAC,CAAC;IAC7D,MAAM,CAAC,EAAE,CAAC,qBAAqB,EAAK,uBAAa,CAAC,SAAS,CAAC,CAAC;AACjE,CAAC,CAAA"}
