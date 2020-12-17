@@ -405,6 +405,14 @@ class UserController {
 
 
 
+    filterName = async ({ w }: { w: string }) => {
+        const nope = dbs.FilterString.isOk(w);
+        return {
+            isOk: !nope,
+        }
+    }
+
+
 
     searchUser = async ({ search_name, limit = 100, offset = 0 }: any, {uid}: DecodedIdToken) => {
         const users = await dbs.User.search({ search_name, limit, offset });
