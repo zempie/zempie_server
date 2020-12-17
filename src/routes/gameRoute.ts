@@ -1,7 +1,8 @@
 import { Router } from 'express';
 import convert from '../controllers/_convert';
-import { validateFirebaseIdToken } from './_common';
-import GameController from '../controllers/gameController';
+import { isAuthenticated, validateFirebaseIdToken } from './_common';
+import GameController from '../controllers/game/gameController';
+import GameContentController from '../controllers/game/gameContentController';
 import BattleController from '../controllers/battleController';
 import AdController from '../controllers/adController';
 import RankingController from '../controllers/rankingController';
@@ -17,6 +18,8 @@ export default (router: Router) => {
     router.get(`${apiVer}/games/ranking/g`,     validateFirebaseIdToken,    convert(RankingController.getGlobalRanking));
     router.get(`${apiVer}/games/ranking/f`,     validateFirebaseIdToken,    convert(RankingController.getFollowingRanking));
 
+
+    router.post(`${apiVer}/game/ch-report`,     validateFirebaseIdToken,    isAuthenticated,    convert(GameContentController.createOrUpdateChallengingReport));
 
 
     // for testing

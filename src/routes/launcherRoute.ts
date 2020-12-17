@@ -2,7 +2,7 @@ import { NextFunction, Request, Response, Router } from 'express';
 import RpcController from '../controllers/rpcController';
 import LauncherController from '../controllers/launcherController';
 import convert from '../controllers/_convert';
-import GameController from '../controllers/gameController';
+import GameController from '../controllers/game/gameController';
 import BattleController from '../controllers/battleController';
 import RankingController from '../controllers/rankingController';
 import { isAuthenticated, validateFirebaseIdToken } from './_common';

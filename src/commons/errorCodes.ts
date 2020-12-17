@@ -24,6 +24,11 @@ export const ErrorCodes = {
         code: 1030,
         message: '파라미터 오류'
     },
+    FORBIDDEN_STRING: {
+        code: 1040,
+        message: '사용할 수 없는 단어'
+    },
+
     INVALID_TOKEN: {
         code: 1100,
         message: '잘 못 된 토큰입니다'

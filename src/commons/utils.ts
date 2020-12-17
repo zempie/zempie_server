@@ -5,6 +5,7 @@ import * as jwt from 'jsonwebtoken';
 import { IZempieClaims } from '../controllers/_interfaces';
 import admin from 'firebase-admin';
 import DecodedIdToken = admin.auth.DecodedIdToken;
+import { CreateError, ErrorCodes } from './errorCodes';
 const path = require('path');
 
 
@@ -164,4 +165,24 @@ export function getContentType(file : any) {
     else {
         return undefined
     }
+}
+
+
+/**
+ * checker
+ */
+// 규칙 확인
+export function isOK_channelID (channel_id: string) {
+    if ( channel_id.search(/\s/) !== -1 ) {
+        return false
+    }
+    const regExp = /[\{\}\[\]\/?.,;:|\)*~`!^\+<>@\#$%&\\\=\(\'\"]/gi;
+    if ( regExp.test(channel_id) ) {
+        return false
+    }
+    if ( channel_id.length > 20 ) {
+        return false
+    }
+
+    return true
 }

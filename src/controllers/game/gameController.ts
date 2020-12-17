@@ -1,13 +1,13 @@
 import * as _ from 'lodash';
 import admin from 'firebase-admin';
 import DecodedIdToken = admin.auth.DecodedIdToken;
-import { IGameListParams, IGameParams, IGamePlayParams, IRoute } from './_interfaces';
+import { IGameListParams, IGameParams, IGamePlayParams, IRoute } from '../_interfaces';
 import { Transaction } from 'sequelize';
-import { caches, dbs } from '../commons/globals';
-import { CreateError, ErrorCodes } from '../commons/errorCodes';
-import MQ from '../services/messageQueueService';
-import Opt from '../../config/opt';
-import { getGameData } from './_common';
+import { caches, dbs } from '../../commons/globals';
+import { CreateError, ErrorCodes } from '../../commons/errorCodes';
+import MQ from '../../services/messageQueueService';
+import Opt from '../../../config/opt';
+import { getGameData } from '../_common';
 const { Url } = Opt;
 
 

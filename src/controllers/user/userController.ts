@@ -12,6 +12,7 @@ const replaceExt = require('replace-ext');
 import { CreateError, ErrorCodes } from '../../commons/errorCodes';
 import Opt from '../../../config/opt';
 import { getGameData } from '../_common';
+import { isOK_channelID } from '../../commons/utils';
 const { Url, CORS } = Opt;
 
 
@@ -54,6 +55,11 @@ class UserController {
         }
 
         return dbs.User.getTransaction(async (transaction: Transaction) => {
+            const { isOk } = await this.filterName({w: name || _user.name });
+            if ( !isOk ) {
+                throw CreateError(ErrorCodes.FORBIDDEN_STRING);
+            }
+
             const user = await dbs.User.create({
                 uid: _user.uid,
                 name: name || _user.name,
@@ -225,14 +231,7 @@ class UserController {
 
     async verifyChannelId ({ channel_id }: { channel_id: string }, user: DecodedIdToken) {
         // 규칙 확인
-        if ( channel_id.search(/\s/) !== -1 ) {
-            throw CreateError(ErrorCodes.INVALID_CHANNEL_ID);
-        }
-        const regExp = /[\{\}\[\]\/?.,;:|\)*~`!^\+<>@\#$%&\\\=\(\'\"]/gi;
-        if ( regExp.test(channel_id) ) {
-            throw CreateError(ErrorCodes.INVALID_CHANNEL_ID);
-        }
-        if ( channel_id.length > 20 ) {
+        if ( !isOK_channelID(channel_id) ) {
             throw CreateError(ErrorCodes.INVALID_CHANNEL_ID);
         }
 
@@ -257,6 +256,10 @@ class UserController {
             const updateRequest: any = {};
 
             if ( params.channel_id ) {
+                // 규칙 확인
+                if ( !isOK_channelID(params.channel_id) ) {
+                    throw CreateError(ErrorCodes.INVALID_CHANNEL_ID);
+                }
                 user.channel_id = urlencode(params.channel_id);
             }
 
@@ -267,7 +270,10 @@ class UserController {
 
             // 이름 변경
             if ( params.name ) {
-                // 이름 검사 해야함 - 불량 단어
+                const { isOk } = await this.filterName({w: params.name });
+                if ( !isOk ) {
+                    throw CreateError(ErrorCodes.FORBIDDEN_STRING);
+                }
                 user.name = params.name;
                 updateRequest.displayName = params.name;
             }
