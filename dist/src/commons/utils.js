@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getContentType = exports.afterHours = exports.Yesterday = exports.Today = exports.expiresIn = exports.getFiles = exports.updateZempieClaims = exports.verifyJWT = exports.signJWT = exports.verifyPassword = exports.makePassword = exports.parseBoolean = exports.capitalize = void 0;
+exports.getContentType = exports.afterHours = exports.Yesterday = exports.Today = exports.expiresIn = exports.getFiles = exports.updateZempieClaims = exports.verifyJWT = exports.signJWT = exports.verifyPassword = exports.makePassword = exports.IsJsonString = exports.parseBoolean = exports.capitalize = void 0;
 const fs = require("fs");
 const crypto = require("crypto");
 const opt_1 = require("../../config/opt");
@@ -36,6 +36,16 @@ function parseBoolean(str) {
     return false;
 }
 exports.parseBoolean = parseBoolean;
+function IsJsonString(str) {
+    try {
+        const json = JSON.parse(str);
+        return (typeof json === 'object');
+    }
+    catch (e) {
+        return false;
+    }
+}
+exports.IsJsonString = IsJsonString;
 /**
  * Password - pbkdf2
  */

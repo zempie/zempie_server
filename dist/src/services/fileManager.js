@@ -18,6 +18,8 @@ const formidable_1 = require("formidable");
 const opt_1 = require("../../config/opt");
 const utils_1 = require("../commons/utils");
 const logger_1 = require("../commons/logger");
+const errorCodes_1 = require("../commons/errorCodes");
+const _convert_1 = require("../controllers/_convert");
 AWS.config.loadFromPath('config/aws/credentials.json');
 const s3 = new AWS.S3({ apiVersion: '2006-03-01' });
 class FileManager {
@@ -31,10 +33,33 @@ class FileManager {
                 next();
             }
             catch (e) {
-                console.error(e);
+                _convert_1.responseError(res, e);
             }
         });
-        this.formidable = (req) => {
+        this.uploadImage2 = (maxFileSizeMB = 100, maxFieldsSizeMB = 20) => {
+            return (req, res, next) => __awaiter(this, void 0, void 0, function* () {
+                try {
+                    const { err, params, files } = yield this.formidable(req, maxFileSizeMB, maxFieldsSizeMB);
+                    if (err) {
+                        if (err.message.includes('maxFileSize')) {
+                            _convert_1.responseError(res, errorCodes_1.CreateError(errorCodes_1.ErrorCodes.MAX_FILE_SIZE_EXCEEDED));
+                        }
+                        else if (err.message.includes('maxFieldsSize')) {
+                            _convert_1.responseError(res, errorCodes_1.CreateError(errorCodes_1.ErrorCodes.MAX_FIELDS_SIZE_EXCEEDED));
+                        }
+                    }
+                    else {
+                        req.params = params;
+                        req.files = files;
+                        next();
+                    }
+                }
+                catch (e) {
+                    _convert_1.responseError(res, e);
+                }
+            });
+        };
+        this.formidable = (req, maxFileSizeMB = 100, maxFieldsSizeMB = 20) => {
             const uploadDir = path.join(__dirname, '..', '..', 'upload');
             if (!fs.existsSync(uploadDir)) {
                 fs.mkdirSync(uploadDir);
@@ -44,14 +69,15 @@ class FileManager {
                     encoding: 'utf-8',
                     uploadDir,
                     keepExtensions: true,
-                    maxFileSize: 1024 * 1024 * 100,
-                    maxFieldsSize: 1024 * 1024 * 20,
+                    maxFileSize: 1024 * 1024 * maxFileSizeMB,
+                    maxFieldsSize: 1024 * 1024 * maxFieldsSizeMB,
                     multiples: false,
                 });
                 form.parse(req, (err, fields, files) => __awaiter(this, void 0, void 0, function* () {
                     logger_1.logger.debug('fields:', fields);
                     // const webps = await this.convertToWebp(_.map(files), 80);
                     resolve({
+                        err,
                         params: fields,
                         files
                     });

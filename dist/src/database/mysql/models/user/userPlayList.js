@@ -12,14 +12,16 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const sequelize_1 = require("sequelize");
 const model_1 = require("../../model");
 const globals_1 = require("../../../../commons/globals");
-class UserPlayListModel extends model_1.default {
+class UserPlaylistModel extends model_1.default {
     initialize() {
-        this.name = 'userPlayList';
+        this.name = 'userPlaylist';
         this.attributes = {
             uid: { type: sequelize_1.DataTypes.STRING(36), allowNull: false },
             user_uid: { type: sequelize_1.DataTypes.STRING(36), allowNull: false },
+            limit: { type: sequelize_1.DataTypes.SMALLINT, allowNull: false, defaultValue: 5 },
             title: { type: sequelize_1.DataTypes.STRING(100), allowNull: false },
             url_bg: { type: sequelize_1.DataTypes.STRING(250) },
+            indexes: { type: sequelize_1.DataTypes.JSON },
             count_visited: { type: sequelize_1.DataTypes.INTEGER, allowNull: false, defaultValue: 0 },
         };
     }
@@ -29,18 +31,18 @@ class UserPlayListModel extends model_1.default {
         });
         return __awaiter(this, void 0, void 0, function* () {
             yield _super.afterSync.call(this);
-            this.model.belongsTo(globals_1.dbs.User.model);
-            this.model.hasMany(globals_1.dbs.UserPlayListGame.model, { as: 'games' });
+            this.model.belongsTo(globals_1.dbs.User.model, { foreignKey: 'user_uid', targetKey: 'uid' });
+            this.model.hasMany(globals_1.dbs.UserPlaylistGame.model, { as: 'games' });
         });
     }
-    getPlayList({ uid }) {
+    getPlaylist({ uid }) {
         return __awaiter(this, void 0, void 0, function* () {
             const record = yield this.model.findOne({
                 where: { uid },
                 include: [{
                         model: globals_1.dbs.User.model,
                     }, {
-                        model: globals_1.dbs.UserPlayListGame.model,
+                        model: globals_1.dbs.UserPlaylistGame.model,
                         as: 'games',
                         include: [{
                                 model: globals_1.dbs.Game.model,
@@ -54,5 +56,5 @@ class UserPlayListModel extends model_1.default {
         });
     }
 }
-exports.default = (rdb) => new UserPlayListModel(rdb);
+exports.default = (rdb) => new UserPlaylistModel(rdb);
 //# sourceMappingURL=userPlayList.js.map

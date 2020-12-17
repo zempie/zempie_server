@@ -3,12 +3,12 @@ import Model from '../../model';
 import { dbs } from '../../../../commons/globals';
 
 
-class UserPlayListGameModel extends Model {
+class UserPlaylistGameModel extends Model {
     protected initialize(): void {
-        this.name = 'userPlayListGame';
+        this.name = 'userPlaylistGame';
         this.attributes = {
-            userPlayList_id:    { type: DataTypes.INTEGER, allowNull: false },
-            game_id:            { type: DataTypes.INTEGER, allowNull: false },
+            user_playlist_id:   { type: DataTypes.INTEGER, allowNull: false, unique: 'compositeIndex' },
+            game_id:            { type: DataTypes.INTEGER, allowNull: false, unique: 'compositeIndex' },
         }
     }
 
@@ -22,4 +22,4 @@ class UserPlayListGameModel extends Model {
 }
 
 
-export default (rdb: Sequelize) => new UserPlayListGameModel(rdb)
+export default (rdb: Sequelize) => new UserPlaylistGameModel(rdb)

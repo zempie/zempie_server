@@ -24,6 +24,7 @@ class ProjectVersionModel extends model_1.default {
             version: { type: sequelize_1.DataTypes.STRING(20), defaultValue: '0.0.1' },
             state: { type: sequelize_1.DataTypes.STRING(20), allowNull: false, defaultValue: 'none' },
             url: { type: sequelize_1.DataTypes.STRING, allowNull: true },
+            size: { type: sequelize_1.DataTypes.FLOAT, defaultValue: 0 },
             description: { type: sequelize_1.DataTypes.STRING, allowNull: true },
             reason: { type: sequelize_1.DataTypes.STRING, allowNull: true },
             autoDeploy: { type: sequelize_1.DataTypes.BOOLEAN, defaultValue: false },
@@ -32,9 +33,17 @@ class ProjectVersionModel extends model_1.default {
     afterSync() {
         return __awaiter(this, void 0, void 0, function* () {
             this.model.belongsTo(globals_1.dbs.Project.model);
+            const desc = yield this.model.sequelize.queryInterface.describeTable(this.model.tableName);
+            if (!desc['size']) {
+                this.model.sequelize.queryInterface.addColumn(this.model.tableName, 'size', {
+                    type: sequelize_1.DataTypes.FLOAT,
+                    defaultValue: 0,
+                    after: 'url'
+                });
+            }
         });
     }
-    create({ project_id, version, url, description, number, state, autoDeploy }, transaction) {
+    create({ project_id, version, url, description, number, state, autoDeploy, size }, transaction) {
         const _super = Object.create(null, {
             create: { get: () => super.create }
         });
@@ -53,6 +62,9 @@ class ProjectVersionModel extends model_1.default {
             }
             if (autoDeploy === false || autoDeploy) {
                 value.autoDeploy = autoDeploy;
+            }
+            if (size) {
+                value.size = size;
             }
             return _super.create.call(this, value, transaction);
         });

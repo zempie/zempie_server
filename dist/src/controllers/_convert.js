@@ -9,15 +9,19 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.responseError = void 0;
 const _ = require("lodash");
+const responseError = (res, error) => {
+    res.status(400).send({
+        error: error.message
+    });
+};
+exports.responseError = responseError;
 function convert(func, middleware = false) {
     function response(res, result) {
         res.header('Last-Modified', (new Date()).toUTCString());
         if (result instanceof Error) {
-            return res.status(400).send({
-                // data: result,
-                error: result.message,
-            });
+            return exports.responseError(res, result);
         }
         return res.status(200).send({
             result: result || {}

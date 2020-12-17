@@ -142,6 +142,10 @@ export const ErrorCodes = {
         code: 3101,
         message: 'Playlist UID 오류'
     },
+    PLAYLIST_DUPLICATED_GAME: {
+        code: 3102,
+        message: '플레이 리스트 게임 중복'
+    },
 };
 
 

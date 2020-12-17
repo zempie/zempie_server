@@ -37,6 +37,14 @@ export function parseBoolean(str?: string) {
     else if ( str === 'true' ) return true;
     return false
 }
+export function IsJsonString(str: string) {
+    try {
+        const json = JSON.parse(str);
+        return (typeof json === 'object');
+    } catch (e) {
+        return false;
+    }
+}
 
 /**
  * Password - pbkdf2

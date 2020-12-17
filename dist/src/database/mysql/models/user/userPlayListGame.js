@@ -12,12 +12,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const sequelize_1 = require("sequelize");
 const model_1 = require("../../model");
 const globals_1 = require("../../../../commons/globals");
-class UserPlayListGameModel extends model_1.default {
+class UserPlaylistGameModel extends model_1.default {
     initialize() {
-        this.name = 'userPlayListGame';
+        this.name = 'userPlaylistGame';
         this.attributes = {
-            userPlayList_id: { type: sequelize_1.DataTypes.INTEGER, allowNull: false },
-            game_id: { type: sequelize_1.DataTypes.INTEGER, allowNull: false },
+            user_playlist_id: { type: sequelize_1.DataTypes.INTEGER, allowNull: false, unique: 'compositeIndex' },
+            game_id: { type: sequelize_1.DataTypes.INTEGER, allowNull: false, unique: 'compositeIndex' },
         };
     }
     afterSync() {
@@ -30,5 +30,5 @@ class UserPlayListGameModel extends model_1.default {
         });
     }
 }
-exports.default = (rdb) => new UserPlayListGameModel(rdb);
+exports.default = (rdb) => new UserPlaylistGameModel(rdb);
 //# sourceMappingURL=userPlayListGame.js.map

@@ -13,6 +13,7 @@ const globals_1 = require("../../commons/globals");
 const errorCodes_1 = require("../../commons/errorCodes");
 const fileManager_1 = require("../../services/fileManager");
 const uuid_1 = require("uuid");
+const path = require("path");
 const replaceExt = require('replace-ext');
 const ERROR_STUDIO = {
     NOT_FIND_USER: {
@@ -146,29 +147,38 @@ class StudioController {
                 files['project_picture'] = undefined;
                 const picFile2 = files && files['project_picture2'] || undefined;
                 files['project_picture2'] = undefined;
-                if (picFile) {
-                    const webp = yield fileManager_1.default.convertToWebp(picFile, 80);
-                    const data = yield fileManager_1.default.s3upload(replaceExt(picFile.name, '.webp'), webp[0].destinationPath, uid);
-                    params.picture = data.Location;
-                }
-                if (picFile2) {
-                    // const webp = await FileManager.convertToWebp(picFile, 80);
-                    // file.name, file.path, uid, versionPath
-                    const data = yield fileManager_1.default.s3upload(picFile2.name, picFile2.path, uid);
-                    params.picture2 = data.Location;
-                }
                 params.hashtags = params.hashtags || '';
                 const project = yield globals_1.dbs.Project.create(params, transaction);
+                if (picFile) {
+                    const webp = yield fileManager_1.default.convertToWebp(picFile, 80);
+                    const data = yield fileManager_1.default.s3upload3({
+                        key: replaceExt('thumb', '.webp'),
+                        filePath: webp[0].destinationPath,
+                        uid,
+                        bucket: `/project/${project.id}/thumb`
+                    });
+                    project.picture = data.Location;
+                }
+                if (picFile2) {
+                    const data = yield fileManager_1.default.s3upload3({
+                        key: replaceExt('thumb2', path.extname(picFile2.name)),
+                        filePath: picFile2.path,
+                        uid,
+                        bucket: `/project/${project.id}/thumb`
+                    });
+                    project.picture2 = data.Location;
+                }
                 const versionParams = {};
                 versionParams.project_id = project.id;
                 versionParams.number = 1;
                 versionParams.autoDeploy = params.autoDeploy || true;
                 versionParams.version = params.version || '1.0.0';
                 versionParams.startFile = params.startFile || '';
+                versionParams.size = params.size || 0;
                 const versionFiles = files;
                 if (versionFiles && versionParams.startFile) {
-                    const versionPath = `${project.id}/${uuid_1.v4()}`;
-                    versionParams.url = yield uploadVersionFile(versionFiles, uid, versionPath, versionParams.startFile);
+                    const bucket = `/project/${project.id}/${uuid_1.v4()}`;
+                    versionParams.url = yield uploadVersionFile(versionFiles, uid, bucket, versionParams.startFile);
                     versionParams.state = 'process';
                 }
                 const version = yield globals_1.dbs.ProjectVersion.create(versionParams, transaction);
@@ -219,12 +229,23 @@ class StudioController {
                 });
                 if (file) {
                     const webp = yield fileManager_1.default.convertToWebp(file, 80);
-                    const data = yield fileManager_1.default.s3upload(replaceExt(file.name, '.webp'), webp[0].destinationPath, uid);
+                    const data = yield fileManager_1.default.s3upload3({
+                        key: replaceExt('thumb', '.webp'),
+                        filePath: webp[0].destinationPath,
+                        uid,
+                        bucket: `/project/${project.id}/thumb`
+                    });
                     params.picture = data.Location;
                     game.url_thumb = params.picture;
                 }
                 if (file2) {
-                    const data = yield fileManager_1.default.s3upload(file2.name, file2.path, uid);
+                    const data = yield fileManager_1.default.s3upload3({
+                        // key : file2.name,
+                        key: replaceExt('thumb2', path.extname(file2.name)),
+                        filePath: file2.path,
+                        uid,
+                        bucket: `/project/${project.id}/thumb`
+                    });
                     params.picture2 = data.Location;
                     game.url_thumb_gif = params.picture2;
                 }
@@ -261,7 +282,6 @@ class StudioController {
         });
         this.createVersion = (params, { uid }, { req: { files } }) => __awaiter(this, void 0, void 0, function* () {
             const project_id = params.project_id;
-            const versionPath = `${project_id}/${uuid_1.v4()}`;
             // const data: any = await FileManager.s3upload(replaceExt(file.name, '.webp'), webp[0].destinationPath, uid);
             return globals_1.dbs.ProjectVersion.getTransaction((transaction) => __awaiter(this, void 0, void 0, function* () {
                 const project = yield globals_1.dbs.Project.findOne({ id: project_id }, transaction);
@@ -279,7 +299,8 @@ class StudioController {
                     const lastVersion = result.rows[result.rows.length - 1];
                     maxNum = lastVersion.number;
                 }
-                const url = yield uploadVersionFile(files, uid, versionPath, params.startFile);
+                const bucket = `/project/${project_id}/${uuid_1.v4()}`;
+                const url = yield uploadVersionFile(files, uid, bucket, params.startFile);
                 params.number = maxNum + 1;
                 params.state = 'process';
                 params.url = url;
@@ -344,13 +365,18 @@ class Version {
         return `${this.major}.${this.minor}.${this.patch}`;
     }
 }
-function uploadVersionFile(files, uid, versionPath, startFile) {
+function uploadVersionFile(files, uid, bucket, startFile) {
     return __awaiter(this, void 0, void 0, function* () {
         let url = '';
         for (let key in files) {
             const file = files[key];
             if (file) {
-                const data = yield fileManager_1.default.s3upload2(file.name, file.path, uid, versionPath);
+                const data = yield fileManager_1.default.s3upload3({
+                    key: file.name,
+                    filePath: file.path,
+                    uid,
+                    bucket,
+                });
                 if (file.name === startFile) {
                     url = data.Location;
                 }

@@ -16,28 +16,59 @@ const errorCodes_1 = require("../../commons/errorCodes");
 const _common_1 = require("../_common");
 const fileManager_1 = require("../../services/fileManager");
 const replaceExt = require('replace-ext');
-class UserPlayListController {
+class UserPlaylistController {
     constructor() {
-        this.getPlayList = ({ uid }, _user) => __awaiter(this, void 0, void 0, function* () {
-            const playlist = yield globals_1.dbs.UserPlayList.getPlayList({ uid });
-            if (!playlist) {
-                throw errorCodes_1.CreateError(errorCodes_1.ErrorCodes.INVALID_PLAYLIST_UID);
-            }
-            const { user } = playlist;
+        this.getPlaylists = (params, user) => __awaiter(this, void 0, void 0, function* () {
+            const records = yield globals_1.dbs.UserPlaylist.findAll({ user_uid: user.uid }, {
+                include: [{
+                        model: globals_1.dbs.User.model,
+                    }]
+            });
             return {
-                uid: playlist.uid,
-                title: playlist.title,
-                url_bg: playlist.url_bg,
-                user: {
-                    uid: user.uid,
-                    name: user.name,
-                    picture: user.picture,
-                },
-                games: _.map(playlist.games, (obj) => {
-                    const { game } = obj;
-                    return _common_1.getGameData(game);
-                }),
+                playlists: _.map(records, (record) => {
+                    const { user } = record;
+                    return {
+                        uid: record.uid,
+                        title: record.title,
+                        url_bg: record.url_bg,
+                        user: {
+                            uid: user.uid,
+                            name: user.name,
+                            picture: user.picture,
+                            channel_id: user.channel_id,
+                        }
+                    };
+                })
             };
+        });
+        this.getPlaylist = ({ uid }, _user) => __awaiter(this, void 0, void 0, function* () {
+            let ret = yield globals_1.caches.playlist.getOne(uid);
+            if (!ret) {
+                const playlist = yield globals_1.dbs.UserPlaylist.getPlaylist({ uid });
+                if (!playlist) {
+                    throw errorCodes_1.CreateError(errorCodes_1.ErrorCodes.INVALID_PLAYLIST_UID);
+                }
+                const indexes = JSON.parse(playlist.indexes);
+                const indexedGames = [];
+                _.forEach(indexes, (i) => {
+                    const obj = _.find(playlist.games, (g) => g.game_id === i);
+                    indexedGames.push(_common_1.getGameData(obj.game));
+                });
+                const { user } = playlist;
+                ret = {
+                    uid: playlist.uid,
+                    title: playlist.title,
+                    url_bg: playlist.url_bg,
+                    user: {
+                        uid: user.uid,
+                        name: user.name,
+                        picture: user.picture,
+                    },
+                    games: indexedGames,
+                };
+                globals_1.caches.playlist.setOne(uid, ret);
+            }
+            return ret;
         });
         this.createPlaylist = ({ title }, user, { req: { files: { file } } }) => __awaiter(this, void 0, void 0, function* () {
             let data;
@@ -51,24 +82,25 @@ class UserPlayListController {
                     bucket: '/playlist',
                 });
             }
-            const playlist = yield globals_1.dbs.UserPlayList.create({
+            const playlist = yield globals_1.dbs.UserPlaylist.create({
                 uid: playlist_uid,
                 user_uid: user.uid,
                 title,
-                url_bg: data.Location,
+                url_bg: data ? data.Location : null,
+                indexes: [],
             });
             return {
                 playlist: {
                     uid: playlist.uid,
                     title: playlist.title,
-                    url_bg: data ? data.Location : null,
+                    url_bg: playlist.url_bg,
                     updated_at: playlist.updated_at,
                 }
             };
         });
         this.updatePlaylist = ({ uid, title }, user, { req: { files: { file } } }) => __awaiter(this, void 0, void 0, function* () {
-            yield globals_1.dbs.UserPlayList.getTransaction((transaction) => __awaiter(this, void 0, void 0, function* () {
-                const playlist = yield globals_1.dbs.UserPlayList.findOne({ uid, user_uid: user.uid }, transaction);
+            yield globals_1.dbs.UserPlaylist.getTransaction((transaction) => __awaiter(this, void 0, void 0, function* () {
+                const playlist = yield globals_1.dbs.UserPlaylist.findOne({ uid, user_uid: user.uid }, transaction);
                 if (!playlist) {
                     throw errorCodes_1.CreateError(errorCodes_1.ErrorCodes.INVALID_PLAYLIST_UID);
                 }
@@ -84,7 +116,8 @@ class UserPlayListController {
                 }
                 playlist.title = title || playlist.title;
                 playlist.url_bg = data ? data.Location : playlist.url_bg;
-                playlist.save({ transaction });
+                yield playlist.save({ transaction });
+                globals_1.caches.playlist.delOne(uid);
                 return {
                     playlist: {
                         uid,
@@ -96,36 +129,73 @@ class UserPlayListController {
             }));
         });
         this.deletePlaylist = ({ uid }, user) => __awaiter(this, void 0, void 0, function* () {
-            yield globals_1.dbs.UserPlayList.destroy({ uid, user_uid: user.uid });
+            globals_1.caches.playlist.delOne(uid);
+            yield globals_1.dbs.UserPlaylist.destroy({ uid, user_uid: user.uid });
         });
         /**
          * game in a playlist
          */
         this.addGame = ({ uid, game_id }, user) => __awaiter(this, void 0, void 0, function* () {
-            const playlist = yield globals_1.dbs.UserPlayList.findOne({ uid, user_uid: user.uid });
-            if (!playlist) {
-                throw errorCodes_1.CreateError(errorCodes_1.ErrorCodes.INVALID_PLAYLIST_UID);
-            }
-            const game = yield globals_1.dbs.Game.findOne({ game_id });
-            if (!game) {
-                throw errorCodes_1.CreateError(errorCodes_1.ErrorCodes.INVALID_GAME_ID);
-            }
-            const count = yield globals_1.dbs.UserPlayListGame.count({ userPlayList_id: playlist.id });
-            yield globals_1.dbs.UserPlayListGame.create({
-                userPlayList_id: playlist.id,
-                num: count + 1,
-                game_id: game.id,
-            });
+            game_id = _.toNumber(game_id);
+            yield globals_1.dbs.UserPlaylist.getTransaction((transaction) => __awaiter(this, void 0, void 0, function* () {
+                const playlist = yield globals_1.dbs.UserPlaylist.findOne({ uid, user_uid: user.uid }, transaction);
+                if (!playlist) {
+                    throw errorCodes_1.CreateError(errorCodes_1.ErrorCodes.INVALID_PLAYLIST_UID);
+                }
+                const game = yield globals_1.dbs.Game.findOne({ id: game_id });
+                if (!game) {
+                    throw errorCodes_1.CreateError(errorCodes_1.ErrorCodes.INVALID_GAME_ID);
+                }
+                const arr = JSON.parse(playlist.indexes);
+                const i = _.indexOf(arr, game_id);
+                if (i !== -1) {
+                    throw errorCodes_1.CreateError(errorCodes_1.ErrorCodes.PLAYLIST_DUPLICATED_GAME);
+                }
+                yield globals_1.dbs.UserPlaylistGame.create({
+                    user_playlist_id: playlist.id,
+                    game_id: game.id,
+                }, transaction);
+                arr.push(game_id);
+                playlist.indexes = arr;
+                yield playlist.save({ transaction });
+                globals_1.caches.playlist.delOne(uid);
+            }));
         });
         this.delGame = ({ uid, game_id }, user) => __awaiter(this, void 0, void 0, function* () {
-            const playlist = yield globals_1.dbs.UserPlayList.findOne({ uid, user_uid: user.uid });
-            if (!playlist) {
-                throw errorCodes_1.CreateError(errorCodes_1.ErrorCodes.INVALID_PLAYLIST_UID);
-            }
+            game_id = _.toNumber(game_id);
+            yield globals_1.dbs.UserPlaylist.getTransaction((transaction) => __awaiter(this, void 0, void 0, function* () {
+                const playlist = yield globals_1.dbs.UserPlaylist.findOne({ uid, user_uid: user.uid }, transaction);
+                if (!playlist) {
+                    throw errorCodes_1.CreateError(errorCodes_1.ErrorCodes.INVALID_PLAYLIST_UID);
+                }
+                const arr = JSON.parse(playlist.indexes);
+                _.pull(arr, game_id);
+                playlist.indexes = arr;
+                yield playlist.save({ transaction });
+                yield globals_1.dbs.UserPlaylistGame.destroy({ user_playlist_id: playlist.id, game_id }, transaction);
+                globals_1.caches.playlist.delOne(uid);
+            }));
         });
-        this.sortGame = () => __awaiter(this, void 0, void 0, function* () {
+        this.sortGame = ({ uid, indexes }, user) => __awaiter(this, void 0, void 0, function* () {
+            yield globals_1.dbs.UserPlaylist.getTransaction((transaction) => __awaiter(this, void 0, void 0, function* () {
+                const playlist = yield globals_1.dbs.UserPlaylist.findOne({ uid, user_uid: user.uid }, transaction);
+                if (!playlist) {
+                    throw errorCodes_1.CreateError(errorCodes_1.ErrorCodes.INVALID_PLAYLIST_UID);
+                }
+                try {
+                    const _indexes = JSON.parse(indexes);
+                    if (typeof _indexes === 'object') {
+                        playlist.indexes = _indexes;
+                        yield playlist.save({ transaction });
+                        globals_1.caches.playlist.delOne(uid);
+                    }
+                }
+                catch (e) {
+                    throw errorCodes_1.CreateError(errorCodes_1.ErrorCodes.INVALID_PARAMS);
+                }
+            }));
         });
     }
 }
-exports.default = new UserPlayListController();
-//# sourceMappingURL=userPlayListController.js.map
+exports.default = new UserPlaylistController();
+//# sourceMappingURL=userPlaylistController.js.map

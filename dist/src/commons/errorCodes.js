@@ -10,6 +10,14 @@ exports.ErrorCodes = {
         code: 1002,
         message: 'invalid session'
     },
+    MAX_FILE_SIZE_EXCEEDED: {
+        code: 1010,
+        message: '전체 파일 용량 초과'
+    },
+    MAX_FIELDS_SIZE_EXCEEDED: {
+        code: 1011,
+        message: '개별 파일 용량 초과'
+    },
     INVALID_PARAMS: {
         code: 1030,
         message: '파라미터 오류'
@@ -116,7 +124,11 @@ exports.ErrorCodes = {
     },
     INVALID_PLAYLIST_UID: {
         code: 3101,
-        message: 'PlayList UID 오류'
+        message: 'Playlist UID 오류'
+    },
+    PLAYLIST_DUPLICATED_GAME: {
+        code: 3102,
+        message: '플레이 리스트 게임 중복'
     },
 };
 const CreateError = (err, ...args) => {

@@ -3,15 +3,18 @@ import * as _ from 'lodash';
 
 
 
+export const responseError = (res: Response, error: Error) => {
+    res.status(400).send({
+        error: error.message
+    })
+};
+
 export default function convert(func: Function, middleware: boolean = false) {
     function response(res: Response, result: any) {
         res.header('Last-Modified', (new Date()).toUTCString());
 
         if( result instanceof Error ) {
-            return res.status(400).send({
-                // data: result,
-                error: result.message,
-            });
+            return responseError(res, result);
         }
 
         return res.status(200).send({
