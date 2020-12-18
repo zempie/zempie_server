@@ -83,8 +83,8 @@ class LauncherController {
     /**
      *
      */
-    async getSharedUrl({ game_id }: ILauncherParams, { uid: user_uid }: DecodedIdToken) {
-        const uid = await dbs.SharedGame.getSharedUid({ user_uid, game_id });
+    async getSharedUrl({ game_id }: ILauncherParams, user: DecodedIdToken) {
+        const uid = await dbs.SharedGame.getSharedUid({ user_uid: user.uid, game_id });
 
         return {
             shared_uid: uid,
@@ -93,12 +93,12 @@ class LauncherController {
     }
 
 
-    async getBattleUrl({ game_id }: ILauncherParams, { uid: user_uid }: DecodedIdToken) {
+    async getBattleUrl({ game_id }: ILauncherParams, user: DecodedIdToken) {
         const uid = uniqid();
 
         await dbs.Battle.create({
             uid,
-            user_uid,
+            user_uid: user.uid,
             game_id,
             end_at: Date.now() + (1000 * 60 * 10),
         })

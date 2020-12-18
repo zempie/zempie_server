@@ -7,7 +7,7 @@ import DecodedIdToken = admin.auth.DecodedIdToken;
 
 
 class RankingController {
-    getGlobalRanking = async ({ game_id, limit = 50, offset = 0 }: IGameParams, {uid: user_uid}: DecodedIdToken) => {
+    getGlobalRanking = async ({ game_id, limit = 50, offset = 0 }: IGameParams, user: DecodedIdToken) => {
         let score, rank;
 
         // const userRecord = await dbs.User.findOne({ uid });
@@ -19,8 +19,8 @@ class RankingController {
         // const user_id = userRecord.id;
         // const game_id = game.id;
 
-        if ( user_uid ) {
-            const gameRecord = await dbs.UserGame.findOne({game_id, user_uid});
+        if ( user && user.uid ) {
+            const gameRecord = await dbs.UserGame.findOne({game_id, user_uid: user.uid});
             if ( gameRecord ) {
                 score = gameRecord.score;
                 rank = await dbs.UserGame.model.count({

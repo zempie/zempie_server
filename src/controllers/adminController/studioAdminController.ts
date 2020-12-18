@@ -5,7 +5,7 @@ import DecodedIdToken = admin.auth.DecodedIdToken;
 
 
 class StudioAdminController {
-    getVersions = async  ( params : any, {uid}: DecodedIdToken )=>{
+    getVersions = async  ( params : any, _user: DecodedIdToken )=>{
         return await dbs.ProjectVersion.findAll( params.where, {
             include : [{
                 model: dbs.Project.model,
@@ -13,7 +13,7 @@ class StudioAdminController {
         });
     }
 
-    getVersion = async ({ version_id } : any, {uid}: DecodedIdToken ) => {
+    getVersion = async ({ version_id } : any, _user: DecodedIdToken ) => {
         const version = await dbs.ProjectVersion.findOne( {
             id : version_id
         });
@@ -31,7 +31,7 @@ class StudioAdminController {
         }
     }
 
-    setVersion = async ( params : any, {uid}: DecodedIdToken )=>{
+    setVersion = async ( params : any,_user: DecodedIdToken )=>{
         return dbs.ProjectVersion.getTransaction( async (transaction : Transaction)=>{
             if( params.state === 'passed' ) {
                 const version = await dbs.ProjectVersion.findOne( { id : params.id } );
