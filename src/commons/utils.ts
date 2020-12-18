@@ -33,11 +33,14 @@ export function parseBoolean(str?: string) {
         return undefined
     }
 
-    str = str.toLowerCase();
-    if ( str === '1' ) return true;
-    else if ( str === 'true' ) return true;
-    return false
+    switch (str.toLowerCase()) {
+        case 'true':case 'yes':case '1':
+            return true;
+        default:
+            return false
+    }
 }
+
 export function IsJsonString(str: string) {
     try {
         const json = JSON.parse(str);

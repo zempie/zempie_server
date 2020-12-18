@@ -2,6 +2,7 @@ import { Request, Response, Router } from 'express';
 import convert from '../controllers/_convert';
 import AdminController from '../controllers/adminController/adminController';
 import AdminUserController from '../controllers/adminController/adminUserController';
+import AdminGameController from '../controllers/adminController/adminGameController';
 import AdminSupportController from '../controllers/adminController/adminSupportController';
 import AdminStudioController from '../controllers/adminController/adminStudioController';
 import { adminTracking, validateAdminIdToken } from './_common';
@@ -63,9 +64,11 @@ export default (router: Router) => {
     /**
      * 게임
      */
-    // router.get(`${apiVer}/admin/game/list`,     validateAdminIdToken,    convert(AdminController.getGames));
+    router.get(`${apiVer}/admin/games`,         validateAdminIdToken,   convert(AdminGameController.getGames));
+    router.post(`${apiVer}/admin/game/u`,       validateAdminIdToken,   adminTracking,  convert(AdminGameController.updateGame));
 
-    // router.get(`${apiVer}/admin/projects`,      validateAdminIdToken,   convert(AdminController.getProjects));
+
+    // router.get(`${apiVer}/admin/projects`,      validateAdminIdToken,   convert(AdminGameController.getProjects));
 
 
     /**
