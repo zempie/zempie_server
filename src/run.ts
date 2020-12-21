@@ -14,6 +14,7 @@ import cfgOption from '../config/opt';
         rdb: true,
         mdb: true,
         swagger: true,
+        graphql: true,
     }
     const apiServer = new APIServer();
     await apiServer.initialize2(options);

@@ -22,6 +22,7 @@ const opt_1 = require("../config/opt");
         rdb: true,
         mdb: true,
         swagger: true,
+        graphql: true,
     };
     const apiServer = new apiServer_1.default();
     yield apiServer.initialize2(options);

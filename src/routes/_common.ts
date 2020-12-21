@@ -87,7 +87,7 @@ export const isAuthenticated = (req: Request, res: Response, next: NextFunction)
     next();
 }
 
-const getIdToken = (req: Request) => {
+export const getIdToken = (req: Request) => {
     if ((!req.headers.authorization || !req.headers.authorization.startsWith('Bearer ')) &&
         !(req.cookies && req.cookies.__session)) {
         logger.debug('No Firebase ID token was passed as a Bearer token in the Authorization header.',

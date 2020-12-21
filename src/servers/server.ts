@@ -40,6 +40,9 @@ import swaggerDef from './swaggerDef';
 import * as colors from 'colors';
 import { logger } from '../commons/logger';
 import Kafka from '../services/messageQueueService';
+import { getIdToken, validateAdminIdToken } from '../routes/_common';
+import { IncomingMessage } from 'http';
+import { verifyJWT } from '../commons/utils';
 
 colors.setTheme({
     silly: 'rainbow',
@@ -114,13 +117,31 @@ export default class Server {
 
     protected setGraphQL() {
         if ( !!this.app ) {
-            const models: any = {};
+            const models: any = {
+                Sequelize,
+            };
             _.forEach(dbs, (db: any) => {
                 models[db.name] = db.model;
             });
-            const { generateSchema } = require('sequelize-graphql-schema')();
+            // models.Sequelize = Sequelize;
 
-            models.Sequelize = Sequelize;
+            const options = {
+                authorizer: (source: any, args: any, context: IncomingMessage, info: any) => {
+                    try {
+                        // const idToken = getIdToken(context as Request);
+                        // const admin = verifyJWT(idToken)
+                        // if ( !admin ) {
+                        //
+                        // }
+
+                        return Promise.resolve();
+                    }
+                    catch (e) {
+                        return  Promise.reject(e);
+                    }
+                }
+            }
+            const { generateSchema } = require('sequelize-graphql-schema')(options);
             const schema = generateSchema(models);
             const hooker: any = (req: Request, res: Response, next: any) => {
                 next();

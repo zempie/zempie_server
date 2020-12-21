@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.adminTracking = exports.validateAdminIdToken = exports.validateFirebaseIdToken = exports.isAuthenticated = exports.readyToPlay = exports.validateUid = exports.throwError = void 0;
+exports.adminTracking = exports.validateAdminIdToken = exports.validateFirebaseIdToken = exports.getIdToken = exports.isAuthenticated = exports.readyToPlay = exports.validateUid = exports.throwError = void 0;
 const admin = require("firebase-admin");
 const utils_1 = require("../commons/utils");
 const globals_1 = require("../commons/globals");
@@ -98,9 +98,10 @@ const getIdToken = (req) => {
     }
     return idToken;
 };
+exports.getIdToken = getIdToken;
 const validateFirebaseIdToken = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const idToken = getIdToken(req);
+        const idToken = exports.getIdToken(req);
         if (idToken) {
             req.user = yield admin.auth().verifyIdToken(idToken);
         }
@@ -113,7 +114,7 @@ const validateFirebaseIdToken = (req, res, next) => __awaiter(void 0, void 0, vo
 exports.validateFirebaseIdToken = validateFirebaseIdToken;
 const validateAdminIdToken = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const idToken = getIdToken(req);
+        const idToken = exports.getIdToken(req);
         req.user = yield utils_1.verifyJWT(idToken);
         return next();
     }

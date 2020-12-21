@@ -39,6 +39,9 @@ module.exports = {
             path: '/home/loki/project/raptor/platform-server',
             ssh_options: '',
             'post-deploy': 'npm install && tsc && pm2 startOrRestart ecosystem.config.js --env staging && pm2 startOrRestart admin_ecosystem.config.js --env staging'
+        },
+        production: {
+
         }
     }
 };

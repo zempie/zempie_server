@@ -116,12 +116,29 @@ class Server {
     }
     setGraphQL() {
         if (!!this.app) {
-            const models = {};
+            const models = {
+                Sequelize: sequelize_1.Sequelize,
+            };
             _.forEach(globals_2.dbs, (db) => {
                 models[db.name] = db.model;
             });
-            const { generateSchema } = require('sequelize-graphql-schema')();
-            models.Sequelize = sequelize_1.Sequelize;
+            // models.Sequelize = Sequelize;
+            const options = {
+                authorizer: (source, args, context, info) => {
+                    try {
+                        // const idToken = getIdToken(context as Request);
+                        // const admin = verifyJWT(idToken)
+                        // if ( !admin ) {
+                        //
+                        // }
+                        return Promise.resolve();
+                    }
+                    catch (e) {
+                        return Promise.reject(e);
+                    }
+                }
+            };
+            const { generateSchema } = require('sequelize-graphql-schema')(options);
             const schema = generateSchema(models);
             const hooker = (req, res, next) => {
                 next();
