@@ -31,6 +31,8 @@ class MySql {
             await this.db.authenticate();
             await this.syncDefine();
             logger.info('mysql is ready.'.cyan)
+
+            return this.db;
         }
         catch (e) {
             console.error(e.stack);

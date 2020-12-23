@@ -63,6 +63,7 @@ export default class Server {
     protected app?: express.Application;
     protected wss?: ws.Server;
     private started_at!: Date;
+    private db?: Sequelize
 
 
     public initialize = async (options: IServerOptions) => {
@@ -119,6 +120,7 @@ export default class Server {
         if ( !!this.app ) {
             const models: any = {
                 Sequelize,
+                sequelize: this.db,
             };
             _.forEach(dbs, (db: any) => {
                 models[db.name] = db.model;
@@ -210,7 +212,7 @@ export default class Server {
 
 
     protected async setRDB() {
-        await MySql.initialize();
+        this.db = await MySql.initialize();
     }
 
 
