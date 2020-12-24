@@ -1,1 +1,0 @@
-{"version":3,"file":"logMQ.js","sourceRoot":"","sources":["../../../../src/controllers/messageQueues/logMQ.ts"],"names":[],"mappings":";;;;;;;;;;;AAAA,qCAAiC;AAKjC,MAAM,KAAM,SAAQ,cAAK;IACf,QAAQ,CAAC,OAAgB;;YAC3B,OAAO,CAAC,GAAG,CAAC,OAAO,EAAE,OAAO,CAAC,CAAA;YAC7B,oDAAoD;YACpD,6BAA6B;YAC7B,eAAe;YACf,eAAe;YACf,YAAY;YACZ,MAAM;QACV,CAAC;KAAA;CACJ;AAGD,kBAAe,IAAI,KAAK,EAAE,CAAA"}

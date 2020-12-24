@@ -29,6 +29,9 @@ export default (router: Router) => {
     router.get(`${apiVer}/cache-test`,          convert(GameController.cacheTest));
     router.get(`${apiVer}/cache-test2`,         convert(GameController.cacheTest2));
 
+    router.post(`${apiVer}/tag-test`,           convert(GameController.tagTest));
+    router.get(`${apiVer}/tag-test/search`,     convert(GameController.tagTest2));
+
 
     // deprecated
     router.post(`${apiVer}/game/start`,         validateFirebaseIdToken,    convert(GameController.gameStart));
