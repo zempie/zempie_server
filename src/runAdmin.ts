@@ -4,15 +4,18 @@ import cfgOption from '../config/opt';
 
 
 (async () => {
-    const apiServer = new AdminServer();
     const options : IServerOptions = {
         tcp: false,
         port: cfgOption.Server.admin.port,
         static_path: [
             { path: '/', route: 'public' },
         ],
+        rdb: true,
+        mdb: true,
+        swagger: true,
+        graphql: true,
     };
-
-    await apiServer.initialize(options);
+    const apiServer = new AdminServer();
+    await apiServer.initialize2(options);
     await apiServer.start();
 })();
