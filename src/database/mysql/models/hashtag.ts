@@ -21,6 +21,7 @@ class HashtagModel extends Model {
 
 
     async addTags(game_id: number, hashtags: string, transaction?: Transaction) {
+        hashtags = hashtags.replace(/\s|,/gi, '#');
         const tags = _.map(_.filter(hashtags.split('#'), tag => tag !== ''), tag => tag.trim());
         const dup = await dbs.Hashtag.findAll({
             name: {
