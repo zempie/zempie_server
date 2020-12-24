@@ -59,6 +59,8 @@ interface IProject {
 interface IVersion {
     project_id? : number,
     startFile? : string,
+    description? : string,
+    version_description? : string,
     version? : string,
     url? : string,
     number? : number,
@@ -222,6 +224,7 @@ class StudioController {
             versionParams.version = params.version || '1.0.0';
             versionParams.startFile = params.startFile || '';
             versionParams.size = params.size || 0;
+            versionParams.description = params.version_description || '';
 
 
             const versionFiles = files;
