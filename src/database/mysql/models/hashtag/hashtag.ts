@@ -1,8 +1,8 @@
-import Model from '../model';
+import Model from '../../model';
 import { DataTypes, Op, Sequelize, Transaction } from 'sequelize';
-import { dbs } from '../../../commons/globals';
+import { dbs } from '../../../../commons/globals';
 import * as _ from 'lodash';
-import { getGameData } from '../../../controllers/_common';
+import { getGameData } from '../../../../controllers/_common';
 
 class HashtagModel extends Model {
     protected initialize(): void {
@@ -20,7 +20,7 @@ class HashtagModel extends Model {
     }
 
 
-    async addTags(game_id: number, hashtags: string, transaction?: Transaction) {
+    async addTags(game_id: number, hashtags: string, transaction: Transaction) {
         hashtags = hashtags.replace(/\s|,/gi, '#');
         const tags = _.map(_.filter(hashtags.split('#'), tag => tag !== ''), tag => tag.trim());
         const dup = await dbs.Hashtag.findAll({
@@ -53,6 +53,32 @@ class HashtagModel extends Model {
             }
         });
         await dbs.RefTag.bulkCreate(bulkRef, {transaction});
+    }
+
+
+    async delTags(ref_id: number, tag: string, transaction?: Transaction) {
+        await dbs.RefTag.destroy({ref_id}, transaction);
+    }
+
+
+    async getTagsLike(tag: string) {
+        const records = await this.model.findAll({
+            where: {
+                name: {
+                    [Op.like]: `${tag}%`
+                }
+            },
+        });
+        return _.map(records, record => record.get({ plain: true }))
+    }
+    async getGamesById(id: number) {
+        const records = await this.model.findAll({
+            where: { id },
+            include: [{
+                model: dbs.Game.model,
+            }]
+        });
+        return _.map(records, record => record.get({ plain: true }))
     }
 
 

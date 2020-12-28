@@ -1,6 +1,6 @@
-import Model from '../model';
-import { DataTypes, Sequelize } from 'sequelize';
-import { dbs } from '../../../commons/globals';
+import Model from '../../model';
+import { DataTypes, Sequelize, Transaction } from 'sequelize';
+import { dbs } from '../../../../commons/globals';
 
 
 class RefTagModel extends Model {

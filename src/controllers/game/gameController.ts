@@ -150,6 +150,29 @@ class GameController {
         }
     }
 
+
+    getHashTags = async ({ tag }: {tag: string}, user: DecodedIdToken) => {
+        const tags = await dbs.Hashtag.getTagsLike(tag);
+
+        return {
+            tags: _.map(tags, (tag: any) => {
+                return {
+                    id: tag.id,
+                    tag: tag.name,
+                }
+            })
+        }
+    }
+
+
+    getHashTagById = async ({ id }: {id: number}, user: DecodedIdToken) => {
+        const games = await dbs.HashTag.getGamesById(id);
+        return {
+            games: _.map(games, game => getGameData(game))
+        }
+    }
+
+
     getGameListByHashtag = async ({ tag }: { tag: string }, user: DecodedIdToken) => {
         const games = await caches.hashtag.findAll(tag)
         return {
