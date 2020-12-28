@@ -7,6 +7,7 @@ import { v4 as uuid } from 'uuid';
 import admin from 'firebase-admin';
 import DecodedIdToken = admin.auth.DecodedIdToken;
 import * as path from "path";
+import Opt from '../../../config/opt';
 
 const replaceExt = require('replace-ext');
 
@@ -195,21 +196,23 @@ class StudioController {
 
             if( picFile ) {
                 const webp = await FileManager.convertToWebp(picFile, 80);
-                const data: any = await FileManager.s3upload3({
+                const data: any = await FileManager.s3upload({
+                    bucket: Opt.AWS.Bucket.RscPublic,
                     key : replaceExt('thumb', '.webp'),
                     filePath : webp[0].destinationPath,
                     uid,
-                    bucket: `/project/${project.id}/thumb`
+                    subDir: `/project/${project.id}/thumb`
                 })
                 project.picture = data.Location;
             }
 
             if( picFile2 ) {
-                const data: any = await FileManager.s3upload3({
+                const data: any = await FileManager.s3upload({
+                    bucket: Opt.AWS.Bucket.RscPublic,
                     key : replaceExt( 'thumb2', path.extname(picFile2.name) ),
                     filePath : picFile2.path,
                     uid,
-                    bucket: `/project/${project.id}/thumb`
+                    subDir: `/project/${project.id}/thumb`
                 });
                 project.picture2 = data.Location;
             }
@@ -226,8 +229,8 @@ class StudioController {
 
             const versionFiles = files;
             if( versionFiles && versionParams.startFile ) {
-                const bucket = `/project/${project.id}/${uuid()}`;
-                versionParams.url = await uploadVersionFile( versionFiles, uid, bucket, versionParams.startFile );
+                const subDir = `/project/${project.id}/${uuid()}`;
+                versionParams.url = await uploadVersionFile( versionFiles, uid, subDir, versionParams.startFile );
                 versionParams.state = 'process';
             }
 
@@ -286,23 +289,25 @@ class StudioController {
 
             if ( file ) {
                 const webp = await FileManager.convertToWebp(file, 80);
-                const data: any = await FileManager.s3upload3({
+                const data: any = await FileManager.s3upload({
+                    bucket: Opt.AWS.Bucket.RscPublic,
                     key : replaceExt('thumb', '.webp'),
                     filePath : webp[0].destinationPath,
                     uid,
-                    bucket: `/project/${project.id}/thumb`
+                    subDir: `/project/${project.id}/thumb`
                 });
                 params.picture = data.Location;
                 game.url_thumb = params.picture;
             }
 
             if ( file2 ) {
-                const data: any = await FileManager.s3upload3({
+                const data: any = await FileManager.s3upload({
+                    bucket: Opt.AWS.Bucket.RscPublic,
                     // key : file2.name,
                     key : replaceExt( 'thumb2', path.extname(file2.name) ),
                     filePath : file2.path,
                     uid,
-                    bucket: `/project/${project.id}/thumb`
+                    subDir: `/project/${project.id}/thumb`
                 });
                 params.picture2 = data.Location;
                 game.url_thumb_gif = params.picture2;
@@ -370,8 +375,8 @@ class StudioController {
                 maxNum = lastVersion.number;
             }
 
-            const bucket = `/project/${project_id}/${uuid()}`;
-            const url = await uploadVersionFile( files, uid, bucket, params.startFile );
+            const subDir = `/project/${project_id}/${uuid()}`;
+            const url = await uploadVersionFile( files, uid, subDir, params.startFile );
             params.number = maxNum + 1;
             params.state = 'process';
             params.url = url;
@@ -455,17 +460,18 @@ class Version {
 
 }
 
-async function uploadVersionFile( files : any, uid : string, bucket : string, startFile : string ) : Promise<string> {
+async function uploadVersionFile( files : any, uid : string, subDir : string, startFile : string ) : Promise<string> {
 
     let url = '';
     for( let key in files ) {
         const file = files[key];
         if( file ) {
-            const data = await FileManager.s3upload3( {
+            const data = await FileManager.s3upload( {
+                bucket: Opt.AWS.Bucket.Rsc,
                 key : file.name,
                 filePath : file.path,
                 uid,
-                bucket,
+                subDir,
             }) as any;
 
             if( file.name === startFile ) {
