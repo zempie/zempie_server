@@ -12,6 +12,7 @@ export function getGameData (game: any) {
         count_over: game.count_over,
         url_game: game.url_game,
         url_thumb: game.url_thumb,
+        url_thumb_webp: game.url_thumb_webp,
         url_thumb_gif: game.url_thumb_gif,
         // share_url: user? `${Url.Redirect}/${game.pathname}/${user.uid}` : undefined,
         user: user? {
