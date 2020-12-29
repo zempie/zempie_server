@@ -14,6 +14,7 @@ export default (router: Router) => {
     router.get(`/game/:pathname/:pid`,          convert(GameController.playGame, true),    convert(GameController.redirectGame));
     router.get(`${apiVer}/game/:pathname`,      validateFirebaseIdToken,    convert(GameController.getGame));
     router.get(`${apiVer}/games`,               validateFirebaseIdToken,    convert(GameController.getGameList));
+    router.get(`${apiVer}/games/ht/:tag`,       validateFirebaseIdToken,    convert(GameController.getHashTags));
     router.get(`${apiVer}/games/s/:tag`,        validateFirebaseIdToken,    convert(GameController.getGameListByHashtag));
     router.get(`${apiVer}/games/ranking/g`,     validateFirebaseIdToken,    convert(RankingController.getGlobalRanking));
     router.get(`${apiVer}/games/ranking/f`,     validateFirebaseIdToken,    convert(RankingController.getFollowingRanking));
@@ -28,6 +29,9 @@ export default (router: Router) => {
     router.get(`${apiVer}/sample-test`,         convert(GameController.sampleTest));
     router.get(`${apiVer}/cache-test`,          convert(GameController.cacheTest));
     router.get(`${apiVer}/cache-test2`,         convert(GameController.cacheTest2));
+
+    router.post(`${apiVer}/tag-test`,           convert(GameController.tagTest));
+    router.get(`${apiVer}/tag-test/search`,     convert(GameController.tagTest2));
 
 
     // deprecated

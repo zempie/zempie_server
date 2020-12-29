@@ -33,7 +33,11 @@ export default {
     },
 
     AWS: {
-        Bucket: 'zempie-rsc/v1',
+        // Bucket: 'zempie-rsc/v1',
+        Bucket: {
+            Rsc: 'zempie-rsc/v1',
+            RscPublic: 'zempie-rsc-pb/v1',
+        }
     },
 
     password: {

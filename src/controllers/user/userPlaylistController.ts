@@ -8,6 +8,7 @@ import { getGameData } from '../_common';
 import { IRoute } from '../_interfaces';
 import FileManager from '../../services/fileManager';
 import { Transaction } from 'sequelize';
+import Opt from '../../../config/opt';
 const replaceExt = require('replace-ext');
 
 
@@ -77,12 +78,13 @@ class UserPlaylistController {
         const playlist_uid = uniqid();
         if ( file ) {
             const webp = await FileManager.convertToWebp(file, 80);
-            data = await FileManager.s3upload3({
+            data = await FileManager.s3upload({
+                bucket: Opt.AWS.Bucket.Rsc,
                 key: replaceExt(`playlist_${playlist_uid}`, '.webp'),
                 filePath: webp[0].destinationPath,
                 uid: user.uid,
-                bucket: '/playlist',
-            });
+                subDir: 'playlist'
+            })
         }
 
         const playlist = await dbs.UserPlaylist.create({
@@ -114,11 +116,12 @@ class UserPlaylistController {
             let data: any;
             if ( file ) {
                 const webp = await FileManager.convertToWebp(file, 80);
-                data = await FileManager.s3upload3({
+                data = await FileManager.s3upload({
+                    bucket: Opt.AWS.Bucket.Rsc,
                     key: replaceExt(`playlist_${uid}`, '.webp'),
                     filePath: webp[0].destinationPath,
                     uid: user.uid,
-                    bucket: '/playlist',
+                    subDir: '/playlist',
                 });
             }
 

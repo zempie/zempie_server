@@ -70,8 +70,8 @@ abstract class Model {
         };
     }
 
-    public async bulkCreate(bulk: [], transaction?: Transaction) {
-        return (await this.model.bulkCreate(bulk, {transaction, ignoreDuplicates: true }))
+    public async bulkCreate(bulk: [], options?: any) {
+        return (await this.model.bulkCreate(bulk, options))
             .map((d: any) => d.get({plain: true}));
     }
 

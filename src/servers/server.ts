@@ -260,7 +260,7 @@ export default class Server {
             }
 
             this.started_at = new Date();
-            logger.info(`[${process.env.NODE_ENV}] Api Server [ver.${Pkg.version}] has started. (port: ${port})`.cyan.bold)
+            logger.info(`[${process.env.NODE_ENV || 'local'}] Api Server [ver.${Pkg.version}] has started. (port: ${port})`.cyan.bold)
         };
 
         if ( !!this.app ) {

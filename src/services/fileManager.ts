@@ -131,22 +131,23 @@ class FileManager {
     }
 
 
-    s3upload = (Key: string, filePath: string, uid: string) => {
+    s3upload = ({ bucket, key, filePath, uid, subDir }: IS3Upload) => {
         return new Promise((resolve, reject) => {
             const params = {
-                Bucket: `${Opt.AWS.Bucket}/${uid}/p`,
-                Key,
+                // Bucket: `${bucket}/${uid}${subDir}`,
+                Bucket: path.join(bucket, uid, subDir).replace(/\\/g, '/'),
+                Key: key,
                 // ACL: 'public-read',
                 ContentType: getContentType(filePath),
                 Body: fs.createReadStream(filePath),
             };
             s3.upload(params, (err: Error, data: SendData) => {
                 fs.unlink(filePath, (err) => {
-                    logger.debug('.webp 삭제');
+                    logger.debug(`${filePath} 삭제`);
                 });
 
                 if (err) {
-                    console.error(err);
+                    logger.error(err);
                     return reject(err);
                 }
                 resolve(data);

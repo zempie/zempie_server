@@ -1,8 +1,9 @@
+import * as uniqid from 'uniqid';
 import * as _ from 'lodash';
 import admin from 'firebase-admin';
 import DecodedIdToken = admin.auth.DecodedIdToken;
 import { IGameListParams, IGameParams, IGamePlayParams, IRoute } from '../_interfaces';
-import { Transaction } from 'sequelize';
+import { Op, Transaction } from 'sequelize';
 import { caches, dbs } from '../../commons/globals';
 import { CreateError, ErrorCodes } from '../../commons/errorCodes';
 import MQ from '../../services/messageQueueService';
@@ -149,6 +150,29 @@ class GameController {
         }
     }
 
+
+    getHashTags = async ({ tag }: {tag: string}, user: DecodedIdToken) => {
+        const tags = await dbs.Hashtag.getTagsLike(tag);
+
+        return {
+            tags: _.map(tags, (tag: any) => {
+                return {
+                    id: tag.id,
+                    tag: tag.name,
+                }
+            })
+        }
+    }
+
+
+    getHashTagById = async ({ id }: {id: number}, user: DecodedIdToken) => {
+        const games = await dbs.HashTag.getGamesById(id);
+        return {
+            games: _.map(games, game => getGameData(game))
+        }
+    }
+
+
     getGameListByHashtag = async ({ tag }: { tag: string }, user: DecodedIdToken) => {
         const games = await caches.hashtag.findAll(tag)
         return {
@@ -187,6 +211,37 @@ class GameController {
         return {
             records: _.map(records, JSON.parse)
         };
+    }
+
+
+    tagTest = async ({ title, hashtags }: any, user: DecodedIdToken) => {
+        await dbs.Game.getTransaction(async (transaction: Transaction) => {
+            const game = await dbs.Game.create( {
+                // uid : uuid(),
+                activated : 0,
+                enabled : 0,
+                user_id : 16,
+                pathname : uniqid(),
+                title,
+                description : '',
+                hashtags,
+                // version : version.version,
+                // url_game : version.url,
+                url_thumb : '',
+                url_thumb_gif : '',
+            }, transaction);
+
+            await dbs.Hashtag.addTags(game.id, hashtags, transaction);
+        })
+    }
+
+    tagTest2 = async ({ tag }: any) => {
+        const r = await dbs.Hashtag.getGamesByTagLike(tag);
+
+        return {
+            tag,
+            games: _.map(r?.refTags, (ref: any) => getGameData(ref.game))
+        }
     }
 }
 
