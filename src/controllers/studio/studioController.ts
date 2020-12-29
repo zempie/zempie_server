@@ -328,7 +328,21 @@ class StudioController {
                 game.hashtags = params.hashtags;
             }
 
-            if( params.deploy_version_id ) {
+            if( parseInt(params.deploy_version_id) === 0 ) {
+                if( project.deploy_version_id ) {
+                    const preDeployVersion = await dbs.ProjectVersion.findOne(  {
+                        id : project.deploy_version_id
+                    }, transaction );
+                    preDeployVersion.state = 'passed';
+                    await preDeployVersion.save({transaction});
+                }
+
+                game.activated = false;
+                game.enabled = false;
+                game.url_game = null;
+                params.deploy_version_id = null;
+            }
+            else if( params.deploy_version_id ) {
                 if( project.deploy_version_id ) {
                     const preDeployVersion = await dbs.ProjectVersion.findOne(  {
                         id : project.deploy_version_id
@@ -346,7 +360,11 @@ class StudioController {
                 },transaction );
                 deployVersion.state = 'deploy';
                 await deployVersion.save({transaction});
+
                 game.version = deployVersion.version;
+                game.activated = true;
+                game.enabled = true;
+                game.url_game = deployVersion.url;
             }
 
             await game.save({transaction});
