@@ -62,13 +62,52 @@ class GameModel extends Model {
     }
 
 
+    async getInfo(where: object) {
+        const record = await this.model.findOne({
+            where,
+            // attributes: {
+            //     exclude: ['id', 'created_at', 'updated_at', 'deleted_at']
+            // },
+            include: [{
+                model: dbs.User.model,
+                where: {
+                    activated: true,
+                    banned: false,
+                    deleted_at: null,
+                },
+                required: true,
+            }],
+        })
+
+        return record.get({ plain: true })
+    }
+
+
     async getList({ limit = 50, offset = 0, official, sort = 'id', dir = 'asc' }: IGameListParams) {
+        // where
         const where: any = {
             activated: true,
             enabled: true,
         }
         if ( official ) {
             where.official = parseBoolean(official)
+        }
+
+        // order by
+        dir = dir === 'desc' ? 'desc' : 'asc';
+        sort = sort.toLowerCase();
+
+        if ( sort === 'u' || sort === 'updated' ) {
+            sort = 'updated_at';
+        }
+        else if ( sort === 'c' || sort === 'created' ) {
+            sort = 'created_at';
+        }
+        else if ( sort === 't' || sort === 'title' ) {
+            sort = 'title';
+        }
+        else {
+            sort = 'id';
         }
 
         return await this.model.findAll({
@@ -89,27 +128,6 @@ class GameModel extends Model {
             limit: _.toNumber(limit),
             offset: _.toNumber(offset),
         })
-    }
-
-
-    async getInfo(where: object) {
-        const record = await this.model.findOne({
-            where,
-            // attributes: {
-            //     exclude: ['id', 'created_at', 'updated_at', 'deleted_at']
-            // },
-            include: [{
-                model: dbs.User.model,
-                where: {
-                    activated: true,
-                    banned: false,
-                    deleted_at: null,
-                },
-                required: true,
-            }],
-        })
-
-        return record.get({ plain: true })
     }
 }
 
