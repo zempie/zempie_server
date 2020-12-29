@@ -33,7 +33,7 @@ class GameModel extends Model {
             url_thumb:          { type: DataTypes.STRING },
             url_thumb_webp:     { type: DataTypes.STRING },
             url_thumb_gif:      { type: DataTypes.STRING },
-            url_title:          { type: DataTypes.STRING },
+            // url_title:          { type: DataTypes.STRING },
         }
     }
 
