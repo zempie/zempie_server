@@ -14,7 +14,8 @@ export default (router: Router) => {
     router.get(`/game/:pathname/:pid`,          convert(GameController.playGame, true),    convert(GameController.redirectGame));
     router.get(`${apiVer}/game/:pathname`,      validateFirebaseIdToken,    convert(GameController.getGame));
     router.get(`${apiVer}/games`,               validateFirebaseIdToken,    convert(GameController.getGameList));
-    router.get(`${apiVer}/games/ht/:tag`,       validateFirebaseIdToken,    convert(GameController.getHashTags));
+    router.get(`${apiVer}/games/hashtags/:tag`, validateFirebaseIdToken,    convert(GameController.getHashTags));
+    router.get(`${apiVer}/games/tagged/:id`,    validateFirebaseIdToken,    convert(GameController.getHashTagById));
     router.get(`${apiVer}/games/s/:tag`,        validateFirebaseIdToken,    convert(GameController.getGameListByHashtag));
     router.get(`${apiVer}/games/ranking/g`,     validateFirebaseIdToken,    convert(RankingController.getGlobalRanking));
     router.get(`${apiVer}/games/ranking/f`,     validateFirebaseIdToken,    convert(RankingController.getFollowingRanking));

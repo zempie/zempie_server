@@ -165,10 +165,14 @@ class GameController {
     }
 
 
-    getHashTagById = async ({ id }: {id: number}, user: DecodedIdToken) => {
-        const games = await dbs.HashTag.getGamesById(id);
+    getHashTagById = async ({ id, limit = 50, offset = 0 }: {id: number, limit: number, offset: number}, user: DecodedIdToken) => {
+        const ref = await dbs.Hashtag.getGamesById(id, {limit, offset});
         return {
-            games: _.map(games, game => getGameData(game))
+            tag: ref.name,
+            games: _.map(ref.refTags, ref => {
+                const { game } = ref;
+                return getGameData(game)
+            })
         }
     }
 
