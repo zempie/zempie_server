@@ -1,5 +1,4 @@
-import { NextFunction, Request, Response, Router } from 'express';
-import RpcController from '../controllers/rpcController';
+import { Router } from 'express';
 import LauncherController from '../controllers/launcherController';
 import convert from '../controllers/_convert';
 import GameController from '../controllers/game/gameController';
