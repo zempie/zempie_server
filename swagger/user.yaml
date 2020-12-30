@@ -1,14 +1,14 @@
 paths:
-  /play-list:
-    post:
+  /user/filter/bad-word:
+    get:
       tags:
-        - "Zempie"
+        - Zempie
       parameters:
-        - name: "title"
-          in: "body"
-          type: "string"
-          description: '이름'
+        - name: w
+          in: query
+          type: string
+          description: 확인할 단어
           required: true
       responses:
-        "200":
-          description: 'ㅇㅋ'
+        200:
+          description: ㅇㅋ

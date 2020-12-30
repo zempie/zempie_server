@@ -87,7 +87,7 @@ class FileManager {
         })
     }
 
-    convertToWebp = async (file: any, quality = 100) => {
+    convertToWebp = async (file: any, quality = 100, del = true) => {
         const uploadDir = path.join(__dirname, '..', '..', 'upload');
         if( !fs.existsSync(uploadDir) ) {
             fs.mkdirSync(uploadDir);
@@ -99,9 +99,11 @@ class FileManager {
                 imageminWebp({ quality })
             ]
         });
-        fs.unlink(file.path, (err) => {
-            logger.debug('.jpg 삭제');
-        })
+        if ( del ) {
+            fs.unlink(file.path, (err) => {
+                logger.debug('.jpg 삭제');
+            })
+        }
         return webp;
     }
 
