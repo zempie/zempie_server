@@ -12,9 +12,15 @@ import Opt from '../../../config/opt';
 const replaceExt = require('replace-ext');
 
 
+interface IPlaylistParams {
+    uid: string
+    title?: string
+}
+
 class UserPlaylistController {
-    getPlaylists = async (params: any, user: DecodedIdToken) => {
-        const records = await dbs.UserPlaylist.findAll({ user_uid: user.uid }, {
+    getPlaylists = async (params: IPlaylistParams, user: DecodedIdToken) => {
+        const user_uid = params.uid || user.uid;
+        const records = await dbs.UserPlaylist.findAll({ user_uid }, {
             include: [{
                 model: dbs.User.model,
             }]
@@ -38,7 +44,7 @@ class UserPlaylistController {
     }
 
 
-    getPlaylist = async ({ uid }: { uid: string }, _user: DecodedIdToken) => {
+    getPlaylist = async ({ uid }: IPlaylistParams, _user: DecodedIdToken) => {
         let ret = await caches.playlist.getOne(uid);
         if ( !ret ) {
             const playlist = await dbs.UserPlaylist.getPlaylist({ uid });
@@ -73,7 +79,10 @@ class UserPlaylistController {
     }
 
 
-    createPlaylist = async ({ title }: any, user: DecodedIdToken, {req:{files:{file}}}: IRoute) => {
+    createPlaylist = async ({ title }: IPlaylistParams, user: DecodedIdToken, {req:{files:{file}}}: IRoute) => {
+        if ( !title ) {
+            throw CreateError(ErrorCodes.INVALID_PARAMS);
+        }
         let data: any;
         const playlist_uid = uniqid();
         if ( file ) {
@@ -106,7 +115,7 @@ class UserPlaylistController {
     }
 
 
-    updatePlaylist = async ({ uid, title }: any, user: DecodedIdToken, {req:{files:{file}}}: IRoute) => {
+    updatePlaylist = async ({ uid, title }: IPlaylistParams, user: DecodedIdToken, {req:{files:{file}}}: IRoute) => {
         await dbs.UserPlaylist.getTransaction(async (transaction: Transaction) => {
             const playlist = await dbs.UserPlaylist.findOne({ uid, user_uid: user.uid }, transaction);
             if ( !playlist ) {
@@ -142,7 +151,7 @@ class UserPlaylistController {
         })
     }
 
-    deletePlaylist = async ({ uid }: any, user: DecodedIdToken) => {
+    deletePlaylist = async ({ uid }: IPlaylistParams, user: DecodedIdToken) => {
         caches.playlist.delOne(uid);
         await dbs.UserPlaylist.destroy({ uid, user_uid: user.uid });
     }

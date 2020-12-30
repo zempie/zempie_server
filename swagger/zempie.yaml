@@ -2,94 +2,94 @@ paths:
   /games:
     get:
       tags:
-        - "Zempie"
-      summary: "게임 목록"
+        - Zempie
+      summary: 게임 목록
       parameters:
-        - name: "limit"
-          in: "query"
-          type: "number"
-          description: "몇 개 가져올거냐? - offset이랑 같이 써라 ( def: 50 )"
+        - name: limit
+          in: query
+          type: number
+          description: 데이터 갯수 offset이랑 함께 사용 ( 기본 50 )
           required: false
 
-        - name: "offset"
-          in: "query"
-          type: "number"
-          description: "몇 페이지? - limit이랑 같이 써라 ( def: 0 )"
+        - name: offset
+          in: query
+          type: number
+          description: 몇 번째부터? - limit이랑 함께 사용 ( 기본 0 )
           required: false
 
-        - name: "official"
-          in: "query"
-          type: "number"
-          description: "정식 게임? 아니면 도전 게임? ( 1, 0 )"
+        - name: official
+          in: query
+          type: number
+          description: 정식 게임? 아니면 도전 게임? ( 1, 0 )
           required: false
 
-        - name: "sort"
-          in: "query"
-          type: "string"
-          description: "정렬 기준 ( id, u, c, t )"
+        - name: sort
+          in: query
+          type: string
+          description: 정렬 기준 ( id, u, c, t )
           required: false
 
-        - name: "dir"
-          in: "query"
-          type: "string"
-          description: "정렬 방향 ( asc, desc )"
+        - name: dir
+          in: query
+          type: string
+          description: 정렬 방향 ( asc, desc )
           required: false
 
       responses:
-        "200":
-          description: "ㅇㅋ"
+        200:
+          description: ㅇㅋ
 
   /games/hashtags/{tag}:
     get:
       tags:
-        - "Zempie"
-      summary: "태그 목록 가져오기"
+        - Zempie
+      summary: 태그 목록 가져오기
       parameters:
-        - name: "limit"
-          in: "query"
-          type: "number"
-          description: "몇 개 가져올거냐? - offset이랑 같이 써라 ( def: 50 )"
+        - name: limit
+          in: query
+          type: number
+          description: 데이터 갯수? - offset이랑 함께 사용 ( 기본 50 )
           required: false
 
-        - name: "offset"
-          in: "query"
-          type: "number"
-          description: "몇 페이지? - limit이랑 같이 써라 ( def: 0 )"
+        - name: offset
+          in: query
+          type: number
+          description: 몇 번째부터? - limit이랑 함께 사용 ( 기본 0 )
           required: false
 
-        - name: "tag"
-          in: "path"
-          type: "string"
-          description: "검색할 태그"
+        - name: tag
+          in: path
+          type: string
+          description: 검색할 태그
           required: true
 
       responses:
-        "200":
-          description: "태그 리스트"
+        200:
+          description: 태그 리스트
 
   /games/tagged/{id}:
     get:
       tags:
-        - "Zempie"
-      summary: "태그된 게임들 가져오기"
+        - Zempie
+      summary: 태그된 게임들 가져오기
       parameters:
-        - name: "limit"
-          in: "query"
-          type: "number"
-          description: "몇 개 가져올거냐? - offset이랑 같이 써라 ( def: 50 )"
+        - name: limit
+          in: query
+          type: number
+          description: 데이터 갯수? - offset이랑 함께 사용 ( 기본 50 )
           required: false
 
-        - name: "offset"
-          in: "query"
-          type: "number"
-          description: "몇 페이지? - limit이랑 같이 써라 ( def: 0 )"
+        - name: offset
+          in: query
+          type: number
+          description: 몇 번째부터? - limit이랑 함께 사용 ( 기본 0 )
           required: false
 
-        - name: "id"
-          in: "path"
-          type: "number"
-          description: "태그 id"
+        - name: id
+          in: path
+          type: number
+          description: 태그 id
           required: true
       responses:
-        "200":
-          description: "태그된 게임들"
+        200:
+          description: 태그된 게임들
