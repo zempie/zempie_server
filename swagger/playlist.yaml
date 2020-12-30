@@ -1,0 +1,138 @@
+paths:
+  /playlists:
+    get:
+      tags:
+        - Zempie Playlist
+      summary: 플레이리스트 목록
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: uid
+          in: query
+          type: string
+          description: 사용자 UID (입력 안할 경우엔 내 UID가 사용됨)
+          required: false
+      responses:
+        200:
+          description: okay.good.
+        403:
+          $ref: '#/components/responses/UnauthorizedError'
+
+  /playlist:
+    get:
+      tags:
+        - Zempie Playlist
+      summary: 플레이리스트
+      parameters:
+        - name: uid
+          in: path
+          type: string
+          description: 플레이리스트 UID
+          required: true
+      responses:
+        200:
+          description: okay.good.
+        403:
+          $ref: '#/components/responses/UnauthorizedError'
+
+  /playlist/c:
+    post:
+      tags:
+        - Zempie Playlist
+      summary: 플레이리스트 생성
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  description: 플레이리스트 제목
+                file:
+                  type: string
+                  format: binary
+                  description: 배경 이미지 파일
+              required:
+                - title
+      responses:
+        200:
+          description: okay.good.
+        403:
+          $ref: '#/components/responses/UnauthorizedError'
+
+  /playlist/u:
+    post:
+      tags:
+        - Zempie Playlist
+      summary: 플레이리스트 수정
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                uid:
+                  type: string
+                  description: 플레이리스트 UID
+                title:
+                  type: string
+                  description: 플레이리스트 제목
+                file:
+                  type: string
+                  format: binary
+                  description: 배경 이미지 파일
+              required:
+                - uid
+      responses:
+        200:
+          description: okay.good.
+        403:
+          $ref: '#/components/responses/UnauthorizedError'
+
+  /playlist/d:
+    post:
+      tags:
+        - Zempie Playlist
+      summary: 플레이리스트 삭제
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: uid
+          in: body
+          type: string
+          required: true
+          description: 플레이리스트 UID
+      responses:
+        200:
+          description: okay.good.
+        403:
+          $ref: '#/components/responses/UnauthorizedError'
+
+  /playlist/game/c:
+    post:
+      tags:
+        - Zempie Playlist
+      summary: 플레이리스트에 게임 추가
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: uid
+          in: body
+          type: string
+          required: true
+          description: 플레이리스트 UID
+        - name: game_id
+          in: body
+          type: string
+          required: true
+          description: 게임 ID
+      responses:
+        200:
+          description: okay.good.
+        403:
+          $ref: '#/components/responses/UnauthorizedError'
