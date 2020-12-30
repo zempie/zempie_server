@@ -71,14 +71,19 @@ class HashtagModel extends Model {
         });
         return _.map(records, record => record.get({ plain: true }))
     }
-    async getGamesById(id: number) {
-        const records = await this.model.findAll({
+    async getGamesById(id: number, {limit = 50, offset= 0}) {
+        const record = await this.model.findOne({
             where: { id },
             include: [{
-                model: dbs.Game.model,
+                model: dbs.RefTag.model,
+                include: [{
+                    model: dbs.Game.model,
+                }],
+                limit: _.toNumber(limit),
+                offset: _.toNumber(offset),
             }]
         });
-        return _.map(records, record => record.get({ plain: true }))
+        return record?.get({ plain: true })
     }
 
 
