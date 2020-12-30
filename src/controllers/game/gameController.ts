@@ -3,7 +3,7 @@ import * as _ from 'lodash';
 import admin from 'firebase-admin';
 import DecodedIdToken = admin.auth.DecodedIdToken;
 import { IGameListParams, IGameParams, IGamePlayParams, IRoute } from '../_interfaces';
-import { Op, Transaction } from 'sequelize';
+import { Op, Sequelize, Transaction } from 'sequelize';
 import { caches, dbs } from '../../commons/globals';
 import { CreateError, ErrorCodes } from '../../commons/errorCodes';
 import MQ from '../../services/messageQueueService';
@@ -13,6 +13,28 @@ const { Url } = Opt;
 
 
 class GameController {
+    featuredList = async () => {
+        const popular = await dbs.Game.getListIncludingUser({}, { order: Sequelize.literal('rand()'), limit: 5 });
+        const recommended = await dbs.Game.getListIncludingUser({}, { order: Sequelize.literal('rand()'), limit: 5 });
+        const latest = await dbs.Game.getListIncludingUser({ activated: true, enabled: true }, { order: [['id', 'asc']], limit: 5 });
+
+        return [
+            {
+                name: '인기 게임 Popular Games',
+                games: _.map(popular, obj => getGameData(obj)),
+            },
+            {
+                name: '추천 게임 Recommended Games',
+                games: _.map(recommended, obj => getGameData(obj)),
+            },
+            {
+                name: '최신 게임 Latest Games',
+                games: _.map(latest, obj => getGameData(obj)),
+            },
+        ]
+    }
+
+
     playGame = async ({ pathname, user_uid }: IGamePlayParams) => {
         if ( !user_uid ) {
             return;

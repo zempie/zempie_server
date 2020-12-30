@@ -1,4 +1,15 @@
 paths:
+  /featured:
+    get:
+      tags:
+        - Zempie
+      summary: 젬파이 홈 (featured)
+      responses:
+        200:
+          $ref: '#/components/responses/Okay'
+        403:
+          $ref: '#/components/responses/UnauthorizedError'
+
   /games:
     get:
       tags:
@@ -37,7 +48,9 @@ paths:
 
       responses:
         200:
-          description: ㅇㅋ
+          $ref: '#/components/responses/Okay'
+        403:
+          $ref: '#/components/responses/UnauthorizedError'
 
   /games/hashtags/{tag}:
     get:
@@ -65,7 +78,9 @@ paths:
 
       responses:
         200:
-          description: 태그 리스트
+          $ref: '#/components/responses/Okay'
+        403:
+          $ref: '#/components/responses/UnauthorizedError'
 
   /games/tagged/{id}:
     get:
@@ -92,4 +107,6 @@ paths:
           required: true
       responses:
         200:
-          description: 태그된 게임들
+          $ref: '#/components/responses/Okay'
+        403:
+          $ref: '#/components/responses/UnauthorizedError'

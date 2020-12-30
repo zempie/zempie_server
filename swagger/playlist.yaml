@@ -14,7 +14,7 @@ paths:
           required: false
       responses:
         200:
-          description: okay.good.
+          $ref: '#/components/responses/Okay'
         403:
           $ref: '#/components/responses/UnauthorizedError'
 
@@ -31,7 +31,7 @@ paths:
           required: true
       responses:
         200:
-          description: okay.good.
+          $ref: '#/components/responses/Okay'
         403:
           $ref: '#/components/responses/UnauthorizedError'
 
@@ -59,7 +59,7 @@ paths:
                 - title
       responses:
         200:
-          description: okay.good.
+          $ref: '#/components/responses/Okay'
         403:
           $ref: '#/components/responses/UnauthorizedError'
 
@@ -90,7 +90,7 @@ paths:
                 - uid
       responses:
         200:
-          description: okay.good.
+          $ref: '#/components/responses/Okay'
         403:
           $ref: '#/components/responses/UnauthorizedError'
 
@@ -109,7 +109,7 @@ paths:
           description: 플레이리스트 UID
       responses:
         200:
-          description: okay.good.
+          $ref: '#/components/responses/Okay'
         403:
           $ref: '#/components/responses/UnauthorizedError'
 
@@ -133,6 +133,6 @@ paths:
           description: 게임 ID
       responses:
         200:
-          description: okay.good.
+          $ref: '#/components/responses/Okay'
         403:
           $ref: '#/components/responses/UnauthorizedError'

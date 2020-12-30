@@ -39,6 +39,9 @@ const swaggerDefinition = {
             }
         },
         responses: {
+            Okay: {
+                description: '오퀘이'
+            },
             UnauthorizedError: {
                 description: 'Firebase 토큰 오류'
             }
