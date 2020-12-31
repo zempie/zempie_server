@@ -11,6 +11,7 @@ class ProjectModel extends Model {
             name:               { type: DataTypes.STRING(50), allowNull: true },
             picture:            { type: DataTypes.STRING(250), allowNull: true },
             picture2:           { type: DataTypes.STRING(250), allowNull: true },
+            picture_webp:       { type: DataTypes.STRING(250), allowNull: true },
             control_type:       { type: DataTypes.SMALLINT, defaultValue: 0 },
             description:        { type: DataTypes.STRING, defaultValue: '' },
             hashtags:           { type: DataTypes.STRING, defaultValue: '' },
@@ -38,17 +39,25 @@ class ProjectModel extends Model {
             })
         }
 
+        if ( !desc['picture_webp'] ) {
+            this.model.sequelize.queryInterface.addColumn(this.model.tableName, 'picture_webp', {
+                type: DataTypes.STRING(250),
+                defaultValue: '',
+                after: 'picture'
+            })
+        }
+
         if ( !desc['picture2'] ) {
             this.model.sequelize.queryInterface.addColumn(this.model.tableName, 'picture2', {
                 type: DataTypes.STRING(250),
                 allowNull: true,
-                after: 'picture'
+                after: 'picture_webp'
             })
         }
 
     }
 
-    async create({ user_id, name, description, picture, picture2, hashtags } : any, transaction?: Transaction) {
+    async create({ user_id, name, description, picture, picture_webp, picture2, hashtags } : any, transaction?: Transaction) {
         const value : any = {
             user_id,
             name,
@@ -60,11 +69,13 @@ class ProjectModel extends Model {
             value.picture = picture;
         }
 
+        if( picture_webp ) {
+            value.picture_webp = picture_webp;
+        }
 
         if( picture2 ) {
             value.picture2 = picture2;
         }
-
 
         return super.create( value, transaction );
     }
@@ -94,7 +105,7 @@ class ProjectModel extends Model {
         });
     }
 
-    async updateProject({ id, name, picture, picture2, control_type, description, hashtags, game_id, deploy_version_id, update_version_id } : any, transaction?: Transaction) {
+    async updateProject({ id, name, picture, picture2, picture_webp, control_type, description, hashtags, game_id, deploy_version_id, update_version_id } : any, transaction?: Transaction) {
         const project = await this.findOne( { id }, transaction );
 
         if( name ) {
@@ -107,6 +118,10 @@ class ProjectModel extends Model {
 
         if( picture2 ) {
             project.picture2 = picture2;
+        }
+
+        if( picture_webp ) {
+            project.picture_webp = picture_webp;
         }
 
         if( control_type ) {

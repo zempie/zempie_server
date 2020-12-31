@@ -60,6 +60,8 @@ interface IProject {
 interface IVersion {
     project_id? : number,
     startFile? : string,
+    description? : string,
+    version_description? : string,
     version? : string,
     url? : string,
     number? : number,
@@ -69,59 +71,6 @@ interface IVersion {
 }
 
 class StudioController {
-    // getDeveloper = async (params: any, {uid}: DecodedIdToken)=>{
-    //     const user = await dbs.User.findOne({ uid });
-    //     if( !user ) {
-    //         throw CreateError(ERROR_STUDIO.NOT_FIND_USER)
-    //     }
-    //
-    //     const developer = await dbs.Developer.findOne( {user_id : user.id} );
-    //     return {
-    //         developer,
-    //         user,
-    //     }
-    // }
-
-    // createDeveloper = async (params: any, { uid }: DecodedIdToken, {req: {files: {file}}}: IRoute) =>{
-    //     return dbs.Developer.getTransaction( async (transaction : Transaction) => {
-    //         const user = await dbs.User.findOne({ uid });
-    //         const dev = await dbs.Developer.findOne( { user_id : user.id } );
-    //         if( dev ) {
-    //             return dev;
-    //         }
-    //         else {
-    //
-    //             let picture = params.picture || user.picture;
-    //             if( file ) {
-    //                 const webp = await FileManager.convertToWebp(file, 80);
-    //                 const data: any = await FileManager.s3upload(replaceExt(file.name, '.webp'), webp[0].destinationPath, uid);
-    //                 picture = data.Location;
-    //             }
-    //
-    //             return await dbs.Developer.create( {
-    //                 user_id : user.id,
-    //                 user_uid : uid,
-    //                 name : params.name || user.name,
-    //                 picture,
-    //             }, transaction );
-    //         }
-    //     })
-    // }
-
-    // updateDeveloper = async  (params: any, { uid }: DecodedIdToken, {req: {files: {file}}}: IRoute) =>{
-    //     return dbs.Developer.getTransaction( async (transaction : Transaction)=>{
-    //         params = params || {};
-    //         params.user_uid = uid;
-    //
-    //         if ( file ) {
-    //             const webp = await FileManager.convertToWebp(file, 80);
-    //             const data: any = await FileManager.s3upload(replaceExt(file.name, '.webp'), webp[0].destinationPath, uid);
-    //             params.picture = data.Location;
-    //         }
-    //
-    //         return await dbs.Developer.updateDeveloper( params, transaction ) ;
-    //     })
-    // }
 
     signupDeveloper = async  (params: any, {uid}: DecodedIdToken) =>{
         return dbs.User.getTransaction( async (transaction : Transaction)=>{
@@ -195,15 +144,29 @@ class StudioController {
             const project = await dbs.Project.create( params, transaction );
 
             if( picFile ) {
-                const webp = await FileManager.convertToWebp(picFile, 80);
+
+                const webp = await FileManager.convertToWebp(picFile, 80, false);
+
                 const data: any = await FileManager.s3upload({
+                    bucket: Opt.AWS.Bucket.RscPublic,
+                    // key : file2.name,
+                    key : replaceExt( 'thumb', path.extname(picFile.name) ),
+                    filePath : picFile.path,
+                    uid,
+                    subDir: `/project/${project.id}/thumb`
+                });
+
+                const data2: any = await FileManager.s3upload({
                     bucket: Opt.AWS.Bucket.RscPublic,
                     key : replaceExt('thumb', '.webp'),
                     filePath : webp[0].destinationPath,
                     uid,
                     subDir: `/project/${project.id}/thumb`
-                })
+                });
+
+
                 project.picture = data.Location;
+                project.picture_webp = data2.Location;
             }
 
             if( picFile2 ) {
@@ -225,6 +188,7 @@ class StudioController {
             versionParams.version = params.version || '1.0.0';
             versionParams.startFile = params.startFile || '';
             versionParams.size = params.size || 0;
+            versionParams.description = params.version_description || '';
 
 
             const versionFiles = files;
@@ -249,6 +213,7 @@ class StudioController {
                 // version : version.version,
                 // url_game : version.url,
                 url_thumb : project.picture,
+                url_thumb_webp : project.picture_webp,
                 url_thumb_gif : project.picture2,
             }, transaction );
             project.game_id = game.id;
@@ -288,16 +253,32 @@ class StudioController {
             } );
 
             if ( file ) {
-                const webp = await FileManager.convertToWebp(file, 80);
+                const webp = await FileManager.convertToWebp(file, 80, false);
+
                 const data: any = await FileManager.s3upload({
+                    bucket: Opt.AWS.Bucket.RscPublic,
+                    // key : file.name,
+                    key : replaceExt( 'thumb', path.extname(file.name) ),
+                    filePath : file.path,
+                    uid,
+                    subDir: `/project/${project.id}/thumb`
+                });
+
+
+                const data2: any = await FileManager.s3upload({
                     bucket: Opt.AWS.Bucket.RscPublic,
                     key : replaceExt('thumb', '.webp'),
                     filePath : webp[0].destinationPath,
                     uid,
                     subDir: `/project/${project.id}/thumb`
                 });
+
+
                 params.picture = data.Location;
                 game.url_thumb = params.picture;
+
+                params.picture_webp = data2.Location;
+                game.url_thumb_webp = params.picture_webp;
             }
 
             if ( file2 ) {
@@ -325,7 +306,21 @@ class StudioController {
                 game.hashtags = params.hashtags;
             }
 
-            if( params.deploy_version_id ) {
+            if( parseInt(params.deploy_version_id) === 0 ) {
+                if( project.deploy_version_id ) {
+                    const preDeployVersion = await dbs.ProjectVersion.findOne(  {
+                        id : project.deploy_version_id
+                    }, transaction );
+                    preDeployVersion.state = 'passed';
+                    await preDeployVersion.save({transaction});
+                }
+
+                game.activated = false;
+                game.enabled = false;
+                game.url_game = null;
+                params.deploy_version_id = null;
+            }
+            else if( params.deploy_version_id ) {
                 if( project.deploy_version_id ) {
                     const preDeployVersion = await dbs.ProjectVersion.findOne(  {
                         id : project.deploy_version_id
@@ -343,7 +338,11 @@ class StudioController {
                 },transaction );
                 deployVersion.state = 'deploy';
                 await deployVersion.save({transaction});
+
                 game.version = deployVersion.version;
+                game.activated = true;
+                game.enabled = true;
+                game.url_game = deployVersion.url;
             }
 
             await game.save({transaction});
