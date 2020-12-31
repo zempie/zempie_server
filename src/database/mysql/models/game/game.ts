@@ -101,9 +101,15 @@ class GameModel extends Model {
         }
 
         // order by
-        dir = dir === 'desc' ? 'desc' : 'asc';
-        sort = sort.toLowerCase();
+        dir = dir.toLowerCase();
+        if ( dir === 'd' || dir === 'desc' ) {
+            dir = 'desc';
+        }
+        else {
+            dir = 'asc';
+        }
 
+        sort = sort.toLowerCase();
         if ( sort === 'u' || sort === 'updated' ) {
             sort = 'updated_at';
         }
@@ -117,23 +123,46 @@ class GameModel extends Model {
             sort = 'id';
         }
 
-        return await this.model.findAll({
-            where,
-            // attributes: {
-            //     include: [['uid', 'game_uid']]
-            // },
-            include: [{
-                model: dbs.User.model,
-                where: {
-                    activated: true,
-                    banned: false,
-                    deleted_at: null,
-                },
-                required: true,
-            }],
+        return this.getListIncludingUser(where, {
             order: [[sort, dir]],
             limit: _.toNumber(limit),
             offset: _.toNumber(offset),
+        });
+        // return await this.model.findAll({
+        //     where,
+        //     // attributes: {
+        //     //     include: [['uid', 'game_uid']]
+        //     // },
+        //     include: [{
+        //         model: dbs.User.model,
+        //         where: {
+        //             activated: true,
+        //             banned: false,
+        //             deleted_at: null,
+        //         },
+        //         required: true,
+        //     }],
+        //     order: [[sort, dir]],
+        //     limit: _.toNumber(limit),
+        //     offset: _.toNumber(offset),
+        // })
+    }
+
+    getListIncludingUser = async (where: any, options: any = {}) => {
+        return await this.model.findAll({
+            where,
+            include: [
+                {
+                    model: dbs.User.model,
+                    where: {
+                        activated: true,
+                        banned: false,
+                        deleted_at: null,
+                    },
+                    required: true,
+                }
+            ],
+            ...options,
         })
     }
 }
