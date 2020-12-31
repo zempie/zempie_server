@@ -15,8 +15,8 @@ class GameController {
     featuredList = async () => {
         let ret = await caches.game.getFeatured();
         if ( !ret ) {
-            const popular = await dbs.Game.getListIncludingUser({}, { order: Sequelize.literal('rand()'), limit: 5 });
-            const recommended = await dbs.Game.getListIncludingUser({}, { order: Sequelize.literal('rand()'), limit: 5 });
+            const popular = await dbs.Game.getListIncludingUser({ activated: true, enabled: true }, { order: Sequelize.literal('rand()'), limit: 5 });
+            const recommended = await dbs.Game.getListIncludingUser({ activated: true, enabled: true }, { order: Sequelize.literal('rand()'), limit: 5 });
             const latest = await dbs.Game.getListIncludingUser({ activated: true, enabled: true }, { order: [['id', 'asc']], limit: 5 });
             const official = await dbs.Game.getListIncludingUser({ official: true, activated: true, enabled: true }, { order: Sequelize.literal('rand()'), limit: 5 });
             const unofficial = await dbs.Game.getListIncludingUser({ official: false, activated: true, enabled: true }, { order: Sequelize.literal('rand()'), limit: 5 });
