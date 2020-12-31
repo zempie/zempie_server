@@ -1,8 +1,11 @@
 import { dbs } from '../../commons/globals';
-import { IAdmin, INoticeParams } from '../_interfaces';
+import { IAdmin, INoticeParams, IRoute } from '../_interfaces';
 import * as _ from 'lodash';
 import { Transaction } from 'sequelize';
 import { CreateError, ErrorCodes } from '../../commons/errorCodes';
+import FileManager from '../../services/fileManager';
+import Opt from '../../../config/opt';
+const replaceExt = require('replace-ext');
 
 
 /**
@@ -104,6 +107,28 @@ class AdminSupportController {
             }
 
             await notice.destroy({ transaction });
+        })
+    }
+
+
+    /**
+     * FAQ
+     */
+    async createFAQ({ category, q, a }: any, admin: IAdmin, {req: {files: {file}}}: IRoute) {
+        await dbs.Faq.getTransaction(async (transaction: Transaction) => {
+            const record = await dbs.Faq.create({ category, q, a }, transaction);
+            if ( file ) {
+                const webp = await FileManager.convertToWebp(file, 80);
+                const data: any = await FileManager.s3upload({
+                    bucket: Opt.AWS.Bucket.Static,
+                    key: replaceExt(`${category}_${record.id}`, '.webp'),
+                    filePath: webp[0].destinationPath,
+                    uid: '',
+                    subDir: '/support/faq',
+                });
+                record.url_img = data.Location;
+                await record.save({ transaction });
+            }
         })
     }
 }

@@ -37,6 +37,7 @@ export default {
         Bucket: {
             Rsc: 'zempie-rsc/v1',
             RscPublic: 'zempie-rsc-pb/v1',
+            Static: 'zempie-rsc/static',
         }
     },
 

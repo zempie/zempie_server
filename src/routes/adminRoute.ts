@@ -6,6 +6,7 @@ import AdminGameController from '../controllers/adminController/adminGameControl
 import AdminSupportController from '../controllers/adminController/adminSupportController';
 import AdminStudioController from '../controllers/adminController/adminStudioController';
 import { adminTracking, validateAdminIdToken } from './_common';
+import FileManager from '../services/fileManager';
 
 
 const apiVer = `/api/v1`;
@@ -52,6 +53,13 @@ export default (router: Router) => {
     router.post(`${apiVer}/admin/support/notice`,       validateAdminIdToken,   adminTracking,  convert(AdminSupportController.createNotice));
     router.post(`${apiVer}/admin/support/notice/mod`,   validateAdminIdToken,   adminTracking,  convert(AdminSupportController.updateNotice));
     router.post(`${apiVer}/admin/support/notice/del`,   validateAdminIdToken,   adminTracking,  convert(AdminSupportController.deleteNotice));
+
+
+    /**
+     * FAQ
+     */
+    router.post(`${apiVer}/admin/support/faq`,      validateAdminIdToken,   adminTracking,  FileManager.uploadImage2(3, 3),     convert(AdminSupportController.createFAQ));
+
 
     /**
      * 비속어
