@@ -5,7 +5,6 @@ import DecodedIdToken = admin.auth.DecodedIdToken;
 import { IGameListParams, IGameParams, IGamePlayParams, IRoute } from '../_interfaces';
 import { Op, Sequelize, Transaction } from 'sequelize';
 import { caches, dbs } from '../../commons/globals';
-import { CreateError, ErrorCodes } from '../../commons/errorCodes';
 import MQ from '../../services/messageQueueService';
 import Opt from '../../../config/opt';
 import { getGameData } from '../_common';
@@ -14,24 +13,53 @@ const { Url } = Opt;
 
 class GameController {
     featuredList = async () => {
-        const popular = await dbs.Game.getListIncludingUser({}, { order: Sequelize.literal('rand()'), limit: 5 });
-        const recommended = await dbs.Game.getListIncludingUser({}, { order: Sequelize.literal('rand()'), limit: 5 });
-        const latest = await dbs.Game.getListIncludingUser({ activated: true, enabled: true }, { order: [['id', 'asc']], limit: 5 });
+        let ret = await caches.game.getFeatured();
+        if ( !ret ) {
+            const popular = await dbs.Game.getListIncludingUser({}, { order: Sequelize.literal('rand()'), limit: 5 });
+            const recommended = await dbs.Game.getListIncludingUser({}, { order: Sequelize.literal('rand()'), limit: 5 });
+            const latest = await dbs.Game.getListIncludingUser({ activated: true, enabled: true }, { order: [['id', 'asc']], limit: 5 });
+            const official = await dbs.Game.getListIncludingUser({ official: true, activated: true, enabled: true }, { order: Sequelize.literal('rand()'), limit: 5 });
+            const unofficial = await dbs.Game.getListIncludingUser({ official: false, activated: true, enabled: true }, { order: Sequelize.literal('rand()'), limit: 5 });
 
-        return [
-            {
-                name: '인기 게임 Popular Games',
-                games: _.map(popular, obj => getGameData(obj)),
-            },
-            {
-                name: '추천 게임 Recommended Games',
-                games: _.map(recommended, obj => getGameData(obj)),
-            },
-            {
-                name: '최신 게임 Latest Games',
-                games: _.map(latest, obj => getGameData(obj)),
-            },
-        ]
+            ret = [
+                {
+                    name: '인기 게임 Popular Games',
+                    games: _.map(popular, obj => getGameData(obj)),
+                },
+                {
+                    name: '추천 게임 Recommended Games',
+                    games: _.map(recommended, obj => getGameData(obj)),
+                },
+                {
+                    name: '최신 게임 Latest Games',
+                    games: _.map(latest, obj => getGameData(obj)),
+                },
+                {
+                    name: '정식 게임 Official Games',
+                    games: _.map(official, obj => getGameData(obj)),
+                    key: 'official',
+                },
+                {
+                    name: '정식 게임 Official Games',
+                    games: _.map(unofficial, obj => getGameData(obj)),
+                    key: 'unofficial',
+                },
+                {
+                    name: '퍼즐 게임 Puzzle Games',
+                    games: [],
+                    key: 'puzzle',
+                },
+                {
+                    name: '스포츠 게임 Sports Games',
+                    games: [],
+                    key: 'sports',
+                },
+            ];
+
+            caches.game.setFeatured(ret);
+        }
+
+        return ret;
     }
 
 

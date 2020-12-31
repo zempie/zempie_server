@@ -1,6 +1,7 @@
 import CacheModel from './_cache';
 
 
+const FeaturedKey = `zempie.game:featured`;
 const PathnameKey = `zempie:game:p:`;
 const ListKey = 'zempie:games:';
 const GameKey = `zempie:game:g:`;
@@ -35,6 +36,22 @@ class GameCache extends CacheModel {
     setByPathname(ret: any, pathname: string) {
         this.redis.set(PathnameKey + pathname, JSON.stringify(ret), () => {
             this.redis.expire(PathnameKey + pathname, 60, () => {});
+        })
+    }
+
+    /**
+     * featured
+     */
+    async getFeatured() {
+        const ret = await this.redis.get(FeaturedKey);
+        if ( ret ) {
+            return JSON.parse(ret)
+        }
+        return ret;
+    }
+    setFeatured(ret: any) {
+        this.redis.set(FeaturedKey, JSON.stringify(ret), () => {
+            this.redis.expire(FeaturedKey, 60, () => {});
         })
     }
 

@@ -12,6 +12,7 @@ const apiVer = `/api/v1`;
 
 export default (router: Router) => {
     router.get(`${apiVer}/featured`,            validateFirebaseIdToken,    convert(GameController.featuredList));
+
     router.get(`/game/:pathname/:pid`,          convert(GameController.playGame, true),    convert(GameController.redirectGame));
     router.get(`${apiVer}/game/:pathname`,      validateFirebaseIdToken,    convert(GameController.getGame));
     router.get(`${apiVer}/games`,               validateFirebaseIdToken,    convert(GameController.getGameList));
