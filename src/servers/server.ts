@@ -123,6 +123,8 @@ export default class Server {
                 sequelize: this.db,
             };
             _.forEach(dbs, (db: any) => {
+                db.model.graphql = { queries: {} };
+                db.model.graphql.queries[`${db.name}Count`] = { resolver: () => Promise.resolve(db.model.count()) };
                 models[db.name] = db.model;
             });
             // models.Sequelize = Sequelize;
