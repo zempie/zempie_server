@@ -3,6 +3,10 @@ import admin from 'firebase-admin';
 import DecodedIdToken = admin.auth.DecodedIdToken;
 import { CreateError, ErrorCodes } from '../commons/errorCodes';
 import { dbs } from '../commons/globals';
+import { IRoute } from './_interfaces';
+import FileManager from '../services/fileManager';
+import Opt from '../../config/opt';
+const replaceExt = require('replace-ext');
 
 
 interface IQnaParams {
@@ -12,7 +16,7 @@ interface IQnaParams {
 }
 
 class SupportController {
-    async askInquiry ({ category, title, text }: IQnaParams, { uid }: DecodedIdToken) {
+    async askInquiry ({ category, title, text }: IQnaParams, { uid }: DecodedIdToken, {req: {files: {file}}}: IRoute) {
         if ( !title || title.length < 1 ) {
             throw CreateError(ErrorCodes.INVALID_QNA_PARAMS)
         }
@@ -20,8 +24,22 @@ class SupportController {
             throw CreateError(ErrorCodes.INVALID_QNA_PARAMS)
         }
 
+        let url_img = null;
+        if ( file ) {
+            const webp = await FileManager.convertToWebp(file, 80);
+            const data: any = await FileManager.s3upload({
+                bucket: Opt.AWS.Bucket.Rsc,
+                key: replaceExt(Date.now().toString(), '.webp'),
+                filePath: webp[0].destinationPath,
+                uid,
+                subDir: '/support/inquiries',
+            });
+
+            url_img = data.Location;
+        }
+
         const user = await dbs.User.findOne({ uid });
-        await dbs.UserInquiry.create({ user_id: user.id, category, title, text });
+        await dbs.UserInquiry.create({ user_id: user.id, category, title, text, url_img });
     }
 
 

@@ -103,6 +103,8 @@ class AdminController {
                     },
                     path: row.path,
                     body: JSON.parse(row.body),
+                    created_at: row.created_at,
+                    updated_at: row.updated_at,
                 }
             })
         }

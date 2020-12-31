@@ -25,6 +25,7 @@ class UserInquiryModel extends Model {
             text:       { type: DataTypes.STRING(500), allowNull: false },
             response:   { type: DataTypes.STRING(500) },
             admin_id:   { type: DataTypes.INTEGER },
+            url_img:    { type: DataTypes.STRING },
         }
     }
 
@@ -33,6 +34,15 @@ class UserInquiryModel extends Model {
 
         this.model.belongsTo(dbs.User.model);
         this.model.belongsTo(dbs.Admin.model);
+
+
+        const desc = await this.model.sequelize.queryInterface.describeTable(this.model.tableName);
+        if ( !desc.url_img ) {
+            await this.model.sequelize.queryInterface.addColumn(this.model.tableName, 'url_img', {
+                type: DataTypes.STRING,
+                after: 'admin_id'
+            })
+        }
     }
 
     async getList({ user_id, no_answer, limit = 50, offset = 0, sort = 'id', dir = 'asc' }: IUserInquiryParams) {
@@ -65,6 +75,7 @@ class UserInquiryModel extends Model {
                     category: r.category,
                     title: r.title,
                     text: r.text,
+                    url_img: r.url_img,
                     response: r.response,
                     asked_at: r.created_at,
                     responded_at: r.updated_at,
