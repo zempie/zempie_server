@@ -30,6 +30,7 @@ class UserModel extends Model {
             email_verified:     { type: DataTypes.BOOLEAN, defaultValue: false },
             fcm_token:          { type: DataTypes.STRING },
             is_developer:       { type: DataTypes.BOOLEAN, defaultValue: false },
+            last_log_in:        { type: DataTypes.DATE },
         };
     }
 
@@ -41,6 +42,14 @@ class UserModel extends Model {
         this.model.hasMany(dbs.UserPublishing.model, { sourceKey: 'uid', foreignKey: 'user_uid', as: 'publishing' });
         this.model.hasMany(dbs.UserExternalLink.model, { as: 'externalLink' });
         this.model.hasMany(dbs.Game.model, { as: 'devGames' });
+
+        const desc = await this.model.sequelize.queryInterface.describeTable(this.model.tableName);
+        if ( !desc['last_log_in'] ) {
+            this.model.sequelize.queryInterface.addColumn(this.model.tableName, 'last_log_in', {
+                type: DataTypes.DATE,
+                after: 'is_developer'
+            })
+        }
     }
 
     async getInfo({uid}: DecodedIdToken, transaction?: Transaction) {
