@@ -35,12 +35,12 @@ class GameController {
                     games: _.map(latest, obj => getGameData(obj)),
                 },
                 {
-                    name: '정식 게임 Official Games',
+                    name: '공식 게임 Official Games',
                     games: _.map(official, obj => getGameData(obj)),
                     key: 'official',
                 },
                 {
-                    name: '정식 게임 Official Games',
+                    name: '도전 게임 Unofficial Games',
                     games: _.map(unofficial, obj => getGameData(obj)),
                     key: 'unofficial',
                 },

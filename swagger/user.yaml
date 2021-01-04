@@ -1,4 +1,17 @@
 paths:
+  /user/info:
+    get:
+      tags:
+        - Zempie User
+      summary: 사용자 정보
+      security:
+        - bearerAuth: [ ]
+      responses:
+        200:
+          $ref: '#/components/responses/Okay'
+        403:
+          $ref: '#/components/responses/UnauthorizedError'
+
   /user/filter/bad-word:
     get:
       tags:

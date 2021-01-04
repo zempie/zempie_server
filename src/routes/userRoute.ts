@@ -28,7 +28,7 @@ export default (router: Router) => {
 
     router.get(`${apiVer}/user/filter/bad-word`,    validateFirebaseIdToken,    convert(UserController.filterBadWord));
 
-    router.get(`${apiVer}/user/info`,               validateFirebaseIdToken,    convert(UserController.getInfo));
+    router.get(`${apiVer}/user/info`,               validateFirebaseIdToken,    isAuthenticated,    convert(UserController.getInfo));
     router.get(`${apiVer}/channel/:channel_id`,     validateFirebaseIdToken,    convert(UserController.getTargetInfoByChannelId));
 
     router.get(`${apiVer}/playlists`,               validateFirebaseIdToken,    convert(UserPlaylistController.getPlaylists));
