@@ -85,6 +85,15 @@ class HashtagModel extends Model {
                 model: dbs.RefTag.model,
                 include: [{
                     model: dbs.Game.model,
+                    include: [{
+                        model: dbs.User.model,
+                        where: {
+                            activated: true,
+                            banned: false,
+                            deleted_at: null,
+                        },
+                        required: true,
+                    }]
                 }],
                 limit: _.toNumber(limit),
                 offset: _.toNumber(offset),

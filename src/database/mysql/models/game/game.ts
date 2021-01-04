@@ -39,6 +39,7 @@ class GameModel extends Model {
 
     async afterSync(): Promise<void> {
         this.model.belongsTo(dbs.User.model);
+
         if ( process.env.NODE_ENV !== 'production' ) {
             if ( await this.model.count() < 1 ) {
                 const sampleGames: any = [
