@@ -3,7 +3,7 @@ import * as cookie from 'cookie';
 import * as urlencode from 'urlencode';
 import { Request, Response } from 'express';
 import { IRoute, IZempieClaims } from '../_interfaces';
-import { dbs, caches } from '../../commons/globals';
+import { dbs, caches, docs } from '../../commons/globals';
 import admin from 'firebase-admin';
 import DecodedIdToken = admin.auth.DecodedIdToken;
 import { Transaction, Op } from 'sequelize';
@@ -134,32 +134,26 @@ class UserController {
     getTargetInfoByChannelId = async ({channel_id}: {channel_id: string}, _: DecodedIdToken) => {
         let channel = await caches.user.getChannel(channel_id);
         if ( !channel ) {
+            // const user = await docs.User.getProfile({ channel_id });
+            // if ( user ) {
+            //     channel = await this.getUserDetailInfo(user);
+            // }
             const user = await dbs.User.getProfileByChannelId({ channel_id });
             if ( !user ) {
                 throw CreateError(ErrorCodes.INVALID_CHANNEL_ID);
             }
             channel = await this.getUserDetailInfo(user)
-            caches.user.setChannel(channel_id, channel);
+            // caches.user.setChannel(channel_id, channel);
         }
         return {
             target: channel
         }
-        // const user = await dbs.User.getProfileByChannelId({ channel_id });
-        // if ( !user ) {
-        //     throw CreateError(ErrorCodes.INVALID_CHANNEL_ID);
-        // }
-        // const target = await this.getUserDetailInfo(user);
-        // return {
-        //     target,
-        // }
     }
 
 
     private getUserDetailInfo = async (user: any, profile?: any, setting?: any) => {
         profile = profile || user.profile;
         setting = setting || user.setting;
-
-        // todo: 나중에 읽는 횟수 줄여야함
 
         return {
             uid: user.uid,
@@ -192,20 +186,9 @@ class UserController {
                 return {
                     activated: game.activated,
                     ...getGameData(game),
-                    // game_uid: game.uid,
-                    // official: game.official,
-                    // title: game.title,
-                    // pathname: game.pathname,
-                    // version: game.version,
-                    // control_type: game.control_type,
-                    // hashtags: game.hashtags,
-                    // count_over: game.count_over,
-                    // url_game: game.url_game,
-                    // url_thumb: game.url_thumb,
-                    // share_url: user? `${Url.Redirect}/${game.pathname}/${user.uid}` : undefined,
                 }
             }) : undefined,
-            game_records: user.game_records? _.map(user.gameRecords, (gr: any) => {
+            game_records: user.gameRecords? _.map(user.gameRecords, (gr: any) => {
                 const game = gr.game;
                 return {
                     game_id: game.id,

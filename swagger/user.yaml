@@ -12,6 +12,25 @@ paths:
         403:
           $ref: '#/components/responses/UnauthorizedError'
 
+  /channel/{channel_id}:
+    get:
+      tags:
+        - Zempie User
+      summary: 사용자 채널
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: "channel_id"
+          in: "path"
+          description: "채널 ID"
+          type: "string"
+          required: true
+      responses:
+        200:
+          $ref: '#/components/responses/Okay'
+        403:
+          $ref: '#/components/responses/UnauthorizedError'
+
   /user/filter/bad-word:
     get:
       tags:

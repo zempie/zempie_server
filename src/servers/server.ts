@@ -17,6 +17,7 @@ import { firebase } from '../commons/globals';
 
 import MySql from '../database/mysql';
 import Redis from '../database/redis';
+import Mongo from '../database/mongodb';
 
 import { IMessageQueueOptions, IServerOptions } from '../commons/interfaces';
 import * as Pkg from '../../package.json';
@@ -124,7 +125,7 @@ export default class Server {
             };
             _.forEach(dbs, (db: any) => {
                 db.model.graphql = { queries: {} };
-                db.model.graphql.queries[`${db.name}Count`] = { resolver: () => Promise.resolve(db.model.count()) };
+                db.model.graphql.queries[`${db.name}Count`] = { resolver: (_: any, where: any) => Promise.resolve(db.model.count(where)) };
                 models[db.name] = db.model;
             });
             // models.Sequelize = Sequelize;
@@ -220,6 +221,7 @@ export default class Server {
 
     protected async setMDB() {
         await Redis.initialize();
+        await Mongo.initialize();
     }
 
 
