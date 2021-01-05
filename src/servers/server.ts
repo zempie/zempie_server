@@ -221,7 +221,7 @@ export default class Server {
 
     protected async setMDB() {
         await Redis.initialize();
-        await Mongo.initialize();
+        // await Mongo.initialize();
     }
 
 
