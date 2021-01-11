@@ -13,6 +13,11 @@ export enum eInquiry {
     Studio,
 }
 
+export enum eReportType {
+    Game,
+    User,
+}
+
 
 export enum eTimeline {
     PR = 1,
