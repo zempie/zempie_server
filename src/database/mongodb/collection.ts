@@ -1,49 +1,44 @@
+import * as mongoose from 'mongoose';
+import { ClientSession, Model, Schema, SchemaDefinition } from 'mongoose';
 import { Db } from 'mongodb';
-import { logger } from '../../commons/logger';
 
 
-export abstract class Collection {
-    protected collection: any;
-    protected name: string = '';
-    protected attributes: object = {};
+export default abstract class Collection {
+    protected attributes: SchemaDefinition = {};
+    protected schema!: Schema;
+    protected model!: Model<any>
+    protected name!: string;
+    // private db!: Db;
 
-    constructor(db: Db) {
+
+    constructor() {
         this.initialize();
+        this.attributes.deleted_at = { type: String };
+        this.schema = new Schema(this.attributes, {versionKey: false, timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' }});
+        this.model = mongoose.model(this.name, this.schema);
+    }
+    protected abstract initialize (): void;
 
-        this.collection = db.collection(this.name);
+    getName () { return this.name }
+
+    async afterSync() {}
+    async getTransaction(callback: Function) {
+        // const session = await this.model.startSession();
+        // await session.withTransaction(async () => {
+        //     await callback(session);
+        // })
+        const session = await mongoose.startSession();
+        session.startTransaction();
+        await callback(session);
+        session.endSession();
     }
 
-    protected abstract initialize(): void;
 
-    async afterSync() {
-        logger.info(`[collection] ${this.name} synced.`);
+    async create(query: any, session: ClientSession) {
+        return this.model.create([query], { session })
     }
-
-    getName() {
-        return this.name;
-    }
-    getCollectionName() {
-        return this.collection.collectionName;
-    }
-
-    async create(obj: any) {
-        const now = new Date();
-        obj.created_at = now;
-        obj.updated_at = now;
-        obj.deleted_at = null;
-
-        return await this.collection.insertOne(obj);
-    }
-
-    async bulkCreate(arr: any[]) {
-        return await this.collection.insertMany(arr);
-    }
-
-    async findOne(query: any) {
-        return await this.collection.findOne(query)
-    }
-
-    async findAll(query: any) {
-        return await this.collection.find(query)
-    }
+    async findOne(query: any, options?: any) { query.deleted_at = null; return this.model.findOne(query, null, options) }
+    async findAll(query: any, options?: any) { query.deleted_at = null; return this.model.find(query, null, options) }
+    async destroy(query: any) { await this.model.updateOne(query, { deleted_at: Date.now() }) }
+    async bulkCreate(bulk: any[], options?: any) { await this.model.insertMany(bulk) }
 }

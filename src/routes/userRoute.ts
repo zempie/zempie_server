@@ -46,4 +46,9 @@ export default (router: Router) => {
     router.get(`${apiVer}/user/search`,             validateFirebaseIdToken,    convert(UserController.searchUser));
     router.get(`${apiVer}/user/alarm`,              validateFirebaseIdToken,    convert(AlarmController.getList));
     router.get(`${apiVer}/user/publishing`,         validateFirebaseIdToken,    convert(PublishingController.getList));
+
+
+
+    // for testing
+    router.get(`${apiVer}/test-mongo`,      convert(UserController.testMongo));
 }
