@@ -12,6 +12,10 @@ export enum eInquiry {
     Personality,
     Studio,
 }
+export enum eReportType{
+    User,
+    Game,
+}
 
 export enum eReportType {
     Game,

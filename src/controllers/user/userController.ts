@@ -8,12 +8,13 @@ import admin from 'firebase-admin';
 import DecodedIdToken = admin.auth.DecodedIdToken;
 import { Transaction, Op } from 'sequelize';
 import FileManager from '../../services/fileManager';
-const replaceExt = require('replace-ext');
 import { CreateError, ErrorCodes } from '../../commons/errorCodes';
-import Opt from '../../../config/opt';
 import { getGameData } from '../_common';
 import { isOK_channelID } from '../../commons/utils';
+import { ClientSession } from 'mongoose';
+import Opt from '../../../config/opt';
 const { Url, CORS } = Opt;
+const replaceExt = require('replace-ext');
 
 
 class UserController {
@@ -188,7 +189,7 @@ class UserController {
                     ...getGameData(game),
                 }
             }) : undefined,
-            game_records: user.gameRecords? _.map(user.gameRecords, (gr: any) => {
+            game_records: user.game_records? _.map(user.game_records, (gr: any) => {
                 const game = gr.game;
                 return {
                     game_id: game.id,
@@ -427,6 +428,23 @@ class UserController {
                 await dbs.User.destroy({ uid }, transaction);
             })
         })
+    }
+
+
+    testMongo = async () => {
+        await docs.User2.getTransaction(async (session: ClientSession) => {
+            await docs.Sample.create({
+                name: 'wndhrl',
+                text: 'wndhrdlajrdjdtjdkgksmsep'
+            }, session);
+            await docs.Sample2.create({
+                name: 'gpfk',
+                text: 'gpfkakswlrhtlvek'
+            }, session);
+            // const doc = await docs.Sample.findOne({name: 'wndhrl' }, { session });
+            // doc.text = 'wndhrlEkajrj'
+            // doc.save({ session });
+        });
     }
 }
 

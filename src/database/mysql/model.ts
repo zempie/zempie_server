@@ -11,7 +11,7 @@ abstract class Model {
     static queue: PQueue = new PQueue();
 
 
-    public constructor(rdb: Sequelize) {
+    constructor(rdb: Sequelize) {
         this.initialize();
 
         this.model = rdb.define(

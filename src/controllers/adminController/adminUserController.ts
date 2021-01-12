@@ -2,6 +2,7 @@ import { IAdmin } from '../_interfaces';
 import { dbs } from '../../commons/globals';
 import * as _ from 'lodash';
 import { EBan } from '../../database/mysql/models/user/user';
+import { Transaction } from 'sequelize';
 
 
 /**
@@ -27,18 +28,20 @@ class AdminUserController {
     }
 
     async banUser({ id, activated, banned, reason, period }: any, admin: IAdmin) {
-        const user = await dbs.User.getInfo({ user_id: id });
-        if ( activated ) user.activated = activated;
-        if ( banned && reason && period && Object.values(EBan).includes(banned) ) {
-            user.banned = banned;
-            await dbs.UserBan.create({
-                user_id: id,
-                admin_id: admin.id,
-                reason,
-                period,
-            })
-        }
-        user.save();
+        await dbs.User.getTransaction(async (transaction: Transaction) => {
+            const user = await dbs.User.getInfo({ user_id: id }, transaction);
+            if ( activated ) user.activated = activated;
+            if ( banned && reason && period && Object.values(EBan).includes(banned) ) {
+                user.banned = banned;
+                await dbs.UserBan.create({
+                    user_id: id,
+                    admin_id: admin.id,
+                    reason,
+                    period,
+                }, transaction)
+            }
+            await user.save({ transaction });
+        })
     }
 
 

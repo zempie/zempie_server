@@ -41,7 +41,7 @@ import swaggerDef from './swaggerDef';
 import * as colors from 'colors';
 import { logger } from '../commons/logger';
 import Kafka from '../services/messageQueueService';
-import { getIdToken, validateAdminIdToken } from '../routes/_common';
+import { adminTracking, getIdToken, validateAdminIdToken } from '../routes/_common';
 import { IncomingMessage } from 'http';
 import { verifyJWT } from '../commons/utils';
 
@@ -149,6 +149,9 @@ export default class Server {
             const { generateSchema } = require('sequelize-graphql-schema')(options);
             const schema = generateSchema(models);
             const hooker: any = (req: Request, res: Response, next: any) => {
+                if ( !req.body?.query?.includes('Get') ) {
+                    return adminTracking(req, res, next);
+                }
                 next();
             };
             this.app.use('/graphql', hooker, graphqlHTTP({
