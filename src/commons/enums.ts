@@ -17,11 +17,6 @@ export enum eReportType{
     Game,
 }
 
-export enum eReportType {
-    Game,
-    User,
-}
-
 
 export enum eTimeline {
     PR = 1,
