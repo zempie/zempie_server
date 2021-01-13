@@ -18,20 +18,30 @@ class HashtagModel extends Model {
 
         this.model.hasMany(dbs.RefTag.model, { sourceKey: 'id', foreignKey: 'tag_id' });
 
-        if ( await this.model.count() < 1 ) {
-            let games = await dbs.Game.findAll({});
-            games = _.map(games, game => game.get({ plain: true }));
-            for( let i = 0; i < games.length; i++ ) {
-                const game = games[i];
-                await this.addTags(game.id, game.hashtags);
+        try {
+            if ( await this.model.count() < 1 ) {
+                let games = await dbs.Game.findAll({});
+                games = _.map(games, game => game.get({ plain: true }));
+                for( let i = 0; i < games.length; i++ ) {
+                    const game = games[i];
+                    if ( game.id === 65 || game.id === 82) {
+                        console.log(game);
+                    }
+                    if ( game.hashtags.length > 0 ) {
+                        await this.addTags(game.id, game.hashtags);
+                    }
+                }
             }
+        }
+        catch (e) {
+            console.error(e);
         }
     }
 
 
     async addTags(game_id: number, hashtags: string, transaction?: Transaction) {
         hashtags = hashtags.replace(/\s|,/gi, '#');
-        const tags = _.map(_.filter(hashtags.split('#'), tag => tag !== ''), tag => tag.trim());
+        const tags = _.union(_.map(_.filter(hashtags.split('#'), tag => tag !== ''), tag => tag.trim()))
         const dup = await dbs.Hashtag.findAll({
             name: {
                 [Op.in]: tags
@@ -53,7 +63,7 @@ class HashtagModel extends Model {
         });
 
         // ref_hash
-        const newRef = [..._.map(dup, r => r.id), ..._.map(records, r => r.id)];
+        const newRef = _.union([..._.map(dup, r => r.id), ..._.map(records, r => r.id)]);
         const bulkRef: any = _.map(newRef, tag_id => {
             return {
                 ref_id: game_id,
