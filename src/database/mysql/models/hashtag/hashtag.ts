@@ -18,12 +18,14 @@ class HashtagModel extends Model {
 
         this.model.hasMany(dbs.RefTag.model, { sourceKey: 'id', foreignKey: 'tag_id' });
 
-        // let games = await dbs.Game.findAll({});
-        // games = _.map(games, game => game.get({ plain: true }));
-        // for( let i = 0; i < games.length; i++ ) {
-        //     const game = games[i];
-        //     await this.addTags(game.id, game.hashtags, undefined);
-        // }
+        if ( this.model.count() < 1 ) {
+            let games = await dbs.Game.findAll({});
+            games = _.map(games, game => game.get({ plain: true }));
+            for( let i = 0; i < games.length; i++ ) {
+                const game = games[i];
+                await this.addTags(game.id, game.hashtags);
+            }
+        }
     }
 
 
