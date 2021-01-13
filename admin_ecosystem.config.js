@@ -29,7 +29,7 @@ module.exports = {
             repo: 'git@192.168.0.36:raptor/platform-api-server.git',
             path: '/home/dev103/projects/zempie/admin-api-server',
             ssh_options: '',
-            'post-deploy': 'yarn install && tsc && pm2 startOrRestart admin_ecosystem.config.js --env development'
+            'post-deploy': 'npm install && tsc && pm2 startOrRestart admin_ecosystem.config.js --env development'
         },
     }
 };
