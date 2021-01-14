@@ -56,7 +56,7 @@ class BadWordModel extends model_1.default {
         });
     }
     isOk(str) {
-        return !_.some(this.filters, (word) => str.includes(word));
+        return !_.some(this.filters, (word) => str.toLowerCase().includes(word));
     }
 }
 exports.default = (rdb) => new BadWordModel(rdb);

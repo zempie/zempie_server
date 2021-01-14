@@ -44,7 +44,7 @@ class BadWordModel extends Model {
     }
 
     isOk (str: string) {
-        return !_.some(this.filters, (word: string) => str.includes(word));
+        return !_.some(this.filters, (word: string) => str.toLowerCase().includes(word));
     }
 }
 
