@@ -38,7 +38,7 @@ class HashtagModel extends model_1.default {
                             console.log(game);
                         }
                         if (game.hashtags.length > 0) {
-                            yield this.addTags(game.id, game.hashtags, undefined);
+                            yield this.addTags(game.id, game.hashtags);
                         }
                     }
                 }
@@ -48,38 +48,40 @@ class HashtagModel extends model_1.default {
             }
         });
     }
-    addTags(game_id, hashtags, transaction) {
+    addTags(game_id, hashtags) {
         return __awaiter(this, void 0, void 0, function* () {
-            hashtags = hashtags.replace(/\s|,/gi, '#');
-            const tags = _.union(_.map(_.filter(hashtags.split('#'), tag => tag !== ''), tag => tag.trim()));
-            const dup = yield globals_1.dbs.Hashtag.findAll({
-                name: {
-                    [sequelize_1.Op.in]: tags
-                }
-            });
-            const newTags = _.difference(tags, _.map(dup, d => d.name));
-            const bulkTag = _.map(newTags, tag => {
-                return {
-                    fixed: false,
-                    name: tag,
-                };
-            });
-            const records = yield this.bulkCreate(bulkTag, {
-                transaction,
-                updateOnDuplicate: ['name'],
-                // returning: true,
-                individualHooks: true
-            });
-            // ref_hash
-            const newRef = _.union([..._.map(dup, r => r.id), ..._.map(records, r => r.id)]);
-            const bulkRef = _.map(newRef, tag_id => {
-                return {
-                    ref_id: game_id,
-                    ref_type: 'game',
-                    tag_id: tag_id,
-                };
-            });
-            yield globals_1.dbs.RefTag.bulkCreate(bulkRef, { transaction });
+            yield this.getTransaction((transaction) => __awaiter(this, void 0, void 0, function* () {
+                hashtags = hashtags.replace(/\s|,/gi, '#');
+                const tags = _.union(_.map(_.filter(hashtags.split('#'), tag => tag !== ''), tag => tag.trim()));
+                const dup = yield globals_1.dbs.Hashtag.findAll({
+                    name: {
+                        [sequelize_1.Op.in]: tags
+                    }
+                });
+                const newTags = _.difference(tags, _.map(dup, d => d.name));
+                const bulkTag = _.map(newTags, tag => {
+                    return {
+                        fixed: false,
+                        name: tag,
+                    };
+                });
+                const records = yield this.bulkCreate(bulkTag, {
+                    transaction,
+                    updateOnDuplicate: ['name'],
+                    // returning: true,
+                    individualHooks: true
+                });
+                // ref_hash
+                const newRef = _.union([..._.map(dup, r => r.id), ..._.map(records, r => r.id)]);
+                const bulkRef = _.map(newRef, tag_id => {
+                    return {
+                        ref_id: game_id,
+                        ref_type: 'game',
+                        tag_id: tag_id,
+                    };
+                });
+                yield globals_1.dbs.RefTag.bulkCreate(bulkRef, { transaction });
+            }));
         });
     }
     delTags(ref_id, tag, transaction) {
