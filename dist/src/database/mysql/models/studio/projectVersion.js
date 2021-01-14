@@ -20,6 +20,7 @@ class ProjectVersionModel extends model_1.default {
         this.name = 'projectVersion';
         this.attributes = {
             project_id: { type: sequelize_1.DataTypes.INTEGER, allowNull: false },
+            game_id: { type: sequelize_1.DataTypes.INTEGER, allowNull: true },
             number: { type: sequelize_1.DataTypes.INTEGER, allowNull: false },
             version: { type: sequelize_1.DataTypes.STRING(20), defaultValue: '0.0.1' },
             state: { type: sequelize_1.DataTypes.STRING(20), allowNull: false, defaultValue: 'none' },
@@ -34,6 +35,12 @@ class ProjectVersionModel extends model_1.default {
         return __awaiter(this, void 0, void 0, function* () {
             this.model.belongsTo(globals_1.dbs.Project.model);
             const desc = yield this.model.sequelize.queryInterface.describeTable(this.model.tableName);
+            if (!desc['game_id']) {
+                this.model.sequelize.queryInterface.addColumn(this.model.tableName, 'game_id', {
+                    type: sequelize_1.DataTypes.INTEGER,
+                    after: 'project_id'
+                });
+            }
             if (!desc['size']) {
                 this.model.sequelize.queryInterface.addColumn(this.model.tableName, 'size', {
                     type: sequelize_1.DataTypes.FLOAT,
@@ -43,13 +50,14 @@ class ProjectVersionModel extends model_1.default {
             }
         });
     }
-    create({ project_id, version, url, description, number, state, autoDeploy, size }, transaction) {
+    create({ project_id, game_id, version, url, description, number, state, autoDeploy, size }, transaction) {
         const _super = Object.create(null, {
             create: { get: () => super.create }
         });
         return __awaiter(this, void 0, void 0, function* () {
             const value = {
                 project_id,
+                game_id,
                 version,
                 url,
                 number

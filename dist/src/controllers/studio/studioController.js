@@ -129,22 +129,6 @@ class StudioController {
                     });
                     project.picture2 = data.Location;
                 }
-                const versionParams = {};
-                versionParams.project_id = project.id;
-                versionParams.number = 1;
-                versionParams.autoDeploy = params.autoDeploy || true;
-                versionParams.version = params.version || '1.0.0';
-                versionParams.startFile = params.startFile || '';
-                versionParams.size = params.size || 0;
-                versionParams.description = params.version_description || '';
-                const versionFiles = files;
-                if (versionFiles && versionParams.startFile) {
-                    const subDir = `/project/${project.id}/${uuid_1.v4()}`;
-                    versionParams.url = yield uploadVersionFile(versionFiles, uid, subDir, versionParams.startFile);
-                    versionParams.state = 'process';
-                }
-                const version = yield globals_1.dbs.ProjectVersion.create(versionParams, transaction);
-                project.update_version_id = version.id;
                 const game = yield globals_1.dbs.Game.create({
                     // uid : uuid(),
                     activated: 0,
@@ -161,6 +145,23 @@ class StudioController {
                     url_thumb_gif: project.picture2,
                 }, transaction);
                 project.game_id = game.id;
+                const versionParams = {};
+                versionParams.project_id = project.id;
+                versionParams.game_id = game.id;
+                versionParams.number = 1;
+                versionParams.autoDeploy = params.autoDeploy || true;
+                versionParams.version = params.version || '1.0.0';
+                versionParams.startFile = params.startFile || '';
+                versionParams.size = params.size || 0;
+                versionParams.description = params.version_description || '';
+                const versionFiles = files;
+                if (versionFiles && versionParams.startFile) {
+                    const subDir = `/project/${project.id}/${uuid_1.v4()}`;
+                    versionParams.url = yield uploadVersionFile(versionFiles, uid, subDir, versionParams.startFile);
+                    versionParams.state = 'process';
+                }
+                const version = yield globals_1.dbs.ProjectVersion.create(versionParams, transaction);
+                project.update_version_id = version.id;
                 return yield project.save({ transaction });
             }));
         });
@@ -295,6 +296,7 @@ class StudioController {
                 params.number = maxNum + 1;
                 params.state = 'process';
                 params.url = url;
+                params.game_id = project.game_id;
                 const version = yield globals_1.dbs.ProjectVersion.create(params, transaction);
                 project.update_version_id = version.id;
                 yield project.save({ transaction });
