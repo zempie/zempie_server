@@ -11,6 +11,7 @@ class ProjectVersionModel extends Model {
         this.name = 'projectVersion';
         this.attributes = {
             project_id:         { type: DataTypes.INTEGER, allowNull: false },
+            game_id:            { type: DataTypes.INTEGER, allowNull: true },
             number:             { type: DataTypes.INTEGER, allowNull: false },
             version:            { type: DataTypes.STRING(20), defaultValue: '0.0.1' },
             state:              { type: DataTypes.STRING(20), allowNull: false, defaultValue: 'none' },
@@ -26,6 +27,12 @@ class ProjectVersionModel extends Model {
         this.model.belongsTo(dbs.Project.model);
 
         const desc = await this.model.sequelize.queryInterface.describeTable(this.model.tableName);
+        if ( !desc['game_id'] ) {
+            this.model.sequelize.queryInterface.addColumn(this.model.tableName, 'game_id', {
+                type: DataTypes.INTEGER,
+                after: 'project_id'
+            })
+        }
         if ( !desc['size'] ) {
             this.model.sequelize.queryInterface.addColumn(this.model.tableName, 'size', {
                 type: DataTypes.FLOAT,
@@ -35,10 +42,11 @@ class ProjectVersionModel extends Model {
         }
     }
 
-    async create( { project_id, version, url, description, number, state, autoDeploy, size } : any, transaction?: Transaction ) {
+    async create( { project_id, game_id, version, url, description, number, state, autoDeploy, size } : any, transaction?: Transaction ) {
 
         const value : any = {
             project_id,
+            game_id,
             version,
             url,
             number

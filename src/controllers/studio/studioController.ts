@@ -59,6 +59,7 @@ interface IProject {
 
 interface IVersion {
     project_id? : number,
+    game_id? : number,
     startFile? : string,
     description? : string,
     version_description? : string,
@@ -180,9 +181,27 @@ class StudioController {
                 project.picture2 = data.Location;
             }
 
+            const game = await dbs.Game.create( {
+                // uid : uuid(),
+                activated : 0,
+                enabled : 0,
+                user_id : user.id,
+                pathname : params.pathname,
+                title : project.name,
+                description : project.description,
+                hashtags : project.hashtags,
+                // version : version.version,
+                // url_game : version.url,
+                url_thumb : project.picture,
+                url_thumb_webp : project.picture_webp,
+                url_thumb_gif : project.picture2,
+            }, transaction );
+            project.game_id = game.id;
+
             const versionParams : IVersion = {};
 
             versionParams.project_id = project.id;
+            versionParams.game_id = game.id;
             versionParams.number = 1;
             versionParams.autoDeploy = params.autoDeploy || true;
             versionParams.version = params.version || '1.0.0';
@@ -201,22 +220,7 @@ class StudioController {
             const version = await dbs.ProjectVersion.create( versionParams, transaction );
             project.update_version_id = version.id;
 
-            const game = await dbs.Game.create( {
-                // uid : uuid(),
-                activated : 0,
-                enabled : 0,
-                user_id : user.id,
-                pathname : params.pathname,
-                title : project.name,
-                description : project.description,
-                hashtags : project.hashtags,
-                // version : version.version,
-                // url_game : version.url,
-                url_thumb : project.picture,
-                url_thumb_webp : project.picture_webp,
-                url_thumb_gif : project.picture2,
-            }, transaction );
-            project.game_id = game.id;
+
 
             return await project.save({transaction});
         })
@@ -379,6 +383,7 @@ class StudioController {
             params.number = maxNum + 1;
             params.state = 'process';
             params.url = url;
+            params.game_id = project.game_id;
 
             const version = await dbs.ProjectVersion.create( params, transaction );
             project.update_version_id = version.id;
