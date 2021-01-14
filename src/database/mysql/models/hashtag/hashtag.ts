@@ -28,7 +28,7 @@ class HashtagModel extends Model {
                         console.log(game);
                     }
                     if ( game.hashtags.length > 0 ) {
-                        await this.addTags(game.id, game.hashtags);
+                        await this.addTags(game.id, game.hashtags, undefined);
                     }
                 }
             }

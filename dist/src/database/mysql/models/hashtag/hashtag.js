@@ -38,7 +38,7 @@ class HashtagModel extends model_1.default {
                             console.log(game);
                         }
                         if (game.hashtags.length > 0) {
-                            yield this.addTags(game.id, game.hashtags);
+                            yield this.addTags(game.id, game.hashtags, undefined);
                         }
                     }
                 }
