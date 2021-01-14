@@ -4,7 +4,7 @@ import { isAuthenticated, validateFirebaseIdToken } from './_common';
 import UserController from '../controllers/user/userController';
 import UserPlaylistController from '../controllers/user/userPlaylistController';
 import AlarmController from '../controllers/alarmController';
-import RpcController from '../controllers/rpcController';
+import ContentController from '../controllers/contentController';
 import FileManager from '../services/fileManager';
 import PublishingController from '../controllers/publishingController';
 
@@ -42,8 +42,15 @@ export default (router: Router) => {
     router.post(`${apiVer}/playlist/game/d`,        validateFirebaseIdToken,    isAuthenticated,    convert(UserPlaylistController.delGame));
     router.post(`${apiVer}/playlist/game/s`,        validateFirebaseIdToken,    isAuthenticated,    convert(UserPlaylistController.sortGame));
 
+    router.post(`${apiVer}/report/game`,            validateFirebaseIdToken,    convert(ContentController.reportGame));
+    router.post(`${apiVer}/report/user`,            validateFirebaseIdToken,    convert(ContentController.reportUser));
 
     router.get(`${apiVer}/user/search`,             validateFirebaseIdToken,    convert(UserController.searchUser));
     router.get(`${apiVer}/user/alarm`,              validateFirebaseIdToken,    convert(AlarmController.getList));
     router.get(`${apiVer}/user/publishing`,         validateFirebaseIdToken,    convert(PublishingController.getList));
+
+
+
+    // for testing
+    router.get(`${apiVer}/test-mongo`,      convert(UserController.testMongo));
 }

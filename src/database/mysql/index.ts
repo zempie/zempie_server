@@ -47,7 +47,7 @@ class MySql {
         getFiles(dir, (dir: string, file: string) => {
             if ( !!this.db ) {
                 // const model: any = this.db.import(path.join(dir, file));
-                const model: any = require(path.join(dir, file)).default(this.db)
+                const model: any = require(path.join(dir, file)).default(this.db);
                 models[capitalize(model.getName())] = model;
             }
         });

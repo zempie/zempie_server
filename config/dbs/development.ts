@@ -1,8 +1,8 @@
 export default {
     mysql: {
         database: 'zempie',
-        username: 'loki',
-        password: 'wjddnjs',
+        username: 'dev',
+        password: 'ftred103',
         conn: {
             host: '192.168.0.10',
             port: 3306,
@@ -28,9 +28,9 @@ export default {
     },
     redis: {
         host: '192.168.0.10',
-        port: 16379,
+        port: 6379,
         family: 4,
-        password: 'fromthered2020#!',
+        password: 'ftred103',
         db: 0,
     }
 }

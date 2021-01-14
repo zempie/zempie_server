@@ -36,24 +36,24 @@ class UserGameModel extends Model {
             })
         }
 
-        await this.getTransaction(async (transaction: Transaction) => {
-            const records = await this.model.findAll({
-                where: {},
-                transaction,
-            })
-
-            if ( records[0].game_id === null ) {
-                const _games = await dbs.Game.findAll({});
-                const games = _.map(_games, game => game.get({plain: true}))
-
-                for ( let i = 0; i < records.length; i++ ) {
-                    const userGame = records[i];
-                    const game = _.find(games, game => game.uid === userGame.game_uid);
-                    userGame.game_id = game.id;
-                    await userGame.save({ transaction });
-                }
-            }
-        })
+        // await this.getTransaction(async (transaction: Transaction) => {
+        //     const records = await this.model.findAll({
+        //         where: {},
+        //         transaction,
+        //     })
+        //
+        //     if ( records[0].game_id === null ) {
+        //         const _games = await dbs.Game.findAll({});
+        //         const games = _.map(_games, game => game.get({plain: true}))
+        //
+        //         for ( let i = 0; i < records.length; i++ ) {
+        //             const userGame = records[i];
+        //             const game = _.find(games, game => game.uid === userGame.game_uid);
+        //             userGame.game_id = game.id;
+        //             await userGame.save({ transaction });
+        //         }
+        //     }
+        // })
     }
 
 
