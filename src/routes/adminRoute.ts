@@ -5,6 +5,7 @@ import AdminUserController from '../controllers/adminController/adminUserControl
 import AdminGameController from '../controllers/adminController/adminGameController';
 import AdminSupportController from '../controllers/adminController/adminSupportController';
 import AdminStudioController from '../controllers/adminController/adminStudioController';
+import AdminContentsController from '../controllers/adminController/adminContentsController';
 import { adminTracking, validateAdminIdToken } from './_common';
 import FileManager from '../services/fileManager';
 
@@ -34,6 +35,25 @@ export default (router: Router) => {
     router.get(`${apiVer}/admin/user/profile`,      validateAdminIdToken,   convert(AdminUserController.getUserProfile));
     router.post(`${apiVer}/admin/user/ban`,         validateAdminIdToken,   adminTracking,  convert(AdminUserController.banUser));
 
+
+    /**
+     * 게임
+     */
+    router.get(`${apiVer}/admin/games`,         validateAdminIdToken,   convert(AdminGameController.getGames));
+    router.post(`${apiVer}/admin/game/u`,       validateAdminIdToken,   adminTracking,  convert(AdminGameController.updateGame));
+
+
+    /**
+     * 이용 제재
+     */
+    router.post(`${apiVer}/admin/punish/game`,  validateAdminIdToken,   adminTracking,  convert(AdminContentsController.punishGame));
+
+
+    /**
+     * 우편함
+     */
+    router.post(`${apiVer}/admin/send-mail`,    validateAdminIdToken,   adminTracking,  convert(AdminUserController.sendMail));
+    router.post(`${apiVer}/admin/cancel-mail`,  validateAdminIdToken,   adminTracking,  convert(AdminUserController.cancelMail));
 
     /**
      * 고객지원
@@ -68,12 +88,6 @@ export default (router: Router) => {
     router.post(`${apiVer}/admin/filter/bad-word/c`,    validateAdminIdToken,   convert(AdminUserController.addBadWord));
     router.post(`${apiVer}/admin/filter/bad-word/u`,    validateAdminIdToken,   convert(AdminUserController.setBadWord));
     router.post(`${apiVer}/admin/filter/bad-word/d`,    validateAdminIdToken,   convert(AdminUserController.delBadWord));
-
-    /**
-     * 게임
-     */
-    router.get(`${apiVer}/admin/games`,         validateAdminIdToken,   convert(AdminGameController.getGames));
-    router.post(`${apiVer}/admin/game/u`,       validateAdminIdToken,   adminTracking,  convert(AdminGameController.updateGame));
 
 
     // router.get(`${apiVer}/admin/projects`,      validateAdminIdToken,   convert(AdminGameController.getProjects));

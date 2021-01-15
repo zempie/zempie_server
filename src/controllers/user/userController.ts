@@ -239,7 +239,7 @@ class UserController {
 
             const updateRequest: any = {};
 
-            if ( params.channel_id ) {
+            if ( user.channel_id !== params.channel_id && params.channel_id ) {
                 // 규칙 확인
                 if ( !isOK_channelID(params.channel_id) ) {
                     throw CreateError(ErrorCodes.INVALID_CHANNEL_ID);

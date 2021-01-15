@@ -81,6 +81,10 @@ export const ErrorCodes = {
     INVALID_ADMIN_PARAMS: {
         message: '관리자 파라미터 오류'
     },
+    ALREADY_ADMIN_USER_READ_MAIL: {
+        code: 1211,
+        message: '이미 읽은 우편',
+    },
 
 
     USER_ALREADY_VERIFIED_EMAIL: {

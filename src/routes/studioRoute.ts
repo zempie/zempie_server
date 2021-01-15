@@ -5,7 +5,7 @@ import FileManager from "../services/fileManager";
 import convert from "../controllers/_convert";
 import UserController from "../controllers/user/userController";
 import StudioController  from '../controllers/studio/studioController';
-import StudioAdminController from '../controllers/adminController/studioAdminController';
+import AdminStudioController from '../controllers/adminController/adminStudioController';
 
 
 const apiVer = `/api/v1`;
@@ -44,9 +44,9 @@ export default (router: Router) => {
 // RpcController.generator( 'create-version', StudioController.createVersion, true );
 // RpcController.generator( 'set-version', StudioController.updateVersion, true );
 
-RpcController.generator( 'admin-get-versions', StudioAdminController.getVersions, true );
-RpcController.generator( 'admin-get-version', StudioAdminController.getVersion, true );
-RpcController.generator( 'admin-set-version', StudioAdminController.setVersion, true );
+RpcController.generator( 'admin-get-versions', AdminStudioController.getVersions, true );
+RpcController.generator( 'admin-get-version', AdminStudioController.getVersion, true );
+RpcController.generator( 'admin-set-version', AdminStudioController.setVersion, true );
 
 
 // RpcController.generator( 'delete-version', StudioController.deleteProject, true );

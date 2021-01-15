@@ -44,3 +44,47 @@ paths:
       responses:
         200:
           description: ㅇㅋ
+
+  /user/sign-up:
+    post:
+      tags:
+        - Zempie User
+      summary: 가입
+      security:
+          - bearerAuth: []
+      parameters:
+        - name: name
+          in: body
+          type: string
+          description: 이름
+          required: false
+      responses:
+        200:
+          $ref: '#/components/responses/Okay'
+        403:
+          $ref: '#/components/responses/UnauthorizedError'
+
+  /user/update/info:
+    post:
+      tags:
+        - Zempie User
+      summary: 사용자 채널 정보 수정
+      security:
+          - bearerAuth: []
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                channel_id:
+                  type: string
+                  description: 채널 ID
+                name:
+                  type: string
+                  description: 이름
+      responses:
+        200:
+          $ref: '#/components/responses/Okay'
+        403:
+          $ref: '#/components/responses/UnauthorizedError'
