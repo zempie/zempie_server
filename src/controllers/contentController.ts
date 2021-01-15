@@ -1,7 +1,6 @@
 import admin from 'firebase-admin';
 import DecodedIdToken = admin.auth.DecodedIdToken;
 import { dbs } from '../commons/globals';
-import { Transaction } from 'sequelize';
 import { eReportType } from '../commons/enums';
 import { CreateError, ErrorCodes } from '../commons/errorCodes';
 

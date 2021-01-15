@@ -178,7 +178,7 @@ class UserController {
                     throw errorCodes_1.CreateError(errorCodes_1.ErrorCodes.INVALID_USER_UID);
                 }
                 const updateRequest = {};
-                if (params.channel_id) {
+                if (user.channel_id !== params.channel_id && params.channel_id) {
                     // 규칙 확인
                     if (!utils_1.isOK_channelID(params.channel_id)) {
                         throw errorCodes_1.CreateError(errorCodes_1.ErrorCodes.INVALID_CHANNEL_ID);

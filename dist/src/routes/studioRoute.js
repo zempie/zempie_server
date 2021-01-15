@@ -5,7 +5,7 @@ const _common_1 = require("./_common");
 const fileManager_1 = require("../services/fileManager");
 const _convert_1 = require("../controllers/_convert");
 const studioController_1 = require("../controllers/studio/studioController");
-const studioAdminController_1 = require("../controllers/adminController/studioAdminController");
+const adminStudioController_1 = require("../controllers/adminController/adminStudioController");
 const apiVer = `/api/v1`;
 exports.default = (router) => {
     // router.post(`${apiVer}/studio/developer`,   validateFirebaseIdToken, FileManager.uploadImage, convert(StudioController.createDeveloper));
@@ -32,8 +32,8 @@ exports.default = (router) => {
 // RpcController.generator( 'get-version', StudioController.getVersion, true );
 // RpcController.generator( 'create-version', StudioController.createVersion, true );
 // RpcController.generator( 'set-version', StudioController.updateVersion, true );
-rpcController_1.default.generator('admin-get-versions', studioAdminController_1.default.getVersions, true);
-rpcController_1.default.generator('admin-get-version', studioAdminController_1.default.getVersion, true);
-rpcController_1.default.generator('admin-set-version', studioAdminController_1.default.setVersion, true);
+rpcController_1.default.generator('admin-get-versions', adminStudioController_1.default.getVersions, true);
+rpcController_1.default.generator('admin-get-version', adminStudioController_1.default.getVersion, true);
+rpcController_1.default.generator('admin-set-version', adminStudioController_1.default.setVersion, true);
 // RpcController.generator( 'delete-version', StudioController.deleteProject, true );
 //# sourceMappingURL=studioRoute.js.map

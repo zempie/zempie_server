@@ -12,10 +12,42 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const globals_1 = require("../../commons/globals");
 const _ = require("lodash");
 const user_1 = require("../../database/mysql/models/user/user");
+const notifyService_1 = require("../../services/notifyService");
+const errorCodes_1 = require("../../commons/errorCodes");
 /**
  * 사용자
  */
 class AdminUserController {
+    notify({ title, body }, admin) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const topic = 'test-topic';
+            const data = {
+                title,
+                body,
+            };
+            yield notifyService_1.default.send({ topic, data });
+        });
+    }
+    /**
+     * mail
+     */
+    sendMail({ user_id, title, content }, _admin) {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield globals_1.dbs.UserMailbox.create({ user_id, title, content });
+        });
+    }
+    cancelMail({ mail_id }) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const mail = yield globals_1.dbs.UserMailbox.findOne({ id: mail_id });
+            if (mail.is_read) {
+                throw errorCodes_1.CreateError(errorCodes_1.ErrorCodes.ALREADY_ADMIN_USER_READ_MAIL);
+            }
+            yield mail.destroy({});
+        });
+    }
+    /**
+     * user
+     */
     getUsers({ limit = 50, offset = 0, sort = 'id', dir = 'asc' }, admin) {
         return __awaiter(this, void 0, void 0, function* () {
             const { count, rows } = yield globals_1.dbs.User.getProfileAll({ limit, offset, sort, dir });

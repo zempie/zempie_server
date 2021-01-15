@@ -3,6 +3,8 @@ import { dbs } from '../../commons/globals';
 import * as _ from 'lodash';
 import { EBan } from '../../database/mysql/models/user/user';
 import { Transaction } from 'sequelize';
+import NotifyService from '../../services/notifyService';
+import { CreateError, ErrorCodes } from '../../commons/errorCodes';
 
 
 /**
@@ -10,6 +12,33 @@ import { Transaction } from 'sequelize';
  */
 
 class AdminUserController {
+    async notify({ title, body }: any, admin: IAdmin) {
+        const topic = 'test-topic';
+        const data = {
+            title,
+            body,
+        }
+        await NotifyService.send({ topic, data });
+    }
+
+    /**
+     * mail
+     */
+    async sendMail ({ user_id, title, content }: any, _admin: IAdmin) {
+        await dbs.UserMailbox.create({ user_id, title, content });
+    }
+    async cancelMail ({ mail_id }: any) {
+        const mail = await dbs.UserMailbox.findOne({ id: mail_id });
+        if ( mail.is_read ) {
+            throw CreateError(ErrorCodes.ALREADY_ADMIN_USER_READ_MAIL);
+        }
+        await mail.destroy({});
+    }
+
+
+    /**
+     * user
+     */
     async getUsers({ limit = 50, offset = 0, sort = 'id', dir = 'asc' }, admin: IAdmin) {
         const { count, rows } = await dbs.User.getProfileAll({ limit, offset, sort, dir });
         return {

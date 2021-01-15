@@ -2,9 +2,9 @@ import {dbs} from "../../commons/globals";
 import {Transaction} from "sequelize";
 import {IAdmin} from "../_interfaces";
 
+
 class AdminStudioController {
     getVersions = async  ( params : any, admin: IAdmin )=>{
-
         return await dbs.ProjectVersion.findAll(  { state : 'process' }, {
             include : [{
                 model: dbs.Project.model,

@@ -6,6 +6,7 @@ const adminUserController_1 = require("../controllers/adminController/adminUserC
 const adminGameController_1 = require("../controllers/adminController/adminGameController");
 const adminSupportController_1 = require("../controllers/adminController/adminSupportController");
 const adminStudioController_1 = require("../controllers/adminController/adminStudioController");
+const adminContentsController_1 = require("../controllers/adminController/adminContentsController");
 const _common_1 = require("./_common");
 const fileManager_1 = require("../services/fileManager");
 const apiVer = `/api/v1`;
@@ -27,6 +28,20 @@ exports.default = (router) => {
     router.get(`${apiVer}/admin/user/list`, _common_1.validateAdminIdToken, _convert_1.default(adminUserController_1.default.getUsers));
     router.get(`${apiVer}/admin/user/profile`, _common_1.validateAdminIdToken, _convert_1.default(adminUserController_1.default.getUserProfile));
     router.post(`${apiVer}/admin/user/ban`, _common_1.validateAdminIdToken, _common_1.adminTracking, _convert_1.default(adminUserController_1.default.banUser));
+    /**
+     * 게임
+     */
+    router.get(`${apiVer}/admin/games`, _common_1.validateAdminIdToken, _convert_1.default(adminGameController_1.default.getGames));
+    router.post(`${apiVer}/admin/game/u`, _common_1.validateAdminIdToken, _common_1.adminTracking, _convert_1.default(adminGameController_1.default.updateGame));
+    /**
+     * 이용 제재
+     */
+    router.post(`${apiVer}/admin/punish/game`, _common_1.validateAdminIdToken, _common_1.adminTracking, _convert_1.default(adminContentsController_1.default.punishGame));
+    /**
+     * 우편함
+     */
+    router.post(`${apiVer}/admin/send-mail`, _common_1.validateAdminIdToken, _common_1.adminTracking, _convert_1.default(adminUserController_1.default.sendMail));
+    router.post(`${apiVer}/admin/cancel-mail`, _common_1.validateAdminIdToken, _common_1.adminTracking, _convert_1.default(adminUserController_1.default.cancelMail));
     /**
      * 고객지원
      */
@@ -54,11 +69,6 @@ exports.default = (router) => {
     router.post(`${apiVer}/admin/filter/bad-word/c`, _common_1.validateAdminIdToken, _convert_1.default(adminUserController_1.default.addBadWord));
     router.post(`${apiVer}/admin/filter/bad-word/u`, _common_1.validateAdminIdToken, _convert_1.default(adminUserController_1.default.setBadWord));
     router.post(`${apiVer}/admin/filter/bad-word/d`, _common_1.validateAdminIdToken, _convert_1.default(adminUserController_1.default.delBadWord));
-    /**
-     * 게임
-     */
-    router.get(`${apiVer}/admin/games`, _common_1.validateAdminIdToken, _convert_1.default(adminGameController_1.default.getGames));
-    router.post(`${apiVer}/admin/game/u`, _common_1.validateAdminIdToken, _common_1.adminTracking, _convert_1.default(adminGameController_1.default.updateGame));
     // router.get(`${apiVer}/admin/projects`,      validateAdminIdToken,   convert(AdminGameController.getProjects));
     /**
      *
