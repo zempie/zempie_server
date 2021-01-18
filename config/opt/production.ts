@@ -72,6 +72,7 @@ export default {
             'http://studio.zempie.com', 'https://studio.zempie.com',
             'http://support.zempie.com', 'https://support.zempie.com',
             'http://admin.zempie.com', 'https://admin.zempie.com',
+            'https://zempie.web.app',
         ],
         secure: false,
         domain: '.zempie.com',

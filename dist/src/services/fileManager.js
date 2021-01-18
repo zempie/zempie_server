@@ -27,8 +27,8 @@ class FileManager {
         this.uploadImage = (req, res, next) => __awaiter(this, void 0, void 0, function* () {
             try {
                 // const { user } = req;
-                const { params, files } = yield this.formidable(req);
-                req.params = params;
+                const { fields, files } = yield this.formidable(req);
+                req.params = Object.assign(Object.assign({}, req.params), fields);
                 req.files = files;
                 next();
             }
@@ -39,7 +39,7 @@ class FileManager {
         this.uploadImage2 = (maxFileSizeMB = 100, maxFieldsSizeMB = 20) => {
             return (req, res, next) => __awaiter(this, void 0, void 0, function* () {
                 try {
-                    const { err, params, files } = yield this.formidable(req, maxFileSizeMB, maxFieldsSizeMB);
+                    const { err, fields, files } = yield this.formidable(req, maxFileSizeMB, maxFieldsSizeMB);
                     if (err) {
                         if (err.message.includes('maxFileSize')) {
                             _convert_1.responseError(res, errorCodes_1.CreateError(errorCodes_1.ErrorCodes.MAX_FILE_SIZE_EXCEEDED));
@@ -49,7 +49,7 @@ class FileManager {
                         }
                     }
                     else {
-                        req.params = params;
+                        req.params = Object.assign(Object.assign({}, req.params), fields);
                         req.files = files;
                         next();
                     }
@@ -78,7 +78,7 @@ class FileManager {
                     // const webps = await this.convertToWebp(_.map(files), 80);
                     resolve({
                         err,
-                        params: fields,
+                        fields,
                         files
                     });
                 }));

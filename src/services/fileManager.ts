@@ -23,8 +23,8 @@ class FileManager {
     uploadImage = async (req: Request, res: Response, next: NextFunction) => {
         try {
             // const { user } = req;
-            const { params, files }: any = await this.formidable(req);
-            req.params = params;
+            const { fields, files }: any = await this.formidable(req);
+            req.params = { ...req.params, ...fields };
             req.files = files;
             next();
         }
@@ -35,7 +35,7 @@ class FileManager {
     uploadImage2 = (maxFileSizeMB = 100, maxFieldsSizeMB = 20) => {
         return async (req: Request, res: Response, next: NextFunction) => {
             try {
-                const { err, params, files }: any = await this.formidable(req, maxFileSizeMB, maxFieldsSizeMB);
+                const { err, fields, files }: any = await this.formidable(req, maxFileSizeMB, maxFieldsSizeMB);
                 if ( err ) {
                     if ( err.message.includes('maxFileSize') ) {
                         responseError(res, CreateError(ErrorCodes.MAX_FILE_SIZE_EXCEEDED));
@@ -45,7 +45,7 @@ class FileManager {
                     }
                 }
                 else {
-                    req.params = params;
+                    req.params = { ...req.params, ...fields };
                     req.files = files;
                     next();
                 }
@@ -80,7 +80,7 @@ class FileManager {
 
                 resolve({
                     err,
-                    params: fields,
+                    fields,
                     files
                 });
             })
