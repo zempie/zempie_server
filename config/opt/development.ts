@@ -28,9 +28,9 @@ export default {
     Url: {
         Host: 'http://gtest.fromthered.com:8280',
         DeployApiV1: 'http://gtest.fromthered.com:8288/api/v1',
-        GameClient: 'http://localhost:8080/#/play',
+        GameClient: 'http://localhost:8080/play',
         Redirect: 'http://localhost:8280/game',
-        Launcher: 'http://gtest.fromthered.com/zempie/launcher/#',
+        Launcher: 'http://gtest.fromthered.com/zempie/launcher',
     },
 
     Deploy: {

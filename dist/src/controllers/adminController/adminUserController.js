@@ -11,7 +11,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const globals_1 = require("../../commons/globals");
 const _ = require("lodash");
-const user_1 = require("../../database/mysql/models/user/user");
 const notifyService_1 = require("../../services/notifyService");
 const errorCodes_1 = require("../../commons/errorCodes");
 /**
@@ -67,23 +66,23 @@ class AdminUserController {
             };
         });
     }
+    // deprecated
     banUser({ id, activated, banned, reason, period }, admin) {
         return __awaiter(this, void 0, void 0, function* () {
-            yield globals_1.dbs.User.getTransaction((transaction) => __awaiter(this, void 0, void 0, function* () {
-                const user = yield globals_1.dbs.User.getInfo({ user_id: id }, transaction);
-                if (activated)
-                    user.activated = activated;
-                if (banned && reason && period && Object.values(user_1.EBan).includes(banned)) {
-                    user.banned = banned;
-                    yield globals_1.dbs.UserBan.create({
-                        user_id: id,
-                        admin_id: admin.id,
-                        reason,
-                        period,
-                    }, transaction);
-                }
-                yield user.save({ transaction });
-            }));
+            // await dbs.User.getTransaction(async (transaction: Transaction) => {
+            //     const user = await dbs.User.getInfo({ user_id: id }, transaction);
+            //     if ( activated ) user.activated = activated;
+            //     if ( banned && reason && period && Object.values(EBan).includes(banned) ) {
+            //         user.banned = banned;
+            //         await dbs.UserBan.create({
+            //             user_id: id,
+            //             admin_id: admin.id,
+            //             reason,
+            //             period,
+            //         }, transaction)
+            //     }
+            //     await user.save({ transaction });
+            // })
         });
     }
     getBadWords({ limit = 50, offset = 0 }) {

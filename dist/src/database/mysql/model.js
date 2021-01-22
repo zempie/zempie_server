@@ -34,6 +34,11 @@ class Model {
             // return this.model.sequelize.transaction(async (transaction?: Transaction) => {
             //     return await callback(transaction);
             // });
+            // await this.model.sequelize.transaction({
+            //     isolationLevel: Transaction.ISOLATION_LEVELS.SERIALIZABLE,
+            // }, async (transaction?: Transaction) => {
+            //     return await callback(transaction);
+            // })
             return Model.queue.add(() => this.model.sequelize.transaction((transaction) => callback(transaction)));
         });
     }

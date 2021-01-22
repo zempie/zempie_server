@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import convert from '../controllers/_convert';
-import { isAuthenticated, validateFirebaseIdToken } from './_common';
+import { checkUserDenied, isAuthenticated, validateFirebaseIdToken } from './_common';
 import UserController from '../controllers/user/userController';
 import UserPlaylistController from '../controllers/user/userPlaylistController';
 import AlarmController from '../controllers/alarmController';
@@ -53,4 +53,5 @@ export default (router: Router) => {
 
     // for testing
     router.get(`${apiVer}/test-mongo`,      convert(UserController.testMongo));
+    router.post(`${apiVer}/test-claim`,     validateFirebaseIdToken,    checkUserDenied('reply'),    convert(UserController.testClaim));
 }

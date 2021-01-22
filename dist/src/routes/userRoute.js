@@ -41,5 +41,6 @@ exports.default = (router) => {
     router.get(`${apiVer}/user/publishing`, _common_1.validateFirebaseIdToken, _convert_1.default(publishingController_1.default.getList));
     // for testing
     router.get(`${apiVer}/test-mongo`, _convert_1.default(userController_1.default.testMongo));
+    router.post(`${apiVer}/test-claim`, _common_1.validateFirebaseIdToken, _common_1.checkUserDenied('reply'), _convert_1.default(userController_1.default.testClaim));
 };
 //# sourceMappingURL=userRoute.js.map

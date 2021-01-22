@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.adminTracking = exports.validateAdminIdToken = exports.validateFirebaseIdToken = exports.getIdToken = exports.isAuthenticated = exports.readyToPlay = exports.validateUid = exports.throwError = void 0;
+exports.adminTracking = exports.checkUserDenied = exports.validateAdminIdToken = exports.validateFirebaseIdToken = exports.getIdToken = exports.isAuthenticated = exports.readyToPlay = exports.validateUid = exports.throwError = void 0;
 const admin = require("firebase-admin");
 const utils_1 = require("../commons/utils");
 const globals_1 = require("../commons/globals");
@@ -123,6 +123,17 @@ const validateAdminIdToken = (req, res, next) => __awaiter(void 0, void 0, void 
     }
 });
 exports.validateAdminIdToken = validateAdminIdToken;
+const checkUserDenied = (name) => {
+    return (req, res, next) => {
+        var _a;
+        const claim = req.user.zempie;
+        if (((_a = claim === null || claim === void 0 ? void 0 : claim.deny[name]) === null || _a === void 0 ? void 0 : _a.state) && claim.deny[name].date >= Date.now()) {
+            return throwError(res, `Access Denied: ${name}`, 403);
+        }
+        return next();
+    };
+};
+exports.checkUserDenied = checkUserDenied;
 const adminTracking = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     globals_1.dbs.AdminLog.create({
         admin_id: req.user.id,

@@ -21,6 +21,7 @@ var eReportType;
 (function (eReportType) {
     eReportType[eReportType["User"] = 0] = "User";
     eReportType[eReportType["Game"] = 1] = "Game";
+    eReportType[eReportType["Reply"] = 2] = "Reply";
 })(eReportType = exports.eReportType || (exports.eReportType = {}));
 var eTimeline;
 (function (eTimeline) {

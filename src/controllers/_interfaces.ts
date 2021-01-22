@@ -45,6 +45,15 @@ export interface IPublisher extends IDecoded {
  */
 export interface IZempieClaims {
     zempie: {
+        deny: {
+            [key: string]: {
+                state: boolean,
+                date: number,
+                count: number
+            },
+        },
+
+        [key: string]: any
     }
 }
 

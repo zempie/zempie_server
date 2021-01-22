@@ -13,6 +13,11 @@ const model_1 = require("../../model");
 const sequelize_1 = require("sequelize");
 const enums_1 = require("../../../../commons/enums");
 const globals_1 = require("../../../../commons/globals");
+/**
+ * 신고 하기
+ * user_id: 신고한 유저
+ * target_id: 신고 당한 유저/게임/댓글/...
+ */
 class UserReportModel extends model_1.default {
     initialize() {
         this.name = 'userReport';
@@ -22,6 +27,7 @@ class UserReportModel extends model_1.default {
             target_id: { type: sequelize_1.DataTypes.INTEGER, allowNull: false },
             reason_num: { type: sequelize_1.DataTypes.SMALLINT, allowNull: false },
             reason: { type: sequelize_1.DataTypes.STRING(300) },
+            is_done: { type: sequelize_1.DataTypes.BOOLEAN, allowNull: false },
         };
     }
     afterSync() {

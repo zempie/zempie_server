@@ -356,6 +356,36 @@ class UserController {
                 // doc.save({ session });
             }));
         });
+        this.testClaim = (params, user) => __awaiter(this, void 0, void 0, function* () {
+            // const claim = {
+            //     zempie: {
+            //         deny: {
+            //             reply: {
+            //                 state: true,
+            //                 date: new Date(2021,0, 22),
+            //                 count: 1,
+            //             }
+            //         }
+            //     }
+            // };
+            //
+            // if ( !user.zempie ) {
+            //     await admin.auth().setCustomUserClaims(user.uid, claim);
+            // }
+            // else {
+            //     console.log(JSON.stringify(claim))
+            // }
+            const userClaim = yield globals_1.dbs.UserClaim.findOne({ user_uid: user.uid });
+            const claim = JSON.parse(userClaim.data);
+            claim.zempie.deny['reply'] = {
+                state: true,
+                date: new Date(2020, 0, 23).getTime(),
+                count: claim.zempie.deny['reply'].count + 1,
+            };
+            userClaim.data = claim;
+            userClaim.save();
+            firebase_admin_1.default.auth().setCustomUserClaims(userClaim.user_uid, claim);
+        });
     }
     verifyEmail({}, user) {
         return __awaiter(this, void 0, void 0, function* () {

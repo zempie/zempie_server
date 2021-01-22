@@ -80,6 +80,19 @@ class UserModel extends model_1.default {
                 transaction
             });
         });
+        this.getClaims = ({ user_id }) => __awaiter(this, void 0, void 0, function* () {
+            const claims = yield this.model.findOne({
+                where: { id: user_id },
+                include: [{
+                        model: globals_1.dbs.UserClaim.model,
+                        as: 'claims',
+                        attributes: {
+                            exclude: ['created_at', 'updated_at', 'deleted_at'],
+                        }
+                    }],
+            });
+            return claims.get({ plain: true });
+        });
     }
     initialize() {
         this.name = 'user';
@@ -110,6 +123,7 @@ class UserModel extends model_1.default {
             this.model.hasMany(globals_1.dbs.UserPublishing.model, { sourceKey: 'uid', foreignKey: 'user_uid', as: 'publishing' });
             this.model.hasMany(globals_1.dbs.UserExternalLink.model, { as: 'externalLink' });
             this.model.hasMany(globals_1.dbs.Game.model, { as: 'devGames' });
+            this.model.hasMany(globals_1.dbs.UserClaim.model, { as: 'claims' });
             const desc = yield this.model.sequelize.queryInterface.describeTable(this.model.tableName);
             if (!desc['last_log_in']) {
                 this.model.sequelize.queryInterface.addColumn(this.model.tableName, 'last_log_in', {

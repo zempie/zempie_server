@@ -10,6 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const globals_1 = require("../../commons/globals");
+const firebase_admin_1 = require("firebase-admin");
 class AdminContentsController {
     constructor() {
         this.punishGame = ({ game_id, title, content }, _admin) => __awaiter(this, void 0, void 0, function* () {
@@ -23,6 +24,18 @@ class AdminContentsController {
                 title,
                 content,
             });
+        });
+        this.punishUser = ({ user_id, name, value, date }, _admin) => __awaiter(this, void 0, void 0, function* () {
+            const userClaim = yield globals_1.dbs.UserClaim.find({ id: user_id });
+            const claim = JSON.parse(userClaim.data);
+            claim.zempie.deny[name] = {
+                state: value,
+                date,
+                count: value ? claim.zempie.deny[name].count + 1 : 1,
+            };
+            userClaim.data = claim;
+            userClaim.save();
+            yield firebase_admin_1.default.auth().setCustomUserClaims(userClaim.user_uid, claim);
         });
     }
 }

@@ -1,5 +1,7 @@
-import { IAdmin } from '../_interfaces';
+import * as _ from 'lodash';
+import { IAdmin, IZempieClaims } from '../_interfaces';
 import { dbs } from '../../commons/globals';
+import admin from 'firebase-admin';
 
 
 class AdminContentsController {
@@ -15,6 +17,23 @@ class AdminContentsController {
             title,
             content,
         })
+    }
+
+
+    punishUser = async ({ user_id, name, value, date }: any, _admin: IAdmin) => {
+        const userClaim = await dbs.UserClaim.find({id: user_id});
+        const claim: IZempieClaims = JSON.parse(userClaim.data);
+
+        claim.zempie.deny[name] = {
+            state: value,
+            date,
+            count: value? claim.zempie.deny[name].count + 1 : 1,
+        };
+
+        userClaim.data = claim;
+        userClaim.save();
+
+        await admin.auth().setCustomUserClaims(userClaim.user_uid, claim);
     }
 }
 

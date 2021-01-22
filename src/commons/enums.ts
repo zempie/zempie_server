@@ -15,6 +15,7 @@ export enum eInquiry {
 export enum eReportType{
     User,
     Game,
+    Reply,
 }
 
 

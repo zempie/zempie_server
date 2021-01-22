@@ -42,6 +42,7 @@ class UserModel extends Model {
         this.model.hasMany(dbs.UserPublishing.model, { sourceKey: 'uid', foreignKey: 'user_uid', as: 'publishing' });
         this.model.hasMany(dbs.UserExternalLink.model, { as: 'externalLink' });
         this.model.hasMany(dbs.Game.model, { as: 'devGames' });
+        this.model.hasMany(dbs.UserClaim.model, { as: 'claims' });
 
         const desc = await this.model.sequelize.queryInterface.describeTable(this.model.tableName);
         if ( !desc['last_log_in'] ) {
@@ -207,6 +208,22 @@ class UserModel extends Model {
             offset,
             transaction
         })
+    }
+
+
+    getClaims = async ({ user_id }: any) => {
+        const claims = await this.model.findOne({
+            where: { id: user_id },
+            include: [{
+                model: dbs.UserClaim.model,
+                as: 'claims',
+                attributes: {
+                    exclude: ['created_at', 'updated_at', 'deleted_at'],
+                }
+            }],
+        });
+
+        return claims.get({plain: true});
     }
 }
 

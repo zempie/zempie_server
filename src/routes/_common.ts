@@ -139,6 +139,17 @@ export const validateAdminIdToken = async (req: Request, res: Response, next: Ne
 }
 
 
+export const checkUserDenied = (name: string) => {
+    return (req: Request, res: Response, next: NextFunction) => {
+        const claim = req.user.zempie;
+        if ( claim?.deny[name]?.state && claim.deny[name].date >= Date.now() ) {
+            return throwError(res, `Access Denied: ${name}`, 403)
+        }
+        return next();
+    }
+}
+
+
 export const adminTracking = async (req: Request, res: Response, next: NextFunction) => {
     dbs.AdminLog.create({
         admin_id: req.user.id,

@@ -4,6 +4,12 @@ import { eReportType } from '../../../../commons/enums';
 import { dbs } from '../../../../commons/globals';
 
 
+/**
+ * 신고 하기
+ * user_id: 신고한 유저
+ * target_id: 신고 당한 유저/게임/댓글/...
+ */
+
 class UserReportModel extends Model {
     protected initialize(): void {
         this.name = 'userReport';
@@ -13,6 +19,7 @@ class UserReportModel extends Model {
             target_id:      { type: DataTypes.INTEGER, allowNull: false },
             reason_num:     { type: DataTypes.SMALLINT, allowNull: false },
             reason:         { type: DataTypes.STRING(300) },
+            is_done:        { type: DataTypes.BOOLEAN, allowNull: false },
         }
     }
 
