@@ -28,9 +28,9 @@ export default {
     Url: {
         Host: 'http://192.168.0.196:8280',
         DeployApiV1: 'http://192.168.0.196:8288/api/v1',
-        GameClient: 'http://localhost:8080/#/play',
+        GameClient: 'http://localhost:8080/play',
         Redirect: 'http://localhost:8280/game',
-        Launcher: 'http://localhost:8080/#',
+        Launcher: 'http://localhost:8080',
     },
 
     Deploy: {

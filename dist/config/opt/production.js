@@ -24,9 +24,9 @@ exports.default = {
     },
     Url: {
         Host: 'https://zempie.com',
-        GameClient: 'http://zempie.com/#/play',
+        GameClient: 'http://zempie.com/play',
         Redirect: 'https://zempie.com/share',
-        Launcher: 'https://launcher.zempie.com/#',
+        Launcher: 'https://launcher.zempie.com',
     },
     AWS: {
         // Bucket: 'zempie-rsc/v1',
@@ -64,8 +64,7 @@ exports.default = {
             'http://launcher.zempie.com', 'https://launcher.zempie.com',
             'http://studio.zempie.com', 'https://studio.zempie.com',
             'http://support.zempie.com', 'https://support.zempie.com',
-            'http://admin.zempie.com', 'https://admin.zempie.com',
-            'https://zempie.web.app',
+            'http://admin.zempie.com', 'https://admin.zempie.com'
         ],
         secure: false,
         domain: '.zempie.com',
