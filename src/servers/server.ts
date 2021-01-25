@@ -149,7 +149,7 @@ export default class Server {
             const { generateSchema } = require('sequelize-graphql-schema')(options);
             const schema = generateSchema(models);
             const hooker: any = (req: Request, res: Response, next: any) => {
-                if ( !req.body?.query?.includes('Get') ) {
+                if ( req.method.toUpperCase() !== 'GET' && req.body?.query?.includes('Post') ) {
                     return adminTracking(req, res, next);
                 }
                 next();

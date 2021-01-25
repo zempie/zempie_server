@@ -36,7 +36,7 @@ class ApiServer extends Server {
         launcherRoute(app);
         supportRoute(app);
 
-        tcpRoute(app);
+        // tcpRoute(app);
 
         // scheduleService.start()
         // ExchangeManager.start()

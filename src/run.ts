@@ -5,7 +5,7 @@ import cfgOption from '../config/opt';
 
 (async () => {
     const options: IServerOptions = {
-        tcp: true,
+        tcp: false,
         port: cfgOption.Server.http.port,
         static_path: [
             { path: '/', route: 'public' },
