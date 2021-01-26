@@ -47,7 +47,7 @@ export default (router: Router) => {
      * 이용 제재
      */
     router.post(`${apiVer}/admin/punish/game`,  validateAdminIdToken,   adminTracking,  convert(AdminContentsController.punishGame));
-
+    router.post(`${apiVer}/admin/punish/user`,  validateAdminIdToken,   adminTracking,  convert(AdminContentsController.punishUser));
 
     /**
      * 우편함

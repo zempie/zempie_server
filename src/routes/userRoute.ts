@@ -2,6 +2,7 @@ import { Router } from 'express';
 import convert from '../controllers/_convert';
 import { checkUserDenied, isAuthenticated, validateFirebaseIdToken } from './_common';
 import UserController from '../controllers/user/userController';
+import UserContentController from '../controllers/user/userContentController';
 import UserPlaylistController from '../controllers/user/userPlaylistController';
 import AlarmController from '../controllers/alarmController';
 import ContentController from '../controllers/contentController';
@@ -30,6 +31,12 @@ export default (router: Router) => {
 
     router.get(`${apiVer}/user/info`,               validateFirebaseIdToken,    isAuthenticated,    convert(UserController.getInfo));
     router.get(`${apiVer}/channel/:channel_id`,     validateFirebaseIdToken,    convert(UserController.getTargetInfoByChannelId));
+
+
+    router.get(`${apiVer}/user/mails`,              validateFirebaseIdToken,    isAuthenticated,    convert(UserContentController.getMailbox));
+    router.get(`${apiVer}/user/mail/:id`,           validateFirebaseIdToken,    isAuthenticated,    convert(UserContentController.readMail));
+    router.post(`${apiVer}/user/mail/d`,            validateFirebaseIdToken,    isAuthenticated,    convert(UserContentController.deleteMail));
+
 
     router.get(`${apiVer}/playlists`,               validateFirebaseIdToken,    convert(UserPlaylistController.getPlaylists));
     router.get(`${apiVer}/playlist/:uid`,           validateFirebaseIdToken,    convert(UserPlaylistController.getPlaylist));

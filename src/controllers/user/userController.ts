@@ -473,7 +473,7 @@ class UserController {
 
         claim.zempie.deny['reply'] = {
             state: true,
-            date: new Date(2020, 0, 23).getTime(),
+            date: new Date(2021, 0, 23).getTime(),
             count: claim.zempie.deny['reply'].count + 1,
         };
 

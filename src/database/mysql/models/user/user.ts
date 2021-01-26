@@ -22,6 +22,7 @@ class UserModel extends Model {
             uid:                { type: DataTypes.STRING(36), allowNull: false, unique: true },
             activated:          { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: true },
             banned:             { type: DataTypes.SMALLINT, allowNull: false, defaultValue: EBan.not },
+
             name:               { type: DataTypes.STRING(20), allowNull: true },
             channel_id:         { type: DataTypes.STRING(36), allowNull: false },
             picture:            { type: DataTypes.STRING(250), allowNull: true },

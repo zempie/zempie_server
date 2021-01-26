@@ -28,6 +28,7 @@ class GameModel extends Model {
 
             count_start:        { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0 },
             count_over:         { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0 },
+            count_heart:        { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0 },
 
             url_game:           { type: DataTypes.STRING },
             url_thumb:          { type: DataTypes.STRING },
@@ -65,6 +66,14 @@ class GameModel extends Model {
             this.model.sequelize.queryInterface.addColumn(this.model.tableName, 'url_thumb_gif', {
                 type: DataTypes.STRING,
                 after: 'url_thumb_webp'
+            })
+        }
+        if ( !desc['count_heart'] ) {
+            this.model.sequelize.queryInterface.addColumn(this.model.tableName, 'count_heart', {
+                type: DataTypes.INTEGER,
+                allowNull: false,
+                defaultValue: 0,
+                after: 'count_over'
             })
         }
     }
