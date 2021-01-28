@@ -3,6 +3,7 @@ export function getGameData (game: any) {
     return {
         id: game.id,
         official: game.official,
+        category: game.category,
         title: game.title,
         description: game.description,
         pathname: game.pathname,
@@ -10,6 +11,7 @@ export function getGameData (game: any) {
         control_type: game.control_type,
         hashtags: game.hashtags,
         count_over: game.count_over,
+        count_heart: game.count_heart,
         url_game: game.url_game,
         url_thumb: game.url_thumb,
         url_thumb_webp: game.url_thumb_webp,

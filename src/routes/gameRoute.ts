@@ -22,6 +22,8 @@ export default (router: Router) => {
     router.get(`${apiVer}/games/ranking/g`,     validateFirebaseIdToken,    convert(RankingController.getGlobalRanking));
     router.get(`${apiVer}/games/ranking/f`,     validateFirebaseIdToken,    convert(RankingController.getFollowingRanking));
 
+    // 게임 하르 ❤
+    router.post(`${apiVer}/game/heart`,         validateFirebaseIdToken,    isAuthenticated,    convert(GameContentController.heart));
 
     // 도전 게임 - 평가 리포트
     router.get(`${apiVer}/game/ch-report`,      validateFirebaseIdToken,    convert(GameContentController.getReports));

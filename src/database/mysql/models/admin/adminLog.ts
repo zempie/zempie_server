@@ -18,8 +18,8 @@ class AdminLogModel extends Model {
         this.name = 'adminLog';
         this.attributes = {
             admin_id:       { type: DataTypes.INTEGER, allowNull: false },
-            path:           { type: DataTypes.STRING(30), allowNull: false },
-            body:           { type: DataTypes.STRING(150) },
+            path:           { type: DataTypes.STRING(50), allowNull: false },
+            body:           { type: DataTypes.STRING(500) },
         }
     }
 

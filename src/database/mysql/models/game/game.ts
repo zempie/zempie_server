@@ -5,6 +5,7 @@ import { DataTypes, Sequelize } from 'sequelize';
 import { dbs } from '../../../../commons/globals';
 import { parseBoolean } from '../../../../commons/utils';
 import { IGameListParams } from '../../../../controllers/_interfaces';
+import { eGameCategory } from '../../../../commons/enums';
 
 
 class GameModel extends Model {
@@ -16,6 +17,7 @@ class GameModel extends Model {
             enabled:            { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false },
 
             official:           { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false },
+            category:           { type: DataTypes.INTEGER, allowNull: false, defaultValue: eGameCategory.Challenge },
             user_id:            { type: DataTypes.INTEGER },
 
             pathname:           { type: DataTypes.STRING(50), allowNull: false, unique: true },
@@ -76,6 +78,14 @@ class GameModel extends Model {
                 after: 'count_over'
             })
         }
+        if ( !desc['category'] ) {
+            this.model.sequelize.queryInterface.addColumn(this.model.tableName, 'category', {
+                type: DataTypes.SMALLINT,
+                allowNull: false,
+                defaultValue: eGameCategory.Challenge,
+                after: 'official'
+            })
+        }
     }
 
 
@@ -100,14 +110,19 @@ class GameModel extends Model {
     }
 
 
-    async getList({ limit = 50, offset = 0, official, sort = 'id', dir = 'asc' }: IGameListParams) {
+    async getList({ official, category, limit = 50, offset = 0, sort = 'id', dir = 'asc' }: IGameListParams) {
         // where
         const where: any = {
             activated: true,
             enabled: true,
         }
-        if ( official ) {
-            where.official = parseBoolean(official)
+        if ( category ) {
+            where.category = _.toNumber(category);
+        }
+        else {
+            if ( official ) {
+                where.official = parseBoolean(official)
+            }
         }
 
         // order by

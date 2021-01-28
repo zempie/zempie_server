@@ -2,6 +2,8 @@ import * as _ from 'lodash';
 import { dbs } from '../../commons/globals';
 import { Transaction } from 'sequelize';
 import { parseBoolean } from '../../commons/utils';
+import { CreateError, ErrorCodes } from '../../commons/errorCodes';
+import { eGameCategory } from '../../commons/enums';
 
 
 class AdminGameController {
@@ -20,9 +22,37 @@ class AdminGameController {
     }
 
 
-    updateGame = async ({ game_id, official, enabled, activated, }: any) => {
+    createProvidedGame = async ({ pathname, title, description, hashtags, url_game, url_thumb, url_thumb_webp, url_thumb_gif}: any) => {
+        const exist = await dbs.Game.findOne({ pathname });
+        if ( exist ) {
+            throw CreateError(ErrorCodes.ADMIN_GAME_PATHNAME_DUPLICATED);
+        }
+
+        return dbs.Game.getTransaction(async (transaction: Transaction) => {
+            const game = await dbs.Game.create({
+                // category: eGameCategory.Provided,
+                pathname,
+                title, description,
+                hashtags,
+                url_game, url_thumb, url_thumb_webp, url_thumb_gif,
+            }, transaction);
+
+            await dbs.Hashtag.addTags(game.id, hashtags, transaction);
+
+            return {
+                game: game.get({ plain: true }),
+            }
+        })
+    }
+
+
+    updateGame = async ({ game_id, official, category, enabled, activated, }: any) => {
         await dbs.Game.getTransaction(async (transaction: Transaction) => {
             const game = await dbs.Game.findOne({ game_id }, transaction);
+
+            if ( !!category ) {
+                game.category = _.toNumber(category);
+            }
 
             if ( !!official ) {
                 game.official = parseBoolean(official);

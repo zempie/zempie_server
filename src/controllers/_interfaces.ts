@@ -90,7 +90,8 @@ export interface IGameListParams {
     offset: number,
     sort: string,
     dir: string,
-    official?: string
+    official?: string,
+    category?: number,
 }
 
 export interface IS3Upload {

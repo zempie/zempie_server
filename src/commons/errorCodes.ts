@@ -85,6 +85,10 @@ export const ErrorCodes = {
         code: 1211,
         message: '이미 읽은 우편',
     },
+    ADMIN_GAME_PATHNAME_DUPLICATED: {
+        code: 1212,
+        message: '게임 Pathname 중복'
+    },
 
 
     USER_ALREADY_VERIFIED_EMAIL: {

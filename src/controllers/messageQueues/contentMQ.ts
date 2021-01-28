@@ -7,6 +7,12 @@ import { Sequelize } from 'sequelize';
 class ContentMQ extends SrvMQ {
     private interval: NodeJS.Timeout;
     private game_over: {[key: string]: number} = {};
+    private game_heart: {[Key: string]: number} = {};
+
+    private game_ids: {[Key: number]: {
+            game_over: number,
+            game_heart: number,
+        }} = {};
 
     constructor() {
         super();
@@ -18,19 +24,30 @@ class ContentMQ extends SrvMQ {
 
     private processBulk = async () =>{
         // const games = await caches.game.getList();
-        _.forEach(this.game_over, async (count, id) => {
-            if ( count > 0 ) {
+        _.forEach(this.game_ids, async (obj: any, id: any) => {
+            if ( obj.game_over > 0 || obj.game_heart > 0 ) {
                 dbs.Game.update({
-                    count_over: Sequelize.literal(`count_over + ${count}`)
-                }, { id })
-                this.game_over[id] = 0;
-                console.log('[gameOver] id:', id)
-                // const game = _.find(games, game => game.game_uid === uid);
-                // if ( game ) {
-                //     game.count_over += count;
-                // }
+                    count_over: Sequelize.literal(`count_over + ${obj.game_over}`),
+                    count_heart: Sequelize.literal(`count_heart + ${obj.game_heart}`),
+                }, { id });
+                obj.count_over = 0;
+                obj.count_heart = 0;
             }
         })
+        // _.forEach(this.game_over, async (count, id) => {
+        //     if ( count > 0 ) {
+        //         dbs.Game.update({
+        //             count_over: Sequelize.literal(`count_over + ${count}`),
+        //             count_heart: Sequelize.literal(`count_heart + ${count}`),
+        //         }, { id })
+        //         this.game_over[id] = 0;
+        //         console.log('[gameOver] id:', id)
+        //         // const game = _.find(games, game => game.game_uid === uid);
+        //         // if ( game ) {
+        //         //     game.count_over += count;
+        //         // }
+        //     }
+        // })
         // caches.game.setList(games);
     }
 
@@ -46,6 +63,19 @@ class ContentMQ extends SrvMQ {
         this.game_over[game_id] += 1;
 
         console.log('consume:', game_id);
+    }
+
+
+    async gameHeart(message: string) {
+        const { user_uid, game_id, activated }: any = JSON.parse(message);
+
+        this.game_heart[game_id] = this.game_heart[game_id] || 0;
+        if ( activated ) {
+            this.game_heart[game_id] += 1;
+        }
+        else {
+            this.game_heart[game_id] -= 1;
+        }
     }
 }
 

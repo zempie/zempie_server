@@ -40,6 +40,7 @@ export default (router: Router) => {
      * 게임
      */
     router.get(`${apiVer}/admin/games`,         validateAdminIdToken,   convert(AdminGameController.getGames));
+    router.post(`${apiVer}/admin/game/c/p`,     validateAdminIdToken,   adminTracking,  convert(AdminGameController.createProvidedGame));
     router.post(`${apiVer}/admin/game/u`,       validateAdminIdToken,   adminTracking,  convert(AdminGameController.updateGame));
 
 

@@ -12,10 +12,15 @@ export enum eInquiry {
     Personality,
     Studio,
 }
-export enum eReportType{
+export enum eReportType {
     User,
     Game,
     Reply,
+}
+export enum eGameCategory {
+    Challenge,
+    Certified,
+    Provided,
 }
 
 

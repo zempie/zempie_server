@@ -1,0 +1,28 @@
+paths:
+  /game/heart:
+    post:
+      tags:
+        - Zempie Game Content
+      summary: 게임 하트 ❤
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                game_id:
+                  type: number
+                  description: 게임 ID
+                heart:
+                  type: boolean
+                  description: 메일 ID
+              required:
+                - game_id
+                - heart
+      responses:
+        200:
+          $ref: '#/components/responses/Okay'
+        403:
+          $ref: '#/components/responses/UnauthorizedError'
