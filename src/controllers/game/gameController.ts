@@ -9,6 +9,7 @@ import MQ from '../../services/messageQueueService';
 import Opt from '../../../config/opt';
 import { getGameData } from '../_common';
 import { eGameCategory } from '../../commons/enums';
+import { CreateError, ErrorCodes } from '../../commons/errorCodes';
 const { Url } = Opt;
 
 
@@ -259,25 +260,10 @@ class GameController {
     }
 
 
-    tagTest = async ({ title, hashtags }: any, user: DecodedIdToken) => {
-        await dbs.Game.getTransaction(async (transaction: Transaction) => {
-            const game = await dbs.Game.create( {
-                // uid : uuid(),
-                activated : 0,
-                enabled : 0,
-                user_id : 16,
-                pathname : uniqid(),
-                title,
-                description : '',
-                hashtags,
-                // version : version.version,
-                // url_game : version.url,
-                url_thumb : '',
-                url_thumb_gif : '',
-            }, transaction);
-
-            await dbs.Hashtag.addTags(game.id, hashtags, transaction);
-        })
+    tagTest = async (params: any, user: DecodedIdToken) => {
+        if ( !dbs.BadWords.areOk(params) ) {
+            throw CreateError(ErrorCodes.FORBIDDEN_STRING);
+        }
     }
 
     tagTest2 = async ({ tag }: any) => {

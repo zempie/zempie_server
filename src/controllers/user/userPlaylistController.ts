@@ -83,6 +83,11 @@ class UserPlaylistController {
         if ( !title ) {
             throw CreateError(ErrorCodes.INVALID_PARAMS);
         }
+        // 불량 단어 색출
+        if ( !dbs.BadWords.isOk(title) ) {
+            throw CreateError(ErrorCodes.FORBIDDEN_STRING);
+        }
+
         let data: any;
         const playlist_uid = uniqid();
         if ( file ) {
@@ -116,6 +121,11 @@ class UserPlaylistController {
 
 
     updatePlaylist = async ({ uid, title }: IPlaylistParams, user: DecodedIdToken, {req:{files:{file}}}: IRoute) => {
+        // 불량 단어 색출
+        if ( !!title && !dbs.BadWords.isOk(title) ) {
+            throw CreateError(ErrorCodes.FORBIDDEN_STRING);
+        }
+
         await dbs.UserPlaylist.getTransaction(async (transaction: Transaction) => {
             const playlist = await dbs.UserPlaylist.findOne({ uid, user_uid: user.uid }, transaction);
             if ( !playlist ) {

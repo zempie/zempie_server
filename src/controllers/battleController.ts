@@ -127,6 +127,11 @@ class BattleController {
 
 
     updateUserName = async ({ battle_key, name }: IBattlePlayParams, user: DecodedIdToken) => {
+        // 불량 단어 색출
+        if ( !!name && !dbs.BadWords.isOk(name) ) {
+            throw CreateError(ErrorCodes.FORBIDDEN_STRING);
+        }
+
         const decoded = verifyJWT(battle_key);
         const { uid: battle_uid, game_id, user_uid, secret_id, best_score } = decoded;
 

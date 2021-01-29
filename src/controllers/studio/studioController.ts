@@ -126,6 +126,12 @@ class StudioController {
 
 
     createProject = async ( params : ICreateProject, {uid}: DecodedIdToken, {req:{files}}: IRoute) => {
+        // 불량 단어 색출
+        if ( !dbs.BadWords.areOk(params) ) {
+            throw CreateError(ErrorCodes.FORBIDDEN_STRING);
+        }
+
+
         return dbs.Project.getTransaction( async (transaction : Transaction)=>{
             // const dev = await dbs.Developer.findOne( {user_uid : uid} );
             // params.developer_id = dev.id;
@@ -249,7 +255,10 @@ class StudioController {
      activated
      */
     updateProject = async ( params : any, {uid}: DecodedIdToken, {req: {files: {file, file2}}}: IRoute)=>{
-
+        // 불량 단어 색출
+        if ( !dbs.BadWords.areOk(params) ) {
+            throw CreateError(ErrorCodes.FORBIDDEN_STRING);
+        }
         return dbs.Project.getTransaction( async (transaction : Transaction) => {
             const project = await dbs.Project.findOne( { id : params.id } );
             const game = await dbs.Game.findOne( {

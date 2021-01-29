@@ -46,7 +46,12 @@ class AdminGameController {
     }
 
 
-    updateGame = async ({ game_id, official, category, enabled, activated, }: any) => {
+    updateGame = async (params: any) => {
+        // 불량 단어 색출
+        if ( !dbs.BadWords.areOk(params) ) {
+            throw CreateError(ErrorCodes.FORBIDDEN_STRING);
+        }
+        const { game_id, official, category, enabled, activated } = params;
         await dbs.Game.getTransaction(async (transaction: Transaction) => {
             const game = await dbs.Game.findOne({ game_id }, transaction);
 

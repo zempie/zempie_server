@@ -133,6 +133,11 @@ class UserController {
 
 
     getTargetInfoByChannelId = async ({channel_id}: {channel_id: string}, _: DecodedIdToken) => {
+        // 불량 단어 색출
+        if ( !!channel_id && !dbs.BadWords.isOk(channel_id) ) {
+            throw CreateError(ErrorCodes.FORBIDDEN_STRING);
+        }
+
         let channel = await caches.user.getChannel(channel_id);
         if ( !channel ) {
             // const user = await docs.User.getProfile({ channel_id });
@@ -231,6 +236,11 @@ class UserController {
 
 
     setInfo = async (params: any, {uid}: DecodedIdToken, {req: {files: {file}}}: IRoute) => {
+        // 불량 단어 색출
+        if ( !dbs.BadWords.areOk(params) ) {
+            throw CreateError(ErrorCodes.FORBIDDEN_STRING);
+        }
+
         return dbs.User.getTransaction(async (transaction: Transaction) => {
             const user = await dbs.User.getInfo({ uid }, transaction);
             if ( !user ) {

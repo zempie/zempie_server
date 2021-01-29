@@ -4,7 +4,6 @@ import { isAuthenticated, validateFirebaseIdToken } from './_common';
 import GameController from '../controllers/game/gameController';
 import GameContentController from '../controllers/game/gameContentController';
 import BattleController from '../controllers/battleController';
-import AdController from '../controllers/adController';
 import RankingController from '../controllers/rankingController';
 
 
@@ -38,7 +37,7 @@ export default (router: Router) => {
     router.get(`${apiVer}/cache-test`,          convert(GameController.cacheTest));
     router.get(`${apiVer}/cache-test2`,         convert(GameController.cacheTest2));
 
-    router.post(`${apiVer}/tag-test`,           convert(GameController.tagTest));
+    router.post(`${apiVer}/test-badword`,       convert(GameController.tagTest));
     router.get(`${apiVer}/tag-test/search`,     convert(GameController.tagTest2));
 
 
