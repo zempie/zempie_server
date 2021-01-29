@@ -28,17 +28,21 @@ export function capitalize(str: string, lowercaseRest: boolean = false) : string
 /**
  *
  */
-export function parseBoolean(str: string) {
-    if ( !str ) {
-        return undefined
+export function parseBoolean(val: any) {
+    if ( typeof val === 'boolean' ) {
+        return val;
     }
 
-    switch (str.toLowerCase()) {
-        case 'true':case 'yes':case '1':
-            return true;
-        default:
-            return false
+    if ( typeof val === 'string' ) {
+        switch (val.toLowerCase()) {
+            case 'true':case 'yes':case '1':
+                return true;
+            default:
+                return false;
+        }
     }
+
+    return false;
 }
 
 export function IsJsonString(str: string) {

@@ -1,5 +1,6 @@
 import Model from '../../model';
 import { DataTypes, Sequelize, Transaction } from 'sequelize';
+import { parseBoolean } from '../../../../commons/utils';
 
 
 class GameHeartModel extends Model {
@@ -18,7 +19,7 @@ class GameHeartModel extends Model {
         return await this.getTransaction(async (transaction: Transaction) => {
             const record = await this.findOne({ game_id, user_uid }, transaction);
             if ( record ) {
-                if ( record.activated !== activated  ) {
+                if ( record.activated !== parseBoolean(activated)  ) {
                     record.activated = activated;
                     await record.save({ transaction });
                     changed = true;
