@@ -7,38 +7,71 @@ import { CreateError, ErrorCodes } from '../../commons/errorCodes';
 import { parseBoolean } from '../../commons/utils';
 import MQ from '../../services/messageQueueService';
 
+interface IGameHeartParams {
+    game_id: number
+    heart_on: boolean
+}
+interface IGameEmotionParams {
+    game_id: number
+    emotion: string
+    on: boolean
+}
 
 class GameContentController {
-    heart = async ({ game_id, heart }: any, user: DecodedIdToken) => {
+    heart = async ({ game_id, heart_on }: IGameHeartParams, user: DecodedIdToken) => {
         const user_uid = user.uid;
-        return await dbs.GameHeart.getTransaction(async (transaction: Transaction) => {
-            const game = await dbs.Game.findOne({ id: game_id });
-            if ( !game ) {
-                throw CreateError(ErrorCodes.INVALID_GAME_ID);
-            }
+        const game = await dbs.Game.findOne({ id: game_id });
+        if ( !game ) {
+            throw CreateError(ErrorCodes.INVALID_GAME_ID);
+        }
 
-            let gameHeart = await dbs.GameHeart.findOne({ game_id, user_uid }, transaction);
-            if ( !gameHeart ) {
-                gameHeart = await dbs.GameHeart.create({ game_id, user_uid }, transaction);
-            }
-            gameHeart.activated = parseBoolean(heart);
-            await gameHeart.save({ transaction });
+        const changed = await dbs.GameHeart.likeIt(game_id, user_uid, heart_on);
 
+        if ( changed ) {
             MQ.send({
                 topic: 'gameHeart',
                 messages: [{
                     value: JSON.stringify({
                         user_uid,
                         game_id,
-                        activated: gameHeart.activated,
+                        activated: heart_on,
                     })
                 }]
             })
+        }
 
-            return {
-                gameHeart: gameHeart.activated
-            }
-        })
+        return {
+            heart_on,
+        }
+    }
+
+
+    emotion = async ({ game_id, emotion, on }: IGameEmotionParams, user: DecodedIdToken) => {
+        const user_uid = user.uid;
+        const game = await dbs.Game.findOne({ id: game_id });
+        if ( !game ) {
+            throw CreateError(ErrorCodes.INVALID_GAME_ID);
+        }
+
+        const changed = await dbs.UserGameEmotion.feelLike(game_id, user_uid, emotion, on);
+
+        if ( changed ) {
+            MQ.send({
+                topic: 'gameEmotion',
+                messages: [{
+                    value: JSON.stringify({
+                        user_uid,
+                        game_id,
+                        emotion,
+                        activated: on,
+                    })
+                }]
+            })
+        }
+
+        return {
+            emotion_on: on,
+        }
     }
 
 

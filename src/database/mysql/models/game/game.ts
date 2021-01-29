@@ -43,6 +43,8 @@ class GameModel extends Model {
     async afterSync(): Promise<void> {
         this.model.belongsTo(dbs.User.model);
 
+        this.model.hasOne(dbs.GameEmotion.model);
+
         // if ( process.env.NODE_ENV !== 'production' ) {
         //     if ( await this.model.count() < 1 ) {
         //         const sampleGames: any = [
@@ -178,13 +180,16 @@ class GameModel extends Model {
             where,
             include: [
                 {
+                    model: dbs.GameEmotion.model,
+                },
+                {
                     model: dbs.User.model,
                     where: {
                         activated: true,
                         banned: false,
                         deleted_at: null,
                     },
-                    required: true,
+                    required: false,
                 }
             ],
             ...options,
