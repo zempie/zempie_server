@@ -25,6 +25,9 @@ export default (router: Router) => {
     // 게임 하르 ❤
     router.post(`${apiVer}/game/heart`,         validateFirebaseIdToken,    isAuthenticated,    convert(GameContentController.heart));
 
+    // 게임 감정 표현
+    router.post(`${apiVer}/game/emotion`,       validateFirebaseIdToken,    isAuthenticated,    convert(GameContentController.emotion));
+
     // 도전 게임 - 평가 리포트
     router.get(`${apiVer}/game/ch-report`,      validateFirebaseIdToken,    convert(GameContentController.getReports));
     router.post(`${apiVer}/game/ch-report`,     validateFirebaseIdToken,    isAuthenticated,    convert(GameContentController.createOrUpdateChallengingReport));

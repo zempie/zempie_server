@@ -19,11 +19,11 @@ paths:
               required:
                 - account
                 - password
-        responses:
-          200:
-            $ref: '#/components/responses/Okay'
-          403:
-            $ref: '#/components/responses/UnauthorizedError'
+      responses:
+        200:
+          $ref: '#/components/responses/Okay'
+        403:
+          $ref: '#/components/responses/UnauthorizedError'
 
   /admin/game/c/p:
     post:

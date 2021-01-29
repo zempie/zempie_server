@@ -1,31 +1,32 @@
-import Model from '../../model';
 import { DataTypes, Sequelize, Transaction } from 'sequelize';
+import Model from '../../model';
 
 
-class GameHeartModel extends Model {
+class UserGameEmotionModel extends Model {
     protected initialize(): void {
-        this.name = 'gameHeart';
+        this.name = 'userGameEmotion';
         this.attributes = {
+            user_uid:   { type: DataTypes.STRING(36), allowNull: false, unique: 'compositeIndex' },
             game_id:    { type: DataTypes.INTEGER, allowNull: false, unique: 'compositeIndex' },
-            user_uid:   { type: DataTypes.STRING, allowNull: false, unique: 'compositeIndex' },
+            emotion:    { type: DataTypes.STRING(4), allowNull: false, unique: 'compositeIndex' },
             activated:  { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false },
         }
     }
 
 
-    likeIt = async (game_id: number, user_uid: string, activated: any) => {
+    feelLike = async (game_id: number, user_uid: string, emotion: string, activated: boolean) => {
         let changed = false;
         return await this.getTransaction(async (transaction: Transaction) => {
-            const record = await this.findOne({ game_id, user_uid }, transaction);
+            const record = await this.findOne({ game_id, user_uid, emotion }, transaction);
             if ( record ) {
-                if ( record.activated !== activated  ) {
+                if ( record.activated !== activated ) {
                     record.activated = activated;
                     await record.save({ transaction });
                     changed = true;
                 }
             }
             else {
-                this.create({ game_id, user_uid, activated: true });
+                this.create({ game_id, user_uid, emotion, activated: true });
                 changed = true;
             }
             return changed;
@@ -34,4 +35,4 @@ class GameHeartModel extends Model {
 }
 
 
-export default (rdb: Sequelize) => new GameHeartModel(rdb)
+export default (rdb: Sequelize) => new UserGameEmotionModel(rdb)

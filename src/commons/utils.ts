@@ -28,7 +28,7 @@ export function capitalize(str: string, lowercaseRest: boolean = false) : string
 /**
  *
  */
-export function parseBoolean(str?: string) {
+export function parseBoolean(str: string) {
     if ( !str ) {
         return undefined
     }

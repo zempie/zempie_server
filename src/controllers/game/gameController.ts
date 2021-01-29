@@ -8,6 +8,7 @@ import { caches, dbs } from '../../commons/globals';
 import MQ from '../../services/messageQueueService';
 import Opt from '../../../config/opt';
 import { getGameData } from '../_common';
+import { eGameCategory } from '../../commons/enums';
 const { Url } = Opt;
 
 
@@ -18,8 +19,8 @@ class GameController {
             const popular = await dbs.Game.getListIncludingUser({ activated: true, enabled: true }, { order: Sequelize.literal('rand()'), limit: 5 });
             const recommended = await dbs.Game.getListIncludingUser({ activated: true, enabled: true }, { order: Sequelize.literal('rand()'), limit: 5 });
             const latest = await dbs.Game.getListIncludingUser({ activated: true, enabled: true }, { order: [['id', 'asc']], limit: 5 });
-            const official = await dbs.Game.getListIncludingUser({ official: true, activated: true, enabled: true }, { order: Sequelize.literal('rand()'), limit: 5 });
-            const unofficial = await dbs.Game.getListIncludingUser({ official: false, activated: true, enabled: true }, { order: Sequelize.literal('rand()'), limit: 5 });
+            const certified = await dbs.Game.getListIncludingUser({ category: eGameCategory.Certified, activated: true, enabled: true }, { order: Sequelize.literal('rand()'), limit: 5 });
+            const uncertified = await dbs.Game.getListIncludingUser({ category: eGameCategory.Challenge, activated: true, enabled: true }, { order: Sequelize.literal('rand()'), limit: 5 });
 
             ret = [
                 {
@@ -31,28 +32,18 @@ class GameController {
                     games: _.map(recommended, obj => getGameData(obj)),
                 },
                 {
-                    name: '최신 게임 Latest Games',
+                    name: '최신 게임 New Games',
                     games: _.map(latest, obj => getGameData(obj)),
                 },
                 {
-                    name: '공식 게임 Official Games',
-                    games: _.map(official, obj => getGameData(obj)),
+                    name: '인증 게임 Certified Games',
+                    games: _.map(certified, obj => getGameData(obj)),
                     key: 'official',
                 },
                 {
-                    name: '도전 게임 Unofficial Games',
-                    games: _.map(unofficial, obj => getGameData(obj)),
+                    name: '도전 게임 Challenging Games',
+                    games: _.map(uncertified, obj => getGameData(obj)),
                     key: 'unofficial',
-                },
-                {
-                    name: '퍼즐 게임 Puzzle Games',
-                    games: [],
-                    key: 'puzzle',
-                },
-                {
-                    name: '스포츠 게임 Sports Games',
-                    games: [],
-                    key: 'sports',
                 },
             ];
 

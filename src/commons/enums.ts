@@ -22,6 +22,10 @@ export enum eGameCategory {
     Certified,
     Provided,
 }
+export enum eGameEmotion {
+    Excellent,
+
+}
 
 
 export enum eTimeline {
