@@ -16,7 +16,7 @@ interface IPunishParams {
     date: Date
 }
 class AdminContentsController {
-    punishGame = async ({ game_id, permanent, title, content }: any, _admin: IAdmin) => {
+    punishGame = async ({ game_id, permanent, title, content }: any) => {
         await dbs.Game.getTransaction(async (transaction: Transaction) => {
             // make the game disabled
             const game = await dbs.Game.findOne({ id: game_id });
@@ -45,8 +45,8 @@ class AdminContentsController {
     }
 
 
-    punishUser = async ({ user_id, deny_name: name, is_deny, date }: any, _admin: IAdmin) => {
-        const userClaim = await dbs.UserClaim.find({id: user_id});
+    punishUser = async ({ user_id, deny_name: name, is_deny, date }: any) => {
+        const userClaim = await dbs.UserClaim.find({ id: user_id });
         const claim: IZempieClaims = JSON.parse(userClaim.data);
 
         claim.zempie.deny[name] = {
