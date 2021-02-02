@@ -27,6 +27,7 @@ class AdminSupportController {
                 category: inquiry.category,
                 title: inquiry.title,
                 text: inquiry.text,
+                url_img: inquiry.url_img,
                 response: inquiry.response,
                 created_at: inquiry.created_at,
                 updated_at: inquiry.updated_at,
