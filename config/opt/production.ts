@@ -80,9 +80,9 @@ export default {
     Kafka: {
         clientId: 'zempie',
         brokers: [
-            // 'localhost:9092',
-            'b-1.zempie-cluster-1.61ghlz.c4.kafka.ap-northeast-2.amazonaws.com:9092',
-            'b-2.zempie-cluster-1.61ghlz.c4.kafka.ap-northeast-2.amazonaws.com:9092'
+            'localhost:9092',
+            // 'b-1.zempie-cluster-1.61ghlz.c4.kafka.ap-northeast-2.amazonaws.com:9092',
+            // 'b-2.zempie-cluster-1.61ghlz.c4.kafka.ap-northeast-2.amazonaws.com:9092'
         ]
     },
 }
