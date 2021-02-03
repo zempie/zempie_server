@@ -1,4 +1,6 @@
-export default {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = {
     Server: {
         http: {
             port: 8280,
@@ -7,12 +9,8 @@ export default {
             port: 8280,
         },
         Secure: {
-            // https: false,
-            // port: 8281,
-            // options: {
-            //     key: fs.readFileSync('key.pem'),
-            //     cert: fs.readFileSync('cert.pem')
-            // },
+            https: false,
+            port: 8281,
         },
         studio: {
             port: 8281,
@@ -24,34 +22,28 @@ export default {
             port: 8283,
         }
     },
-
     Url: {
-        Host: 'http://192.168.0.196:8280',
-        DeployApiV1: 'http://192.168.0.196:8288/api/v1',
+        Host: 'http://gtest.fromthered.com:8280',
+        DeployApiV1: 'http://gtest.fromthered.com:8288/api/v1',
         GameClient: 'http://localhost:8080/play',
         Redirect: 'http://localhost:8280/game',
-        Launcher: 'http://localhost:8080',
+        Launcher: 'http://gtest.fromthered.com/zempie/launcher',
     },
-
     Deploy: {
-        url_v1: 'http://192.168.0.196:8288/api/v1',
+        url_v1: 'http://gtest.fromthered.com:8288/api/v1',
         api_key: 'xdo1lbgkc5xmxn2'
     },
-
     AWS: {
-        // Bucket: 'dev-zempie/v1',
         Bucket: {
             Rsc: 'dev-zempie/v1',
             RscPublic: 'dev-zempie/v1',
             Static: 'dev-zempie/static',
         }
     },
-
     password: {
-        salt : '@#FP)UVuOWJF)@#MJ',
+        salt: '@#FP)UVuOWJF)@#MJ',
         iteration: 100000
     },
-
     JWT: {
         access: {
             secret: 'JW@#MJ%Y^Y$U%@$I1f',
@@ -64,30 +56,25 @@ export default {
         refresh: {
             secret: '*I^H%$HG%#!@GF#%GH@',
             options: {
-                algorithm : 'HS256',
-                expiresIn : '30d',
-                issuer    : 'from the red'
+                algorithm: 'HS256',
+                expiresIn: '30d',
+                issuer: 'from the red'
             },
-        },
+        }
     },
-
     CORS: {
         allowedOrigin: [
             'http://gtest.fromthered.com',
             'http://zempie.fromthered.com',
-            'http://localhost:8080',
-            'http://localhost:8081',
+            'http://studio.fromthered.com',
+            'http://launcher.fromthered.com',
         ],
         secure: false,
-        domain: '.localhost',
+        domain: '.fromthered.com',
     },
-
     Kafka: {
         clientId: 'zempie',
-        brokers: [
-            // 'localhost:9092',
-            'b-1.zempie-cluster-1.61ghlz.c4.kafka.ap-northeast-2.amazonaws.com:9092',
-            'b-2.zempie-cluster-1.61ghlz.c4.kafka.ap-northeast-2.amazonaws.com:9092'
-        ]
+        brokers: ['localhost:9092']
     },
-}
+};
+//# sourceMappingURL=development.js.map

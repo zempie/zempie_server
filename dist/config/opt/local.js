@@ -1,4 +1,6 @@
-export default {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = {
     Server: {
         http: {
             port: 8280,
@@ -7,12 +9,12 @@ export default {
             port: 8280,
         },
         Secure: {
-            // https: false,
-            // port: 8281,
-            // options: {
-            //     key: fs.readFileSync('key.pem'),
-            //     cert: fs.readFileSync('cert.pem')
-            // },
+        // https: false,
+        // port: 8281,
+        // options: {
+        //     key: fs.readFileSync('key.pem'),
+        //     cert: fs.readFileSync('cert.pem')
+        // },
         },
         studio: {
             port: 8281,
@@ -24,7 +26,6 @@ export default {
             port: 8283,
         }
     },
-
     Url: {
         Host: 'http://192.168.0.196:8280',
         DeployApiV1: 'http://192.168.0.196:8288/api/v1',
@@ -32,12 +33,10 @@ export default {
         Redirect: 'http://localhost:8280/game',
         Launcher: 'http://localhost:8080',
     },
-
     Deploy: {
         url_v1: 'http://192.168.0.196:8288/api/v1',
         api_key: 'xdo1lbgkc5xmxn2'
     },
-
     AWS: {
         // Bucket: 'dev-zempie/v1',
         Bucket: {
@@ -46,12 +45,10 @@ export default {
             Static: 'dev-zempie/static',
         }
     },
-
     password: {
-        salt : '@#FP)UVuOWJF)@#MJ',
+        salt: '@#FP)UVuOWJF)@#MJ',
         iteration: 100000
     },
-
     JWT: {
         access: {
             secret: 'JW@#MJ%Y^Y$U%@$I1f',
@@ -64,13 +61,12 @@ export default {
         refresh: {
             secret: '*I^H%$HG%#!@GF#%GH@',
             options: {
-                algorithm : 'HS256',
-                expiresIn : '30d',
-                issuer    : 'from the red'
+                algorithm: 'HS256',
+                expiresIn: '30d',
+                issuer: 'from the red'
             },
         },
     },
-
     CORS: {
         allowedOrigin: [
             'http://gtest.fromthered.com',
@@ -81,7 +77,6 @@ export default {
         secure: false,
         domain: '.localhost',
     },
-
     Kafka: {
         clientId: 'zempie',
         brokers: [
@@ -90,4 +85,5 @@ export default {
             'b-2.zempie-cluster-1.61ghlz.c4.kafka.ap-northeast-2.amazonaws.com:9092'
         ]
     },
-}
+};
+//# sourceMappingURL=local.js.map
