@@ -38,6 +38,10 @@ class GameCache extends CacheModel {
             this.redis.expire(PathnameKey + pathname, 60, () => {});
         })
     }
+    delByPathname(pathname: string, user_uid: string) {
+        const key = pathname + '_' + user_uid;
+        this.redis.expire(PathnameKey + key, 0, () => {});
+    }
 
     /**
      * featured

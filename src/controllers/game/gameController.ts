@@ -151,7 +151,7 @@ class GameController {
     }
 
 
-    getGame = async ({pathname}: any, _user: DecodedIdToken) => {
+    getGame = async ({pathname}: any, user: DecodedIdToken) => {
         // let game = await caches.game.getByPathname(pathname);
         // if ( !game ) {
         //     game = await dbs.Game.getInfo({ pathname });
@@ -162,13 +162,24 @@ class GameController {
         // return {
         //     game
         // };
-        let ret = await caches.game.getByPathname(pathname);
+        const user_uid = user? user.uid : '';
+        const key = pathname + '_' + user_uid;
+        let ret = await caches.game.getByPathname(key);
         if ( !ret ) {
             const game = await dbs.Game.getInfo({ pathname });
+            const my_heart = await dbs.GameHeart.findOne({ game_id: game.id, user_uid });
+            const my_emotions: any = { e1: false, e2: false, e3: false, e4: false, e5: false };
+            const emotions = await dbs.UserGameEmotion.findAll({ game_id: game.id, user_uid });
+            _.forEach(emotions, (obj) => {
+                const e = obj.get({plain: true});
+                my_emotions[e.emotion] = e.activated;
+            })
             ret = {
                 game: getGameData(game),
+                my_heart: my_heart? my_heart.activated : false,
+                my_emotions,
             }
-            caches.game.setByPathname(ret, pathname);
+            caches.game.setByPathname(ret, key);
         }
         // const game = await dbs.Game.getInfo({ pathname });
         // const ret = {

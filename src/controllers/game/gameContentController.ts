@@ -1,5 +1,5 @@
 import * as _ from 'lodash';
-import { dbs } from '../../commons/globals';
+import { caches, dbs } from '../../commons/globals';
 import { Transaction } from 'sequelize';
 import admin from 'firebase-admin';
 import DecodedIdToken = admin.auth.DecodedIdToken;
@@ -28,6 +28,7 @@ class GameContentController {
         const changed = await dbs.GameHeart.likeIt(game_id, user_uid, on);
 
         if ( changed ) {
+            caches.game.delByPathname(game.pathname, user_uid);
             MQ.send({
                 topic: 'gameHeart',
                 messages: [{
@@ -56,6 +57,7 @@ class GameContentController {
         const changed = await dbs.UserGameEmotion.feelLike(game_id, user_uid, e_id, on);
 
         if ( changed ) {
+            caches.game.delByPathname(game.pathname, user_uid);
             MQ.send({
                 topic: 'gameEmotion',
                 messages: [{
