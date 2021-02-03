@@ -15,9 +15,40 @@ paths:
                 game_id:
                   type: number
                   description: 게임 ID
-                heart:
+                on:
                   type: boolean
-                  description: 메일 ID
+                  description: on / off
+              required:
+                - game_id
+                - heart
+      responses:
+        200:
+          $ref: '#/components/responses/Okay'
+        403:
+          $ref: '#/components/responses/UnauthorizedError'
+
+  /game/emotion:
+    port:
+      tags:
+        - Zempie Game Content
+      summary: 게임 감정표현
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                game_id:
+                  type: number
+                  description: 게임 ID
+                e_id:
+                  type: number
+                  description: 감정 ID (e1, e2, e3, e4, e5)
+                on:
+                  type: boolean
+                  description: on / off
               required:
                 - game_id
                 - heart

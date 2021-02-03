@@ -9,23 +9,23 @@ import MQ from '../../services/messageQueueService';
 
 interface IGameHeartParams {
     game_id: number
-    heart_on: boolean
+    on: boolean
 }
 interface IGameEmotionParams {
     game_id: number
-    emotion: string
+    e_id: string
     on: boolean
 }
 
 class GameContentController {
-    heart = async ({ game_id, heart_on }: IGameHeartParams, user: DecodedIdToken) => {
+    heart = async ({ game_id, on }: IGameHeartParams, user: DecodedIdToken) => {
         const user_uid = user.uid;
         const game = await dbs.Game.findOne({ id: game_id });
         if ( !game ) {
             throw CreateError(ErrorCodes.INVALID_GAME_ID);
         }
 
-        const changed = await dbs.GameHeart.likeIt(game_id, user_uid, heart_on);
+        const changed = await dbs.GameHeart.likeIt(game_id, user_uid, on);
 
         if ( changed ) {
             MQ.send({
@@ -34,26 +34,26 @@ class GameContentController {
                     value: JSON.stringify({
                         user_uid,
                         game_id,
-                        activated: heart_on,
+                        activated: on,
                     })
                 }]
             })
         }
 
         return {
-            heart_on,
+            heart_on: on,
         }
     }
 
 
-    emotion = async ({ game_id, emotion, on }: IGameEmotionParams, user: DecodedIdToken) => {
+    emotion = async ({ game_id, e_id, on }: IGameEmotionParams, user: DecodedIdToken) => {
         const user_uid = user.uid;
         const game = await dbs.Game.findOne({ id: game_id });
         if ( !game ) {
             throw CreateError(ErrorCodes.INVALID_GAME_ID);
         }
 
-        const changed = await dbs.UserGameEmotion.feelLike(game_id, user_uid, emotion, on);
+        const changed = await dbs.UserGameEmotion.feelLike(game_id, user_uid, e_id, on);
 
         if ( changed ) {
             MQ.send({
@@ -62,7 +62,7 @@ class GameContentController {
                     value: JSON.stringify({
                         user_uid,
                         game_id,
-                        emotion,
+                        e_id,
                         activated: on,
                     })
                 }]

@@ -86,9 +86,9 @@ class ApiMQ extends SrvMQ {
 
 
     async gameEmotion(message: string) {
-        const { game_id, emotion, activated }: any = JSON.parse(message);
+        const { game_id, e_id, activated }: any = JSON.parse(message);
         const game: any = this.getGameEmotions(game_id);
-        game[emotion] += activated? 1 : -1;
+        game[e_id] += activated? 1 : -1;
     }
 }
 
