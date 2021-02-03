@@ -28,7 +28,7 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
 
   /game/emotion:
-    port:
+    post:
       tags:
         - Zempie Game Content
       summary: 게임 감정표현
