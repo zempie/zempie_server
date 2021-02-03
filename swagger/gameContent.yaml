@@ -20,7 +20,7 @@ paths:
                   description: on / off
               required:
                 - game_id
-                - heart
+                - on
       responses:
         200:
           $ref: '#/components/responses/Okay'
@@ -51,7 +51,8 @@ paths:
                   description: on / off
               required:
                 - game_id
-                - heart
+                - e_id
+                - on
       responses:
         200:
           $ref: '#/components/responses/Okay'
