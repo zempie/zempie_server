@@ -1,0 +1,19 @@
+paths:
+  /game/{pathname}:
+    get:
+      tags:
+        - Zempie Game
+      summary:  게임 정보
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: "pathname"
+          in: "path"
+          description: "pathname of a game"
+          type: "string"
+          required: true
+      responses:
+        200:
+          $ref: '#/components/responses/Okay'
+        403:
+          $ref: '#/components/responses/UnauthorizedError'
