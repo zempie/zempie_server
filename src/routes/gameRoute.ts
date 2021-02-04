@@ -27,6 +27,12 @@ export default (router: Router) => {
     // 게임 감정 표현
     router.post(`${apiVer}/game/emotion`,       validateFirebaseIdToken,    isAuthenticated,    convert(GameContentController.emotion));
 
+    // 게임 댓글
+    router.get(`${apiVer}/game/reply`,              validateFirebaseIdToken,    convert(GameContentController.getReplies));
+    router.get(`${apiVer}/game/rereply`,            validateFirebaseIdToken,    convert(GameContentController.getReReplies));
+    router.post(`${apiVer}/game/reply`,             validateFirebaseIdToken,    isAuthenticated,    convert(GameContentController.leaveReply));
+    router.post(`${apiVer}/game/reply/reaction`,    validateFirebaseIdToken,    isAuthenticated,    convert(GameContentController.reactReply));
+
     // 도전 게임 - 평가 리포트
     router.get(`${apiVer}/game/ch-report`,      validateFirebaseIdToken,    convert(GameContentController.getReports));
     router.post(`${apiVer}/game/ch-report`,     validateFirebaseIdToken,    isAuthenticated,    convert(GameContentController.createOrUpdateChallengingReport));

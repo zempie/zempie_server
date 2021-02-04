@@ -62,6 +62,7 @@ class BattleUserModel extends Model {
                 user_uid: record.user_uid,
                 name: user? user.name : record.name,
                 picture: user? user.picture : null,
+                channel_id: user? user.channel_id : null,
                 score: record.best_score,
             }
         })

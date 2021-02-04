@@ -68,6 +68,7 @@ class UserPlaylistController {
                     uid: user.uid,
                     name: user.name,
                     picture: user.picture,
+                    channel_id: user.channel_id,
                 },
                 games: indexedGames,
             }

@@ -82,7 +82,8 @@ class SocialMediaController {
                 return {
                     uid: record.user.uid,
                     name: record.user.name,
-                    picture: record.user.picture
+                    picture: record.user.picture,
+                    channel_id: record.user.channel_id,
                 }
             })
         }

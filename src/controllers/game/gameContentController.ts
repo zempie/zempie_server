@@ -6,6 +6,7 @@ import DecodedIdToken = admin.auth.DecodedIdToken;
 import { CreateError, ErrorCodes } from '../../commons/errorCodes';
 import { parseBoolean } from '../../commons/utils';
 import MQ from '../../services/messageQueueService';
+import { eReplyReaction } from '../../commons/enums';
 
 interface IGameHeartParams {
     game_id: number
@@ -75,6 +76,78 @@ class GameContentController {
             emotion_on: on,
         }
     }
+
+
+    /**
+     * 댓글
+     */
+    private getRetReplies = async (replies: any) => {
+        return {
+            replies: _.map(replies, (r: any) => {
+                const { user } = r;
+                return {
+                    id: r.id,
+                    content: r.content,
+                    user: {
+                        uid: user.uid,
+                        name: user.name,
+                        picture: user.picture,
+                        channel_id: user.channel_id,
+                    }
+                }
+            })
+        }
+    }
+
+    // 댓글
+    getReplies = async ({ game_id, limit, offset }: { game_id: number, limit: number, offset: number }) => {
+        const replies = await dbs.GameReply.getReplies(game_id, { limit, offset });
+        return this.getRetReplies(replies);
+    }
+
+    // 대댓글
+    getReReplies = async ({ reply_id, limit, offset }: { reply_id: number, limit: number, offset: number }) => {
+        const replies = await dbs.GameReply.getReReplies(reply_id, { limit, offset });
+        return this.getRetReplies(replies);
+    }
+
+    // 댓글 쓰기
+    leaveReply = async ({ game_id, reply_id, content }: { game_id: number, reply_id?: number, content: string }, user: DecodedIdToken) => {
+        // 불량 단어 색출
+        if ( !dbs.BadWords.isOk(content) ) {
+            throw CreateError(ErrorCodes.FORBIDDEN_STRING);
+        }
+
+        await dbs.GameReply.create({
+            game_id,
+            user_uid: user.uid,
+            parent_reply_id: reply_id || null,
+            content,
+        });
+
+        if ( reply_id ) {
+            // 알림?
+        }
+    }
+
+
+    // 댓글 좋아, 싫어
+    reactReply = async ({ reply_id, reaction }: { reply_id: number, reaction: eReplyReaction }, user: DecodedIdToken) => {
+        reaction = _.toNumber(reaction);
+        const record = await dbs.UserGameReplyReaction.findOne({ reply_id, user_uid: user.uid });
+        if ( record ) {
+            if ( record.reaction !== reaction ) {
+                record.reaction = reaction;
+                record.save();
+            }
+        }
+        else {
+            await dbs.UserGameReplyReaction.create({ reply_id, user_uid: user.uid, reaction });
+        }
+
+        return { reaction };
+    }
+
 
 
     createOrUpdateChallengingReport = async ({ game_id, rating, comment}: any, user: DecodedIdToken) => {

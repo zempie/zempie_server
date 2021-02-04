@@ -62,6 +62,7 @@ class RankingController {
                     user_uid: user.uid,
                     name: user.name,
                     picture: user.picture,
+                    channel_id: user.channel_id,
                     score,
                 }
             })
