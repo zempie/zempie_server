@@ -2,33 +2,74 @@ import { Runtime } from 'inspector';
 
 export const ErrorCodes = {
 
-    UNAUTHORIZED: {
-        code: 1001,
-        message: 'Unauthorized'
-    },
-    INVALID_SESSION: {
-        code: 1002,
-        message: 'invalid session'
-    },
-    MAX_FILE_SIZE_EXCEEDED: {
-        code: 1010,
-        message: '전체 파일 용량 초과'
-    },
-    MAX_FIELDS_SIZE_EXCEEDED: {
-        code: 1011,
-        message: '개별 파일 용량 초과'
-    },
+    /*
+        Common
+    */
+    UNAUTHORIZED:               { code: 10001, message: 'Unauthorized' },
+    INVALID_SESSION:            { code: 10002, message: 'invalid session' },
+    INVALID_PARAMS:             { code: 10003, message: '파라미터 오류' },
+    MAX_FILE_SIZE_EXCEEDED:     { code: 10011, message: '전체 파일 용량 초과' },
+    MAX_FIELDS_SIZE_EXCEEDED:   { code: 10012, message: '개별 파일 용량 초과' },
+    ACCESS_DENY:                { code: 10101, message: 'Access Denied' },
+    ACCESS_DENY_GAME:           { code: 10101, message: '게임 금지' },
+    ACCESS_DENY_REPLY:          { code: 10101, message: '댓글 작성 금지' },
+
+    /*
+        User
+     */
+    INVALID_USER_UID:               { code: 20001, message: '사용자 UID 오류' },
+    INVALID_CHANNEL_ID:             { code: 20002, message: '사용자 채널 ID 오류' },
+    INVALID_FCM_TOKEN:              { code: 20003, message: '사용자 FCM 토큰 오류' },
+    USER_ALREADY_VERIFIED_EMAIL:    { code: 20101, message: '이미 인증된 메일' },
+    USER_INVALID_VERIFIED_EMAIL:    { code: 20102, message: '이메일 인증 안됨' },
+    USER_DUPLICATED_CHANNEL_ID:     { code: 20103, message: 'Channel ID 중복' },
 
 
-    INVALID_PARAMS: {
-        code: 1030,
-        message: '파라미터 오류'
-    },
-    FORBIDDEN_STRING: {
-        code: 1040,
-        message: '사용할 수 없는 단어'
-    },
+    /*
+        Game
+     */
+    INVALID_GAME_ID:            { code: 30001, message: '게임 ID 오류' },
+    BATTLE_OVER:                { code: 31001, message: '배틀 끝났다' },
+    INVALID_BATTLE:             { code: 31002, message: '배틀 오류' },
 
+
+    /*
+        Contents
+     */
+    FORBIDDEN_STRING:           { code: 40101, message: '사용할 수 없는 단어' },
+    INVALID_NOTICE_ID:          { code: 40102, message: '공지사항 ID 오류' },
+
+    INVALID_PLAYLIST_UID:       { code: 41101, message: 'Playlist UID 오류' },
+    PLAYLIST_DUPLICATED_GAME:   { code: 41201, message: '플레이 리스트 게임 중복' },
+
+    INVALID_TIMELINE_USER_UID:  { code: 42110, message: '타임라인 유저 아이디 오류' },
+    ALREADY_FOLLOWING_TARGET:   { code: 42201, message: '이미 팔로잉 중입니다' },
+    ALREADY_UNFOLLOW_TARGET:    { code: 42202, message: '팔로우 중이 아닙니다' },
+
+    INVALID_QNA_PARAMS:         { code: 43101, message: 'QnA 파라미터 오류' },
+
+    INVALID_ITEM_ID:            { code: 44101, message: '아이템 아이디 오류' },
+    BUY_DUPLICATED_ITEM:        { code: 44201, message: '아이템 중복 구매 오류' },
+    REJECT_USE_ITEM:            { code: 44103, message: '아이템 사용 오류' },
+
+
+    /*
+        Admin
+     */
+    FORBIDDEN_ADMIN:                { code: 50001, message: '관리자 로그인 금지' },
+    INVALID_ADMIN_USERNAME:         { code: 50002, message: '관리자 로그인 오류' },
+    INVALID_ADMIN_PASSWORD:         { code: 50003, message: '관리자 로그인 오류' },
+    INVALID_ADMIN_REFRESH_TOKEN:    { code: 50004, message: '관리자 토큰 오류' },
+    INVALID_ADMIN_LEVEL:            { code: 50005, message: '관리자 권한 오류'    },
+    INVALID_ADMIN_PARAMS:           { code: 50006, message: '관리자 파라미터 오류' },
+
+    ALREADY_ADMIN_USER_READ_MAIL:   { code: 51001, message: '이미 읽은 우편' },
+    ADMIN_GAME_PATHNAME_DUPLICATED: { code: 52001, message: '게임 Pathname 중복' },
+
+
+    /**
+     * 안쓰임
+     */
     INVALID_TOKEN: {
         code: 1100,
         message: '잘 못 된 토큰입니다'
@@ -37,135 +78,21 @@ export const ErrorCodes = {
         code: 1101,
         message: '게임 키 오류'
     },
-    INVALID_USER_UID: {
-        code: 1110,
-        message: '잘 못 된 유저 아이디입니다'
-    },
-    INVALID_GAME_ID: {
-        code: 1111,
-        message: '게임 ID 오류'
-    },
-    INVALID_CHANNEL_ID: {
-        code: 1112,
-        message: '채널 ID 오류'
-    },
-
-    INVALID_FCM_TOKEN: {
-        code: 1121,
-        message: '사용자 FCM 토큰 오류'
-    },
-    INVALID_NOTICE_ID: {
-        code: 1141,
-        message: '공지사항 ID 오류'
-    },
-
-
-    FORBIDDEN_ADMIN: {
-        message: '관리자 로그인 금지'
-    },
-    INVALID_ADMIN_USERNAME: {
-        code: 1201,
-        message: '관리자 로그인 오류'
-    },
-    INVALID_ADMIN_PASSWORD: {
-        code: 1202,
-        message: '관리자 로그인 오류'
-    },
-    INVALID_ADMIN_REFRESH_TOKEN: {
-        code: 1203,
-        message: '관리자 토큰 오류'
-    },
-    INVALID_ADMIN_LEVEL: {
-        message: '관리자 권한 오류'
-    },
-    INVALID_ADMIN_PARAMS: {
-        message: '관리자 파라미터 오류'
-    },
-    ALREADY_ADMIN_USER_READ_MAIL: {
-        code: 1211,
-        message: '이미 읽은 우편',
-    },
-    ADMIN_GAME_PATHNAME_DUPLICATED: {
-        code: 1212,
-        message: '게임 Pathname 중복'
-    },
-
-
-    USER_ALREADY_VERIFIED_EMAIL: {
-        code: 2101,
-        message: '이미 인증된 메일'
-    },
-    USER_INVALID_VERIFIED_EMAIL: {
-        code: 2102,
-        message: '이메일 인증 안됨'
-    },
-    USER_DUPLICATED_CHANNEL_ID: {
-        code: 2103,
-        message: 'Channel ID 중복'
-    },
-
-    INVALID_TIMELINE_USER_UID: {
-        code: 1210,
-        message: '타임라인 유저 아이디 오류'
-    },
-
-    ALREADY_FOLLOWING_TARGET: {
-        code: 1302,
-        message: '이미 팔로잉 중입니다',
-    },
-    ALREADY_UNFOLLOW_TARGET: {
-        code: 1302,
-        message: '팔로우 중이 아닙니다',
-    },
 
     ALREADY_EXIST_PUBLISHER_GAME: {
         code: 1203,
         message: '이미 존재하는 퍼블리셔 게임입니다'
     },
 
-    BATTLE_OVER: {
-        code: 1401,
-        message: '배틀 끝났다'
-    },
-    INVALID_BATTLE: {
-        code: 1402,
-        message: '배틀 오류'
-    },
 
-    INVALID_ITEM_ID: {
-        code: 2101,
-        message: '아이템 아이디 오류',
-    },
-    BUY_DUPLICATED_ITEM: {
-        code: 2102,
-        message: '아이템 중복 구매 오류',
-    },
-    REJECT_USE_ITEM: {
-        code: 2103,
-        message: '아이템 사용 오류',
-    },
-
-
-    INVALID_QNA_PARAMS: {
-        message: 'QnA 파라미터 오류'
-    },
-
-
-    INVALID_PLAYLIST_UID: {
-        code: 3101,
-        message: 'Playlist UID 오류'
-    },
-    PLAYLIST_DUPLICATED_GAME: {
-        code: 3102,
-        message: '플레이 리스트 게임 중복'
-    },
 };
 
 
 
 export const CreateError = (err: any, ...args: any) => {
-    if( !!err ) {
-        throw new Error(err.message)
-    }
-    throw new Error(err.message);
+    const j = JSON.stringify({
+        ...err,
+        ...args,
+    })
+    return new Error(j);
 };

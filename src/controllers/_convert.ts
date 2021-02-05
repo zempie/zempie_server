@@ -3,10 +3,17 @@ import * as _ from 'lodash';
 
 
 
-export const responseError = (res: Response, error: Error) => {
-    res.status(400).send({
-        error: error.message
-    })
+export const responseError = (res: Response, error: Error, statusCode: number = 400) => {
+    try {
+        res.status(statusCode).send({
+            error: JSON.parse(error.message),
+        })
+    }
+    catch (e) {
+        res.status(statusCode).send({
+            error: error.message,
+        })
+    }
 };
 
 export default function convert(func: Function, middleware: boolean = false) {

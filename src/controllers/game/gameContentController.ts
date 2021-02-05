@@ -88,6 +88,8 @@ class GameContentController {
                 return {
                     id: r.id,
                     content: r.content,
+                    count_good: r.count_good,
+                    count_bad: r.count_bad,
                     user: {
                         uid: user.uid,
                         name: user.name,

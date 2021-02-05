@@ -12,14 +12,15 @@ const apiVer = `/api/v1`;
 export default (router: Router) => {
     router.get(`${apiVer}/featured`,            validateFirebaseIdToken,    convert(GameController.featuredList));
 
-    router.get(`/game/:pathname/:pid`,          convert(GameController.playGame, true),    convert(GameController.redirectGame));
-    router.get(`${apiVer}/game/:pathname`,      validateFirebaseIdToken,    convert(GameController.getGame));
-    router.get(`${apiVer}/games`,               validateFirebaseIdToken,    convert(GameController.getGameList));
-    router.get(`${apiVer}/games/hashtags/:tag`, validateFirebaseIdToken,    convert(GameController.getHashTags));
-    router.get(`${apiVer}/games/tagged/:id`,    validateFirebaseIdToken,    convert(GameController.getHashTagById));
-    router.get(`${apiVer}/games/s/:tag`,        validateFirebaseIdToken,    convert(GameController.getGameListByHashtag));
-    router.get(`${apiVer}/games/ranking/g`,     validateFirebaseIdToken,    convert(RankingController.getGlobalRanking));
-    router.get(`${apiVer}/games/ranking/f`,     validateFirebaseIdToken,    convert(RankingController.getFollowingRanking));
+    // 게임 하르 ❤
+    router.post(`${apiVer}/game/heart`,         validateFirebaseIdToken,    isAuthenticated,    convert(GameContentController.heart));
+
+    // 게임 감정 표현
+    router.post(`${apiVer}/game/emotion`,       validateFirebaseIdToken,    isAuthenticated,    convert(GameContentController.emotion));
+
+    // 도전 게임 - 평가 리포트
+    router.get(`${apiVer}/game/ch-report`,      validateFirebaseIdToken,    convert(GameContentController.getReports));
+    router.post(`${apiVer}/game/ch-report`,     validateFirebaseIdToken,    isAuthenticated,    convert(GameContentController.createOrUpdateChallengingReport));
 
     // 게임 하르 ❤
     router.post(`${apiVer}/game/heart`,         validateFirebaseIdToken,    isAuthenticated,    convert(GameContentController.heart));
@@ -36,6 +37,17 @@ export default (router: Router) => {
     // 도전 게임 - 평가 리포트
     router.get(`${apiVer}/game/ch-report`,      validateFirebaseIdToken,    convert(GameContentController.getReports));
     router.post(`${apiVer}/game/ch-report`,     validateFirebaseIdToken,    isAuthenticated,    convert(GameContentController.createOrUpdateChallengingReport));
+
+
+
+    router.get(`/game/:pathname/:pid`,          convert(GameController.playGame, true),    convert(GameController.redirectGame));
+    router.get(`${apiVer}/game/:pathname`,      validateFirebaseIdToken,    convert(GameController.getGame));
+    router.get(`${apiVer}/games`,               validateFirebaseIdToken,    convert(GameController.getGameList));
+    router.get(`${apiVer}/games/hashtags/:tag`, validateFirebaseIdToken,    convert(GameController.getHashTags));
+    router.get(`${apiVer}/games/tagged/:id`,    validateFirebaseIdToken,    convert(GameController.getHashTagById));
+    router.get(`${apiVer}/games/s/:tag`,        validateFirebaseIdToken,    convert(GameController.getGameListByHashtag));
+    router.get(`${apiVer}/games/ranking/g`,     validateFirebaseIdToken,    convert(RankingController.getGlobalRanking));
+    router.get(`${apiVer}/games/ranking/f`,     validateFirebaseIdToken,    convert(RankingController.getFollowingRanking));
 
 
     // for testing

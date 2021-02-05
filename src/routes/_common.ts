@@ -5,6 +5,8 @@ import { dbs } from '../commons/globals';
 import { Transaction } from 'sequelize';
 import cfgOption from '../../config/opt';
 import { logger } from '../commons/logger';
+import { CreateError, ErrorCodes } from '../commons/errorCodes';
+import { responseError } from '../controllers/_convert';
 
 
 export function throwError(res: Response, e: string, statusCode = 401) {
@@ -82,7 +84,7 @@ declare global {
 
 export const isAuthenticated = (req: Request, res: Response, next: NextFunction) => {
     if ( !req.user ) {
-        return throwError(res, '^_^ㅗ');
+        return responseError(res, CreateError(ErrorCodes.UNAUTHORIZED), 401);
     }
     next();
 }
@@ -123,7 +125,8 @@ export const validateFirebaseIdToken = async (req: Request, res: Response, next:
         }
         return next();
     } catch (error) {
-        return throwError(res, 'Unauthorized', 403)
+        return responseError(res, CreateError(ErrorCodes.UNAUTHORIZED), 401);
+        // return throwError(res, 'Unauthorized', 403)
     }
 };
 
@@ -134,7 +137,8 @@ export const validateAdminIdToken = async (req: Request, res: Response, next: Ne
         return next();
     }
     catch (error) {
-        return throwError(res, 'Unauthorized', 403)
+        return responseError(res, CreateError(ErrorCodes.UNAUTHORIZED), 401);
+        // return throwError(res, 'Unauthorized', 403)
     }
 }
 
@@ -143,7 +147,8 @@ export const checkUserDenied = (name: string) => {
     return (req: Request, res: Response, next: NextFunction) => {
         const claim = req.user.zempie;
         if ( claim?.deny[name]?.state && claim.deny[name].date >= Date.now() ) {
-            return throwError(res, `Access Denied: ${name}`, 403)
+            return responseError(res, CreateError(ErrorCodes.ACCESS_DENY), 403);
+            // return throwError(res, `Access Denied: ${name}`, 403)
         }
         return next();
     }
