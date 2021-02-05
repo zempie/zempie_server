@@ -6,13 +6,14 @@ import { Sequelize, Transaction } from 'sequelize';
 
 class ApiMQ extends SrvMQ {
     private interval: NodeJS.Timeout;
-    private game_emotion: {[Key: number]: {
-            [Key: string]: boolean,
+    private game_emotion: {[game_id: number]: {
+            [e_id: string]: boolean,
         }} = {};
-    private game_ids: {[Key: number]: {
+    private game_ids: {[game_id: number]: {
             count_over: number,
             count_heart: number,
         }} = {};
+
 
     constructor() {
         super();
@@ -37,7 +38,7 @@ class ApiMQ extends SrvMQ {
         _.forEach(this.game_emotion, async (obj: any, id: any) => {
             if ( _.some(obj, v => v != 0) ) {
                 await dbs.GameEmotion.getTransaction(async (transaction: Transaction) => {
-                    let gameEmotion = await dbs.GameEmotion.findOne({ id }, transaction);
+                    let gameEmotion = await dbs.GameEmotion.findOne({ game_id: id }, transaction);
                     if ( !gameEmotion ) {
                         gameEmotion = await dbs.GameEmotion.create({ game_id: id }, transaction);
                     }
@@ -69,6 +70,9 @@ class ApiMQ extends SrvMQ {
             e5: 0,
         }
     }
+    private getGameReplyReaction = (id: number) => {
+
+    }
 
 
     async gameOver(message: string) {
@@ -89,6 +93,11 @@ class ApiMQ extends SrvMQ {
         const { game_id, e_id, activated }: any = JSON.parse(message);
         const game: any = this.getGameEmotions(game_id);
         game[e_id] += activated? 1 : -1;
+    }
+
+    async gameReplyReaction(message: string) {
+        const { game_id, reply_id, reaction }: any = JSON.parse(message);
+        // const game: any
     }
 }
 

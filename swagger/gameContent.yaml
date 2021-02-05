@@ -58,3 +58,118 @@ paths:
           $ref: '#/components/responses/Okay'
         403:
           $ref: '#/components/responses/UnauthorizedError'
+
+  /game/reply:
+    get:
+      tags:
+        - Zempie Game Content
+      summary: 게임 댓글 가져오기
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: game_id
+          in: query
+          description: 게임 ID
+          type: number
+          required: true
+        - name: limit
+          in: query
+          description: 데이터 갯수 offset이랑 함께 사용 ( 기본 50 )
+          type: number
+          required: false
+        - name: offset
+          in: query
+          description: 몇 번째부터? - limit이랑 함께 사용 ( 기본 0 )
+          type: number
+          required: false
+      responses:
+        200:
+          $ref: '#/components/responses/Okay'
+        403:
+          $ref: '#/components/responses/UnauthorizedError'
+    post:
+      tags:
+        - Zempie Game Content
+      summary: 게임 댓글(대댓글) 작성
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                game_id:
+                  type: number
+                  description: 게임 ID
+                reply_id:
+                  type: number
+                  description: 댓글 ID (대댓일 경우에만 사용)
+                content:
+                  type: string
+                  description: 댓글 내용
+              required:
+                - game_id
+                - content
+      responses:
+        200:
+          $ref: '#/components/responses/Okay'
+        403:
+          $ref: '#/components/responses/UnauthorizedError'
+
+  /game/rereply:
+    get:
+      tags:
+        - Zempie Game Content
+      summary: 게임 대댓글 가져오기
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: reply_id
+          in: query
+          description: 댓글 ID
+          type: number
+          required: true
+        - name: limit
+          in: query
+          description: 데이터 갯수 offset이랑 함께 사용 ( 기본 50 )
+          type: number
+          required: false
+        - name: offset
+          in: query
+          description: 몇 번째부터? - limit이랑 함께 사용 ( 기본 0 )
+          type: number
+          required: false
+      responses:
+        200:
+          $ref: '#/components/responses/Okay'
+        403:
+          $ref: '#/components/responses/UnauthorizedError'
+
+  /game/reply/reaction:
+    post:
+      tags:
+        - Zempie Game Content
+      summary: 게임 댓글 리액션
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                reply_id:
+                  type: number
+                  description: 댓글 ID
+                reaction:
+                  type: number
+                  description: 좋아요=1, 싫어요=2, 없음=0
+              required:
+                - reply_id
+                - reaction
+      responses:
+        200:
+          $ref: '#/components/responses/Okay'
+        403:
+          $ref: '#/components/responses/UnauthorizedError'
