@@ -24,11 +24,11 @@ export function getGameData (game: any) {
             channel_id: user.channel_id,
         } : undefined,
         emotions: {
-            e1: emotions.e1,
-            e2: emotions.e2,
-            e3: emotions.e3,
-            e4: emotions.e4,
-            e5: emotions.e5,
+            e1: emotions?.e1 || 0,
+            e2: emotions?.e2 || 0,
+            e3: emotions?.e3 || 0,
+            e4: emotions?.e4 || 0,
+            e5: emotions?.e5 || 0,
         }
     }
 }
