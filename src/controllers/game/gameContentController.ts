@@ -2,11 +2,10 @@ import * as _ from 'lodash';
 import { caches, dbs } from '../../commons/globals';
 import { Transaction } from 'sequelize';
 import admin from 'firebase-admin';
-import DecodedIdToken = admin.auth.DecodedIdToken;
 import { CreateError, ErrorCodes } from '../../commons/errorCodes';
-import { parseBoolean } from '../../commons/utils';
 import MQ from '../../services/messageQueueService';
 import { eReplyReaction } from '../../commons/enums';
+import DecodedIdToken = admin.auth.DecodedIdToken;
 
 interface IGameHeartParams {
     game_id: number
@@ -136,15 +135,50 @@ class GameContentController {
     // 댓글 좋아, 싫어
     reactReply = async ({ reply_id, reaction }: { reply_id: number, reaction: eReplyReaction }, user: DecodedIdToken) => {
         reaction = _.toNumber(reaction);
+        let changed = false;
+        let r = { good: 0, bad: 0 };
+
         const record = await dbs.UserGameReplyReaction.findOne({ reply_id, user_uid: user.uid });
         if ( record ) {
             if ( record.reaction !== reaction ) {
                 record.reaction = reaction;
                 record.save();
+                changed = true;
+                if ( record.reaction === eReplyReaction.good ) {
+                    r.good = -1;
+                }
+                else if ( record.reaction === eReplyReaction.bad ) {
+                    r.bad = -1;
+                }
+                if ( reaction === eReplyReaction.good ) {
+                    r.good += 1;
+                }
+                else if ( reaction === eReplyReaction.bad ) {
+                    r.bad += 1;
+                }
             }
         }
         else {
             await dbs.UserGameReplyReaction.create({ reply_id, user_uid: user.uid, reaction });
+            changed = true;
+            if ( reaction === eReplyReaction.good ) {
+                r.good += 1;
+            }
+            else if ( reaction === eReplyReaction.bad ) {
+                r.bad += 1;
+            }
+        }
+
+        if ( changed ) {
+            MQ.send({
+                topic: 'gameReplyReaction',
+                messages: [{
+                    value: JSON.stringify({
+                        reply_id,
+                        reaction: r,
+                    })
+                }]
+            })
         }
 
         return { reaction };
@@ -152,7 +186,7 @@ class GameContentController {
 
 
 
-    createOrUpdateChallengingReport = async ({ game_id, rating, comment}: any, user: DecodedIdToken) => {
+    createOrUpdateChallengingReport = async ({ game_id, rating, comment }: any, user: DecodedIdToken) => {
         return await dbs.GameChallengingReport.getTransaction(async (transaction: Transaction) => {
             let report = await dbs.GameChallengingReport.findOne({ user_uid: user.uid, game_id }, transaction);
             if ( report ) {
