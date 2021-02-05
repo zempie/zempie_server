@@ -1,5 +1,5 @@
 export function getGameData (game: any) {
-    const { user } = game;
+    const { user, emotions } = game;
     return {
         id: game.id,
         official: game.official,
@@ -22,6 +22,13 @@ export function getGameData (game: any) {
             name: user.name,
             picture: user.picture,
             channel_id: user.channel_id,
-        } : undefined
+        } : undefined,
+        emotions: {
+            e1: emotions.e1,
+            e2: emotions.e2,
+            e3: emotions.e3,
+            e4: emotions.e4,
+            e5: emotions.e5,
+        }
     }
 }

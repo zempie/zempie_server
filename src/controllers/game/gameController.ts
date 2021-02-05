@@ -195,7 +195,7 @@ class GameController {
             const rows = await dbs.Game.getList({ official, category, limit, offset, sort, dir });
             games = _.map(rows, game => getGameData(game))
 
-            caches.game.setList(games, query);
+            // caches.game.setList(games, query);
         }
 
         return {

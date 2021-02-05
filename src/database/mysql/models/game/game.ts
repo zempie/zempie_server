@@ -43,7 +43,7 @@ class GameModel extends Model {
     async afterSync(): Promise<void> {
         this.model.belongsTo(dbs.User.model);
 
-        this.model.hasOne(dbs.GameEmotion.model);
+        this.model.hasOne(dbs.GameEmotion.model, { sourceKey: 'id', foreignKey: 'game_id', as: 'emotions' });
 
         // if ( process.env.NODE_ENV !== 'production' ) {
         //     if ( await this.model.count() < 1 ) {
@@ -105,6 +105,9 @@ class GameModel extends Model {
                     deleted_at: null,
                 },
                 required: true,
+            }, {
+                model: dbs.GameEmotion.model,
+                as: 'emotions',
             }],
         })
 
