@@ -54,7 +54,7 @@ export default {
 
     JWT: {
         access: {
-            secret: 'JW@#MJ%Y^Y$U%@$I1f',
+            secret: 'jLU@Y#R*LIEJlkf24old',
             options: {
                 algorithm: 'HS256',
                 expiresIn: '7d',

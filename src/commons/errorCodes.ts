@@ -28,7 +28,8 @@ export const ErrorCodes = {
     /*
         Game
      */
-    INVALID_GAME_ID:            { code: 30001, message: '게임 ID 오류' },
+    INVALID_PLAY:               { code: 30001, message: '게임 플레이 오류' },
+    INVALID_GAME_ID:            { code: 30011, message: '게임 ID 오류' },
     BATTLE_OVER:                { code: 31001, message: '배틀 끝났다' },
     INVALID_BATTLE:             { code: 31002, message: '배틀 오류' },
 

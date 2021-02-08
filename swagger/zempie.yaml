@@ -28,10 +28,10 @@ paths:
           description: 몇 번째부터? - limit이랑 함께 사용 ( 기본 0 )
           required: false
 
-        - name: official
+        - name: category
           in: query
           type: number
-          description: 정식 게임? 아니면 도전 게임? ( 1, 0 )
+          description: "0: 도전 게임, 1: 인증 게임, 2: 제휴 게임"
           required: false
 
         - name: sort

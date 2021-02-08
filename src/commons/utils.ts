@@ -69,7 +69,7 @@ export function verifyPassword(password: string, digest: string) {
 /**
  * JWT
  */
-export function signJWT(payload: object, expiresIn: string | undefined) {
+export function signJWT(payload: object, expiresIn?: string) {
     const { secret, options } = cfgOption.JWT.access;
     options.expiresIn = expiresIn || options.expiresIn;
 
