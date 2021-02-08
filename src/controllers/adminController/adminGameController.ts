@@ -30,7 +30,7 @@ class AdminGameController {
 
         return dbs.Game.getTransaction(async (transaction: Transaction) => {
             const game = await dbs.Game.create({
-                // category: eGameCategory.Provided,
+                category: eGameCategory.Provided,
                 pathname,
                 title, description,
                 hashtags,
