@@ -103,7 +103,7 @@ class GameModel extends Model {
                     banned: false,
                     deleted_at: null,
                 },
-                required: true,
+                required: false,
             }, {
                 model: dbs.GameEmotion.model,
                 as: 'emotions',
