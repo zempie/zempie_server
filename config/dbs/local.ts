@@ -2,7 +2,7 @@ export default {
     mysql: {
         database: 'zempie',
         username: 'root',
-        password: '1324',
+        password: 'dlgustjr.123',
         conn: {
             host: 'localhost',
             port: 3306,

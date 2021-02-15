@@ -90,6 +90,13 @@ export default (router: Router) => {
     router.post(`${apiVer}/admin/filter/bad-word/u`,    validateAdminIdToken,   convert(AdminUserController.setBadWord));
     router.post(`${apiVer}/admin/filter/bad-word/d`,    validateAdminIdToken,   convert(AdminUserController.delBadWord));
 
+    /**
+     * 금지어
+     */
+    router.get(`${apiVer}/admin/filter/forbidden-words`,      validateAdminIdToken,   convert(AdminUserController.getForbiddenWord));
+    router.post(`${apiVer}/admin/filter/forbidden-word/c`,    validateAdminIdToken,   convert(AdminUserController.addForbiddenWord));
+    router.post(`${apiVer}/admin/filter/forbidden-word/u`,    validateAdminIdToken,   convert(AdminUserController.setForbiddenWord));
+    router.post(`${apiVer}/admin/filter/forbidden-word/d`,    validateAdminIdToken,   convert(AdminUserController.delForbiddenWord));
 
     // router.get(`${apiVer}/admin/projects`,      validateAdminIdToken,   convert(AdminGameController.getProjects));
 

@@ -77,7 +77,7 @@ class AdminUserController {
 
 
     async getBadWords ({ limit = 50, offset = 0 }) {
-        const records = await dbs.BadWord.findAll({}, {
+        const records = await dbs.BadWords.findAll({}, {
             limit,
             offset,
         });
@@ -92,15 +92,42 @@ class AdminUserController {
     }
 
     async addBadWord ({ word }: { word: string }, admin: IAdmin) {
-        await dbs.BadWord.create({ word });
+        await dbs.BadWords.create({ word });
     }
 
     async delBadWord ({ id }: { id: number }, admin: IAdmin) {
-        await dbs.BadWord.destroy({ id });
+        await dbs.BadWords.destroy({ id });
     }
 
     async setBadWord ({ id, activated }: { id: number, activated: boolean }, admin: IAdmin) {
-        await dbs.BadWord.update({ id }, { activated });
+        await dbs.BadWords.update({ id }, { activated });
+    }
+
+    async getForbiddenWord ({ limit = 50, offset = 0 }) {
+        const records = await dbs.ForbiddenWords.findAll({}, {
+            limit,
+            offset,
+        });
+        return {
+            forbidden_words: _.map(records, (r: any) => {
+                return {
+                    activated: r.activated,
+                    word: r.word,
+                }
+            })
+        }
+    }
+
+    async addForbiddenWord ({ word }: { word: string }, admin: IAdmin) {
+        await dbs.ForbiddenWords.create({ word });
+    }
+
+    async delForbiddenWord ({ id }: { id: number }, admin: IAdmin) {
+        await dbs.ForbiddenWords.destroy({ id });
+    }
+
+    async setForbiddenWord ({ id, activated }: { id: number, activated: boolean }, admin: IAdmin) {
+        await dbs.ForbiddenWords.update({ id }, { activated });
     }
 }
 

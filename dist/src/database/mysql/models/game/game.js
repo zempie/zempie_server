@@ -1,0 +1,197 @@
+"use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const _ = require("lodash");
+const model_1 = require("../../model");
+const sequelize_1 = require("sequelize");
+const globals_1 = require("../../../../commons/globals");
+const utils_1 = require("../../../../commons/utils");
+const enums_1 = require("../../../../commons/enums");
+class GameModel extends model_1.default {
+    constructor() {
+        super(...arguments);
+        this.getListIncludingUser = (where, options = {}) => __awaiter(this, void 0, void 0, function* () {
+            return yield this.model.findAll(Object.assign({ where, include: [
+                    {
+                        model: globals_1.dbs.GameEmotion.model,
+                        as: 'emotions',
+                    },
+                    {
+                        model: globals_1.dbs.User.model,
+                        where: {
+                            activated: true,
+                            banned: false,
+                            deleted_at: null,
+                        },
+                        required: false,
+                    }
+                ] }, options));
+        });
+    }
+    initialize() {
+        this.name = 'game';
+        this.attributes = {
+            // uid:                { type: DataTypes.UUID, allowNull: false },
+            activated: { type: sequelize_1.DataTypes.BOOLEAN, allowNull: false, defaultValue: false },
+            enabled: { type: sequelize_1.DataTypes.BOOLEAN, allowNull: false, defaultValue: false },
+            official: { type: sequelize_1.DataTypes.BOOLEAN, allowNull: false, defaultValue: false },
+            category: { type: sequelize_1.DataTypes.INTEGER, allowNull: false, defaultValue: enums_1.eGameCategory.Challenge },
+            user_id: { type: sequelize_1.DataTypes.INTEGER },
+            pathname: { type: sequelize_1.DataTypes.STRING(50), allowNull: false, unique: true },
+            title: { type: sequelize_1.DataTypes.STRING(50), allowNull: false, defaultValue: '' },
+            description: { type: sequelize_1.DataTypes.STRING(200), defaultValue: '' },
+            version: { type: sequelize_1.DataTypes.STRING(20), defaultValue: '0.0.1' },
+            control_type: { type: sequelize_1.DataTypes.SMALLINT, defaultValue: 0 },
+            hashtags: { type: sequelize_1.DataTypes.STRING, allowNull: false },
+            count_start: { type: sequelize_1.DataTypes.INTEGER, allowNull: false, defaultValue: 0 },
+            count_over: { type: sequelize_1.DataTypes.INTEGER, allowNull: false, defaultValue: 0 },
+            count_heart: { type: sequelize_1.DataTypes.INTEGER, allowNull: false, defaultValue: 0 },
+            url_game: { type: sequelize_1.DataTypes.STRING },
+            url_thumb: { type: sequelize_1.DataTypes.STRING },
+            url_thumb_webp: { type: sequelize_1.DataTypes.STRING },
+            url_thumb_gif: { type: sequelize_1.DataTypes.STRING },
+        };
+    }
+    afterSync() {
+        return __awaiter(this, void 0, void 0, function* () {
+            this.model.belongsTo(globals_1.dbs.User.model);
+            this.model.hasOne(globals_1.dbs.GameEmotion.model, { sourceKey: 'id', foreignKey: 'game_id', as: 'emotions' });
+            // if ( process.env.NODE_ENV !== 'production' ) {
+            //     if ( await this.model.count() < 1 ) {
+            //         const sampleGames: any = [
+            //             {
+            //                 // uid: uuid(),
+            //                 pathname: 'test-path',
+            //                 title: 'test-title',
+            //                 genre_tags: 'arcade,puzzle,knight',
+            //             }
+            //         ];
+            //         await this.bulkCreate(sampleGames);
+            //     }
+            // }
+            const desc = yield this.model.sequelize.queryInterface.describeTable(this.model.tableName);
+            if (!desc['url_thumb_webp']) {
+                this.model.sequelize.queryInterface.addColumn(this.model.tableName, 'url_thumb_webp', {
+                    type: sequelize_1.DataTypes.STRING,
+                    after: 'url_thumb'
+                });
+            }
+            if (!desc['url_thumb_gif']) {
+                this.model.sequelize.queryInterface.addColumn(this.model.tableName, 'url_thumb_gif', {
+                    type: sequelize_1.DataTypes.STRING,
+                    after: 'url_thumb_webp'
+                });
+            }
+            if (!desc['count_heart']) {
+                this.model.sequelize.queryInterface.addColumn(this.model.tableName, 'count_heart', {
+                    type: sequelize_1.DataTypes.INTEGER,
+                    allowNull: false,
+                    defaultValue: 0,
+                    after: 'count_over'
+                });
+            }
+            if (!desc['category']) {
+                this.model.sequelize.queryInterface.addColumn(this.model.tableName, 'category', {
+                    type: sequelize_1.DataTypes.SMALLINT,
+                    allowNull: false,
+                    defaultValue: enums_1.eGameCategory.Challenge,
+                    after: 'official'
+                });
+            }
+        });
+    }
+    getInfo(where) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const record = yield this.model.findOne({
+                where,
+                // attributes: {
+                //     exclude: ['id', 'created_at', 'updated_at', 'deleted_at']
+                // },
+                include: [{
+                        model: globals_1.dbs.User.model,
+                        where: {
+                            activated: true,
+                            banned: false,
+                            deleted_at: null,
+                        },
+                        required: false,
+                    }, {
+                        model: globals_1.dbs.GameEmotion.model,
+                        as: 'emotions',
+                    }],
+            });
+            return record.get({ plain: true });
+        });
+    }
+    getList({ official, category, limit = 50, offset = 0, sort = 'id', dir = 'asc' }) {
+        return __awaiter(this, void 0, void 0, function* () {
+            // where
+            const where = {
+                activated: true,
+                enabled: true,
+            };
+            if (category) {
+                where.category = _.toNumber(category);
+            }
+            else {
+                if (official) {
+                    where.official = utils_1.parseBoolean(official);
+                }
+            }
+            // order by
+            dir = dir.toLowerCase();
+            if (dir === 'd' || dir === 'desc') {
+                dir = 'desc';
+            }
+            else {
+                dir = 'asc';
+            }
+            sort = sort.toLowerCase();
+            if (sort === 'u' || sort === 'updated') {
+                sort = 'updated_at';
+            }
+            else if (sort === 'c' || sort === 'created') {
+                sort = 'created_at';
+            }
+            else if (sort === 't' || sort === 'title') {
+                sort = 'title';
+            }
+            else {
+                sort = 'id';
+            }
+            return this.getListIncludingUser(where, {
+                order: [[sort, dir]],
+                limit: _.toNumber(limit),
+                offset: _.toNumber(offset),
+            });
+            // return await this.model.findAll({
+            //     where,
+            //     // attributes: {
+            //     //     include: [['uid', 'game_uid']]
+            //     // },
+            //     include: [{
+            //         model: dbs.User.model,
+            //         where: {
+            //             activated: true,
+            //             banned: false,
+            //             deleted_at: null,
+            //         },
+            //         required: true,
+            //     }],
+            //     order: [[sort, dir]],
+            //     limit: _.toNumber(limit),
+            //     offset: _.toNumber(offset),
+            // })
+        });
+    }
+}
+exports.default = (rdb) => new GameModel(rdb);
+//# sourceMappingURL=game.js.map
