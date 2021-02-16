@@ -20,6 +20,12 @@ class ApiMQ extends SrvMQ {
             count_good: number,
             count_bad: number,
         }} = {};
+    private game_logs: {
+        game_id: number
+        user_uid: string,
+        score: number,
+        playtime: number,
+    }[] = [];
 
 
     constructor() {
@@ -31,6 +37,9 @@ class ApiMQ extends SrvMQ {
     }
 
     private processBulk = async () =>{
+        dbs.GameLog.bulkCreate(this.game_logs);
+        this.game_logs = [];
+
         // 게임 오버 카운팅
         _.forEach(this.game_ids, async (obj: any, id: any) => {
             if ( obj.count_over !== 0 || obj.count_heart !== 0 ) {
@@ -102,7 +111,11 @@ class ApiMQ extends SrvMQ {
 
 
     async gameOver(message: string) {
-        const { game_id }: any = JSON.parse(message);
+        const { user_uid, game_id, score, playtime }: any = JSON.parse(message);
+        this.game_logs.push({ game_id, user_uid, score, playtime });
+
+        dbs.GameLog.create({ user_uid, game_id, score, playtime });
+
         const game = this.getGameIds(game_id);
         game.count_over += 1;
     }

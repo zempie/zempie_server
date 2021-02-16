@@ -15,6 +15,7 @@ class GameLogModel extends Model {
             user_id:        { type: DataTypes.INTEGER, allowNull: false },
             game_id:        { type: DataTypes.INTEGER, allowNull: false },
             score:          { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0 },
+            playtime:       { type: DataTypes.INTEGER, allowNull: false },
         };
     }
 
