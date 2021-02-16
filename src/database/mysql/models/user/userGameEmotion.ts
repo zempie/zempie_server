@@ -27,7 +27,7 @@ class UserGameEmotionModel extends Model {
                 }
             }
             else {
-                this.create({ game_id, user_uid, emotion, activated: true }, undefined);
+                await this.create({ game_id, user_uid, emotion, activated: true });
                 changed = true;
             }
             return changed;
