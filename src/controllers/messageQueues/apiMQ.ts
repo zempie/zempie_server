@@ -21,8 +21,8 @@ class ApiMQ extends SrvMQ {
             count_bad: number,
         }} = {};
     private game_logs: {
-        game_id: number
         user_uid: string,
+        game_id: number,
         score: number,
         playtime: number,
     }[] = [];
@@ -112,7 +112,7 @@ class ApiMQ extends SrvMQ {
 
     async gameOver(message: string) {
         const { user_uid, game_id, score, playtime }: any = JSON.parse(message);
-        this.game_logs.push({ game_id, user_uid, score, playtime });
+        this.game_logs.push({ user_uid, game_id, score, playtime });
 
         const game = this.getGameIds(game_id);
         game.count_over += 1;
