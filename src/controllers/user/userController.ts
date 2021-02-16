@@ -56,8 +56,7 @@ class UserController {
         }
 
         return dbs.User.getTransaction(async (transaction: Transaction) => {
-            const isOk = await this.filterBadWord({ w: name || _user.name });
-            if ( !isOk ) {
+            if ( !await dbs.ForbiddenWords.isOk(name || _user.name) ) {
                 throw CreateError(ErrorCodes.FORBIDDEN_STRING);
             }
 
@@ -133,11 +132,6 @@ class UserController {
 
 
     getTargetInfoByChannelId = async ({channel_id}: {channel_id: string}, _: DecodedIdToken) => {
-        // 불량 단어 색출
-        if ( !!channel_id && !dbs.BadWords.isOk(channel_id) ) {
-            throw CreateError(ErrorCodes.FORBIDDEN_STRING);
-        }
-
         let channel = await caches.user.getChannel(channel_id);
         if ( !channel ) {
             // const user = await docs.User.getProfile({ channel_id });
@@ -264,8 +258,7 @@ class UserController {
 
             // 이름 변경
             if ( params.name ) {
-                const isOk = await this.filterBadWord({w: params.name });
-                if ( !isOk ) {
+                if ( !await dbs.ForbiddenWords.isOk(params.name) ) {
                     throw CreateError(ErrorCodes.FORBIDDEN_STRING);
                 }
                 user.name = params.name;
@@ -408,7 +401,10 @@ class UserController {
 
 
     filterBadWord = async ({ w }: { w: string }) => {
-        return dbs.BadWords.isOk(w);
+        // 불량 단어 색출
+        if ( !dbs.BadWords.isOk(w) || !await dbs.ForbiddenWords.isOk(w) ) {
+            throw CreateError(ErrorCodes.FORBIDDEN_STRING);
+        }
     }
 
 

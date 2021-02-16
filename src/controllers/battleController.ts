@@ -139,7 +139,7 @@ class BattleController {
 
     updateUserName = async ({ battle_key, name }: IBattlePlayParams, user: DecodedIdToken) => {
         // 불량 단어 색출
-        if ( !!name && !dbs.BadWords.isOk(name) ) {
+        if ( !!name && !await dbs.ForbiddenWords.isOk(name) ) {
             throw CreateError(ErrorCodes.FORBIDDEN_STRING);
         }
 

@@ -130,6 +130,10 @@ class StudioController {
         if ( !dbs.BadWords.areOk(params) ) {
             throw CreateError(ErrorCodes.FORBIDDEN_STRING);
         }
+        // 금지 단어 색출
+        if ( !await dbs.ForbiddenWords.isOk(params.name) ) {
+            throw CreateError(ErrorCodes.FORBIDDEN_STRING);
+        }
 
 
         return dbs.Project.getTransaction( async (transaction : Transaction)=>{
@@ -259,6 +263,11 @@ class StudioController {
         if ( !dbs.BadWords.areOk(params) ) {
             throw CreateError(ErrorCodes.FORBIDDEN_STRING);
         }
+        // 금지 단어 색출
+        if ( !await dbs.ForbiddenWords.isOk(params.name) ) {
+            throw CreateError(ErrorCodes.FORBIDDEN_STRING);
+        }
+
         return dbs.Project.getTransaction( async (transaction : Transaction) => {
             const project = await dbs.Project.findOne( { id : params.id } );
             const game = await dbs.Game.findOne( {
