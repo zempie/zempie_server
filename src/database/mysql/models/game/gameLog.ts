@@ -12,7 +12,6 @@ class GameLogModel extends Model {
     protected initialize() {
         this.name = 'gameLog';
         this.attributes = {
-            user_id:        { type: DataTypes.INTEGER, allowNull: false },
             game_id:        { type: DataTypes.INTEGER, allowNull: false },
             score:          { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0 },
             playtime:       { type: DataTypes.INTEGER, allowNull: false },
