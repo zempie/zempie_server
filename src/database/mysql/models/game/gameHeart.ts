@@ -26,7 +26,7 @@ class GameHeartModel extends Model {
                 }
             }
             else {
-                this.create({ game_id, user_uid, activated: true });
+                this.create({ game_id, user_uid, activated: true }, undefined);
                 changed = true;
             }
             return changed;
