@@ -120,7 +120,7 @@ class GameController {
 
     gameOver = async ({ score, pid }: IGameParams, _user: DecodedIdToken) => {
         if ( !pid ) {
-            throw CreateError(ErrorCodes.INVALID_GAME_PLAY_ID);
+            throw CreateError(ErrorCodes.INVALID_PLAY);
         }
 
         let game_id: number;
@@ -131,7 +131,7 @@ class GameController {
             user_uid = decoded.user_uid || null;
         }
         catch (e) {
-            throw CreateError(ErrorCodes.INVALID_GAME_PLAY_ID);
+            throw CreateError(ErrorCodes.INVALID_PLAY);
         }
 
         MQ.send({
