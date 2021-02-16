@@ -106,17 +106,28 @@ class BattleController {
             await dbs.BattleUser.updateBestScore({ battle_uid, user_uid, best_score: score });
         }
 
+        // MQ.send({
+        //     topic: 'battle_gameOver',
+        //     messages: [{
+        //         value: JSON.stringify({
+        //             battle_uid,
+        //             user_uid,
+        //             secret_id,
+        //             best_score,
+        //             score,
+        //             new_record,
+        //         })
+        //     }]
+        // })
         MQ.send({
-            topic: 'battle_gameOver',
+            topic: 'gameOver',
             messages: [{
                 value: JSON.stringify({
-                    battle_uid,
                     user_uid,
-                    secret_id,
-                    best_score,
+                    game_id,
                     score,
-                    new_record,
-                })
+                    battle_uid,
+                }),
             }]
         })
 
