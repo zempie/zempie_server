@@ -1,7 +1,8 @@
+import * as uniqid from 'uniqid';
 import CacheModel from './_cache';
 
 
-const FeaturedKey = `zempie.game:featured`;
+const FeaturedKey = `zempie:game:featured`;
 const PathnameKey = `zempie:game:p:`;
 const ListKey = 'zempie:games:';
 const GameKey = `zempie:game:g:`;
@@ -105,6 +106,16 @@ class GameCache extends CacheModel {
         this.redis.set(SharedKey + uid, JSON.stringify(ret), () => {
             this.redis.expire(SharedKey + uid, 60, () => {});
         })
+    }
+
+
+    /**
+     * playing game
+     */
+    async getPlayingGame () {
+
+    }
+    setPlayingGame (game_id: number, user_uid?: string) {
     }
 }
 

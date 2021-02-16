@@ -10,14 +10,22 @@ import Opt from '../../../config/opt';
 import { getGameData } from '../_common';
 import { eGameCategory } from '../../commons/enums';
 import { CreateError, ErrorCodes } from '../../commons/errorCodes';
+import { signJWT } from '../../commons/utils';
+import * as jwt from 'jsonwebtoken';
 const { Url } = Opt;
 
+
+interface IGamePlay {
+    game_id: number
+    user_uid?: string
+    started_at: number
+}
 
 class GameController {
     featuredList = async () => {
         let ret = await caches.game.getFeatured();
         if ( !ret ) {
-            const popular = await dbs.Game.getListIncludingUser({ activated: true, enabled: true }, { order: Sequelize.literal('rand()'), limit: 5 });
+            const popular = await dbs.Game.getListIncludingUser({ activated: true, enabled: true }, { order: [['count_over', 'desc']], limit: 5 });
             const recommended = await dbs.Game.getListIncludingUser({ activated: true, enabled: true }, { order: Sequelize.literal('rand()'), limit: 5 });
             const latest = await dbs.Game.getListIncludingUser({ activated: true, enabled: true }, { order: [['id', 'asc']], limit: 5 });
             const certified = await dbs.Game.getListIncludingUser({ category: eGameCategory.Certified, activated: true, enabled: true }, { order: Sequelize.literal('rand()'), limit: 5 });
@@ -94,25 +102,37 @@ class GameController {
         //     user_uid: uid,
         //     game_uid
         // });
+        const pid = jwt.sign({
+            game_id,
+            user_uid: user?.uid,
+            started_at: new Date().getTime(),
+        }, 'KJf8y972hfk!#F', {
+            algorithm: 'HS256',
+            expiresIn: '6h',
+            issuer: 'from the red',
+        })
 
         return {
-            value: 'okokoaksfojasdlkfjs'
+            pid
         }
     }
 
 
-    gameOver = async ({ game_id, score, pid }: IGameParams, user: DecodedIdToken) => {
-        const user_uid = user? user.uid : null;
-        // const { uid: user_uid } = user;
-        // const user_uid = user.uid;
-        // const userRecord = await dbs.User.findOne({ uid: user_uid });
-        // const game = await dbs.Game.findOne({ uid: game_uid });
-        // if ( !game ) {
-        //     throw CreateError(ErrorCodes.INVALID_GAME_UID);
-        // }
-        //
-        // const user_id = userRecord.id;
-        // const game_id = game.id;
+    gameOver = async ({ score, pid }: IGameParams, _user: DecodedIdToken) => {
+        if ( !pid ) {
+            throw CreateError(ErrorCodes.INVALID_PLAY);
+        }
+
+        let game_id: number;
+        let user_uid: string;
+        try {
+            const decoded: any = jwt.verify(pid, 'KJf8y972hfk!#F');
+            game_id = decoded.game_id;
+            user_uid = decoded.user_uid || null;
+        }
+        catch (e) {
+            throw CreateError(ErrorCodes.INVALID_PLAY);
+        }
 
         MQ.send({
             topic: 'gameOver',
