@@ -114,8 +114,6 @@ class ApiMQ extends SrvMQ {
         const { user_uid, game_id, score, playtime }: any = JSON.parse(message);
         this.game_logs.push({ game_id, user_uid, score, playtime });
 
-        dbs.GameLog.create({ user_uid, game_id, score, playtime });
-
         const game = this.getGameIds(game_id);
         game.count_over += 1;
     }
