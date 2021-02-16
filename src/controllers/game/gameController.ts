@@ -130,7 +130,7 @@ class GameController {
             const decoded: any = jwt.verify(pid, 'KJf8y972hfk!#F');
             game_id = decoded.game_id;
             user_uid = decoded.user_uid || null;
-            playtime = new Date().getTime() - new Date(decoded.created_at).getTime();
+            playtime = new Date().getTime() - new Date(decoded.started_at).getTime();
         }
         catch (e) {
             throw CreateError(ErrorCodes.INVALID_PLAY);
