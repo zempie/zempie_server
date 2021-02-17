@@ -1,5 +1,5 @@
 import Model from '../../model';
-import { DataTypes, Sequelize } from 'sequelize';
+import { DataTypes, Sequelize, Transaction } from 'sequelize';
 import { dbs } from '../../../../commons/globals';
 
 
@@ -14,6 +14,17 @@ class UserClaimModel extends Model {
     }
 
 
+    async createDefault(user_id: number, user_uid: string) {
+        return await this.create({
+            user_id,
+            user_uid,
+            data: JSON.stringify({
+                zempie: {
+                    deny: {},
+                }
+            })
+        })
+    }
 
 }
 

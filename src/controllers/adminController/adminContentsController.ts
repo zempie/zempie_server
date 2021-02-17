@@ -46,13 +46,17 @@ class AdminContentsController {
 
 
     punishUser = async ({ user_id, deny_name: name, is_deny, date }: any) => {
-        const userClaim = await dbs.UserClaim.find({ id: user_id });
+        const user = await dbs.User.findOne({ id: user_id });
+        let userClaim = await dbs.UserClaim.findOne({ user_id });
+        if ( !userClaim ) {
+            userClaim = await dbs.UserClaim.createDefault(user_id, user.uid);
+        }
         const claim: IZempieClaims = JSON.parse(userClaim.data);
 
         claim.zempie.deny[name] = {
             state: is_deny,
             date: new Date(date).getTime(),
-            count: is_deny? claim.zempie.deny[name].count + 1 : 1,
+            count: is_deny? claim.zempie.deny[name]?.count + 1 : 1,
         };
 
         userClaim.data = claim;
@@ -62,8 +66,9 @@ class AdminContentsController {
 
         // send a mail
         await dbs.UserMailbox.create({
-            user_id,
-            title: '안내',
+            user_uid: user.uid,
+            category: '알림',
+            title: '정지 안내',
             content: `너 ${name} 정지 먹음`,
         })
     }
