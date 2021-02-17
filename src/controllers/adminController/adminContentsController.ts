@@ -59,6 +59,13 @@ class AdminContentsController {
         userClaim.save();
 
         await admin.auth().setCustomUserClaims(userClaim.user_uid, claim);
+
+        // send a mail
+        await dbs.UserMailbox.create({
+            user_id,
+            title: '안내',
+            content: `너 ${name} 정지 먹음`,
+        })
     }
 }
 
