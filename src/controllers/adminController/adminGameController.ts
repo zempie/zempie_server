@@ -22,7 +22,7 @@ class AdminGameController {
     }
 
 
-    createProvidedGame = async ({ pathname, title, description, hashtags, url_game, url_thumb, url_thumb_webp, url_thumb_gif}: any) => {
+    createAffiliatedGame = async ({ pathname, title, description, hashtags, url_game, url_thumb, url_thumb_webp, url_thumb_gif}: any) => {
         const exist = await dbs.Game.findOne({ pathname });
         if ( exist ) {
             throw CreateError(ErrorCodes.ADMIN_GAME_PATHNAME_DUPLICATED);
@@ -30,7 +30,7 @@ class AdminGameController {
 
         return dbs.Game.getTransaction(async (transaction: Transaction) => {
             const game = await dbs.Game.create({
-                category: eGameCategory.Provided,
+                category: eGameCategory.Affiliated,
                 pathname,
                 title, description,
                 hashtags,

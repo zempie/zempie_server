@@ -45,7 +45,7 @@ class AdminContentsController {
     }
 
 
-    punishUser = async ({ user_id, deny_name: name, is_deny, date }: any) => {
+    punishUser = async ({ user_id, category, reason, date }: any) => {
         const user = await dbs.User.findOne({ id: user_id });
         let userClaim = await dbs.UserClaim.findOne({ user_id });
         if ( !userClaim ) {
@@ -53,10 +53,10 @@ class AdminContentsController {
         }
         const claim: IZempieClaims = JSON.parse(userClaim.data);
 
-        claim.zempie.deny[name] = {
-            state: is_deny,
+        claim.zempie.deny[category] = {
+            state: true,
             date: new Date(date).getTime(),
-            count: is_deny? claim.zempie.deny[name]?.count + 1 : 1,
+            count: claim.zempie.deny[category]?.count + 1 || 1,
         };
 
         userClaim.data = claim;
@@ -64,13 +64,48 @@ class AdminContentsController {
 
         await admin.auth().setCustomUserClaims(userClaim.user_uid, claim);
 
+        await dbs.UserPunished.create({
+            user_id,
+            is_denied: true,
+            category,
+            reason,
+            end_at: new Date(date),
+        });
+
         // send a mail
         await dbs.UserMailbox.create({
             user_uid: user.uid,
             category: '알림',
             title: '정지 안내',
-            content: `너 ${name} 정지 먹음`,
-        })
+            content: `너 ${category} 정지 먹음`,
+        });
+    }
+
+    releasePunishedUser = async ({ id }: any) => {
+        await dbs.UserPunished.getTransaction(async (transaction: Transaction) => {
+            const record = await dbs.UserPunished.findOne({ id }, transaction);
+            record.is_denied = false;
+            await record.save({ transaction });
+
+            const userClaim = await dbs.UserClaim.findOne({ user_id: record.user_id }, transaction);
+            const claim: IZempieClaims = JSON.parse(userClaim.data);
+            claim.zempie.deny[record.category].state = false;
+            userClaim.data = claim;
+            await userClaim.save({ transaction });
+
+            await admin.auth().setCustomUserClaims(userClaim.user_uid, claim);
+        });
+    }
+
+    punishedUserList = async ({ user_id, limit = 50, offset = 0, sort = 'id', dir = 'asc' }: any) => {
+        const records = await dbs.UserPunished.model.findAll({
+            where: { user_id },
+            attributes: ['id', 'is_denied', 'category', 'reason', 'end_at', 'created_at'],
+            order: [[sort, dir]],
+            limit: _.toNumber(limit),
+            offset: _.toNumber(offset),
+        });
+        return _.map(records, (d: any) => d.get({ plain: true }))
     }
 }
 

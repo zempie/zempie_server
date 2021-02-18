@@ -20,7 +20,7 @@ export enum eReportType {
 export enum eGameCategory {
     Challenge,
     Certified,
-    Provided,
+    Affiliated,
 }
 export enum eGameEmotion {
     Excellent,

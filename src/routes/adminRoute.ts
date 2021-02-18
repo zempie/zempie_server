@@ -40,7 +40,7 @@ export default (router: Router) => {
      * 게임
      */
     router.get(`${apiVer}/admin/games`,         validateAdminIdToken,   convert(AdminGameController.getGames));
-    router.post(`${apiVer}/admin/game/c/p`,     validateAdminIdToken,   adminTracking,  convert(AdminGameController.createProvidedGame));
+    router.post(`${apiVer}/admin/game/c/p`,     validateAdminIdToken,   adminTracking,  convert(AdminGameController.createAffiliatedGame));
     router.post(`${apiVer}/admin/game/u`,       validateAdminIdToken,   adminTracking,  convert(AdminGameController.updateGame));
 
 
@@ -49,6 +49,8 @@ export default (router: Router) => {
      */
     router.post(`${apiVer}/admin/punish/game`,  validateAdminIdToken,   adminTracking,  convert(AdminContentsController.punishGame));
     router.post(`${apiVer}/admin/punish/user`,  validateAdminIdToken,   adminTracking,  convert(AdminContentsController.punishUser));
+    router.post(`${apiVer}/admin/punish/user/release`,  validateAdminIdToken,   adminTracking,  convert(AdminContentsController.releasePunishedUser));
+    router.get(`${apiVer}/admin/punish/user/list`,      validateAdminIdToken,   adminTracking,  convert(AdminContentsController.punishedUserList));
 
     /**
      * 우편함
