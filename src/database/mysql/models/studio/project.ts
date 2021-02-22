@@ -1,6 +1,7 @@
 import Model from "../../model";
 import { DataTypes, Op, Sequelize, Transaction } from 'sequelize';
 import { dbs } from '../../../../commons/globals';
+import { eProjectState } from '../../../../commons/enums';
 
 
 class ProjectModel extends Model {
@@ -9,6 +10,7 @@ class ProjectModel extends Model {
         this.attributes = {
             user_id:            { type: DataTypes.INTEGER, allowNull: false },
             name:               { type: DataTypes.STRING(50), allowNull: true },
+            state:              { type: DataTypes.SMALLINT, allowNull: false, defaultValue: eProjectState.Normal },
             picture:            { type: DataTypes.STRING(250), allowNull: true },
             picture2:           { type: DataTypes.STRING(250), allowNull: true },
             picture_webp:       { type: DataTypes.STRING(250), allowNull: true },
@@ -52,6 +54,15 @@ class ProjectModel extends Model {
                 type: DataTypes.STRING(250),
                 allowNull: true,
                 after: 'picture_webp'
+            })
+        }
+
+        if ( !desc['state'] ) {
+            this.model.sequelize.queryInterface.addColumn(this.model.tableName, 'state', {
+                type: DataTypes.SMALLINT,
+                allowNull: false,
+                defaultValue: eProjectState.Normal,
+                after: 'name'
             })
         }
 

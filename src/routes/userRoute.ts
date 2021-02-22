@@ -49,8 +49,8 @@ export default (router: Router) => {
     router.post(`${apiVer}/playlist/game/d`,        validateFirebaseIdToken,    isAuthenticated,    convert(UserPlaylistController.delGame));
     router.post(`${apiVer}/playlist/game/s`,        validateFirebaseIdToken,    isAuthenticated,    convert(UserPlaylistController.sortGame));
 
-    router.post(`${apiVer}/report/game`,            validateFirebaseIdToken,    convert(ContentController.reportGame));
-    router.post(`${apiVer}/report/user`,            validateFirebaseIdToken,    convert(ContentController.reportUser));
+    router.post(`${apiVer}/report/game`,            validateFirebaseIdToken,    isAuthenticated,    FileManager.uploadImage2(1, 2),    convert(ContentController.reportGame));
+    router.post(`${apiVer}/report/user`,            validateFirebaseIdToken,    isAuthenticated,    FileManager.uploadImage2(1, 2),    convert(ContentController.reportUser));
 
     router.get(`${apiVer}/user/search`,             validateFirebaseIdToken,    convert(UserController.searchUser));
     router.get(`${apiVer}/user/alarm`,              validateFirebaseIdToken,    convert(AlarmController.getList));

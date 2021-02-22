@@ -24,12 +24,17 @@ export enum eGameCategory {
 }
 export enum eGameEmotion {
     Excellent,
-
 }
 export enum eReplyReaction {
     none,
     good,
     bad,
+}
+
+export enum eProjectState {
+    Normal,
+    Pause,
+    PermanentBan,
 }
 
 

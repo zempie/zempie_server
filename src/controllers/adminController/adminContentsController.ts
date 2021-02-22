@@ -3,6 +3,7 @@ import { IAdmin, IZempieClaims } from '../_interfaces';
 import { dbs } from '../../commons/globals';
 import admin from 'firebase-admin';
 import { Transaction } from 'sequelize';
+import { eProjectState } from '../../commons/enums';
 
 
 
@@ -21,23 +22,25 @@ class AdminContentsController {
             // make the game disabled
             const game = await dbs.Game.findOne({ id: game_id });
             game.enabled = false;
-            game.save({ transaction });
+            await game.save({ transaction });
 
             const project = await dbs.Project.findOne({ game_id });
             if ( permanent ) {
-                // project.enable = false;
-                // project.save({ transaction });
+                project.state = eProjectState.PermanentBan;
+                await project.save({ transaction });
             }
             else {
                 const version = await dbs.ProjectVersion.findOne({ project_id: project.id });
                 version.state = 'pause';
-                version.save({ transaction });
+                await version.save({ transaction });
             }
 
+            const developer = await dbs.User.findOne({ id: game.user_id });
 
             // send a mail
             await dbs.UserMailbox.create({
-                user_id: game.user_id,
+                user_uid: developer.uid,
+                category: '알림',
                 title,
                 content,
             }, transaction)

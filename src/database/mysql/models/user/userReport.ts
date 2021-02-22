@@ -20,6 +20,7 @@ class UserReportModel extends Model {
             reason_num:     { type: DataTypes.SMALLINT, allowNull: false },
             reason:         { type: DataTypes.STRING(300) },
             is_done:        { type: DataTypes.BOOLEAN, allowNull: false },
+            url_img:        { type: DataTypes.STRING(255) },
         }
     }
 
