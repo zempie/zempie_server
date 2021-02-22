@@ -3,7 +3,7 @@ import { IAdmin, IZempieClaims } from '../_interfaces';
 import { dbs } from '../../commons/globals';
 import admin from 'firebase-admin';
 import { Transaction } from 'sequelize';
-import { eProjectState } from '../../commons/enums';
+import { eMailCategory, eProjectState } from '../../commons/enums';
 
 
 
@@ -40,7 +40,7 @@ class AdminContentsController {
             // send a mail
             await dbs.UserMailbox.create({
                 user_uid: developer.uid,
-                category: '알림',
+                category: eMailCategory.Normal,
                 title,
                 content,
             }, transaction)
@@ -78,7 +78,7 @@ class AdminContentsController {
         // send a mail
         await dbs.UserMailbox.create({
             user_uid: user.uid,
-            category: '알림',
+            category: eMailCategory.Normal,
             title: '정지 안내',
             content: `너 ${category} 정지 먹음`,
         });

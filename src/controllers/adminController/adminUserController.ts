@@ -5,6 +5,7 @@ import { EBan } from '../../database/mysql/models/user/user';
 import { Transaction } from 'sequelize';
 import NotifyService from '../../services/notifyService';
 import { CreateError, ErrorCodes } from '../../commons/errorCodes';
+import { eMailCategory } from '../../commons/enums';
 
 
 /**
@@ -24,8 +25,13 @@ class AdminUserController {
     /**
      * mail
      */
-    async sendMail ({ user_id, title, content }: any, _admin: IAdmin) {
-        await dbs.UserMailbox.create({ user_id, title, content });
+    async sendMail ({ user_uid, category, title, content }: any, _admin: IAdmin) {
+        await dbs.UserMailbox.create({
+            user_uid,
+            category,
+            title,
+            content,
+        });
     }
     async cancelMail ({ mail_id }: any) {
         const mail = await dbs.UserMailbox.findOne({ id: mail_id });

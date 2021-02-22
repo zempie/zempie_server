@@ -1,6 +1,7 @@
 import * as _ from 'lodash';
 import Model from '../../model';
 import { DataTypes, Sequelize } from 'sequelize';
+import { eMailCategory } from '../../../../commons/enums';
 
 
 class UserMailboxModel extends Model {
@@ -9,7 +10,7 @@ class UserMailboxModel extends Model {
         this.attributes = {
             user_uid:       { type: DataTypes.STRING(36), allowNull: false },
             is_read:        { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false },
-            category:       { type: DataTypes.STRING(20), allowNull: false },
+            category:       { type: DataTypes.SMALLINT, allowNull: false, defaultValue: eMailCategory.Normal },
             title:          { type: DataTypes.STRING(100), allowNull: false },
             content:        { type: DataTypes.STRING(500), allowNull: false },
             hide:           { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false },
@@ -23,8 +24,9 @@ class UserMailboxModel extends Model {
         const desc = await this.model.sequelize.queryInterface.describeTable(this.model.tableName);
         if ( !desc['category'] ) {
             this.model.sequelize.queryInterface.addColumn(this.model.tableName, 'category', {
-                type: DataTypes.STRING(20),
+                type: DataTypes.SMALLINT,
                 allowNull: false,
+                defaultValue: eMailCategory.Normal,
                 after: 'is_read'
             })
         }

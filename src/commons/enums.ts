@@ -31,6 +31,11 @@ export enum eReplyReaction {
     bad,
 }
 
+export enum eMailCategory {
+    Normal,
+    Alarm,
+}
+
 export enum eProjectState {
     Normal,
     Pause,
