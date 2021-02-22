@@ -34,9 +34,9 @@ class UserMailboxModel extends Model {
     getMails = async ({ user_uid, hide = false, limit = 50, offset = 0 }: any) => {
         return await this.model.findAll({
             where: { user_uid, hide },
-            attributes: {
-                exclude: ['created_at', 'updated_at', 'deleted_at'],
-            },
+            // attributes: {
+            //     exclude: ['created_at', 'updated_at', 'deleted_at'],
+            // },
             order: [['created_at', 'desc']],
             limit: _.toNumber(limit),
             offset: _.toNumber(offset),

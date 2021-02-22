@@ -13,6 +13,7 @@ class UserContentController {
                 return {
                     id: mail.id,
                     is_read: mail.is_read,
+                    category: mail.category,
                     title: mail.title,
                     created_at: mail.created_at,
                 }
