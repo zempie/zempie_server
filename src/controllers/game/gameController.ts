@@ -202,7 +202,8 @@ class GameController {
                 my_heart: my_heart? my_heart.activated : false,
                 my_emotions,
             }
-            caches.game.setByPathname(ret, key);
+            // 임시 주석
+            // caches.game.setByPathname(ret, key);
         }
         // const game = await dbs.Game.getInfo({ pathname });
         // const ret = {

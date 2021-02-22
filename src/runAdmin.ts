@@ -10,6 +10,7 @@ import cfgOption from '../config/opt';
         static_path: [
             { path: '/', route: 'public' },
         ],
+        firebase: true,
         rdb: true,
         mdb: true,
         swagger: true,
