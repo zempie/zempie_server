@@ -38,7 +38,7 @@ export enum eMailCategory {
 
 export enum eProjectState {
     Normal,
-    Pause,
+    Ban,
     PermanentBan,
 }
 

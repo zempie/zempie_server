@@ -247,7 +247,11 @@ class StudioController {
             for( let i = 0; i < versions.length; i++ ) {
                 await dbs.ProjectVersion.destroy( { id : versions[i].id }, transaction );
             }
-            await dbs.Game.destroy( { id : project.game_id }, transaction );
+            const game = await dbs.Game.findOne({ id: project.game_id }, transaction);
+            game.pathname = `d_${game.pathname}`;
+            game.deleted_at = new Date();
+            await game.save({ transaction });
+            // await dbs.Game.destroy({ id : project.game_id }, transaction );
             return await dbs.Project.destroy( { id : params.id }, transaction );
         });
     }
