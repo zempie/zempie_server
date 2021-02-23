@@ -17,7 +17,7 @@ class UserReportModel extends Model {
             user_id:        { type: DataTypes.INTEGER, allowNull: false },
             target_type:    { type: DataTypes.SMALLINT, allowNull: false, defaultValue: eReportType.Game },
             target_id:      { type: DataTypes.INTEGER, allowNull: false },
-            reason_num:     { type: DataTypes.SMALLINT, allowNull: false },
+            reason_num:     { type: DataTypes.STRING(30), allowNull: false },
             reason:         { type: DataTypes.STRING(300) },
             is_done:        { type: DataTypes.BOOLEAN, allowNull: false },
             url_img:        { type: DataTypes.STRING(255) },

@@ -13,7 +13,7 @@ const replaceExt = require('replace-ext');
 interface IReportParams {
     target_type: number,
     target_id: number,
-    reason_num: number,
+    reason_num: number | number[],
     reason: string,
 }
 class ContentController {
@@ -39,7 +39,7 @@ class ContentController {
             user_id: userRecord.id,
             target_type: eReportType.Game,
             target_id,
-            reason_num,
+            reason_num: reason_num.toString(),
             reason,
             url_img: data?.Location,
         })
@@ -68,7 +68,7 @@ class ContentController {
             user_id: userRecord.id,
             target_type: eReportType.User,
             target_id,
-            reason_num,
+            reason_num: reason_num.toString(),
             reason,
             url_img: data?.Location,
         })
