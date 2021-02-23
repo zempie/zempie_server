@@ -31,7 +31,7 @@ class AdminContentsController {
             }
             else {
                 const version = await dbs.ProjectVersion.findOne({ project_id: project.id });
-                version.state = 'pause';
+                version.state = 'ban';
                 await version.save({ transaction });
             }
 
