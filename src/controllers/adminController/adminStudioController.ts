@@ -1,6 +1,7 @@
 import {dbs} from "../../commons/globals";
 import {Transaction} from "sequelize";
 import {IAdmin} from "../_interfaces";
+import { eMailCategory } from '../../commons/enums';
 
 
 class AdminStudioController {
@@ -49,7 +50,7 @@ class AdminStudioController {
                     if( project.deploy_version_id ) {
                         const preDeployVersion = await dbs.ProjectVersion.findOne( { id : project.deploy_version_id }, transaction );
                         preDeployVersion.state = 'passed';
-                        preDeployVersion.save({transaction});
+                        await preDeployVersion.save({transaction});
                     }
                     project.deploy_version_id = version.id;
 
@@ -59,10 +60,27 @@ class AdminStudioController {
 
                     await project.save( {transaction} );
                     await game.save( {transaction} );
+
+                    const developer = await dbs.User.findOne({ id: game.user_id });
+                    await dbs.UserMailbox.create({
+                        user_uid: developer.uid,
+                        category: eMailCategory.AllowProjectVersion,
+                        title: '심사 승인 통과',
+                        content: `배포 대기 중입니다.`,
+                    }, transaction);
                 }
 
             }
 
+            if ( params.user_id ) {
+                const developer = await dbs.User.findOne({ id: params.user_id });
+                await dbs.UserMailbox.create({
+                    user_uid: developer.uid,
+                    category: eMailCategory.BanProjectVersion,
+                    title: '심사 승인 거절',
+                    content: `${params.reason}`,
+                }, transaction);
+            }
             return await dbs.ProjectVersion.updateVersion( params, transaction );
         })
     }

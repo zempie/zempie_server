@@ -34,6 +34,10 @@ export enum eReplyReaction {
 export enum eMailCategory {
     Normal,
     Alarm,
+    AllowProjectVersion,
+    BanProjectVersion,
+    BanProject,
+    BanGame,
 }
 
 export enum eProjectState {

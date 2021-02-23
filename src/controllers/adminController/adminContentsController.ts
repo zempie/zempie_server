@@ -80,7 +80,7 @@ class AdminContentsController {
             user_uid: user.uid,
             category: eMailCategory.Normal,
             title: '정지 안내',
-            content: `너 ${category} 정지 먹음`,
+            content: `이용 정지 되었습니다.`,
         });
     }
 
