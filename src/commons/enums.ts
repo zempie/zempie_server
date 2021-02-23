@@ -41,6 +41,14 @@ export enum eProjectState {
     Ban,
     PermanentBan,
 }
+export enum eProjectVersionState {
+    none = 'none', //업로드전
+    process = 'process', //심사중
+    fail = 'fail', //심사 미통과
+    passed = 'passed', //심사 통과
+    deploy = 'deploy', //배포중
+    ban = 'ban', //이용정지
+}
 
 
 export enum eTimeline {

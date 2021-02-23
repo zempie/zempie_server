@@ -45,6 +45,29 @@ class AdminGameController {
         })
     }
 
+    updateAffiliatedGame = async ({ game_id, pathname, title, description, hashtags, url_game, url_thumb, url_thumb_webp, url_thumb_gif }: any) => {
+        await dbs.Game.getTransaction(async (transaction: Transaction) => {
+            const game = await dbs.Game.findOne({ id: game_id, category: eGameCategory.Affiliated }, transaction);
+            if ( !game ) {
+                throw CreateError(ErrorCodes.INVALID_GAME_ID);
+            }
+
+            game.pathname = pathname || game.pathname;
+            game.title = title || game.title;
+            game.description = description || game.description;
+            game.url_game = url_game || game.url_game;
+            game.url_thumb = url_thumb || game.url_thumb;
+            game.url_thumb_webp = url_thumb_webp || game.url_thumb_webp;
+            game.url_thumb_gif = url_thumb_gif || game.url_thumb_gif;
+            await game.save({ transaction });
+
+            if ( hashtags ) {
+                await dbs.Hashtag.delTags(game.id, 'game', transaction);
+                await dbs.Hashtag.addTags(game.id, game.hashtags, transaction);
+            }
+        })
+    }
+
 
     updateGame = async (params: any) => {
         // 불량 단어 색출
