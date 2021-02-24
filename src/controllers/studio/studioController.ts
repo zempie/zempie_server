@@ -1,3 +1,4 @@
+import * as _ from 'lodash';
 import { IRoute } from '../_interfaces';
 import { dbs, caches } from '../../commons/globals';
 import {Transaction} from "sequelize";
@@ -454,6 +455,33 @@ class StudioController {
     //         return await dbs.ProjectVersion.updateVersion( params, transaction );
     //     });
     // }
+
+    getCurrentSurvey = async (params: any, user: DecodedIdToken) => {
+        const record = await dbs.SurveyResult.isDone(user.uid);
+        return {
+            done: !!record
+        }
+    }
+    callbackSurvey = async ({ formId: form_id, results }: any) => {
+        let user_uid = '';
+        _.some(results, (r: any) => {
+            if ( r.type.toUpperCase() === 'PARAGRAPH_TEXT' && r.title.toLowerCase() === 'uid' ) {
+                user_uid = r.response;
+                return true;
+            }
+            return false;
+        });
+
+        const user = await dbs.User.findOne({ user_uid });
+        if ( !user ) {
+            throw CreateError(ErrorCodes.INVALID_SURVEY_USER_UID);
+        }
+        const survey = await dbs.Survey.findOne({ form_id });
+        if ( !survey ) {
+            throw CreateError(ErrorCodes.INVALID_SURVEY_FORM_ID);
+        }
+        await dbs.SurveyResult.create({ user_uid, survey_id: survey.id });
+    }
 }
 
 

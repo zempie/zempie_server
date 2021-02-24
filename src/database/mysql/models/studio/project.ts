@@ -15,7 +15,7 @@ class ProjectModel extends Model {
             picture2:           { type: DataTypes.STRING(250), allowNull: true },
             picture_webp:       { type: DataTypes.STRING(250), allowNull: true },
             control_type:       { type: DataTypes.SMALLINT, defaultValue: 0 },
-            description:        { type: DataTypes.STRING, defaultValue: '' },
+            description:        { type: DataTypes.STRING(2000), defaultValue: '' },
             hashtags:           { type: DataTypes.STRING, defaultValue: '' },
             game_id:            { type: DataTypes.INTEGER, allowNull: true },
             deploy_version_id:  { type: DataTypes.INTEGER, allowNull: true },

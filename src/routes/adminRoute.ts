@@ -118,4 +118,10 @@ export default (router: Router) => {
     router.get(`${apiVer}/admin/studio/version`,       validateAdminIdToken,   convert(AdminStudioController.getVersion));
     router.get(`${apiVer}/admin/studio/versions`,       validateAdminIdToken,   convert(AdminStudioController.getVersions));
     router.post(`${apiVer}/admin/studio/version`,       validateAdminIdToken,   convert(AdminStudioController.setVersion));
+
+    // 설문조사
+    router.get(`${apiVer}/admin/studio/surveys`,        validateAdminIdToken,   convert(AdminStudioController.getSurveys));
+    router.post(`${apiVer}/admin/studio/survey/c`,      validateAdminIdToken,   adminTracking,  convert(AdminStudioController.createSurvey));
+    router.post(`${apiVer}/admin/studio/survey/u`,      validateAdminIdToken,   adminTracking,  convert(AdminStudioController.updateSurvey));
+    router.post(`${apiVer}/admin/studio/survey/d`,      validateAdminIdToken,   adminTracking,  convert(AdminStudioController.deleteSurvey));
 }

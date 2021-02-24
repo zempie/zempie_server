@@ -1,6 +1,6 @@
 import { Request, Response, Router } from 'express';
 import RpcController from '../controllers/rpcController';
-import {validateFirebaseIdToken} from "./_common";
+import { isAuthenticated, validateFirebaseIdToken } from './_common';
 import FileManager from "../services/fileManager";
 import convert from "../controllers/_convert";
 import UserController from "../controllers/user/userController";
@@ -28,6 +28,9 @@ export default (router: Router) => {
 
     router.get( `${apiVer}/studio/verify-pathname/:pathname`, validateFirebaseIdToken, convert(StudioController.verifyGamePathname) );
 
+    // 설문조사
+    router.post(`/gf/survey`,   convert(StudioController.callbackSurvey));
+    router.get(`${apiVer}/studio/survey`,   validateFirebaseIdToken, isAuthenticated, convert(StudioController.getCurrentSurvey));
 }
 
 // RpcController.generator( 'get-developer', StudioController.getDeveloper, true );

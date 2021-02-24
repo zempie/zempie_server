@@ -63,10 +63,17 @@ export const ErrorCodes = {
     INVALID_ADMIN_REFRESH_TOKEN:    { code: 50004, message: '관리자 토큰 오류' },
     INVALID_ADMIN_LEVEL:            { code: 50005, message: '관리자 권한 오류'    },
     INVALID_ADMIN_PARAMS:           { code: 50006, message: '관리자 파라미터 오류' },
+    INVALID_SURVEY_ID:              { code: 50007, message: '관리자 설문조사 ID 오류' },
 
     ALREADY_ADMIN_USER_READ_MAIL:   { code: 51001, message: '이미 읽은 우편' },
     ADMIN_GAME_PATHNAME_DUPLICATED: { code: 52001, message: '게임 Pathname 중복' },
 
+
+    /*
+        Studio
+     */
+    INVALID_SURVEY_USER_UID:        { code: 62001, message: '설문조사 참여 사용자 UID 오류' },
+    INVALID_SURVEY_FORM_ID:         { code: 62002, message: '설문조사 FORM ID 오류' },
 
     /**
      * 안쓰임

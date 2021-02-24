@@ -2,6 +2,8 @@ import {dbs} from "../../commons/globals";
 import {Transaction} from "sequelize";
 import {IAdmin} from "../_interfaces";
 import { eMailCategory } from '../../commons/enums';
+import * as _ from 'lodash';
+import { CreateError, ErrorCodes } from '../../commons/errorCodes';
 
 
 class AdminStudioController {
@@ -83,6 +85,56 @@ class AdminStudioController {
             }
             return await dbs.ProjectVersion.updateVersion( params, transaction );
         })
+    }
+
+
+    // 설문조사
+    getSurveys = async ({ limit = 50, offset = 0, sort = 'id', dir = 'asc' }) => {
+        const records = await dbs.Survey.findAll({}, {
+            order: [[sort, dir]],
+            limit: _.toNumber(limit),
+            offset: _.toNumber(offset),
+        });
+
+        return {
+            surveys: _.map(records, (r: any) => {
+                return {
+                    id: r.id,
+                    activated: r.activated,
+                    form_id: r.form_id,
+                    start_at: new Date(r.start_at),
+                    end_at: new Date(r.end_at),
+                }
+            })
+        }
+    }
+
+    createSurvey = async ({ form_id, start_at, end_at }: any) => {
+        await dbs.Survey.create({
+            form_id,
+            start_at: new Date(start_at),
+            end_at: new Date(end_at),
+        })
+    }
+    updateSurvey = async ({ id, form_id, start_at, end_at }: any) => {
+        await dbs.Survey.getTransaction(async (transaction: Transaction) => {
+            const record = await dbs.Survey.findOne({ id }, transaction);
+            if ( !record ) {
+                throw CreateError(ErrorCodes.INVALID_SURVEY_ID);
+            }
+            if ( form_id ) {
+                record.form_id = form_id;
+            }
+            if ( start_at ) {
+                record.start_at = new Date(start_at);
+            }
+            if ( end_at ) {
+                record.end_at = new Date(end_at);
+            }
+        })
+    }
+    deleteSurvey = async ({ id }: any) => {
+        await dbs.Survey.destroy({ id });
     }
 }
 
