@@ -15,18 +15,18 @@ export default (router: Router) => {
     // router.patch(`${apiVer}/studio/developer`,    validateFirebaseIdToken, FileManager.uploadImage, convert(StudioController.updateDeveloper));
     // router.get( `${apiVer}/studio/developer`, validateFirebaseIdToken, convert(StudioController.getDeveloper) );
 
-    router.post(`${apiVer}/studio/developer`,    validateFirebaseIdToken, convert(StudioController.signupDeveloper));
+    router.post(`${apiVer}/studio/developer`,    validateFirebaseIdToken,   isAuthenticated,    convert(StudioController.signupDeveloper));
 
-    router.post(`${apiVer}/studio/project`,     validateFirebaseIdToken, FileManager.uploadImage, convert(StudioController.createProject));
-    router.get( `${apiVer}/studio/project`,     validateFirebaseIdToken, convert(StudioController.getProjects));
-    router.get( `${apiVer}/studio/project/:id`, validateFirebaseIdToken, convert(StudioController.getProject));
-    router.post( `${apiVer}/studio/project/:id`, validateFirebaseIdToken, FileManager.uploadImage, convert(StudioController.updateProject));
-    router.delete( `${apiVer}/studio/project/:id`, validateFirebaseIdToken, convert(StudioController.deleteProject));
+    router.post(`${apiVer}/studio/project`,     validateFirebaseIdToken,    isAuthenticated,    convert(StudioController.isAuthenticatedProject, true),   FileManager.uploadImage, convert(StudioController.createProject));
+    router.get( `${apiVer}/studio/project`,     validateFirebaseIdToken,    isAuthenticated,    convert(StudioController.getProjects));
+    router.get( `${apiVer}/studio/project/:id`, validateFirebaseIdToken,    isAuthenticated,    convert(StudioController.isAuthenticatedProject, true),   convert(StudioController.getProject));
+    router.post( `${apiVer}/studio/project/:id`, validateFirebaseIdToken,   isAuthenticated,    convert(StudioController.isAuthenticatedProject, true),   FileManager.uploadImage, convert(StudioController.updateProject));
+    router.delete( `${apiVer}/studio/project/:id`, validateFirebaseIdToken, isAuthenticated,    convert(StudioController.isAuthenticatedProject, true),   convert(StudioController.deleteProject));
 
-    router.post(`${apiVer}/studio/version`,     validateFirebaseIdToken, FileManager.uploadImage, convert(StudioController.createVersion));
-    router.delete(`${apiVer}/studio/version/:id`, validateFirebaseIdToken, convert(StudioController.deleteVersion));
+    router.post(`${apiVer}/studio/version`,     validateFirebaseIdToken,    isAuthenticated,    convert(StudioController.isAuthenticatedProjectVersion, true),   FileManager.uploadImage, convert(StudioController.createVersion));
+    router.delete(`${apiVer}/studio/version/:id`, validateFirebaseIdToken,  isAuthenticated,    convert(StudioController.isAuthenticatedProjectVersion, true),    convert(StudioController.deleteVersion));
 
-    router.get( `${apiVer}/studio/verify-pathname/:pathname`, validateFirebaseIdToken, convert(StudioController.verifyGamePathname) );
+    router.get( `${apiVer}/studio/verify-pathname/:pathname`, validateFirebaseIdToken, isAuthenticated, convert(StudioController.verifyGamePathname) );
 
     // 설문조사
     router.post(`/gf/survey`,   convert(StudioController.callbackSurvey));

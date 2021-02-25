@@ -50,10 +50,7 @@ class AdminContentsController {
 
     punishUser = async ({ user_id, category, reason, date }: any) => {
         const user = await dbs.User.findOne({ id: user_id });
-        let userClaim = await dbs.UserClaim.findOne({ user_id });
-        if ( !userClaim ) {
-            userClaim = await dbs.UserClaim.createDefault(user_id, user.uid);
-        }
+        const userClaim = await dbs.UserClaim.getZempieClaim(user_id, user.uid);
         const claim: IZempieClaims = JSON.parse(userClaim.data);
 
         claim.zempie.deny[category] = {

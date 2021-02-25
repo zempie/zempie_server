@@ -20,10 +20,20 @@ class UserClaimModel extends Model {
             user_uid,
             data: JSON.stringify({
                 zempie: {
+                    id_developer: false,
                     deny: {},
                 }
             })
         })
+    }
+
+
+    async getZempieClaim(user_id: number, user_uid: string) {
+        let userClaim = await this.findOne({ user_id });
+        if ( !userClaim ) {
+            userClaim = await this.createDefault(user_id, user_uid);
+        }
+        return userClaim;
     }
 
 }

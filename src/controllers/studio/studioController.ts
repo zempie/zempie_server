@@ -1,5 +1,5 @@
 import * as _ from 'lodash';
-import { IRoute } from '../_interfaces';
+import { IRoute, IZempieClaims } from '../_interfaces';
 import { dbs, caches } from '../../commons/globals';
 import {Transaction} from "sequelize";
 import {CreateError, ErrorCodes} from "../../commons/errorCodes";
@@ -73,6 +73,60 @@ interface IVersion {
 }
 
 class StudioController {
+    isAuthenticatedProject = async (params: any, _user: DecodedIdToken) => {
+        const project_id = params.project_id || params.id;
+        if ( !project_id ) {
+            throw CreateError(ErrorCodes.INVALID_PARAMS);
+        }
+
+        const project = await dbs.Project.model.findOne({
+            where: { id: project_id },
+            include: [{
+                model: dbs.User.model,
+                where: {
+                    uid: _user.uid,
+                },
+                required: true,
+            }]
+        });
+
+        // const user = await dbs.User.findOne({ uid: _user.uid });
+        // const project = await dbs.Project.findOne({ id: project_id, user_id: user.id });
+        if ( !project ) {
+            throw CreateError(ErrorCodes.INVALID_ACCESS_PROJECT_ID);
+        }
+    }
+    isAuthenticatedProjectVersion = async (params: any, _user: DecodedIdToken) => {
+        const project_version_id = params.project_id || params.id;
+        if ( !project_version_id ) {
+            throw CreateError(ErrorCodes.INVALID_PARAMS);
+        }
+
+        const projectVersion = await dbs.ProjectVersion.model.findOne({
+            where: { id: project_version_id },
+            include: [{
+                model: dbs.Project.model,
+                include: [{
+                    model: dbs.User.model,
+                    where: {
+                        uid: _user.uid
+                    },
+                    required: true,
+                }]
+            }]
+        })
+
+        // const projectVersion = await dbs.ProjectVersion.findOne({ id: project_version_id });
+        if ( !projectVersion ) {
+            throw CreateError(ErrorCodes.INVALID_ACCESS_PROJECT_ID);
+        }
+
+        // const user = await dbs.User.findOne({ uid: _user.uid });
+        // const project = await dbs.Project.findOne({ id: projectVersion.project_id, user_id: user.id });
+        // if ( !project ) {
+        //     throw CreateError(ErrorCodes.INVALID_ACCESS_PROJECT_ID);
+        // }
+    }
 
     signupDeveloper = async  (params: any, {uid}: DecodedIdToken) =>{
         return dbs.User.getTransaction( async (transaction : Transaction)=>{
@@ -81,6 +135,13 @@ class StudioController {
             const user = await dbs.User.findOne({uid}, transaction);
             user.is_developer = true;
             await user.save({transaction});
+
+            const userClaim = await dbs.UserClaim.getZempieClaim(user.id, user.uid);
+            const claim: IZempieClaims = JSON.parse(userClaim.data);
+            claim.zempie.is_developer = true;
+            userClaim.data = claim;
+            await userClaim.save({ transaction });
+            await admin.auth().setCustomUserClaims(userClaim.user_uid, claim);
 
             return {
                 success : true
