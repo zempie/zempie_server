@@ -1,6 +1,6 @@
 import { Request, Response, Router } from 'express';
 import RpcController from '../controllers/rpcController';
-import { isAuthenticated, validateFirebaseIdToken } from './_common';
+import { isAuthenticated, isDeveloper, validateFirebaseIdToken } from './_common';
 import FileManager from "../services/fileManager";
 import convert from "../controllers/_convert";
 import UserController from "../controllers/user/userController";
@@ -17,20 +17,20 @@ export default (router: Router) => {
 
     router.post(`${apiVer}/studio/developer`,    validateFirebaseIdToken,   isAuthenticated,    convert(StudioController.signupDeveloper));
 
-    router.post(`${apiVer}/studio/project`,     validateFirebaseIdToken,    isAuthenticated,    FileManager.uploadImage, convert(StudioController.createProject));
-    router.get( `${apiVer}/studio/project`,     validateFirebaseIdToken,    isAuthenticated,    convert(StudioController.getProjects));
-    router.get( `${apiVer}/studio/project/:id`, validateFirebaseIdToken,    isAuthenticated,    convert(StudioController.isAuthenticatedProject, true),   convert(StudioController.getProject));
-    router.post( `${apiVer}/studio/project/:id`, validateFirebaseIdToken,   isAuthenticated,    convert(StudioController.isAuthenticatedProject, true),   FileManager.uploadImage, convert(StudioController.updateProject));
-    router.delete( `${apiVer}/studio/project/:id`, validateFirebaseIdToken, isAuthenticated,    convert(StudioController.isAuthenticatedProject, true),   convert(StudioController.deleteProject));
+    router.post(`${apiVer}/studio/project`,     validateFirebaseIdToken,    isAuthenticated,    isDeveloper,    FileManager.uploadImage, convert(StudioController.createProject));
+    router.get( `${apiVer}/studio/project`,     validateFirebaseIdToken,    isAuthenticated,    isDeveloper,    convert(StudioController.getProjects));
+    router.get( `${apiVer}/studio/project/:id`, validateFirebaseIdToken,    isAuthenticated,    isDeveloper,    convert(StudioController.isAuthenticatedProject, true),   convert(StudioController.getProject));
+    router.post( `${apiVer}/studio/project/:id`, validateFirebaseIdToken,   isAuthenticated,    isDeveloper,    convert(StudioController.isAuthenticatedProject, true),   FileManager.uploadImage, convert(StudioController.updateProject));
+    router.delete( `${apiVer}/studio/project/:id`, validateFirebaseIdToken, isAuthenticated,    isDeveloper,    convert(StudioController.isAuthenticatedProject, true),   convert(StudioController.deleteProject));
 
-    router.post(`${apiVer}/studio/version`,     validateFirebaseIdToken,    isAuthenticated,    FileManager.uploadImage,    convert(StudioController.isAuthenticatedProject, true), convert(StudioController.createVersion));
-    router.delete(`${apiVer}/studio/version/:id`, validateFirebaseIdToken,  isAuthenticated,    convert(StudioController.isAuthenticatedProjectVersion, true),    convert(StudioController.deleteVersion));
+    router.post(`${apiVer}/studio/version`,     validateFirebaseIdToken,    isAuthenticated,    isDeveloper,    FileManager.uploadImage,    convert(StudioController.isAuthenticatedProject, true), convert(StudioController.createVersion));
+    router.delete(`${apiVer}/studio/version/:id`, validateFirebaseIdToken,  isAuthenticated,    isDeveloper,    convert(StudioController.isAuthenticatedProjectVersion, true),    convert(StudioController.deleteVersion));
 
-    router.get( `${apiVer}/studio/verify-pathname/:pathname`, validateFirebaseIdToken, isAuthenticated, convert(StudioController.verifyGamePathname) );
+    router.get( `${apiVer}/studio/verify-pathname/:pathname`, validateFirebaseIdToken, isAuthenticated, isDeveloper, convert(StudioController.verifyGamePathname) );
 
     // 설문조사
     router.post(`/gf/survey`,   convert(StudioController.callbackSurvey));
-    router.get(`${apiVer}/studio/survey`,   validateFirebaseIdToken, isAuthenticated, convert(StudioController.getCurrentSurveyResult));
+    router.get(`${apiVer}/studio/survey`,   validateFirebaseIdToken, isAuthenticated, isDeveloper, convert(StudioController.getCurrentSurveyResult));
 }
 
 // RpcController.generator( 'get-developer', StudioController.getDeveloper, true );

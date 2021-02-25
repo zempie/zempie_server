@@ -88,6 +88,12 @@ export const isAuthenticated = (req: Request, res: Response, next: NextFunction)
     }
     next();
 }
+export const isDeveloper = (req: Request, res: Response, next: NextFunction) => {
+    if ( !req.user.is_developer ) {
+        return responseError(res, CreateError(ErrorCodes.IS_NOT_DEVELOPER), 401);
+    }
+    next();
+}
 
 export const getIdToken = (req: Request) => {
     if ((!req.headers.authorization || !req.headers.authorization.startsWith('Bearer ')) &&
