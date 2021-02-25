@@ -6,7 +6,7 @@ class SurveyModel extends Model {
     protected initialize(): void {
         this.name = 'survey';
         this.attributes = {
-            activated:  { type: DataTypes.BOOLEAN, allowNull: false },
+            activated:  { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: true },
             form_id:    { type: DataTypes.STRING(100), allowNull: false },
             form_url:   { type: DataTypes.STRING(200), allowNull: false },
             start_at:   { type: DataTypes.DATE, allowNull: false },
