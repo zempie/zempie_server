@@ -17,13 +17,13 @@ export default (router: Router) => {
 
     router.post(`${apiVer}/studio/developer`,    validateFirebaseIdToken,   isAuthenticated,    convert(StudioController.signupDeveloper));
 
-    router.post(`${apiVer}/studio/project`,     validateFirebaseIdToken,    isAuthenticated,    convert(StudioController.isAuthenticatedProject, true),   FileManager.uploadImage, convert(StudioController.createProject));
+    router.post(`${apiVer}/studio/project`,     validateFirebaseIdToken,    isAuthenticated,    FileManager.uploadImage, convert(StudioController.createProject));
     router.get( `${apiVer}/studio/project`,     validateFirebaseIdToken,    isAuthenticated,    convert(StudioController.getProjects));
     router.get( `${apiVer}/studio/project/:id`, validateFirebaseIdToken,    isAuthenticated,    convert(StudioController.isAuthenticatedProject, true),   convert(StudioController.getProject));
     router.post( `${apiVer}/studio/project/:id`, validateFirebaseIdToken,   isAuthenticated,    convert(StudioController.isAuthenticatedProject, true),   FileManager.uploadImage, convert(StudioController.updateProject));
     router.delete( `${apiVer}/studio/project/:id`, validateFirebaseIdToken, isAuthenticated,    convert(StudioController.isAuthenticatedProject, true),   convert(StudioController.deleteProject));
 
-    router.post(`${apiVer}/studio/version`,     validateFirebaseIdToken,    isAuthenticated,    convert(StudioController.isAuthenticatedProjectVersion, true),   FileManager.uploadImage, convert(StudioController.createVersion));
+    router.post(`${apiVer}/studio/version`,     validateFirebaseIdToken,    isAuthenticated,    FileManager.uploadImage,    convert(StudioController.isAuthenticatedProject, true), convert(StudioController.createVersion));
     router.delete(`${apiVer}/studio/version/:id`, validateFirebaseIdToken,  isAuthenticated,    convert(StudioController.isAuthenticatedProjectVersion, true),    convert(StudioController.deleteVersion));
 
     router.get( `${apiVer}/studio/verify-pathname/:pathname`, validateFirebaseIdToken, isAuthenticated, convert(StudioController.verifyGamePathname) );
