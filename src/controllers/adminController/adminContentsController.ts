@@ -4,6 +4,7 @@ import { dbs } from '../../commons/globals';
 import admin from 'firebase-admin';
 import { Transaction } from 'sequelize';
 import { eMailCategory, eProjectState } from '../../commons/enums';
+import { CreateError, ErrorCodes } from '../../commons/errorCodes';
 
 
 
@@ -17,7 +18,7 @@ interface IPunishParams {
     date: Date
 }
 class AdminContentsController {
-    punishGame = async ({ game_id, permanent, title, content }: any) => {
+    punishGame = async ({ game_id, project_version_id, permanent, title, content }: any) => {
         await dbs.Game.getTransaction(async (transaction: Transaction) => {
             // make the game disabled
             const game = await dbs.Game.findOne({ id: game_id });
@@ -29,10 +30,13 @@ class AdminContentsController {
                 project.state = eProjectState.PermanentBan;
                 await project.save({ transaction });
             }
-            else {
-                const version = await dbs.ProjectVersion.findOne({ project_id: project.id });
+            else if ( project_version_id ) {
+                const version = await dbs.ProjectVersion.findOne({ id: project_version_id, project_id: project.id });
                 version.state = 'ban';
                 await version.save({ transaction });
+            }
+            else {
+                throw CreateError(ErrorCodes.INVALID_PARAMS);
             }
 
             const developer = await dbs.User.findOne({ id: game.user_id });
