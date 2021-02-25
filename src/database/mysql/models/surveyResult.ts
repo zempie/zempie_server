@@ -20,16 +20,6 @@ class SurveyResultModel extends Model {
         this.model.belongsTo(dbs.Survey.model);
     }
 
-
-    isDone = async (user_uid: string) => {
-        const currentSurvey = await dbs.Survey.currentSurvey();
-        if ( currentSurvey ) {
-            return await this.findOne({
-                user_uid,
-                survey_id: currentSurvey.id
-            });
-        }
-    }
 }
 
 

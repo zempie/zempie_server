@@ -72,6 +72,7 @@ export const ErrorCodes = {
     /*
         Studio
      */
+    INVALID_ACCESS_PROJECT_ID:      { code: 60010, message: '잘못된 프로젝트 접근' },
     INVALID_SURVEY_USER_UID:        { code: 62001, message: '설문조사 참여 사용자 UID 오류' },
     INVALID_SURVEY_FORM_ID:         { code: 62002, message: '설문조사 FORM ID 오류' },
 

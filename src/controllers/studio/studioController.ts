@@ -456,11 +456,21 @@ class StudioController {
     //     });
     // }
 
-    getCurrentSurvey = async (params: any, user: DecodedIdToken) => {
-        const record = await dbs.SurveyResult.isDone(user.uid);
-        return {
-            done: !!record
+    getCurrentSurveyResult = async (params: any, user: DecodedIdToken) => {
+        const ret: any = {
+            survey_url: null,
+            done: false,
+        };
+        const currentSurvey = await dbs.Survey.currentSurvey();
+        if ( currentSurvey ) {
+            const record = await dbs.SurveyResult.findOne({
+                user_uid: user.uid,
+                survey_id: currentSurvey.id
+            });
+            ret.done = !!record;
+            ret.survey_url = currentSurvey?.form_url;
         }
+        return ret;
     }
     callbackSurvey = async ({ formId: form_id, results }: any) => {
         let user_uid = '';

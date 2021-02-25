@@ -109,9 +109,10 @@ class AdminStudioController {
         }
     }
 
-    createSurvey = async ({ form_id, start_at, end_at }: any) => {
+    createSurvey = async ({ form_id, form_url, start_at, end_at }: any) => {
         await dbs.Survey.create({
             form_id,
+            form_url,
             start_at: new Date(start_at),
             end_at: new Date(end_at),
         })

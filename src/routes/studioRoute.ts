@@ -30,7 +30,7 @@ export default (router: Router) => {
 
     // 설문조사
     router.post(`/gf/survey`,   convert(StudioController.callbackSurvey));
-    router.get(`${apiVer}/studio/survey`,   validateFirebaseIdToken, isAuthenticated, convert(StudioController.getCurrentSurvey));
+    router.get(`${apiVer}/studio/survey`,   validateFirebaseIdToken, isAuthenticated, convert(StudioController.getCurrentSurveyResult));
 }
 
 // RpcController.generator( 'get-developer', StudioController.getDeveloper, true );

@@ -8,6 +8,7 @@ class SurveyModel extends Model {
         this.attributes = {
             activated:  { type: DataTypes.BOOLEAN, allowNull: false },
             form_id:    { type: DataTypes.STRING(100), allowNull: false },
+            form_url:   { type: DataTypes.STRING(200), allowNull: false },
             start_at:   { type: DataTypes.DATE, allowNull: false },
             end_at:     { type: DataTypes.DATE, allowNull: false },
         }
