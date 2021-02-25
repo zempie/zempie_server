@@ -7,9 +7,9 @@ class RefTagModel extends Model {
     protected initialize(): void {
         this.name = 'refTag';
         this.attributes = {
-            ref_id:     { type: DataTypes.INTEGER, unique: 'compositeIndex' },
-            ref_type:   { type: DataTypes.STRING, unique: 'compositeIndex' },
-            tag_id:     { type: DataTypes.INTEGER, unique: 'compositeIndex' },
+            ref_id:     { type: DataTypes.INTEGER },
+            ref_type:   { type: DataTypes.STRING },
+            tag_id:     { type: DataTypes.INTEGER },
         }
     }
 

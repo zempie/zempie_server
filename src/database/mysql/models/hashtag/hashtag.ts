@@ -39,7 +39,7 @@ class HashtagModel extends Model {
     }
 
 
-    private processAddTags = async (game_id: number, hashtags: string, transaction: Transaction) => {
+    private processAddTags = async (game_id: number, hashtags: string, transaction?: Transaction) => {
         hashtags = hashtags.replace(/\s|,/gi, '#');
         const tags = _.union(_.map(_.filter(hashtags.split('#'), tag => tag !== ''), tag => tag.trim()))
         const dup = await dbs.Hashtag.findAll({
@@ -71,15 +71,16 @@ class HashtagModel extends Model {
                 tag_id: tag_id,
             }
         });
-        await dbs.RefTag.bulkCreate(bulkRef, {transaction});
+        await dbs.RefTag.bulkCreate(bulkRef, { transaction });
     }
     addTags = async (game_id: number, hashtags: string, transaction?: Transaction) => {
-        if ( transaction ) {
-            return this.processAddTags(game_id, hashtags, transaction);
-        }
-        return await this.getTransaction(async (transaction: Transaction) => {
-            return this.processAddTags(game_id, hashtags, transaction);
-        })
+        return this.processAddTags(game_id, hashtags, transaction);
+        // if ( transaction ) {
+        //     return this.processAddTags(game_id, hashtags, transaction);
+        // }
+        // return await this.getTransaction(async (transaction: Transaction) => {
+        //     return this.processAddTags(game_id, hashtags, transaction);
+        // })
     }
 
 

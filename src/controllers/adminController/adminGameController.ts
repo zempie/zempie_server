@@ -65,7 +65,7 @@ class AdminGameController {
                 await dbs.Hashtag.delTags(game.id, 'game', transaction);
                 await dbs.Hashtag.addTags(game.id, game.hashtags, transaction);
             }
-        })
+        });
     }
 
 
