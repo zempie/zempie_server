@@ -4,7 +4,7 @@ export default {
         username: 'root',
         password: 'ftred2020#!',
         conn: {
-            host: 'mariadb.cggj5wwsn3fn.ap-northeast-2.rds.amazonaws.com',
+            host: 'zempie.cggj5wwsn3fn.ap-northeast-2.rds.amazonaws.com',
             port: 3306,
             dialect: 'mysql',
             pool: {

@@ -12,7 +12,7 @@ class GameLogModel extends Model {
     protected initialize() {
         this.name = 'gameLog';
         this.attributes = {
-            user_uid:       { type: DataTypes.STRING(36), allowNull: false },
+            user_uid:       { type: DataTypes.STRING(36) },
             game_id:        { type: DataTypes.INTEGER, allowNull: false },
             score:          { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0 },
             playtime:       { type: DataTypes.INTEGER, allowNull: false },
