@@ -517,15 +517,22 @@ class StudioController {
     //     });
     // }
 
-    getCurrentSurveyResult = async (params: any, user: DecodedIdToken) => {
+    getCurrentSurveyResult = async (params: any, _user: DecodedIdToken) => {
         const ret: any = {
             survey_url: null,
             done: false,
         };
+
+        const user = await dbs.User.findOne({ uid: _user.uid });
+        const project = await dbs.Project.findOne({ user_id: user.id });
+        if ( !project ) {
+            return ret;
+        }
+
         const currentSurvey = await dbs.Survey.currentSurvey();
         if ( currentSurvey ) {
             const record = await dbs.SurveyResult.findOne({
-                user_uid: user.uid,
+                user_uid: _user.uid,
                 survey_id: currentSurvey.id
             });
             ret.done = !!record;
