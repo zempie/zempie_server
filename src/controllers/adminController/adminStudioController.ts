@@ -124,7 +124,7 @@ class AdminStudioController {
             if ( !record ) {
                 throw CreateError(ErrorCodes.INVALID_SURVEY_ID);
             }
-            if ( activated ) {
+            if ( !!activated ) {
                 record.activated = parseBoolean(activated);
             }
             if ( form_id ) {
@@ -136,6 +136,7 @@ class AdminStudioController {
             if ( end_at ) {
                 record.end_at = new Date(end_at);
             }
+            await record.save({ transaction });
         })
     }
     deleteSurvey = async ({ id }: any) => {
