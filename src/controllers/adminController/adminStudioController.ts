@@ -4,6 +4,7 @@ import {IAdmin} from "../_interfaces";
 import { eMailCategory } from '../../commons/enums';
 import * as _ from 'lodash';
 import { CreateError, ErrorCodes } from '../../commons/errorCodes';
+import { parseBoolean } from '../../commons/utils';
 
 
 class AdminStudioController {
@@ -117,11 +118,14 @@ class AdminStudioController {
             end_at: new Date(end_at),
         })
     }
-    updateSurvey = async ({ id, form_id, start_at, end_at }: any) => {
+    updateSurvey = async ({ id, activated, form_id, start_at, end_at }: any) => {
         await dbs.Survey.getTransaction(async (transaction: Transaction) => {
             const record = await dbs.Survey.findOne({ id }, transaction);
             if ( !record ) {
                 throw CreateError(ErrorCodes.INVALID_SURVEY_ID);
+            }
+            if ( activated ) {
+                record.activated = parseBoolean(activated);
             }
             if ( form_id ) {
                 record.form_id = form_id;
