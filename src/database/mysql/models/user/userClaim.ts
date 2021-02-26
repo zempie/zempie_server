@@ -1,6 +1,7 @@
 import Model from '../../model';
 import { DataTypes, Sequelize, Transaction } from 'sequelize';
 import { dbs } from '../../../../commons/globals';
+import { IZempieClaims } from '../../../../controllers/_interfaces';
 
 
 class UserClaimModel extends Model {
@@ -20,10 +21,10 @@ class UserClaimModel extends Model {
             user_uid,
             data: JSON.stringify({
                 zempie: {
-                    id_developer: false,
+                    is_developer: false,
                     deny: {},
                 }
-            })
+            } as IZempieClaims)
         })
     }
 

@@ -542,23 +542,25 @@ class StudioController {
     }
     callbackSurvey = async ({ formId: form_id, results }: any) => {
         let user_uid = '';
-        _.some(results, (r: any) => {
-            if ( r.type.toUpperCase() === 'PARAGRAPH_TEXT' && r.title.toLowerCase() === 'uid' ) {
+        const u = _.some(results, (r: any) => {
+            if ( r.type.toUpperCase() === 'TEXT' && r.title.toLowerCase() === 'uid' ) {
                 user_uid = r.response;
                 return true;
             }
             return false;
         });
 
-        const user = await dbs.User.findOne({ user_uid });
-        if ( !user ) {
-            throw CreateError(ErrorCodes.INVALID_SURVEY_USER_UID);
+        if ( u ) {
+            const user = await dbs.User.findOne({ uid: user_uid });
+            if ( !user ) {
+                throw CreateError(ErrorCodes.INVALID_SURVEY_USER_UID);
+            }
+            const survey = await dbs.Survey.findOne({ form_id });
+            if ( !survey ) {
+                throw CreateError(ErrorCodes.INVALID_SURVEY_FORM_ID);
+            }
+            await dbs.SurveyResult.create({ user_uid, survey_id: survey.id });
         }
-        const survey = await dbs.Survey.findOne({ form_id });
-        if ( !survey ) {
-            throw CreateError(ErrorCodes.INVALID_SURVEY_FORM_ID);
-        }
-        await dbs.SurveyResult.create({ user_uid, survey_id: survey.id });
     }
 }
 
