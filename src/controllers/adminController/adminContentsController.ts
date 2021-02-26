@@ -38,7 +38,7 @@ class AdminContentsController {
             }
             else if ( project_version_id ) {
                 const version = await dbs.ProjectVersion.findOne({ id: project_version_id, project_id: project.id });
-                if ( version.state !== 'passed' ) {
+                if ( version.state !== 'passed' || version.state !== 'deploy' ) {
                     // version.state |= eProjectVersionState.Ban;
                     throw CreateError(ErrorCodes.INVALID_PROJECT_VERSION_STATE);
                 }
