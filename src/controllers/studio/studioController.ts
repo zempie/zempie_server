@@ -543,7 +543,7 @@ class StudioController {
     callbackSurvey = async ({ formId: form_id, results }: any) => {
         let user_uid = '';
         const u = _.some(results, (r: any) => {
-            if ( r.type.toUpperCase() === 'TEXT' && r.title.toLowerCase() === 'uid' ) {
+            if ( r.type.toUpperCase() === 'TEXT' && r.title.toLowerCase().includes('uid') ) {
                 user_uid = r.response;
                 return true;
             }
