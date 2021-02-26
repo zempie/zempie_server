@@ -28,6 +28,7 @@ class AdminContentsController {
             const project = await dbs.Project.findOne({ game_id });
             if ( permanent ) {
                 project.state = eProjectState.PermanentBan;
+                project.deploy_version_id = null;
                 await project.save({ transaction });
 
                 const prv = await dbs.ProjectVersion.findOne({ project_id: project.id, state: 'deploy' }, transaction);
@@ -37,13 +38,18 @@ class AdminContentsController {
                 }
             }
             else if ( project_version_id ) {
-                const version = await dbs.ProjectVersion.findOne({ id: project_version_id, project_id: project.id });
-                if ( version.state !== 'passed' || version.state !== 'deploy' ) {
+                const prv = await dbs.ProjectVersion.findOne({ id: project_version_id, project_id: project.id });
+                if ( prv.state !== 'passed' || prv.state !== 'deploy' ) {
                     // version.state |= eProjectVersionState.Ban;
                     throw CreateError(ErrorCodes.INVALID_PROJECT_VERSION_STATE);
                 }
-                version.state = 'ban';
-                await version.save({ transaction });
+                if ( prv.state === 'deploy' ) {
+                    const project = await dbs.Project.findOne({ id: prv.project_id }, transaction);
+                    project.deploy_version_id = null;
+                    await project.save({ transaction });
+                }
+                prv.state = 'ban';
+                await prv.save({ transaction });
             }
             else {
                 throw CreateError(ErrorCodes.INVALID_PARAMS);
