@@ -39,12 +39,11 @@ class AdminContentsController {
             }
             else if ( project_version_id ) {
                 const prv = await dbs.ProjectVersion.findOne({ id: project_version_id, project_id: project.id });
-                if ( prv.state !== 'passed' || prv.state !== 'deploy' ) {
+                if ( prv.state !== 'passed' && prv.state !== 'deploy' ) {
                     // version.state |= eProjectVersionState.Ban;
                     throw CreateError(ErrorCodes.INVALID_PROJECT_VERSION_STATE);
                 }
                 if ( prv.state === 'deploy' ) {
-                    const project = await dbs.Project.findOne({ id: prv.project_id }, transaction);
                     project.deploy_version_id = null;
                     await project.save({ transaction });
                 }
