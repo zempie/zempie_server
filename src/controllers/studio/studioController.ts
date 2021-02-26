@@ -9,6 +9,7 @@ import admin from 'firebase-admin';
 import DecodedIdToken = admin.auth.DecodedIdToken;
 import * as path from "path";
 import Opt from '../../../config/opt';
+import { eProjectState } from '../../commons/enums';
 
 const replaceExt = require('replace-ext');
 
@@ -161,12 +162,15 @@ class StudioController {
     }
 
     getProject = async ( params : any, { uid }: DecodedIdToken )=>{
-
         if( !params.id ) {
             throw CreateError(ErrorCodes.INVALID_PARAMS);
         }
 
-        return await dbs.Project.getProject( { id : params.id } );
+        const prj = await dbs.Project.getProject( { id : params.id } );
+        if ( prj.state !== eProjectState.Normal ) {
+            throw CreateError(ErrorCodes.INVALID_ACCESS_PROJECT_ID);
+        }
+        return prj;
     }
 
     verifyGamePathname = async ( params : any, { uid }: DecodedIdToken ) => {
