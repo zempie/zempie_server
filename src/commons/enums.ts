@@ -41,18 +41,26 @@ export enum eMailCategory {
 }
 
 export enum eProjectState {
-    Normal,
-    Ban,
-    PermanentBan,
+    Normal          = 0b0,
+    Ban             = 0b1,
+    PermanentBan    = 0b10,
 }
 export enum eProjectVersionState {
-    none = 'none', //업로드전
-    process = 'process', //심사중
-    fail = 'fail', //심사 미통과
-    passed = 'passed', //심사 통과
-    deploy = 'deploy', //배포중
-    ban = 'ban', //이용정지
+    None    = 0b0,      //업로드전
+    Process = 0b10,     //심사중
+    Fail    = 0b100,    //심사 미통과
+    Passed  = 0b1000,   //심사 통과
+    Deploy  = 0b10000,  //배포중
+    Ban     = 0b100000, //이용정지
 }
+// export enum eProjectVersionState {
+//     none = 'none',          //업로드전
+//     process = 'process',    //심사중
+//     fail = 'fail',          //심사 미통과
+//     passed = 'passed',      //심사 통과
+//     deploy = 'deploy',      //배포중
+//     ban = 'ban',            //이용정지
+// }
 
 
 export enum eTimeline {

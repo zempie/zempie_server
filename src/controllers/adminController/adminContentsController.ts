@@ -3,7 +3,7 @@ import { IAdmin, IZempieClaims } from '../_interfaces';
 import { dbs } from '../../commons/globals';
 import admin from 'firebase-admin';
 import { Transaction } from 'sequelize';
-import { eMailCategory, eProjectState } from '../../commons/enums';
+import { eMailCategory, eProjectState, eProjectVersionState } from '../../commons/enums';
 import { CreateError, ErrorCodes } from '../../commons/errorCodes';
 
 
@@ -29,9 +29,19 @@ class AdminContentsController {
             if ( permanent ) {
                 project.state = eProjectState.PermanentBan;
                 await project.save({ transaction });
+
+                const prv = await dbs.ProjectVersion.findOne({ project_id: project.id, state: 'deploy' }, transaction);
+                if ( prv ) {
+                    prv.state = 'passed';
+                    await prv.save({ transaction });
+                }
             }
             else if ( project_version_id ) {
                 const version = await dbs.ProjectVersion.findOne({ id: project_version_id, project_id: project.id });
+                if ( version.state !== 'passed' ) {
+                    // version.state |= eProjectVersionState.Ban;
+                    throw CreateError(ErrorCodes.INVALID_PROJECT_VERSION_STATE);
+                }
                 version.state = 'ban';
                 await version.save({ transaction });
             }
@@ -83,6 +93,44 @@ class AdminContentsController {
             title: '정지 안내',
             content: `이용 정지 되었습니다.`,
         });
+    }
+
+    releasePunishedGame = async ({ project_id, project_version_id }: any) => {
+        if ( project_version_id ) {
+            await dbs.ProjectVersion.getTransaction(async (transaction: Transaction) => {
+                const prv = await dbs.ProjectVersion.findOne({ id: project_version_id }, transaction);
+                // prv.state ^= eProjectVersionState.Ban;
+                prv.state = 'passed';
+                await prv.save({ transaction });
+
+                // send a mail
+                const prj = await dbs.Project.findOne({ id: prv.project_id });
+                const developer = await dbs.User.findOne({ id: prj.user_id });
+                await dbs.UserMailbox.create({
+                    user_uid: developer.uid,
+                    category: eMailCategory.Normal,
+                    title: '정지 해제 안내',
+                    content: `정지되었던 ${prj.name} 프로젝트 버젼이 정상화되었습니다.`,
+                }, transaction)
+            })
+        }
+        if ( project_id ) {
+            await dbs.Project.getTransaction(async (transaction: Transaction) => {
+                const prj = await dbs.Project.findOne({ id: project_id }, transaction);
+                // prj.state ^= eProjectState.PermanentBan;
+                prj.state = eProjectState.Normal;
+                await prj.save({ transaction });
+
+                // send a mail
+                const developer = await dbs.User.findOne({ id: prj.user_id });
+                await dbs.UserMailbox.create({
+                    user_uid: developer.uid,
+                    category: eMailCategory.Normal,
+                    title: '정지 해제 안내',
+                    content: `정지되었던 ${prj.name} 프로젝트가 정상화되었습니다.`,
+                }, transaction)
+            })
+        }
     }
 
     releasePunishedUser = async ({ id }: any) => {

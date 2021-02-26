@@ -66,8 +66,10 @@ export const ErrorCodes = {
     INVALID_SURVEY_ID:              { code: 50007, message: '관리자 설문조사 ID 오류' },
 
     ALREADY_ADMIN_USER_READ_MAIL:   { code: 51001, message: '이미 읽은 우편' },
+
     ADMIN_GAME_PATHNAME_DUPLICATED: { code: 52001, message: '게임 Pathname 중복' },
 
+    INVALID_PROJECT_VERSION_STATE:  { code: 53001, message: '프로젝트 버젼의 상태 부적합' },
 
     /*
         Studio

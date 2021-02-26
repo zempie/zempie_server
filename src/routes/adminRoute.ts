@@ -50,6 +50,7 @@ export default (router: Router) => {
      */
     router.post(`${apiVer}/admin/punish/game`,  validateAdminIdToken,   adminTracking,  convert(AdminContentsController.punishGame));
     router.post(`${apiVer}/admin/punish/user`,  validateAdminIdToken,   adminTracking,  convert(AdminContentsController.punishUser));
+    router.post(`${apiVer}/admin/punish/game/release`,  validateAdminIdToken,   adminTracking,  convert(AdminContentsController.releasePunishedGame));
     router.post(`${apiVer}/admin/punish/user/release`,  validateAdminIdToken,   adminTracking,  convert(AdminContentsController.releasePunishedUser));
     router.get(`${apiVer}/admin/punish/user/list`,      validateAdminIdToken,   adminTracking,  convert(AdminContentsController.punishedUserList));
 
