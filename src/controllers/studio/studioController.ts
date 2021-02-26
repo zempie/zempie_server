@@ -340,6 +340,10 @@ class StudioController {
 
         return dbs.Project.getTransaction( async (transaction : Transaction) => {
             const project = await dbs.Project.findOne( { id : params.id } );
+            if ( project.state !== eProjectState.Normal ) {
+                throw CreateError(ErrorCodes.INVALID_ACCESS_PROJECT_ID);
+            }
+
             const game = await dbs.Game.findOne( {
                 id : project.game_id,
             } );
@@ -544,7 +548,7 @@ class StudioController {
         }
         return ret;
     }
-    callbackSurvey = async ({ formId: form_id, results }: any) => {
+    callbackSurvey = async ({ formId: form_id, results }: any, user: any, {req}: IRoute) => {
         let user_uid = '';
         const u = _.some(results, (r: any) => {
             if ( r.type.toUpperCase() === 'TEXT' && r.title.toLowerCase().includes('uid') ) {
