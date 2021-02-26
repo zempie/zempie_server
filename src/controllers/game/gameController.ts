@@ -1,4 +1,5 @@
 import * as uniqid from 'uniqid';
+import * as path from 'path';
 import * as _ from 'lodash';
 import admin from 'firebase-admin';
 import DecodedIdToken = admin.auth.DecodedIdToken;
@@ -13,16 +14,16 @@ import { CreateError, ErrorCodes } from '../../commons/errorCodes';
 import { signJWT } from '../../commons/utils';
 import * as jwt from 'jsonwebtoken';
 const { Url } = Opt;
+import * as i18n from 'i18n';
+i18n.configure({
+    locales: ['ko', 'en', 'uk-UA'],
+    defaultLocale: 'ko',
+    directory: path.join(__dirname, '..', '..', '..', 'config', 'locales'),
+})
 
-
-interface IGamePlay {
-    game_id: number
-    user_uid?: string
-    started_at: number
-}
 
 class GameController {
-    featuredList = async () => {
+    featuredList = async ({ lang }: { lang: string }) => {
         let ret = await caches.game.getFeatured();
         if ( !ret ) {
             const popular = await dbs.Game.getListIncludingUser({ activated: true, enabled: true }, { order: [['count_over', 'desc']], limit: 5 });
@@ -33,30 +34,30 @@ class GameController {
 
             ret = [
                 {
-                    name: '인기 게임 Popular Games',
+                    name: i18n.__({ phrase: 'Popular Games', locale: lang || 'ko' }),
                     games: _.map(popular, obj => getGameData(obj)),
                 },
                 {
-                    name: '추천 게임 Recommended Games',
+                    name: i18n.__({ phrase: 'Recommended Games', locale: lang || 'ko' }),
                     games: _.map(recommended, obj => getGameData(obj)),
                 },
                 {
-                    name: '최신 게임 New Games',
+                    name: i18n.__({ phrase: 'New Games', locale: lang || 'ko' }),
                     games: _.map(latest, obj => getGameData(obj)),
                 },
                 {
-                    name: '인증 게임 Certified Games',
+                    name: i18n.__({ phrase: 'Certified Games', locale: lang || 'ko' }),
                     games: _.map(certified, obj => getGameData(obj)),
                     key: 'official',
                 },
                 {
-                    name: '도전 게임 Challenging Games',
+                    name: i18n.__({ phrase: 'Challenging Games', locale: lang || 'ko' }),
                     games: _.map(uncertified, obj => getGameData(obj)),
                     key: 'unofficial',
                 },
             ];
 
-            caches.game.setFeatured(ret);
+            // caches.game.setFeatured(ret);
         }
 
         return ret;
