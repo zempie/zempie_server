@@ -193,7 +193,7 @@ class StudioController {
             throw CreateError(ErrorCodes.FORBIDDEN_STRING);
         }
         // 금지 단어 색출
-        if ( !await dbs.ForbiddenWords.isOk(params.name) ) {
+        if ( !!params.name && !await dbs.ForbiddenWords.isOk(params.name) ) {
             throw CreateError(ErrorCodes.FORBIDDEN_STRING);
         }
 
@@ -330,7 +330,7 @@ class StudioController {
             throw CreateError(ErrorCodes.FORBIDDEN_STRING);
         }
         // 금지 단어 색출
-        if ( !await dbs.ForbiddenWords.isOk(params.name) ) {
+        if ( !!params.name && !await dbs.ForbiddenWords.isOk(params.name) ) {
             throw CreateError(ErrorCodes.FORBIDDEN_STRING);
         }
 
