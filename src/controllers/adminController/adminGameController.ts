@@ -79,7 +79,7 @@ class AdminGameController {
         }
         const { game_id, official, category, enabled, activated } = params;
         await dbs.Game.getTransaction(async (transaction: Transaction) => {
-            const game = await dbs.Game.findOne({ game_id }, transaction);
+            const game = await dbs.Game.findOne({ id : game_id }, transaction);
 
             if ( !!category ) {
                 game.category = _.toNumber(category);
