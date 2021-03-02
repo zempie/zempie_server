@@ -43,6 +43,7 @@ export default (router: Router) => {
     router.post(`${apiVer}/admin/game/c/p`,     validateAdminIdToken,   adminTracking,  convert(AdminGameController.createAffiliatedGame));
     router.post(`${apiVer}/admin/game/u`,       validateAdminIdToken,   adminTracking,  convert(AdminGameController.updateGame));
     router.post(`${apiVer}/admin/game/u/p`,     validateAdminIdToken,   adminTracking,  convert(AdminGameController.updateAffiliatedGame));
+    router.post(`${apiVer}/admin/game/d/p`,     validateAdminIdToken,   adminTracking,  convert(AdminGameController.deleteAffiliatedGame));
 
 
     /**

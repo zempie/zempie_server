@@ -68,6 +68,9 @@ class AdminGameController {
         });
     }
 
+    deleteAffiliatedGame = async ({ game_id } : any) => {
+        await dbs.Game.destroy({ id : game_id });
+    }
 
     updateGame = async (params: any) => {
         // 불량 단어 색출
