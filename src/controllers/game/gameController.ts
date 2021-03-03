@@ -23,35 +23,35 @@ i18n.configure({
 
 
 class GameController {
-    featuredList = async ({ lang }: { lang: string }) => {
+    featuredList = async ({ lang = 'ko' }: { lang: string }) => {
         let ret = await caches.game.getFeatured();
         if ( !ret ) {
-            const popular = await dbs.Game.getListIncludingUser({ activated: true, enabled: true }, { order: [['count_over', 'desc']], limit: 5 });
-            const recommended = await dbs.Game.getListIncludingUser({ activated: true, enabled: true }, { order: Sequelize.literal('rand()'), limit: 5 });
-            const latest = await dbs.Game.getListIncludingUser({ activated: true, enabled: true }, { order: [['id', 'asc']], limit: 5 });
-            const certified = await dbs.Game.getListIncludingUser({ category: eGameCategory.Certified, activated: true, enabled: true }, { order: Sequelize.literal('rand()'), limit: 5 });
-            const uncertified = await dbs.Game.getListIncludingUser({ category: eGameCategory.Challenge, activated: true, enabled: true }, { order: Sequelize.literal('rand()'), limit: 5 });
+            const popular = await dbs.Game.getListWithUser({ activated: true, enabled: true }, { order: [['count_over', 'desc']], limit: 5 });
+            const recommended = await dbs.Game.getListWithUser({ activated: true, enabled: true, category: {[Op.ne]: 2} }, { order: Sequelize.literal('rand()'), limit: 5 });
+            const latest = await dbs.Game.getListWithUser({ activated: true, enabled: true }, { order: [['id', 'asc']], limit: 5 });
+            const certified = await dbs.Game.getListWithUser({ category: eGameCategory.Certified, activated: true, enabled: true }, { order: Sequelize.literal('rand()'), limit: 5 });
+            const uncertified = await dbs.Game.getListWithUser({ category: eGameCategory.Challenge, activated: true, enabled: true }, { order: Sequelize.literal('rand()'), limit: 5 });
 
             ret = [
                 {
-                    name: i18n.__({ phrase: 'Popular Games', locale: lang || 'ko' }),
+                    name: i18n.__({ phrase: 'Popular Games', locale: lang }),
                     games: _.map(popular, obj => getGameData(obj)),
                 },
                 {
-                    name: i18n.__({ phrase: 'Recommended Games', locale: lang || 'ko' }),
+                    name: i18n.__({ phrase: 'Recommended Games', locale: lang }),
                     games: _.map(recommended, obj => getGameData(obj)),
                 },
                 {
-                    name: i18n.__({ phrase: 'New Games', locale: lang || 'ko' }),
+                    name: i18n.__({ phrase: 'New Games', locale: lang }),
                     games: _.map(latest, obj => getGameData(obj)),
                 },
                 {
-                    name: i18n.__({ phrase: 'Certified Games', locale: lang || 'ko' }),
+                    name: i18n.__({ phrase: 'Certified Games', locale: lang }),
                     games: _.map(certified, obj => getGameData(obj)),
                     key: 'official',
                 },
                 {
-                    name: i18n.__({ phrase: 'Challenging Games', locale: lang || 'ko' }),
+                    name: i18n.__({ phrase: 'Challenging Games', locale: lang }),
                     games: _.map(uncertified, obj => getGameData(obj)),
                     key: 'unofficial',
                 },
@@ -213,11 +213,11 @@ class GameController {
         return ret;
     }
 
-    getGameList = async ({ official, category, limit = 50, offset = 0, sort, dir }: IGameListParams, user: DecodedIdToken, { req }: IRoute) => {
+    getGameList = async ({ category, limit = 50, offset = 0, sort, dir }: IGameListParams, user: DecodedIdToken, { req }: IRoute) => {
         const query = JSON.stringify(req.query);
         let games = await caches.game.getList(query);
         if ( !games ) {
-            const rows = await dbs.Game.getList({ official, category, limit, offset, sort, dir });
+            const rows = await dbs.Game.getList({ category, limit, offset, sort, dir });
             games = _.map(rows, game => getGameData(game))
 
             // caches.game.setList(games, query);

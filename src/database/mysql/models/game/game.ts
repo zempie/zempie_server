@@ -16,7 +16,7 @@ class GameModel extends Model {
             activated:          { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false },
             enabled:            { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false },
 
-            official:           { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false },
+            official:           { type: DataTypes.BOOLEAN, defaultValue: false },
             category:           { type: DataTypes.INTEGER, allowNull: false, defaultValue: eGameCategory.Challenge },
             user_id:            { type: DataTypes.INTEGER },
 
@@ -44,49 +44,15 @@ class GameModel extends Model {
         this.model.belongsTo(dbs.User.model);
         this.model.hasOne(dbs.GameEmotion.model, { sourceKey: 'id', foreignKey: 'game_id', as: 'emotions' });
 
-        // if ( process.env.NODE_ENV !== 'production' ) {
-        //     if ( await this.model.count() < 1 ) {
-        //         const sampleGames: any = [
-        //             {
-        //                 // uid: uuid(),
-        //                 pathname: 'test-path',
-        //                 title: 'test-title',
-        //                 genre_tags: 'arcade,puzzle,knight',
-        //             }
-        //         ];
-        //         await this.bulkCreate(sampleGames);
-        //     }
+        // const desc = await this.model.sequelize.queryInterface.describeTable(this.model.tableName);
+        // if ( !desc['category'] ) {
+        //     this.model.sequelize.queryInterface.addColumn(this.model.tableName, 'category', {
+        //         type: DataTypes.SMALLINT,
+        //         allowNull: false,
+        //         defaultValue: eGameCategory.Challenge,
+        //         after: 'official'
+        //     })
         // }
-
-        const desc = await this.model.sequelize.queryInterface.describeTable(this.model.tableName);
-        if ( !desc['url_thumb_webp'] ) {
-            this.model.sequelize.queryInterface.addColumn(this.model.tableName, 'url_thumb_webp', {
-                type: DataTypes.STRING,
-                after: 'url_thumb'
-            })
-        }
-        if ( !desc['url_thumb_gif'] ) {
-            this.model.sequelize.queryInterface.addColumn(this.model.tableName, 'url_thumb_gif', {
-                type: DataTypes.STRING,
-                after: 'url_thumb_webp'
-            })
-        }
-        if ( !desc['count_heart'] ) {
-            this.model.sequelize.queryInterface.addColumn(this.model.tableName, 'count_heart', {
-                type: DataTypes.INTEGER,
-                allowNull: false,
-                defaultValue: 0,
-                after: 'count_over'
-            })
-        }
-        if ( !desc['category'] ) {
-            this.model.sequelize.queryInterface.addColumn(this.model.tableName, 'category', {
-                type: DataTypes.SMALLINT,
-                allowNull: false,
-                defaultValue: eGameCategory.Challenge,
-                after: 'official'
-            })
-        }
     }
 
 
@@ -114,7 +80,7 @@ class GameModel extends Model {
     }
 
 
-    async getList({ official, category, limit = 50, offset = 0, sort = 'id', dir = 'asc' }: IGameListParams) {
+    async getList({ official, category, limit = 50, offset = 0, sort = 'id', dir = 'desc' }: IGameListParams) {
         // where
         const where: any = {
             activated: true,
@@ -130,54 +96,40 @@ class GameModel extends Model {
         }
 
         // order by
-        dir = dir.toLowerCase();
-        if ( dir === 'd' || dir === 'desc' ) {
-            dir = 'desc';
-        }
-        else {
-            dir = 'asc';
-        }
+        dir = 'desc';
+        // dir = dir.toLowerCase();
+        // if ( dir === 'd' || dir === 'desc' ) {
+        //     dir = 'desc';
+        // }
+        // else {
+        //     dir = 'asc';
+        // }
 
         sort = sort.toLowerCase();
-        if ( sort === 'u' || sort === 'updated' ) {
-            sort = 'updated_at';
+        if ( sort === 'play' || sort === 'p' ) {
+            sort = 'count_over';
         }
-        else if ( sort === 'c' || sort === 'created' ) {
-            sort = 'created_at';
+        else if ( sort === 'heart' || sort === 'h' ) {
+            sort = 'count_heart'
         }
-        else if ( sort === 't' || sort === 'title' ) {
+        else if ( sort === 'title' || sort === 't' || sort === 'a' ) {
             sort = 'title';
+        }
+        else if ( sort === 'latest' || sort === 'l' || sort === 'c' ) {
+            sort = 'created_at';
         }
         else {
             sort = 'id';
         }
 
-        return this.getListIncludingUser(where, {
+        return this.getListWithUser(where, {
             order: [[sort, dir]],
             limit: _.toNumber(limit),
             offset: _.toNumber(offset),
         });
-        // return await this.model.findAll({
-        //     where,
-        //     // attributes: {
-        //     //     include: [['uid', 'game_uid']]
-        //     // },
-        //     include: [{
-        //         model: dbs.User.model,
-        //         where: {
-        //             activated: true,
-        //             banned: false,
-        //             deleted_at: null,
-        //         },
-        //         required: true,
-        //     }],
-        //     order: [[sort, dir]],
-        //     limit: _.toNumber(limit),
-        //     offset: _.toNumber(offset),
-        // })
     }
 
-    getListIncludingUser = async (where: any, options: any = {}) => {
+    getListWithUser = async (where: any, options: any = {}) => {
         return await this.model.findAll({
             where,
             include: [

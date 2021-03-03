@@ -85,9 +85,9 @@ class AdminGameController {
                 game.category = _.toNumber(category);
             }
 
-            if ( !!official ) {
-                game.official = parseBoolean(official);
-            }
+            // if ( !!official ) {
+            //     game.official = parseBoolean(official);
+            // }
 
             if ( !!enabled ) {
                 game.enabled = parseBoolean(enabled);

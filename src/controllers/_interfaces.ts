@@ -103,26 +103,6 @@ export interface IS3Upload {
     subDir: string,
 }
 
-export interface IGame {
-    uid: string,
-    official: boolean,
-    developer_uid: string,
-    pathname: string,
-    title: string,
-    description: string,
-    version: string,
-    // min_ratio: string,
-    control_type: string,
-    genre_arcade: boolean,
-    genre_puzzle: boolean,
-    genre_sports: boolean,
-    genre_racing: boolean,
-    count_start: number,
-    count_over: number,
-    url_game: string,
-    url_thumb: string,
-    url_title: string,
-}
 
 export interface ITimelineParams {
     uid?: string,

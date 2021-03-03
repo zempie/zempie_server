@@ -13,36 +13,36 @@ import { eProjectState } from '../../commons/enums';
 
 const replaceExt = require('replace-ext');
 
-const ERROR_STUDIO = {
-    NOT_FIND_USER : {
-        code: 2001,
-        message: '유저 정보를 찾을 수 없습니다.'
-    },
-    NOT_FIND_DEVELOPER : {
-        code: 2002,
-        message: '개발자 정보를 찾을 수 없습니다.'
-    },
-    ALREADY_EXIST_GAME_PATH : {
-        code: 2101,
-        message: '이미 존재하는 게임 경로 입니다.'
-    },
-    INVALID_VERSION_FILE : {
-        code: 2102,
-        message: '업로드된 게임 파일이 없습니다.'
-    },
-    INVALID_PROJECT_ID : {
-        code: 2103,
-        message: '프로젝트'
-    },
-    ACTIVE_VERSION : {
-        code : 2104,
-        message: '사용중인 버전 입니다.',
-    },
-    ALREADY_EXIST_UPDATE_VERSION : {
-        code : 2105,
-        message: '이미 등록된 버전이 있습니다.',
-    },
-}
+// const ERROR_STUDIO = {
+//     NOT_FIND_USER : {
+//         code: 2001,
+//         message: '유저 정보를 찾을 수 없습니다.'
+//     },
+//     NOT_FIND_DEVELOPER : {
+//         code: 2002,
+//         message: '개발자 정보를 찾을 수 없습니다.'
+//     },
+//     ALREADY_EXIST_GAME_PATH : {
+//         code: 2101,
+//         message: '이미 존재하는 게임 경로 입니다.'
+//     },
+//     INVALID_VERSION_FILE : {
+//         code: 2102,
+//         message: '업로드된 게임 파일이 없습니다.'
+//     },
+//     INVALID_PROJECT_ID : {
+//         code: 2103,
+//         message: '프로젝트'
+//     },
+//     ACTIVE_VERSION : {
+//         code : 2104,
+//         message: '사용중인 버전 입니다.',
+//     },
+//     ALREADY_EXIST_UPDATE_VERSION : {
+//         code : 2105,
+//         message: '이미 등록된 버전이 있습니다.',
+//     },
+// }
 
 interface ICreateProject extends IVersion, IProject {
 
@@ -74,61 +74,6 @@ interface IVersion {
 }
 
 class StudioController {
-    isAuthenticatedProject = async (params: any, _user: DecodedIdToken) => {
-        const project_id = params.project_id || params.id;
-        if ( !project_id ) {
-            throw CreateError(ErrorCodes.INVALID_PARAMS);
-        }
-
-        const project = await dbs.Project.model.findOne({
-            where: { id: project_id },
-            include: [{
-                model: dbs.User.model,
-                where: {
-                    uid: _user.uid,
-                },
-                required: true,
-            }]
-        });
-
-        // const user = await dbs.User.findOne({ uid: _user.uid });
-        // const project = await dbs.Project.findOne({ id: project_id, user_id: user.id });
-        if ( !project ) {
-            throw CreateError(ErrorCodes.INVALID_ACCESS_PROJECT_ID);
-        }
-    }
-    isAuthenticatedProjectVersion = async (params: any, _user: DecodedIdToken) => {
-        const project_version_id = params.project_id || params.id;
-        if ( !project_version_id ) {
-            throw CreateError(ErrorCodes.INVALID_PARAMS);
-        }
-
-        const projectVersion = await dbs.ProjectVersion.model.findOne({
-            where: { id: project_version_id },
-            include: [{
-                model: dbs.Project.model,
-                include: [{
-                    model: dbs.User.model,
-                    where: {
-                        uid: _user.uid
-                    },
-                    required: true,
-                }]
-            }]
-        })
-
-        // const projectVersion = await dbs.ProjectVersion.findOne({ id: project_version_id });
-        if ( !projectVersion ) {
-            throw CreateError(ErrorCodes.INVALID_ACCESS_PROJECT_ID);
-        }
-
-        // const user = await dbs.User.findOne({ uid: _user.uid });
-        // const project = await dbs.Project.findOne({ id: projectVersion.project_id, user_id: user.id });
-        // if ( !project ) {
-        //     throw CreateError(ErrorCodes.INVALID_ACCESS_PROJECT_ID);
-        // }
-    }
-
     signupDeveloper = async  (params: any, {uid}: DecodedIdToken) =>{
         return dbs.User.getTransaction( async (transaction : Transaction)=>{
             //권한 추가
@@ -151,11 +96,10 @@ class StudioController {
     }
 
     getProjects = async ( params : any, {uid}: DecodedIdToken )=>{
-        // const user = await dbs.User.findOne({ uid });
         const user = await dbs.User.findOne( { uid } );
         if( !user ) {
             //등록된 개발자 찾을수 없음
-            throw CreateError(ERROR_STUDIO.NOT_FIND_DEVELOPER);
+            throw CreateError(ErrorCodes.INVALID_DEVELOPER_ID);
         }
 
         return await dbs.Project.getProjects( { user_id : user.id } );
@@ -166,8 +110,10 @@ class StudioController {
             throw CreateError(ErrorCodes.INVALID_PARAMS);
         }
 
-        const prj = await dbs.Project.getProject( { id : params.id } );
-        if ( prj.state !== eProjectState.Normal ) {
+        const user = await dbs.User.findOne({ uid });
+
+        const prj = await dbs.Project.getProject( { id : params.id, user_id: user.id } );
+        if ( !prj || prj.state !== eProjectState.Normal ) {
             throw CreateError(ErrorCodes.INVALID_ACCESS_PROJECT_ID);
         }
         return prj;
@@ -182,7 +128,7 @@ class StudioController {
 
         if( path ) {
             success = false;
-            // throw CreateError(ERROR_STUDIO.ALREADY_EXIST_GAME_PATH)
+            // throw CreateError(ErrorCodes.ALREADY_EXIST_GAME_PATH)
         }
 
         return {
@@ -307,8 +253,14 @@ class StudioController {
             throw CreateError(ErrorCodes.INVALID_PARAMS);
         }
 
+        const user = await dbs.User.findOne({ uid });
+
         return dbs.Project.getTransaction( async (transaction : Transaction) => {
-            const project = await dbs.Project.findOne( {id : params.id} );
+            const project = await dbs.Project.findOne( {id : params.id, user_id: user.id } );
+            if ( !project ) {
+                throw CreateError(ErrorCodes.INVALID_ACCESS_PROJECT_ID);
+            }
+
             const versions = await dbs.ProjectVersion.findAll( { project_id : params.id } );
             for( let i = 0; i < versions.length; i++ ) {
                 await dbs.ProjectVersion.destroy( { id : versions[i].id }, transaction );
@@ -328,7 +280,7 @@ class StudioController {
      url_game, url_thumb, url_title
      activated
      */
-    updateProject = async ( params : any, {uid}: DecodedIdToken, {req: {files: {file, file2}}}: IRoute)=>{
+    updateProject = async ( params : any, { uid }: DecodedIdToken, {req: {files: {file, file2}}}: IRoute)=>{
         // 불량 단어 색출
         if ( !dbs.BadWords.areOk(params) ) {
             throw CreateError(ErrorCodes.FORBIDDEN_STRING);
@@ -338,10 +290,22 @@ class StudioController {
             throw CreateError(ErrorCodes.FORBIDDEN_STRING);
         }
 
+        const user = await dbs.User.findOne({ uid });
+
         return dbs.Project.getTransaction( async (transaction : Transaction) => {
-            const project = await dbs.Project.findOne( { id : params.id } );
-            if ( project.state !== eProjectState.Normal ) {
+            const project = await dbs.Project.findOne( { id : params.id, user_id: user.id } );
+            if ( !project || project.state !== eProjectState.Normal ) {
                 throw CreateError(ErrorCodes.INVALID_ACCESS_PROJECT_ID);
+            }
+
+            if ( !!project.deploy_version_id ) {
+                const prv = await dbs.ProjectVersion.findOne({ id: project.deploy_version_id, project_id: project.id });
+                if ( !prv ) {
+                    throw CreateError(ErrorCodes.INVALID_ACCESS_PROJECT_ID);
+                }
+                else if ( prv.state === 'ban' ) {
+                    throw CreateError(ErrorCodes.INVALID_ACCESS_PROJECT_VERSION_ID);
+                }
             }
 
             const game = await dbs.Game.findOne( {
@@ -446,18 +410,18 @@ class StudioController {
         })
     }
 
-    createVersion = async ( params : any, {uid}: DecodedIdToken, {req: {files}}: IRoute ) => {
-
+    createVersion = async ( params : any, { uid }: DecodedIdToken, {req: {files}}: IRoute ) => {
         const project_id = params.project_id;
+        const user = await dbs.User.findOne({ uid });
 
         // const data: any = await FileManager.s3upload(replaceExt(file.name, '.webp'), webp[0].destinationPath, uid);
         return dbs.ProjectVersion.getTransaction( async (transaction : Transaction)=>{
 
-            const project = await dbs.Project.findOne( { id : project_id }, transaction );
+            const project = await dbs.Project.findOne( { id : project_id, user_id: user.id }, transaction );
             if( project.update_version_id ) {
                 const preUpdateVersion = await dbs.ProjectVersion.findOne( { id : project.update_version_id }, transaction );
                 if( preUpdateVersion.state !== 'fail' && preUpdateVersion.state !== 'passed' ) {
-                    throw CreateError(ERROR_STUDIO.ALREADY_EXIST_UPDATE_VERSION);
+                    throw CreateError(ErrorCodes.ALREADY_EXIST_UPDATE_VERSION);
                 }
             }
 
@@ -496,18 +460,22 @@ class StudioController {
     //     } );
     // }
 
-    deleteVersion = async  ( params : any, {uid}: DecodedIdToken )=>{
+    deleteVersion = async  ( params : any, { uid }: DecodedIdToken )=>{
+        const user = await dbs.User.findOne({ uid });
 
         return dbs.ProjectVersion.getTransaction( async (transaction : Transaction)=>{
             const version = await dbs.ProjectVersion.findOne( { id : params.id } );
-            const project = await dbs.Project.findOne( { id : version.project_id }, transaction );
+            const project = await dbs.Project.findOne( { id : version.project_id, user_id: user.id }, transaction );
+            if ( !project ) {
+                throw CreateError(ErrorCodes.INVALID_ACCESS_PROJECT_ID);
+            }
 
             if( project.update_version_id === version.id ) {
                 project.update_version_id = null;
             }
 
             if( project.deploy_version_id === version.id ) {
-                throw CreateError(ERROR_STUDIO.ACTIVE_VERSION);
+                throw CreateError(ErrorCodes.ACTIVE_VERSION);
             }
 
             await project.save({transaction});
