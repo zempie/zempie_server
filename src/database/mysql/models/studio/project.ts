@@ -151,12 +151,12 @@ class ProjectModel extends Model {
             project.hashtags = hashtags;
         }
 
-        if( deploy_version_id ) {
+        if( deploy_version_id || deploy_version_id === null ) {
             project.deploy_version_id = deploy_version_id;
         }
 
-        if( update_version_id ) {
-            project.update_version_id = deploy_version_id;
+        if( update_version_id || update_version_id === null) {
+            project.update_version_id = update_version_id;
         }
 
         return await project.save( { transaction } );
