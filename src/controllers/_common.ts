@@ -2,7 +2,7 @@ export function getGameData (game: any) {
     const { user, emotions } = game;
     return {
         id: game.id,
-        official: game.official,
+        // official: game.official,
         category: game.category,
         title: game.title,
         description: game.description,

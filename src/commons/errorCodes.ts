@@ -74,10 +74,15 @@ export const ErrorCodes = {
     /*
         Studio
      */
-    IS_NOT_DEVELOPER:               { code: 60001, message: '개발자가 아님' },
-    INVALID_ACCESS_PROJECT_ID:      { code: 60010, message: '잘못된 프로젝트 접근' },
-    INVALID_SURVEY_USER_UID:        { code: 62001, message: '설문조사 참여 사용자 UID 오류' },
-    INVALID_SURVEY_FORM_ID:         { code: 62002, message: '설문조사 FORM ID 오류' },
+    IS_NOT_DEVELOPER:                   { code: 60001, message: '개발자가 아님' },
+    INVALID_ACCESS_PROJECT_ID:          { code: 60010, message: '잘못된 프로젝트 접근' },
+    INVALID_ACCESS_PROJECT_VERSION_ID:  { code: 60011, message: '잘못된 프로젝트 버전 접근' },
+    INVALID_SURVEY_USER_UID:            { code: 62001, message: '설문조사 참여 사용자 UID 오류' },
+    INVALID_SURVEY_FORM_ID:             { code: 62002, message: '설문조사 FORM ID 오류' },
+    INVALID_DEVELOPER_ID:               { code: 63001, message: '개발자 정보를 찾을 수 없습니다.' },
+    ALREADY_EXIST_GAME_PATH:            { code: 64001, message: '이미 존재하는 게임 경로입니다.' },
+    ACTIVE_VERSION:                     { code: 64002, message: '사용중인 버전 입니다.' },
+    ALREADY_EXIST_UPDATE_VERSION:       { code: 64003, message: '이미 등록된 버전이 있습니다.' },
 
     /**
      * 안쓰임
