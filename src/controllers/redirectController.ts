@@ -30,7 +30,7 @@ class RedirectController {
             }
         }
         else {
-            res.redirect(`https://zempie.com/play/${req.params.pathname}`)
+            res.redirect(`https://zempie.com/redirect/play/${req.params.pathname}`)
         }
     }
 }
