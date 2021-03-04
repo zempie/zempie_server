@@ -105,6 +105,20 @@ class StudioController {
         return await dbs.Project.getProjects( { user_id : user.id } );
     }
 
+    getProjects2 = async (params: any, { uid }: DecodedIdToken) => {
+        const user = await dbs.User.findOne({ uid });
+        if ( !user || !user.is_developer ) {
+            throw CreateError(ErrorCodes.INVALID_DEVELOPER_ID);
+        }
+
+        return await dbs.Project.model.findAll({
+            where: { user_id: user.id },
+            include: [{
+                model: dbs.Game.model,
+            }]
+        })
+    }
+
     getProject = async ( params : any, { uid }: DecodedIdToken )=>{
         if( !params.id ) {
             throw CreateError(ErrorCodes.INVALID_PARAMS);
