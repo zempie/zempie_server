@@ -280,7 +280,10 @@ class StudioController {
                 await dbs.ProjectVersion.destroy( { id : versions[i].id }, transaction );
             }
             const game = await dbs.Game.findOne({ id: project.game_id }, transaction);
+            game.activated = false;
+            game.enabled = false;
             game.pathname = `d_${game.pathname}`;
+            game.url_game = null;
             game.deleted_at = new Date();
             await game.save({ transaction });
             // await dbs.Game.destroy({ id : project.game_id }, transaction );
