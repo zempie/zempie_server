@@ -9,6 +9,7 @@ import supportRoute from '../routes/supportRoute';
 import tcpRoute from '../routes/tcpRoute';
 import { IMessageQueueOptions, IServerOptions } from '../commons/interfaces';
 import mq from '../controllers/messageQueues/apiMQ';
+import redirectRoute from '../routes/redirectRoute';
 
 
 class ApiServer extends Server {
@@ -35,6 +36,8 @@ class ApiServer extends Server {
         gameRoute(app);
         launcherRoute(app);
         supportRoute(app);
+
+        redirectRoute(app);
 
         // tcpRoute(app);
 
