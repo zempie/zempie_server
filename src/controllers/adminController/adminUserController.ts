@@ -106,7 +106,7 @@ class AdminUserController {
     }
 
     async setBadWord ({ id, activated }: { id: number, activated: boolean }, admin: IAdmin) {
-        await dbs.BadWords.update({ id }, { activated });
+        await dbs.BadWords.update({ activated }, { id });
     }
 
     async getForbiddenWord ({ limit = 50, offset = 0 }) {
@@ -133,7 +133,7 @@ class AdminUserController {
     }
 
     async setForbiddenWord ({ id, activated }: { id: number, activated: boolean }, admin: IAdmin) {
-        await dbs.ForbiddenWords.update({ id }, { activated });
+        await dbs.ForbiddenWords.update({ activated }, { id });
     }
 }
 
