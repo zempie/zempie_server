@@ -105,25 +105,30 @@ class GameModel extends Model {
         //     dir = 'asc';
         // }
 
+        let order = [];
         sort = sort.toLowerCase();
         if ( sort === 'play' || sort === 'p' ) {
-            sort = 'count_over';
+            order.push([['count_over'], [dir]]);
+            order.push([['id'], [dir]])
         }
         else if ( sort === 'heart' || sort === 'h' ) {
-            sort = 'count_heart'
+            order.push([['count_heart'], [dir]]);
+            order.push([['id'], [dir]])
         }
         else if ( sort === 'title' || sort === 't' || sort === 'a' ) {
-            sort = 'title';
+            order.push([['title'], ['asc']]);
+            order.push([['id'], ['asc']])
         }
         else if ( sort === 'latest' || sort === 'l' || sort === 'c' ) {
-            sort = 'created_at';
+            order.push([['created_at'], ['desc']]);
+            order.push([['id'], ['desc']])
         }
         else {
-            sort = 'id';
+            order.push([['id'], ['asc']])
         }
 
         return this.getListWithUser(where, {
-            order: [[sort, dir]],
+            order,
             limit: _.toNumber(limit),
             offset: _.toNumber(offset),
         });
