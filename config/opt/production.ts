@@ -28,7 +28,7 @@ export default {
     Url: {
         Host: 'https://zempie.com',
         GameClient: 'http://zempie.com/play',
-        Redirect: 'https://zempie.com/share',
+        Redirect: 'https://zempie.com/redirect',
         Launcher: 'https://launcher.zempie.com',
     },
 

@@ -22,6 +22,19 @@ export default {
         },
     },
 
+    Url: {
+        Host: 'http://gtest.fromthered.com:8280',
+        DeployApiV1: 'http://gtest.fromthered.com:8288/api/v1',
+        GameClient: 'http://localhost:8080/play',
+        Redirect: 'http://localhost:8280/redirect',
+        Launcher: 'http://gtest.fromthered.com/zempie/launcher',
+    },
+
+    Deploy: {
+        url_v1: 'http://gtest.fromthered.com:8288/api/v1',
+        api_key: 'xdo1lbgkc5xmxn2'
+    },
+
     AWS: {
         Bucket: {
             Rsc: 'dev-zempie/v1',

@@ -3,6 +3,8 @@ import { IRoute } from './_interfaces';
 import { caches, dbs } from '../commons/globals';
 import { CreateError } from '../commons/errorCodes';
 import { getGameData } from './_common';
+import cfgOption from '../../config/opt';
+const { Opt } = cfgOption;
 
 
 class RedirectController {
@@ -35,48 +37,70 @@ class RedirectController {
                 game = await dbs.Game.findOne({ pathname: pathname });
             }
             if ( !game ) {
-                res.redirect(`https://zempie.com`);
+                res.redirect(Opt.Url.Host);
             }
             else {
                 game = getGameData(game);
                 caches.game.setByPathname(game, pathname);
-                this.responseGame(res, game, `https://zempie.com/play/${req.params.pathname}`);
+                this.responseGame(res, game, `${Opt.Url.Host}/play/${req.params.pathname}`);
             }
         }
         else {
-            res.redirect(`https://zempie.com/redirect/play/${req.params.pathname}`)
+            res.redirect(`${Opt.Url.Redirect}/play/${req.params.pathname}`)
         }
     }
 
 
     battle = async (req: Request, res: Response) => {
         const { battle_uid } = req.params;
+        const keyType = `zempie:redirect:`;
         if ( this.checkUserAgent(req) ) {
-            let battle = caches.battle.getByUid(battle_uid);
-            if ( !battle ) {
-                battle = await dbs.Battle.model.findOne({
+            let game = await caches.game.getData(keyType, battle_uid);
+            if ( !game ) {
+                const record = await dbs.Battle.model.findOne({
                     where: { uid: battle_uid },
                     include: [{
                         model: dbs.Game.model,
                     }]
                 });
+                if ( !record ) {
+                    res.redirect(Opt.Url.Host);
+                    return;
+                }
+                game = getGameData(record.game)
+                caches.game.setData(game, keyType, battle_uid);
             }
-            if ( !battle ) {
-                res.redirect(`https://zempie.com`);
-            }
-            else {
-                caches.game.setByUid(battle, battle_uid);
-                const game = getGameData(battle.game)
-                this.responseGame(res, game, `https://zempie.com/battle/${req.params.battle_uid}`);
-            }
+            this.responseGame(res, game, `${Opt.Url.Host}/battle/${battle_uid}`);
         }
         else {
-            res.redirect(`https://zempie.com/redirect/battle/${req.params.pathname}`)
+            res.redirect(`${Opt.Url.Redirect}/battle/${battle_uid}`)
         }
     }
 
     shared = async (req: Request, res: Response) => {
-
+        const { shared_uid } = req.params;
+        const keyType = `zempie:redirect:`;
+        if ( this.checkUserAgent(req) ) {
+            let game = await caches.game.getData(keyType, shared_uid);
+            if ( !game ) {
+                const record = await dbs.SharedGame.model.findOne({
+                    where: { uid: shared_uid },
+                    include: [{
+                        model: dbs.Game.model,
+                    }]
+                });
+                if ( !record ) {
+                    res.redirect(Opt.Url.Host);
+                    return;
+                }
+                game = getGameData(record.game)
+                caches.game.setData(game, keyType, shared_uid);
+            }
+            this.responseGame(res, game, `${Opt.Url.Host}/shared/${shared_uid}`);
+        }
+        else {
+            res.redirect(`${Opt.Url.Redirect}/shared/${shared_uid}`)
+        }
     }
 }
 
