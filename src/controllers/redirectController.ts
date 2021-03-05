@@ -4,7 +4,7 @@ import { caches, dbs } from '../commons/globals';
 import { CreateError } from '../commons/errorCodes';
 import { getGameData } from './_common';
 import cfgOption from '../../config/opt';
-const { Opt } = cfgOption;
+const { Url } = cfgOption;
 
 
 class RedirectController {
@@ -37,16 +37,16 @@ class RedirectController {
                 game = await dbs.Game.findOne({ pathname: pathname });
             }
             if ( !game ) {
-                res.redirect(Opt.Url.Host);
+                res.redirect(Url.Host);
             }
             else {
                 game = getGameData(game);
                 caches.game.setByPathname(game, pathname);
-                this.responseGame(res, game, `${Opt.Url.Host}/play/${req.params.pathname}`);
+                this.responseGame(res, game, `${Url.Host}/play/${req.params.pathname}`);
             }
         }
         else {
-            res.redirect(`${Opt.Url.Redirect}/play/${req.params.pathname}`)
+            res.redirect(`${Url.Redirect}/play/${req.params.pathname}`)
         }
     }
 
@@ -64,16 +64,16 @@ class RedirectController {
                     }]
                 });
                 if ( !record ) {
-                    res.redirect(Opt.Url.Host);
+                    res.redirect(Url.Host);
                     return;
                 }
                 game = getGameData(record.game)
                 caches.game.setData(game, keyType, battle_uid);
             }
-            this.responseGame(res, game, `${Opt.Url.Host}/battle/${battle_uid}`);
+            this.responseGame(res, game, `${Url.Host}/battle/${battle_uid}`);
         }
         else {
-            res.redirect(`${Opt.Url.Redirect}/battle/${battle_uid}`)
+            res.redirect(`${Url.Redirect}/battle/${battle_uid}`)
         }
     }
 
@@ -90,16 +90,16 @@ class RedirectController {
                     }]
                 });
                 if ( !record ) {
-                    res.redirect(Opt.Url.Host);
+                    res.redirect(Url.Host);
                     return;
                 }
                 game = getGameData(record.game)
                 caches.game.setData(game, keyType, shared_uid);
             }
-            this.responseGame(res, game, `${Opt.Url.Host}/shared/${shared_uid}`);
+            this.responseGame(res, game, `${Url.Host}/shared/${shared_uid}`);
         }
         else {
-            res.redirect(`${Opt.Url.Redirect}/shared/${shared_uid}`)
+            res.redirect(`${Url.Redirect}/shared/${shared_uid}`)
         }
     }
 }
