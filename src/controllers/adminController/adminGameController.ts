@@ -4,20 +4,31 @@ import { Transaction } from 'sequelize';
 import { parseBoolean } from '../../commons/utils';
 import { CreateError, ErrorCodes } from '../../commons/errorCodes';
 import { eGameCategory } from '../../commons/enums';
+const sequelize_1 = require("sequelize");
 
 
 class AdminGameController {
-    getGames = async ({ limit = 50, offset = 0 }) => {
-        const games = await dbs.Game.findAll({}, {
+    getGames = async ({ limit = 50, offset = 0, sort = 'id', dir = 'asc', category = 0, title = '' }) => {
+        const { rows, count } = await dbs.Game.findAndCountAll({}, {
             include: [{
                 model: dbs.User.model,
             }],
-            order: [['id', 'asc']],
+            where: {
+                category,
+                url_game: {
+                    [sequelize_1.Op.ne]: null
+                },
+                title: {
+                    [sequelize_1.Op.like]: `%${title}%`
+                }
+            },
+            order: [[sort, dir]],
             limit: _.toNumber(limit),
             offset: _.toNumber(offset),
         });
         return {
-            games: _.map(games, (game: any) => game.get({ plain: true }))
+            count,
+            games: _.map(rows, (game: any) => game.get({ plain: true })),
         }
     }
 
