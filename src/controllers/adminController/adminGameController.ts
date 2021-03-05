@@ -1,10 +1,9 @@
 import * as _ from 'lodash';
 import { dbs } from '../../commons/globals';
-import { Transaction } from 'sequelize';
+import { Op, Transaction } from 'sequelize';
 import { parseBoolean } from '../../commons/utils';
 import { CreateError, ErrorCodes } from '../../commons/errorCodes';
 import { eGameCategory } from '../../commons/enums';
-const sequelize_1 = require("sequelize");
 
 
 class AdminGameController {
@@ -16,10 +15,10 @@ class AdminGameController {
             where: {
                 category,
                 url_game: {
-                    [sequelize_1.Op.ne]: null
+                    [Op.ne]: null
                 },
                 title: {
-                    [sequelize_1.Op.like]: `%${title}%`
+                    [Op.like]: `%${title}%`
                 }
             },
             order: [[sort, dir]],
