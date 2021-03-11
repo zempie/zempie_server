@@ -148,7 +148,17 @@ class GameContentController {
         });
 
         if ( reply_id ) {
-            // 알림?
+            MQ.send({
+                topic: 'gameReply',
+                messages: [{
+                    value: JSON.stringify({
+                        reply_id,
+                        data: {
+                            reply: 1,
+                        },
+                    })
+                }]
+            })
         }
     }
 
@@ -157,7 +167,7 @@ class GameContentController {
     reactReply = async ({ reply_id, reaction }: { reply_id: number, reaction: eReplyReaction }, user: DecodedIdToken) => {
         reaction = _.toNumber(reaction);
         let changed = false;
-        let r = { good: 0, bad: 0 };
+        let r = { good: 0, bad: 0, reply: 0 };
 
         const record = await dbs.UserGameReplyReaction.findOne({ reply_id, user_uid: user.uid });
         if ( record ) {
@@ -192,11 +202,11 @@ class GameContentController {
 
         if ( changed ) {
             MQ.send({
-                topic: 'gameReplyReaction',
+                topic: 'gameReply',
                 messages: [{
                     value: JSON.stringify({
                         reply_id,
-                        reaction: r,
+                        data: r,
                     })
                 }]
             })

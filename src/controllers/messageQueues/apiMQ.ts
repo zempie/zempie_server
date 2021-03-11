@@ -15,10 +15,11 @@ class ApiMQ extends SrvMQ {
             count_over: number,
             count_heart: number,
         }} = {};
-    private reply_reactions: {
+    private game_replies: {
         [reply_id: number]: {
             count_good: number,
             count_bad: number,
+            count_reply: number,
         }} = {};
     private game_logs: {
         user_uid: string,
@@ -73,15 +74,17 @@ class ApiMQ extends SrvMQ {
 
 
         // 댓글 리액션
-        _.forEach(this.reply_reactions, async (obj: any, id: any) => {
+        _.forEach(this.game_replies, async (obj: any, id: any) => {
             if ( obj.count_good !== 0 || obj.count_bad !== 0 ) {
                 dbs.GameReply.update({
                     count_good: Sequelize.literal(`count_good + ${obj.count_good}`),
                     count_bad: Sequelize.literal(`count_bad + ${obj.count_bad}`),
+                    count_reply: Sequelize.literal(`count_reply + ${obj.count_reply}`),
                 }, { id });
                 obj.count_good = 0;
                 obj.count_bad = 0;
-                delete this.reply_reactions[id];
+                obj.count_reply = 0;
+                delete this.game_replies[id];
             }
         })
     }
@@ -102,10 +105,11 @@ class ApiMQ extends SrvMQ {
             e5: 0,
         }
     }
-    private getGameReplyReaction = (id: number) => {
-        return this.reply_reactions[id] = this.reply_reactions[id] || {
+    private getGameReply = (id: number) => {
+        return this.game_replies[id] = this.game_replies[id] || {
             count_good: 0,
             count_bad: 0,
+            count_reply: 0,
         }
     }
 
@@ -132,11 +136,12 @@ class ApiMQ extends SrvMQ {
         game[e_id] += activated? 1 : -1;
     }
 
-    async gameReplyReaction(message: string) {
-        const { reply_id, reaction }: any = JSON.parse(message);
-        const reply: any = this.getGameReplyReaction(reply_id);
-        reply.count_good += reaction.good;
-        reply.count_bad += reaction.bad;
+    async gameReply(message: string) {
+        const { reply_id, data }: any = JSON.parse(message);
+        const reply: any = this.getGameReply(reply_id);
+        reply.count_good += data?.good || 0;
+        reply.count_bad += data?.bad || 0;
+        reply.count_reply += data?.reply || 0;
     }
 }
 
