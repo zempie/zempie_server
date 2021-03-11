@@ -4,6 +4,8 @@ import CacheModel from './_cache';
 import { dbs } from '../../../commons/globals';
 
 
+const HashtagGames = `zempie:games:hashtag:`;
+
 class HashtagCache extends CacheModel {
     public readonly name = 'hashtag';
 
@@ -54,6 +56,16 @@ class HashtagCache extends CacheModel {
             key = '#tags:' + key;
         }
         return this.redis.hgetall(key);
+    }
+
+    async getGames(key: string) {
+        const data = await this.redis.get(HashtagGames + key);
+        return data? JSON.parse(data) : null;
+    }
+    setGames(key: string, games: any) {
+        this.redis.set(HashtagGames + key, JSON.stringify(games), () => {
+            this.redis.expire(HashtagGames + key, 600, () => {});
+        })
     }
 }
 

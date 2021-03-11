@@ -255,10 +255,19 @@ class GameController {
     }
 
 
-    getGameListByHashtag = async ({ tag }: { tag: string }, user: DecodedIdToken) => {
-        const games = await caches.hashtag.findAll(tag)
+    getGameListByHashtag = async (params: { tag: string, limit: number, offset: number }, user: DecodedIdToken) => {
+        const { tag, limit = 50, offset = 0 } = params;
+        const query = JSON.stringify(params);
+        let games = await caches.hashtag.getGames(query)
+        if ( !games ) {
+            const record = await dbs.Hashtag.getGamesByTag(tag, { limit, offset });
+            games = _.map(record.refTags, (r: any) => {
+                return getGameData(r.game);
+            })
+            caches.hashtag.setGames(query, games);
+        }
         return {
-            games: _.map(games, game => JSON.parse(game))
+            games
         }
     }
 

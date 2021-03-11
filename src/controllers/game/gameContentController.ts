@@ -83,7 +83,7 @@ class GameContentController {
     private getRetReplies = async (replies: any) => {
         return {
             replies: _.map(replies, (r: any) => {
-                const { user } = r;
+                const { user, target } = r;
                 return {
                     id: r.id,
                     content: r.content,
@@ -94,7 +94,13 @@ class GameContentController {
                         name: user.name,
                         picture: user.picture,
                         channel_id: user.channel_id,
-                    }
+                    },
+                    target: target? {
+                        uid: target.uid,
+                        name: target.name,
+                        picture: target.picture,
+                        channel_id: target.channel_id,
+                    }: null,
                 }
             })
         }
@@ -113,16 +119,28 @@ class GameContentController {
     }
 
     // 댓글 쓰기
-    leaveReply = async ({ game_id, reply_id, content }: { game_id: number, reply_id?: number, content: string }, user: DecodedIdToken) => {
+    leaveReply = async ({ game_id, reply_id, target_uid, content }: { game_id: number, reply_id?: number, target_uid?: string, content: string }, user: DecodedIdToken) => {
         // 불량 단어 색출
         if ( !dbs.BadWords.isOk(content) ) {
             throw CreateError(ErrorCodes.FORBIDDEN_STRING);
+        }
+
+        if ( reply_id ) {
+            const query: any = { activated: true, game_id, id: reply_id };
+            if ( target_uid ) {
+                query.user_uid = target_uid;
+            }
+            const rp = await dbs.GameReply.findOne(query);
+            if ( !rp ) {
+                throw CreateError(ErrorCodes.INVALID_PARAMS);
+            }
         }
 
         await dbs.GameReply.create({
             game_id,
             user_uid: user.uid,
             parent_reply_id: reply_id || null,
+            target_uid: reply_id && target_uid? target_uid : null,
             content,
         });
 

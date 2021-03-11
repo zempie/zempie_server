@@ -124,15 +124,18 @@ class HashtagModel extends Model {
     }
 
 
-    async getGamesByTag(tag: string) {
+    async getGamesByTag(tag: string, { limit = 50, offset = 0 }) {
         const record = await this.model.findOne({
             where: { name: tag },
             include: [{
                 model: dbs.RefTag.model,
                 include: [{
                     model: dbs.Game.model,
+                    order: [['count_over', 'desc'], ['count_heart', 'desc']],
                 }]
-            }]
+            }],
+            limit: _.toNumber(limit),
+            offset: _.toNumber(offset),
         });
 
         return record?.get({ plain: true })

@@ -105,6 +105,9 @@ paths:
                 reply_id:
                   type: number
                   description: 댓글 ID (대댓일 경우에만 사용)
+                target_uid:
+                  type: string
+                  description: 대댓 이후의 작성자 UID
                 content:
                   type: string
                   description: 댓글 내용
