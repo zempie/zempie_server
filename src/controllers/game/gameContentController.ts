@@ -89,6 +89,9 @@ class GameContentController {
                     content: r.content,
                     count_good: r.count_good,
                     count_bad: r.count_bad,
+                    count_reply: r.count_reply,
+                    created_at: r.created_at,
+                    updated_at: r.updated_at,
                     user: {
                         uid: user.uid,
                         name: user.name,

@@ -16,6 +16,7 @@ class GameReplyModel extends Model {
             content:            { type: DataTypes.STRING(500), allowNull: false },
             count_good:         { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0 },
             count_bad:          { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0 },
+            count_reply:        { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0 },
         }
     }
 
@@ -25,6 +26,17 @@ class GameReplyModel extends Model {
 
         this.model.belongsTo(dbs.User.model, { foreignKey: 'user_uid', targetKey: 'uid' });
         this.model.belongsTo(dbs.User.model, { foreignKey: 'target_uid', targetKey: 'uid', as: 'target' });
+
+        const desc = await this.model.sequelize.queryInterface.describeTable(this.model.tableName);
+
+        if ( !desc['count_reply'] ) {
+            this.model.sequelize.queryInterface.addColumn(this.model.tableName, 'count_reply', {
+                type: DataTypes.INTEGER,
+                allowNull: false,
+                defaultValue: 0,
+                after: 'count_bad'
+            })
+        }
     }
 
 
