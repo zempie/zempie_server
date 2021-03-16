@@ -75,7 +75,7 @@ class ApiMQ extends SrvMQ {
 
         // 댓글 리액션
         _.forEach(this.game_replies, async (obj: any, id: any) => {
-            if ( obj.count_good !== 0 || obj.count_bad !== 0 ) {
+            if ( obj.count_good !== 0 || obj.count_bad !== 0 || obj.count_reply !== 0 ) {
                 dbs.GameReply.update({
                     count_good: Sequelize.literal(`count_good + ${obj.count_good}`),
                     count_bad: Sequelize.literal(`count_bad + ${obj.count_bad}`),

@@ -172,9 +172,6 @@ class GameContentController {
         const record = await dbs.UserGameReplyReaction.findOne({ reply_id, user_uid: user.uid });
         if ( record ) {
             if ( record.reaction !== reaction ) {
-                record.reaction = reaction;
-                record.save();
-                changed = true;
                 if ( record.reaction === eReplyReaction.good ) {
                     r.good = -1;
                 }
@@ -187,6 +184,9 @@ class GameContentController {
                 else if ( reaction === eReplyReaction.bad ) {
                     r.bad += 1;
                 }
+                changed = true;
+                record.reaction = reaction;
+                record.save();
             }
         }
         else {
