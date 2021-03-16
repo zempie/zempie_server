@@ -9,7 +9,7 @@ class UserGameReplyReactionModel extends Model {
         this.attributes = {
             reply_id:       { type: DataTypes.INTEGER, allowNull: false, unique: 'compositeIndex' },
             user_uid:       { type: DataTypes.STRING(36), allowNull: false, unique: 'compositeIndex' },
-            reaction:       { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: eReplyReaction.none },
+            reaction:       { type: DataTypes.SMALLINT, allowNull: false, defaultValue: eReplyReaction.none },
         }
     }
 
