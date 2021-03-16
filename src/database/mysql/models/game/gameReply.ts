@@ -55,7 +55,7 @@ class GameReplyModel extends Model {
                 where: {
                     user_uid,
                 },
-                limit: 1,
+                required: false,
             }],
             order: [['created_at', 'desc']],
             limit: _.toNumber(limit),
@@ -80,7 +80,6 @@ class GameReplyModel extends Model {
                 where: {
                     user_uid,
                 },
-                limit: 1,
             }],
             order: [['created_at', 'desc']],
             limit: _.toNumber(limit),

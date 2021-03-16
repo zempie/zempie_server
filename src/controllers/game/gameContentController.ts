@@ -104,7 +104,7 @@ class GameContentController {
                         picture: target.picture,
                         channel_id: target.channel_id,
                     }: null,
-                    my_reply: !!my_reply,
+                    my_reply: my_reply? my_reply.reaction : eReplyReaction.none,
                 }
             })
         }
@@ -112,14 +112,20 @@ class GameContentController {
 
     // 댓글
     getReplies = async ({ game_id, limit, offset }: { game_id: number, limit: number, offset: number }, user: DecodedIdToken) => {
-        const user_uid = user.uid;
+        let user_uid;
+        if ( user ) {
+            user_uid = user.uid;
+        }
         const replies = await dbs.GameReply.getReplies(game_id, { limit, offset }, user_uid);
         return this.getRetReplies(replies);
     }
 
     // 대댓글
     getReReplies = async ({ reply_id, limit, offset }: { reply_id: number, limit: number, offset: number }, user: DecodedIdToken) => {
-        const user_uid = user.uid;
+        let user_uid;
+        if ( user ) {
+            user_uid = user.uid;
+        }
         const replies = await dbs.GameReply.getReReplies(reply_id, { limit, offset }, user_uid);
         return this.getRetReplies(replies);
     }
