@@ -80,11 +80,10 @@ class GameContentController {
     /**
      * 댓글
      */
-    private getRetReplies = async (replies: any, my_reply: any) => {
+    private getRetReplies = async (replies: any) => {
         return {
-            my_reply: !!my_reply,
             replies: _.map(replies, (r: any) => {
-                const { user, target } = r;
+                const { user, target, my_reply } = r;
                 return {
                     id: r.id,
                     content: r.content,
@@ -105,6 +104,7 @@ class GameContentController {
                         picture: target.picture,
                         channel_id: target.channel_id,
                     }: null,
+                    my_reply: !!my_reply,
                 }
             })
         }
@@ -112,22 +112,16 @@ class GameContentController {
 
     // 댓글
     getReplies = async ({ game_id, limit, offset }: { game_id: number, limit: number, offset: number }, user: DecodedIdToken) => {
-        const replies = await dbs.GameReply.getReplies(game_id, { limit, offset });
-        let my_reply;
-        if ( limit === 0 && offset === 0 ) {
-            my_reply = await dbs.GameReply.findOne({ game_id, user_uid: user.uid });
-        }
-        return this.getRetReplies(replies, my_reply);
+        const user_uid = user.uid;
+        const replies = await dbs.GameReply.getReplies(game_id, { limit, offset }, user_uid);
+        return this.getRetReplies(replies);
     }
 
     // 대댓글
     getReReplies = async ({ reply_id, limit, offset }: { reply_id: number, limit: number, offset: number }, user: DecodedIdToken) => {
-        const replies = await dbs.GameReply.getReReplies(reply_id, { limit, offset });
-        let my_reply;
-        if ( limit === 0 && offset === 0 ) {
-            my_reply = await dbs.GameReply.findOne({ parent_reply_id: reply_id, user_uid: user.uid });
-        }
-        return this.getRetReplies(replies, my_reply);
+        const user_uid = user.uid;
+        const replies = await dbs.GameReply.getReReplies(reply_id, { limit, offset }, user_uid);
+        return this.getRetReplies(replies);
     }
 
     // 댓글 쓰기

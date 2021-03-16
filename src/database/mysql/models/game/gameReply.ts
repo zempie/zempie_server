@@ -26,6 +26,7 @@ class GameReplyModel extends Model {
 
         this.model.belongsTo(dbs.User.model, { foreignKey: 'user_uid', targetKey: 'uid' });
         this.model.belongsTo(dbs.User.model, { foreignKey: 'target_uid', targetKey: 'uid', as: 'target' });
+        this.model.hasOne(dbs.UserGameReplyReaction.model, { sourceKey: 'id', foreignKey: 'reply_id', as: 'my_reply' });
 
         const desc = await this.model.sequelize.queryInterface.describeTable(this.model.tableName);
 
@@ -40,7 +41,7 @@ class GameReplyModel extends Model {
     }
 
 
-    getReplies = async (game_id: number, { limit = 50, offset = 0 }) => {
+    getReplies = async (game_id: number, { limit = 50, offset = 0 }, user_uid: string) => {
         return await this.model.findAll({
             where: {
                 game_id,
@@ -48,6 +49,13 @@ class GameReplyModel extends Model {
             },
             include: [{
                 model: dbs.User.model,
+            }, {
+                as: 'my_reply',
+                model: dbs.UserGameReplyReaction.model,
+                where: {
+                    user_uid,
+                },
+                limit: 1,
             }],
             order: [['created_at', 'desc']],
             limit: _.toNumber(limit),
@@ -56,7 +64,7 @@ class GameReplyModel extends Model {
     }
 
 
-    getReReplies = async (reply_id: number, { limit = 50, offset = 0 }) => {
+    getReReplies = async (reply_id: number, { limit = 50, offset = 0 }, user_uid: string) => {
         return await this.model.findAll({
             where: {
                 parent_reply_id: reply_id,
@@ -66,6 +74,13 @@ class GameReplyModel extends Model {
             }, {
                 as: 'target',
                 model: dbs.User.model,
+            }, {
+                as: 'my_reply',
+                model: dbs.UserGameReplyReaction.model,
+                where: {
+                    user_uid,
+                },
+                limit: 1,
             }],
             order: [['created_at', 'desc']],
             limit: _.toNumber(limit),
