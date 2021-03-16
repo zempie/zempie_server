@@ -80,8 +80,9 @@ class GameContentController {
     /**
      * 댓글
      */
-    private getRetReplies = async (replies: any) => {
+    private getRetReplies = async (replies: any, my_reply: any) => {
         return {
+            my_reply: !!my_reply,
             replies: _.map(replies, (r: any) => {
                 const { user, target } = r;
                 return {
@@ -110,15 +111,23 @@ class GameContentController {
     }
 
     // 댓글
-    getReplies = async ({ game_id, limit, offset }: { game_id: number, limit: number, offset: number }) => {
+    getReplies = async ({ game_id, limit, offset }: { game_id: number, limit: number, offset: number }, user: DecodedIdToken) => {
         const replies = await dbs.GameReply.getReplies(game_id, { limit, offset });
-        return this.getRetReplies(replies);
+        let my_reply;
+        if ( limit === 0 && offset === 0 ) {
+            my_reply = await dbs.GameReply.findOne({ game_id, user_uid: user.uid });
+        }
+        return this.getRetReplies(replies, my_reply);
     }
 
     // 대댓글
-    getReReplies = async ({ reply_id, limit, offset }: { reply_id: number, limit: number, offset: number }) => {
+    getReReplies = async ({ reply_id, limit, offset }: { reply_id: number, limit: number, offset: number }, user: DecodedIdToken) => {
         const replies = await dbs.GameReply.getReReplies(reply_id, { limit, offset });
-        return this.getRetReplies(replies);
+        let my_reply;
+        if ( limit === 0 && offset === 0 ) {
+            my_reply = await dbs.GameReply.findOne({ parent_reply_id: reply_id, user_uid: user.uid });
+        }
+        return this.getRetReplies(replies, my_reply);
     }
 
     // 댓글 쓰기
