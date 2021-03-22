@@ -6,6 +6,7 @@ export default (router: Router) => {
     router.get(`/redirect/play/:pathname`, RedirectController.play);
     router.get(`/redirect/battle/:battle_uid`, RedirectController.battle);
     router.get(`/redirect/shared/:shared_uid`, RedirectController.shared);
+    router.get(`/redirect/game/:pathname`, RedirectController.game);
 
     // router.get('/test-php', ((req, res) => {
     //     res.send({state: 'good', name: 'raptor'})

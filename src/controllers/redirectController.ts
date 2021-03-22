@@ -102,6 +102,28 @@ class RedirectController {
             res.redirect(`${Url.LauncherRedirect}/shared/${shared_uid}`)
         }
     }
+
+
+    game = async (req: Request, res: Response) => {
+        const { pathname } = req.params;
+        if ( this.checkUserAgent(req) ) {
+            let game = await caches.game.getByPathname(pathname);
+            if ( !game ) {
+                game = await dbs.Game.findOne({ pathname: pathname });
+            }
+            if ( !game ) {
+                res.redirect(Url.Host);
+            }
+            else {
+                game = getGameData(game);
+                caches.game.setByPathname(game, pathname);
+                this.responseGame(res, game, `${Url.Launcher}/game/${req.params.pathname}`);
+            }
+        }
+        else {
+            res.redirect(`${Url.LauncherRedirect}/game/${req.params.pathname}`)
+        }
+    }
 }
 
 
