@@ -35,8 +35,7 @@ class RedirectController {
             res.redirect(Url.Host);
         }
         else {
-            const url = req.url.split('/redirect/site');
-            res.redirect(`${Url.Redirect}${url[1]}`)
+            res.redirect(`${Url.Redirect}/${req.params.url}`)
         }
     }
 
