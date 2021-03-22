@@ -29,6 +29,17 @@ class RedirectController {
                             </html>`);
     }
 
+
+    site = async (req: Request, res: Response) => {
+        if ( this.checkUserAgent(req) ) {
+            res.redirect(Url.Host);
+        }
+        else {
+            const url = req.url.split('/redirect');
+            res.redirect(`${Url.Redirect}${url[1]}`)
+        }
+    }
+
     play = async (req: Request, res: Response) => {
         const { pathname } = req.params;
         if ( this.checkUserAgent(req) ) {
