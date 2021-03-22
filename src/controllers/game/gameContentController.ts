@@ -80,9 +80,9 @@ class GameContentController {
     /**
      * 댓글
      */
-    private getRetReplies = async (replies: any) => {
+    private getRetReplies = (replies: any) => {
         return {
-            replies: replies? _.map(replies, (r: any) => {
+            replies: replies.length > 0? _.map(replies, (r: any) => {
                 const { user, target, my_reply } = r;
                 return {
                     id: r.id,
