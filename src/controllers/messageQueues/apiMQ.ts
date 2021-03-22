@@ -46,7 +46,7 @@ class ApiMQ extends SrvMQ {
         _.forEach(this.game_ids, async (obj: any, id: any) => {
             if ( obj.count_over !== 0 || obj.count_heart !== 0 ) {
                 dbs.Game.update({
-                    count_start: Sequelize.literal(`count_over + ${obj.count_start}`),
+                    count_start: Sequelize.literal(`count_start + ${obj.count_start}`),
                     count_over: Sequelize.literal(`count_over + ${obj.count_over}`),
                     count_heart: Sequelize.literal(`count_heart + ${obj.count_heart}`),
                 }, { id });
