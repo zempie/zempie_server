@@ -12,6 +12,7 @@ class ApiMQ extends SrvMQ {
         }} = {};
     private game_ids: {
         [game_id: number]: {
+            count_start: number,
             count_over: number,
             count_heart: number,
         }} = {};
@@ -45,9 +46,11 @@ class ApiMQ extends SrvMQ {
         _.forEach(this.game_ids, async (obj: any, id: any) => {
             if ( obj.count_over !== 0 || obj.count_heart !== 0 ) {
                 dbs.Game.update({
+                    count_start: Sequelize.literal(`count_over + ${obj.count_start}`),
                     count_over: Sequelize.literal(`count_over + ${obj.count_over}`),
                     count_heart: Sequelize.literal(`count_heart + ${obj.count_heart}`),
                 }, { id });
+                obj.count_start = 0;
                 obj.count_over = 0;
                 obj.count_heart = 0;
             }
@@ -92,6 +95,7 @@ class ApiMQ extends SrvMQ {
 
     private getGameIds = (id: number) => {
         return this.game_ids[id] = this.game_ids[id] || {
+            count_start: 0,
             count_over: 0,
             count_heart: 0,
         }
@@ -111,6 +115,14 @@ class ApiMQ extends SrvMQ {
             count_bad: 0,
             count_reply: 0,
         }
+    }
+
+
+    async gameLoaded (message: string) {
+        const { user_uid, game_id }: any = JSON.parse(message);
+
+        const game = this.getGameIds(game_id);
+        game.count_start += 1;
     }
 
 

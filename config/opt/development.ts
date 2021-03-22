@@ -31,6 +31,7 @@ export default {
         GameClient: 'http://localhost:8080/play',
         Redirect: 'http://localhost:8280/redirect',
         Launcher: 'http://gtest.fromthered.com/zempie/launcher',
+        LauncherRedirect: 'http://gtest.fromthered.com/zempie/launcher/redirect',
     },
 
     Deploy: {

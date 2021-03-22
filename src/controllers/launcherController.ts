@@ -2,8 +2,9 @@ import * as uniqid from 'uniqid';
 import { caches, dbs } from '../commons/globals';
 import admin from 'firebase-admin';
 import DecodedIdToken = admin.auth.DecodedIdToken;
-import Opt from '../../config/opt';
+import MQ from '../services/messageQueueService';
 import { getGameData } from './_common';
+import Opt from '../../config/opt';
 const { Url, Deploy } = Opt;
 
 
@@ -16,7 +17,7 @@ interface ILauncherParams {
 
 
 class LauncherController {
-    async getGame({ pathname }: ILauncherParams) {
+    async getGame({ pathname }: ILauncherParams, user: DecodedIdToken) {
         let ret = await caches.game.getByPathname(pathname);
         if ( !ret ) {
             const game = await dbs.Game.getInfo({ pathname });
@@ -25,6 +26,16 @@ class LauncherController {
             }
             caches.game.setByPathname(ret, pathname);
         }
+
+        MQ.send({
+            topic: 'gameLoaded',
+            messages: [{
+                value: JSON.stringify({
+                    user_uid: user?.uid,
+                    game_id: ret.game.id,
+                })
+            }]
+        })
         // const game = await dbs.Game.getInfo({ pathname });
         // const ret = {
         //     game: getGameData(game),

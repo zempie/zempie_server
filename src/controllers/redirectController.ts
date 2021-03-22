@@ -70,10 +70,10 @@ class RedirectController {
                 game = getGameData(record.game)
                 caches.game.setData(game, keyType, battle_uid);
             }
-            this.responseGame(res, game, `${Url.Host}/battle/${battle_uid}`);
+            this.responseGame(res, game, `${Url.Launcher}/battle/${battle_uid}`);
         }
         else {
-            res.redirect(`${Url.Redirect}/battle/${battle_uid}`)
+            res.redirect(`${Url.LauncherRedirect}/battle/${battle_uid}`)
         }
     }
 
@@ -96,10 +96,10 @@ class RedirectController {
                 game = getGameData(record.game)
                 caches.game.setData(game, keyType, shared_uid);
             }
-            this.responseGame(res, game, `${Url.Host}/shared/${shared_uid}`);
+            this.responseGame(res, game, `${Url.Launcher}/shared/${shared_uid}`);
         }
         else {
-            res.redirect(`${Url.Redirect}/shared/${shared_uid}`)
+            res.redirect(`${Url.LauncherRedirect}/shared/${shared_uid}`)
         }
     }
 }

@@ -111,23 +111,39 @@ class GameContentController {
     }
 
     // 댓글
-    getReplies = async ({ game_id, limit, offset }: { game_id: number, limit: number, offset: number }, user: DecodedIdToken) => {
-        let user_uid;
-        if ( user ) {
-            user_uid = user.uid;
+    getReplies = async (params: { game_id: number, limit: number, offset: number }, user: DecodedIdToken) => {
+        const { game_id, limit, offset } = params;
+
+        let ret = await caches.reply.getData(`zempie:game:reply:${game_id}`, JSON.stringify(params));
+        if ( !ret ) {
+            let user_uid;
+            if ( user ) {
+                user_uid = user.uid;
+            }
+            const replies = await dbs.GameReply.getReplies(game_id, { limit, offset }, user_uid);
+            ret = this.getRetReplies(replies);
+
+            caches.reply.setData(ret, `zempie:game:reply:${game_id}`, JSON.stringify(params));
         }
-        const replies = await dbs.GameReply.getReplies(game_id, { limit, offset }, user_uid);
-        return this.getRetReplies(replies);
+        return ret;
     }
 
     // 대댓글
-    getReReplies = async ({ reply_id, limit, offset }: { reply_id: number, limit: number, offset: number }, user: DecodedIdToken) => {
-        let user_uid;
-        if ( user ) {
-            user_uid = user.uid;
+    getReReplies = async (params: { reply_id: number, limit: number, offset: number }, user: DecodedIdToken) => {
+        const { reply_id, limit, offset } = params;
+
+        let ret = await caches.reply.getData(`zempie:game:rereply:${reply_id}`, JSON.stringify(params));
+        if ( !ret ) {
+            let user_uid;
+            if ( user ) {
+                user_uid = user.uid;
+            }
+            const replies = await dbs.GameReply.getReReplies(reply_id, { limit, offset }, user_uid);
+            ret = this.getRetReplies(replies);
+
+            caches.reply.setData(ret, `zempie:game:rereply:${reply_id}`, JSON.stringify(params));
         }
-        const replies = await dbs.GameReply.getReReplies(reply_id, { limit, offset }, user_uid);
-        return this.getRetReplies(replies);
+        return ret;
     }
 
     // 댓글 쓰기

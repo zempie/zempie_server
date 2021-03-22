@@ -30,6 +30,7 @@ export default {
         GameClient: 'http://zempie.com/play',
         Redirect: 'https://zempie.com/redirect',
         Launcher: 'https://launcher.zempie.com',
+        LauncherRedirect: 'https://launcher.zempie.com/redirect',
     },
 
     AWS: {
