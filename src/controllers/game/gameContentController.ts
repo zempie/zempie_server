@@ -82,7 +82,7 @@ class GameContentController {
      */
     private getRetReplies = async (replies: any) => {
         return {
-            replies: _.map(replies, (r: any) => {
+            replies: replies? _.map(replies, (r: any) => {
                 const { user, target, my_reply } = r;
                 return {
                     id: r.id,
@@ -106,7 +106,7 @@ class GameContentController {
                     }: null,
                     my_reply: my_reply? my_reply.reaction : eReplyReaction.none,
                 }
-            })
+            }) : [],
         }
     }
 
