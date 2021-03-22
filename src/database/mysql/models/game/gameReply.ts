@@ -41,22 +41,26 @@ class GameReplyModel extends Model {
     }
 
 
-    getReplies = async (game_id: number, { limit = 50, offset = 0 }, user_uid: string) => {
-        return await this.model.findAll({
-            where: {
-                game_id,
-                parent_reply_id: null,
-            },
-            include: [{
-                model: dbs.User.model,
-            }, {
+    getReplies = async (game_id: number, { limit = 50, offset = 0 }, user_uid?: string) => {
+        const include: any = [{
+            model: dbs.User.model,
+        }];
+        if ( user_uid ) {
+            include.push({
                 as: 'my_reply',
                 model: dbs.UserGameReplyReaction.model,
                 where: {
                     user_uid,
                 },
                 required: false,
-            }],
+            })
+        }
+        return await this.model.findAll({
+            where: {
+                game_id,
+                parent_reply_id: null,
+            },
+            include,
             order: [['created_at', 'desc']],
             limit: _.toNumber(limit),
             offset: _.toNumber(offset),
@@ -64,23 +68,27 @@ class GameReplyModel extends Model {
     }
 
 
-    getReReplies = async (reply_id: number, { limit = 50, offset = 0 }, user_uid: string) => {
-        return await this.model.findAll({
-            where: {
-                parent_reply_id: reply_id,
-            },
-            include: [{
-                model: dbs.User.model,
-            }, {
-                as: 'target',
-                model: dbs.User.model,
-            }, {
+    getReReplies = async (reply_id: number, { limit = 50, offset = 0 }, user_uid?: string) => {
+        const include: any = [{
+            model: dbs.User.model,
+        }, {
+            as: 'target',
+            model: dbs.User.model,
+        }];
+        if ( user_uid ) {
+            include.push({
                 as: 'my_reply',
                 model: dbs.UserGameReplyReaction.model,
                 where: {
                     user_uid,
                 },
-            }],
+            })
+        }
+        return await this.model.findAll({
+            where: {
+                parent_reply_id: reply_id,
+            },
+            include,
             order: [['created_at', 'desc']],
             limit: _.toNumber(limit),
             offset: _.toNumber(offset),
