@@ -32,7 +32,7 @@ class RedirectController {
     play = async (req: Request, res: Response) => {
         const { pathname } = req.params;
         if ( this.checkUserAgent(req) ) {
-            let game = caches.game.getByPathname(pathname);
+            let game = await caches.game.getByPathname(pathname);
             if ( !game ) {
                 game = await dbs.Game.findOne({ pathname: pathname });
             }
