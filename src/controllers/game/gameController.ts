@@ -26,30 +26,50 @@ class GameController {
     featuredList = async ({ lang = 'ko' }: { lang: string }) => {
         let ret = await caches.game.getFeatured();
         if ( !ret ) {
-            const popular = await dbs.Game.getListWithUser({ activated: true, enabled: true }, { order: [['count_over', 'desc']], limit: 5 });
-            const recommended = await dbs.Game.getListWithUser({ activated: true, enabled: true, category: {[Op.ne]: 2} }, { order: Sequelize.literal('rand()'), limit: 5 });
-            const latest = await dbs.Game.getListWithUser({ activated: true, enabled: true }, { order: [['id', 'asc']], limit: 5 });
-            const certified = await dbs.Game.getListWithUser({ category: eGameCategory.Certified, activated: true, enabled: true }, { order: Sequelize.literal('rand()'), limit: 5 });
+            const popular = await dbs.Game.getListWithUser({
+                activated: true,
+                enabled: true
+            }, { order: [['count_start', 'desc']], limit: 5 });
+
+            const ids = _.map(popular, (p: any) => p.id);
+            const recommended = await dbs.Game.getListWithUser({
+                activated: true,
+                enabled: true,
+                category: {[Op.ne]: 2},
+                id: {[Op.ne]: ids},
+            }, { order: Sequelize.literal('rand()'), limit: 5 });
+            // const latest = await dbs.Game.getListWithUser({ activated: true, enabled: true }, { order: [['id', 'asc']], limit: 5 });
+            // const certified = await dbs.Game.getListWithUser({ category: eGameCategory.Certified, activated: true, enabled: true }, { order: Sequelize.literal('rand()'), limit: 5 });
             const uncertified = await dbs.Game.getListWithUser({ category: eGameCategory.Challenge, activated: true, enabled: true }, { order: Sequelize.literal('rand()'), limit: 5 });
 
+            const affiliated = await dbs.Game.getListWithUser({
+                activated: true,
+                enabled: true,
+                category: 2
+            }, { order: Sequelize.literal('rand()'), limit: 7 });
+
             ret = [
-                {
-                    name: i18n.__({ phrase: 'Popular Games', locale: lang }),
-                    games: _.map(popular, obj => getGameData(obj)),
-                },
                 {
                     name: i18n.__({ phrase: 'Recommended Games', locale: lang }),
                     games: _.map(recommended, obj => getGameData(obj)),
                 },
                 {
-                    name: i18n.__({ phrase: 'New Games', locale: lang }),
-                    games: _.map(latest, obj => getGameData(obj)),
+                    name: i18n.__({ phrase: 'Popular Games', locale: lang }),
+                    games: _.map(popular, obj => getGameData(obj)),
                 },
                 {
-                    name: i18n.__({ phrase: 'Certified Games', locale: lang }),
-                    games: _.map(certified, obj => getGameData(obj)),
-                    key: 'official',
+                    name: i18n.__({ phrase: 'Affiliated Games', locale: lang }),
+                    games: _.map(affiliated, obj => getGameData(obj)),
                 },
+                // {
+                //     name: i18n.__({ phrase: 'New Games', locale: lang }),
+                //     games: _.map(latest, obj => getGameData(obj)),
+                // },
+                // {
+                //     name: i18n.__({ phrase: 'Certified Games', locale: lang }),
+                //     games: _.map(certified, obj => getGameData(obj)),
+                //     key: 'official',
+                // },
                 {
                     name: i18n.__({ phrase: 'Challenging Games', locale: lang }),
                     games: _.map(uncertified, obj => getGameData(obj)),

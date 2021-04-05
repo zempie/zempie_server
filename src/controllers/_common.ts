@@ -10,7 +10,7 @@ export function getGameData (game: any) {
         version: game.version,
         control_type: game.control_type,
         hashtags: game.hashtags,
-        count_over: game.count_over,
+        count_over: game.count_start > game.count_over? game.count_start : game.count_over,
         count_heart: game.count_heart,
         url_game: game.url_game,
         url_thumb: game.url_thumb,

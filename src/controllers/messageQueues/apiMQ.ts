@@ -44,7 +44,7 @@ class ApiMQ extends SrvMQ {
 
         // 게임 오버 카운팅
         _.forEach(this.game_ids, async (obj: any, id: any) => {
-            if ( obj.count_over !== 0 || obj.count_heart !== 0 ) {
+            if ( obj.count_start !== 0 || obj.count_over !== 0 || obj.count_heart !== 0 ) {
                 dbs.Game.update({
                     count_start: Sequelize.literal(`count_start + ${obj.count_start}`),
                     count_over: Sequelize.literal(`count_over + ${obj.count_over}`),
