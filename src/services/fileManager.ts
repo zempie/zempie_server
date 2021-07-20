@@ -136,21 +136,6 @@ class FileManager {
     }
 
 
-    s3upload4 = (params: any, filePath: string) => {
-        return new Promise((resolve, reject) => {
-            s3.upload(params, (err: Error, data: SendData) => {
-                fs.unlink(filePath, (err) => {
-                    logger.debug(`${filePath} 삭제`);
-                });
-
-                if (err) {
-                    logger.error(err);
-                    return reject(err);
-                }
-                resolve(data);
-            })
-        })
-    }
     s3upload = ({ bucket, key, filePath, uid, subDir }: IS3Upload) => {
         return new Promise((resolve, reject) => {
             const params = {

@@ -40,49 +40,52 @@ class CommunityController {
             throw CreateError(ErrorCodes.INVALID_PARAMS);
         }
 
-        let Key = uniqid();
+        let key = uniqid();
         let filePath = file.path;
         let subDir = 'c';
         const Body = fs.createReadStream(file.path);
         const { fileType }: any = await FileType.stream(Body);
+        if ( !fileType ) {
+            fs.unlink(file.path, () => {});
+            throw CreateError(ErrorCodes.INVALID_FILE_TYPE);
+        }
         switch (fileType.mime) {
             case 'image/jpeg':
             case 'image/png':
                 const webp = await FileManager.convertToWebp(file, 80);
-                Key = replaceExt(uniqid(), '.webp');
+                key = replaceExt(uniqid(), '.webp');
                 filePath = webp[0].destinationPath;
                 subDir = 'c/i';
                 break;
 
             case 'image/webp':
-                Key = replaceExt(uniqid(), '.webp');
+                key = replaceExt(uniqid(), '.webp');
                 subDir = 'c/i';
                 break;
 
             case 'audio/x-m4a':
             case 'audio/mp4':
-                Key = replaceExt(uniqid(), `.${fileType.ext}`);
+                key = replaceExt(uniqid(), `.${fileType.ext}`);
                 subDir = 'c/a';
                 break;
 
             case 'video/mp4':
-                Key = replaceExt(uniqid(), `.${fileType.ext}`);
+                key = replaceExt(uniqid(), `.${fileType.ext}`);
                 subDir = 'c/v';
                 break;
 
             default:
-                fs.unlink(file.path, () => {
-                    throw CreateError(ErrorCodes.INVALID_FILE_TYPE);
-                });
+                fs.unlink(file.path, () => {});
+                throw CreateError(ErrorCodes.INVALID_FILE_TYPE);
         }
 
-        const s3params = {
-            Bucket: path.join(AWS.Bucket.Rsc, uid, subDir).replace(/\\/g, '/'),
-            Key,
-            ContentType: fileType.ext,
-            Body,
-        }
-        const data: any = await FileManager.s3upload4(s3params, file.path);
+        const data: any = await FileManager.s3upload({
+            bucket: AWS.Bucket.Rsc,
+            key,
+            filePath,
+            uid,
+            subDir,
+        });
 
         return {
             url: data.Location,
