@@ -1,4 +1,4 @@
-import { NextFunction, Response } from 'express';
+import { NextFunction, Response, Request } from 'express';
 import * as _ from 'lodash';
 
 
@@ -29,7 +29,7 @@ export default function convert(func: Function, middleware: boolean = false) {
         });
     }
 
-    return async (req: any, res: Response, next: NextFunction) => {
+    return async (req: Request, res: Response, next: NextFunction) => {
         try {
             const params = _.assignIn({}, req.body, req.query, req.params);
             // const user = req.user? _.assignIn({}, req.user) : null

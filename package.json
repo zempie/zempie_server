@@ -5,8 +5,8 @@
   "scripts": {
     "build": "tsc",
     "start": "node ./dist/src/run.js",
-    "startStudio": "tsc && node ./dist/src/runStudio.js",
-    "startAdmin": "tsc && node ./dist/src/runAdmin.js",
+    "startStudio": "node ./dist/src/runStudio.js",
+    "startAdmin": "node ./dist/src/runAdmin.js",
     "startContent": "node ./dist/src/runContent.js",
     "startLogger": "node ./dist/src/runLogger.js",
     "startPublishing": "node ./dist/src/runPublish.js"
@@ -49,6 +49,7 @@
     "express": "^4.17.1",
     "express-graphql": "^0.9.0",
     "express-ws": "^4.0.0",
+    "file-type": "^12.4.2",
     "firebase-admin": "^8.13.0",
     "formidable": "^1.2.2",
     "get-port": "^5.1.1",

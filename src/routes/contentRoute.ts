@@ -1,9 +1,11 @@
 import { Request, Response, Router } from 'express';
 import convert from '../controllers/_convert';
-import { validateFirebaseIdToken } from './_common';
-import TimelineController from '../controllers/timelineController'
-import NoticeController from '../controllers/noticeController'
-import SocialMediaController from '../controllers/socialMediaControlller'
+import { isAuthenticated, validateFirebaseIdToken } from './_common';
+import FileManager from "../services/fileManager";
+import TimelineController from '../controllers/timelineController';
+import NoticeController from '../controllers/noticeController';
+import SocialMediaController from '../controllers/socialMediaControlller';
+import CommunityController from '../controllers/communityController';
 
 
 const apiVer = `/api/v1`;
@@ -25,4 +27,9 @@ export default (router: Router) => {
     // social media - DM ( direct message )
     router.post(`${apiVer}/dm/send`);
     router.get(`${apiVer}/dm/list`);
+
+
+
+    // for community
+    router.post(`${apiVer}/community/att`,  validateFirebaseIdToken,    isAuthenticated,    FileManager.uploadFiles(200, 40),   convert(CommunityController.uploadFile));
 }

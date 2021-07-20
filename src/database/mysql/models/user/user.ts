@@ -45,13 +45,13 @@ class UserModel extends Model {
         this.model.hasMany(dbs.Game.model, { as: 'devGames' });
         this.model.hasMany(dbs.UserClaim.model, { as: 'claims' });
 
-        const desc = await this.model.sequelize.queryInterface.describeTable(this.model.tableName);
-        if ( !desc['last_log_in'] ) {
-            this.model.sequelize.queryInterface.addColumn(this.model.tableName, 'last_log_in', {
-                type: DataTypes.DATE,
-                after: 'is_developer'
-            })
-        }
+        // const desc = await this.model.sequelize.queryInterface.describeTable(this.model.tableName);
+        // if ( !desc['last_log_in'] ) {
+        //     this.model.sequelize.queryInterface.addColumn(this.model.tableName, 'last_log_in', {
+        //         type: DataTypes.DATE,
+        //         after: 'is_developer'
+        //     })
+        // }
     }
 
     async getInfo({uid}: DecodedIdToken, transaction?: Transaction) {

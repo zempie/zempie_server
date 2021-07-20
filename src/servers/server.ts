@@ -23,6 +23,8 @@ import { IMessageQueueOptions, IServerOptions } from '../commons/interfaces';
 import * as Pkg from '../../package.json';
 
 import { dbs } from '../commons/globals';
+import dbOptions from '../../config/dbs';
+
 import cfgOption from '../../config/opt';
 const { CORS } = cfgOption;
 
@@ -206,9 +208,9 @@ export default class Server {
                 })
             }
 
-            this.app.use(cors({credentials: true, origin: CORS.allowedOrigin}));
+            this.app.use(cors({ credentials: true, origin: CORS.allowedOrigin }));
             this.app.use(bodyParser.json());
-            this.app.use(bodyParser.urlencoded({extended:false}));
+            this.app.use(bodyParser.urlencoded({ extended:false }));
 
             options.tcp && this.setTcp();
             this.routes(this.app);
@@ -218,7 +220,7 @@ export default class Server {
 
 
     protected async setRDB() {
-        this.db = await MySql.initialize();
+        this.db = await MySql.initialize(dbOptions.mysql);
     }
 
 
@@ -244,7 +246,8 @@ export default class Server {
 
         app.get('/test', (req, res) => {
             const status = {
-                Started_At: this.started_at.toLocaleString()
+                Started_At: this.started_at.toLocaleString('ko-KR',
+                    { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
             }
             res.send(status);
         });

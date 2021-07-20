@@ -13,6 +13,7 @@ export const ErrorCodes = {
     ACCESS_DENY:                { code: 10101, message: 'Access Denied' },
     ACCESS_DENY_GAME:           { code: 10101, message: '게임 금지' },
     ACCESS_DENY_REPLY:          { code: 10101, message: '댓글 작성 금지' },
+    INVALID_FILE_TYPE:          { code: 10202, message: '파일 타입 오류' },
 
     /*
         User
