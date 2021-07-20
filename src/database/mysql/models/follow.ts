@@ -1,4 +1,4 @@
-import Model from '../../../database/mysql/model';
+import Model from '../../_base/model';
 import { DataTypes, Sequelize, Transaction, Op } from 'sequelize';
 import { dbs } from '../../../commons/globals';
 import { CreateError, ErrorCodes } from '../../../commons/errorCodes';

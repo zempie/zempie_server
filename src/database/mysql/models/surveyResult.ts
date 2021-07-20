@@ -1,5 +1,5 @@
 import { DataTypes, Sequelize } from 'sequelize';
-import Model from '../model';
+import Model from '../../_base/model';
 import admin from 'firebase-admin';
 import DecodedIdToken = admin.auth.DecodedIdToken;
 import { dbs } from '../../../commons/globals';

@@ -1,5 +1,5 @@
 import { v4 as uuid } from 'uuid';
-import Model from '../../model';
+import Model from '../../../_base/model';
 import { Sequelize, DataTypes } from 'sequelize';
 import { makePassword } from '../../../../commons/utils';
 

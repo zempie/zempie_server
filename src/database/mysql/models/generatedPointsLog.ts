@@ -1,4 +1,4 @@
-import Model from '../model';
+import Model from '../../_base/model';
 import { DataTypes, Sequelize } from 'sequelize';
 import { dbs } from '../../../commons/globals';
 import { ePubType } from '../../../commons/enums';

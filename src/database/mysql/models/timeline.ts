@@ -1,5 +1,5 @@
 import * as _ from 'lodash';
-import Model from '../../../database/mysql/model';
+import Model from '../../_base/model';
 import { DataTypes, Sequelize, Transaction } from 'sequelize';
 import { dbs } from '../../../commons/globals';
 import { ITimelineParams } from "../../../controllers/_interfaces";

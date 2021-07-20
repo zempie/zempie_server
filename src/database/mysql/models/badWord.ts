@@ -1,6 +1,6 @@
 import * as _ from 'lodash';
 import * as path from 'path';
-import Model from '../model';
+import Model from '../../_base/model';
 import { DataTypes, Op,Sequelize } from 'sequelize';
 import XlsxLoader from '../../../services/xlsxLoader';
 

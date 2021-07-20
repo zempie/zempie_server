@@ -1,5 +1,5 @@
 import * as _ from 'lodash';
-import Model from '../model';
+import Model from '../../_base/model';
 import { DataTypes, Op, Sequelize } from 'sequelize';
 
 class ForbiddenWord extends Model {

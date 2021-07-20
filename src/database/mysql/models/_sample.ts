@@ -1,4 +1,4 @@
-import Model from '../../../database/mysql/model';
+import Model from '../../_base/model';
 import { DataTypes, Sequelize } from 'sequelize';
 
 class SampleModel extends Model {

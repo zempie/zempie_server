@@ -1,4 +1,4 @@
-import Model from "../../model";
+import Model from '../../../_base/model';
 import { DataTypes, Op, Sequelize, Transaction } from 'sequelize';
 import { dbs } from '../../../../commons/globals';
 import { eProjectState } from '../../../../commons/enums';
@@ -26,7 +26,7 @@ class ProjectModel extends Model {
     async afterSync(): Promise<void> {
         this.model.belongsTo(dbs.User.model);
         this.model.belongsTo( dbs.Game.model );
-        
+
         this.model.hasMany(dbs.ProjectVersion.model);
         this.model.hasOne(dbs.ProjectVersion.model, { sourceKey : 'deploy_version_id'});
         this.model.hasOne(dbs.ProjectVersion.model, { sourceKey : 'update_version_id'});

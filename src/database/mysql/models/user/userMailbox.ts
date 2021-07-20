@@ -1,5 +1,5 @@
 import * as _ from 'lodash';
-import Model from '../../model';
+import Model from '../../../_base/model';
 import { DataTypes, Sequelize } from 'sequelize';
 import { eMailCategory } from '../../../../commons/enums';
 

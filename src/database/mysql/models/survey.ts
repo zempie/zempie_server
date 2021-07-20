@@ -1,5 +1,5 @@
 import { DataTypes, Op, Sequelize } from 'sequelize';
-import Model from '../model';
+import Model from '../../_base/model';
 
 
 class SurveyModel extends Model {

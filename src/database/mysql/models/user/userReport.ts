@@ -1,4 +1,4 @@
-import Model from '../../model';
+import Model from '../../../_base/model';
 import { DataTypes, Sequelize } from 'sequelize';
 import { eReportType } from '../../../../commons/enums';
 import { dbs } from '../../../../commons/globals';
