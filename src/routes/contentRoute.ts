@@ -31,5 +31,8 @@ export default (router: Router) => {
 
 
     // for community
-    router.post(`${apiVer}/community/att`,  validateFirebaseIdToken,    isAuthenticated,    FileManager.uploadFiles(200, 40),   convert(CommunityController.uploadFile));
+    router.post(`${apiVer}/community/att`,      validateFirebaseIdToken,    isAuthenticated,    FileManager.uploadFiles(200, 40),   convert(CommunityController.uploadFile));
+    router.post(`${apiVer}/community/att/i`,    validateFirebaseIdToken,    isAuthenticated,    FileManager.uploadFiles(20, 4),     convert(CommunityController.uploadFile));
+    router.post(`${apiVer}/community/att/a`,    validateFirebaseIdToken,    isAuthenticated,    FileManager.uploadFiles(40, 8),     convert(CommunityController.uploadFile));
+    router.post(`${apiVer}/community/att/v`,    validateFirebaseIdToken,    isAuthenticated,    FileManager.uploadFiles(40, 40),    convert(CommunityController.uploadFile));
 }

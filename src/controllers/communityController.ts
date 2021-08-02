@@ -49,10 +49,14 @@ class CommunityController {
             fs.unlink(file.path, () => {});
             throw CreateError(ErrorCodes.INVALID_FILE_TYPE);
         }
+
+        let size = file.size;
+
         switch (fileType.mime) {
             case 'image/jpeg':
             case 'image/png':
                 const webp = await FileManager.convertToWebp(file, 80);
+                size = webp[0].data.length;
                 key = replaceExt(uniqid(), '.webp');
                 filePath = webp[0].destinationPath;
                 subDir = 'c/i';
@@ -89,6 +93,7 @@ class CommunityController {
 
         return {
             url: data.Location,
+            size: file.size,
         }
     }
 }
