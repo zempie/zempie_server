@@ -69,6 +69,7 @@ class CommunityController {
 
             case 'audio/x-m4a':
             case 'audio/mp4':
+            case 'audio/mpeg':
                 key = replaceExt(uniqid(), `.${fileType.ext}`);
                 subDir = 'c/a';
                 break;
