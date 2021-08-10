@@ -23,7 +23,7 @@ class FileManager {
     uploadImage = async (req: Request, res: Response, next: NextFunction) => {
         try {
             // const { user } = req;
-            const { fields, files }: any = await this.formidable(req);
+            const { fields, files }: any = await this.formidable(req, 500, 500);
             req.params = { ...req.params, ...fields };
             req.files = files;
             next();
