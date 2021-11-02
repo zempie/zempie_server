@@ -156,6 +156,7 @@ class UserController {
         setting = setting || user.setting;
 
         return {
+            id:user.id,
             uid: user.uid,
             name: user.name,
             channel_id: user.channel_id,
