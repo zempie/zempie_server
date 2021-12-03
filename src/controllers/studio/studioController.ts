@@ -152,6 +152,7 @@ class StudioController {
 
 
     createProject = async ( params : ICreateProject, {uid}: DecodedIdToken, {req:{files}}: IRoute) => {
+
         // 불량 단어 색출
         if ( !dbs.BadWords.areOk(params) ) {
             throw CreateError(ErrorCodes.FORBIDDEN_STRING);
@@ -420,6 +421,10 @@ class StudioController {
                 game.activated = true;
                 game.enabled = true;
                 game.url_game = deployVersion.url;
+            }
+
+            if( params.stage ) {
+                game.stage = params.stage;
             }
 
             await game.save({transaction});

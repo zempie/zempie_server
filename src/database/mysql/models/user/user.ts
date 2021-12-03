@@ -32,6 +32,7 @@ class UserModel extends Model {
             fcm_token:          { type: DataTypes.STRING },
             is_developer:       { type: DataTypes.BOOLEAN, defaultValue: false },
             last_log_in:        { type: DataTypes.DATE },
+            // follows:            {type: DataTypes.INTEGER}
         };
     }
 
@@ -44,6 +45,9 @@ class UserModel extends Model {
         this.model.hasMany(dbs.UserExternalLink.model, { as: 'externalLink' });
         this.model.hasMany(dbs.Game.model, { as: 'devGames' });
         this.model.hasMany(dbs.UserClaim.model, { as: 'claims' });
+
+        //follow
+        // this.model.hasMany(dbs.Follow.model);
 
         // const desc = await this.model.sequelize.queryInterface.describeTable(this.model.tableName);
         // if ( !desc['last_log_in'] ) {
@@ -92,6 +96,9 @@ class UserModel extends Model {
     }
 
     private getProfile = async (where: object, transaction?: Transaction) => {
+
+
+
         const user = await this.model.findOne({
             where,
             include: [{
@@ -115,6 +122,7 @@ class UserModel extends Model {
             }],
             transaction
         });
+
         if( user ) {
             return user.get({plain: true});
         }
@@ -226,6 +234,8 @@ class UserModel extends Model {
 
         return claims.get({plain: true});
     }
+
+
 }
 
 export default (rdb: Sequelize) => new UserModel(rdb);

@@ -5,6 +5,7 @@ import FileManager from "../services/fileManager";
 import convert from "../controllers/_convert";
 import StudioController  from '../controllers/studio/studioController';
 import AdminStudioController from '../controllers/adminController/adminStudioController';
+import BigQueryController from '../controllers/bigQueryController'
 
 
 const apiVer = `/api/v1`;
@@ -27,6 +28,8 @@ export default (router: Router) => {
     // 설문조사
     router.post(`/gf/survey`,   convert(StudioController.callbackSurvey));
     router.get(`${apiVer}/studio/survey`,   validateFirebaseIdToken, isAuthenticated, isDeveloper, convert(StudioController.getCurrentSurveyResult));
+
+    router.get(`${apiVer}/bigquery/test`, convert(BigQueryController.test))
 }
 
 RpcController.generator( 'admin-get-versions', AdminStudioController.getVersions, true );

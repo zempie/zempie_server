@@ -10,7 +10,7 @@ import tcpRoute from '../routes/tcpRoute';
 import { IMessageQueueOptions, IServerOptions } from '../commons/interfaces';
 import mq from '../controllers/messageQueues/apiMQ';
 import redirectRoute from '../routes/redirectRoute';
-
+import communityRoute from '../routes/communityRoute'
 
 class ApiServer extends Server {
 
@@ -39,6 +39,8 @@ class ApiServer extends Server {
 
         redirectRoute(app);
 
+        communityRoute(app)
+
         // tcpRoute(app);
 
         // scheduleService.start()
@@ -46,14 +48,14 @@ class ApiServer extends Server {
     }
 
     protected afterStart = async (): Promise<void> => {
-        const options: IMessageQueueOptions = {
-            groupId: 'api-server',
-            autoCommit: true,
-            // addTopics: mq.addTopics(),
-            addGateways: mq.addGateway(),
-            eachMessage: mq.eachMessage.bind(mq),
-        }
-        await this.setMessageQueue(options);
+        // const options: IMessageQueueOptions = {
+        //     groupId: 'api-server',
+        //     autoCommit: true,
+        //     // addTopics: mq.addTopics(),
+        //     addGateways: mq.addGateway(),
+        //     eachMessage: mq.eachMessage.bind(mq),
+        // }
+        // await this.setMessageQueue(options);
     }
 }
 

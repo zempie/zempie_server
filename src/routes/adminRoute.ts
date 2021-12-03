@@ -6,8 +6,11 @@ import AdminGameController from '../controllers/adminController/adminGameControl
 import AdminSupportController from '../controllers/adminController/adminSupportController';
 import AdminStudioController from '../controllers/adminController/adminStudioController';
 import AdminContentsController from '../controllers/adminController/adminContentsController';
-import { adminTracking, validateAdminIdToken } from './_common';
+import {adminTracking, isAuthenticated, validateAdminIdToken, validateFirebaseIdToken} from './_common';
 import FileManager from '../services/fileManager';
+import CommunityController from "../controllers/communityController";
+import adminController from "../controllers/adminController/adminController";
+import communityController from "../controllers/communityController";
 
 
 const apiVer = `/api/v1`;
@@ -126,4 +129,7 @@ export default (router: Router) => {
     router.post(`${apiVer}/admin/studio/survey/c`,      validateAdminIdToken,   adminTracking,  convert(AdminStudioController.createSurvey));
     router.post(`${apiVer}/admin/studio/survey/u`,      validateAdminIdToken,   adminTracking,  convert(AdminStudioController.updateSurvey));
     router.post(`${apiVer}/admin/studio/survey/d`,      validateAdminIdToken,   adminTracking,  convert(AdminStudioController.deleteSurvey));
+
+    /* 커뮤니티 */
+    router.post(`${apiVer}/admin/community/att`,      validateAdminIdToken,   adminTracking, FileManager.uploadFiles(200, 40),   convert(communityController.uploadFile));
 }

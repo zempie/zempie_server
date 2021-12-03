@@ -38,6 +38,7 @@ class FileManager {
     uploadFiles = (maxFileSizeMB = 100, maxFieldsSizeMB = 20) => {
         return async (req: Request, res: Response, next: NextFunction) => {
             try {
+
                 const { err, fields, files }: any = await this.formidable(req, maxFileSizeMB, maxFieldsSizeMB);
                 if ( err ) {
                     if ( err.message.includes('maxFileSize') ) {
@@ -73,7 +74,8 @@ class FileManager {
                 keepExtensions: true,
                 maxFileSize: 1024 * 1024 * maxFileSizeMB,
                 maxFieldsSize: 1024 * 1024 * maxFieldsSizeMB,
-                multiples: false,
+                multiples: true,
+
             } as any);
 
             form.parse(req, async (err: any, fields: Fields, files: Files) => {

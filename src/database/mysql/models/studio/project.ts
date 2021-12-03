@@ -20,6 +20,7 @@ class ProjectModel extends Model {
             game_id:            { type: DataTypes.INTEGER, allowNull: true },
             deploy_version_id:  { type: DataTypes.INTEGER, allowNull: true },
             update_version_id:  { type: DataTypes.INTEGER, allowNull: true },
+            stage:              { type: DataTypes.INTEGER, allowNull: false},
         }
     }
 
@@ -66,9 +67,18 @@ class ProjectModel extends Model {
             })
         }
 
+        // 컬럼추가
+        if ( !desc['stage'] ) {
+            this.model.sequelize.queryInterface.addColumn(this.model.tableName, 'stage', {
+                type: DataTypes.INTEGER,
+                allowNull: false,
+                after: 'update_version_id'
+            })
+        }
+
     }
 
-    async create({ user_id, name, description, picture, picture_webp, picture2, hashtags } : any, transaction?: Transaction) {
+    async create({ user_id, name, description, picture, picture_webp, picture2, hashtags, stage } : any, transaction?: Transaction) {
         const value : any = {
             user_id,
             name,
@@ -86,6 +96,10 @@ class ProjectModel extends Model {
 
         if( picture2 ) {
             value.picture2 = picture2;
+        }
+
+        if( stage ) {
+            value.stage = stage;
         }
 
         return super.create( value, transaction );
@@ -116,7 +130,7 @@ class ProjectModel extends Model {
         });
     }
 
-    async updateProject({ id, name, picture, picture2, picture_webp, control_type, description, hashtags, game_id, deploy_version_id, update_version_id } : any, transaction?: Transaction) {
+    async updateProject({ id, name, picture, picture2, picture_webp, control_type, description, hashtags, game_id, deploy_version_id, update_version_id, stage } : any, transaction?: Transaction) {
         const project = await this.findOne( { id }, transaction );
 
         if( name ) {
@@ -157,6 +171,10 @@ class ProjectModel extends Model {
 
         if( update_version_id || update_version_id === null) {
             project.update_version_id = update_version_id;
+        }
+
+        if( stage ) {
+            project.stage = stage;
         }
 
         return await project.save( { transaction } );

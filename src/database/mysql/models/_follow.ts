@@ -10,11 +10,14 @@ import { CreateError, ErrorCodes } from '../../../commons/errorCodes';
 
 class FollowModel extends Model {
     protected initialize() {
-        this.name = 'follow';
+        this.name = 'follow1';
         this.attributes = {
             user_uid:   { type: DataTypes.STRING(36), allowNull: false },
             target_uid: { type: DataTypes.STRING(36), allowNull: false },
         };
+        this.options ={
+            freezeTableName: true
+        }
     }
 
     async afterSync(): Promise<void> {
