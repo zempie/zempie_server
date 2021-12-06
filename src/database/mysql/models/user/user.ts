@@ -135,6 +135,9 @@ class UserModel extends Model {
     getProfileByChannelId = async ({ channel_id }: { channel_id: string }) => {
         return this.getProfile({ channel_id });
     }
+    getProfileByUserID = async ({ user_id }: { user_id: number }) => {
+        return this.getProfile({ id:user_id });
+    }
 
     async getSetting({uid}: DecodedIdToken, transaction?: Transaction) {
         const user = await this.model.findOne({

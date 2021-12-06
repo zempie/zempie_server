@@ -11,5 +11,6 @@ export default (router: Router) => {
     //커뮤니티
     router.get(`${apiVer}/community/project/:id`, convert(CommunityController.getProject));
     // router.get(`${apiVer}/community/channel/:channel_id`, validateFirebaseIdToken, convert(UserController.getTargetInfoByChannelId));
-    router.get(`${apiVer}/community/channel/:channel_id`, validateFirebaseIdToken, convert(CommunityController.getTargetInfoByChannelId));
+    router.get(`${apiVer}/community/channel/:channel_id`, convert(CommunityController.getTargetInfoByChannelId));
+    router.get(`${apiVer}/community/user/:user_id`, convert(CommunityController.getTargetInfoByUserId));
 }

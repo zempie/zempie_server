@@ -156,12 +156,30 @@ class CommunityController {
             target: channel
         }
     }
+    getTargetInfoByUserId = async ({user_id}: {user_id: string}, _: DecodedIdToken) => {
+        // let channel = await caches.user.getChannel(channel_id);
+        // if ( !channel ) {
+        // const user = await docs.User.getProfile({ channel_id });
+        // if ( user ) {
+        //     channel = await this.getUserDetailInfo(user);
+        // }
+        const user = await dbs.User.getProfileByUserID({user_id});
+        if (!user) {
+            throw CreateError(ErrorCodes.INVALID_CHANNEL_ID);
+        }
 
+        const channel = await this.getUserDetailInfo(user)
+        // caches.user.setChannel(channel_id, channel);
+        // }
+        return {
+            target: channel
+        }
+    }
     private getUserDetailInfo = async (user: any, profile?: any, setting?: any) => {
         profile = profile || user.profile;
         setting = setting || user.setting;
-        const followCnt = await this.followCnt({channel_id:user.uid} )
-
+        const followingCnt = await this.followingCnt({user_id:user.id} )
+        const followerCnt = await this.followerCnt({user_id:user.id} )
         return {
             id:user.id,
             uid: user.uid,
@@ -170,7 +188,8 @@ class CommunityController {
             email: user.email,
             picture: user.picture,
             is_developer: user.is_developer,
-            follow_cnt:followCnt,
+            following_cnt:followingCnt,
+            follower_cnt:followerCnt,
             profile: {
                 level: profile.level,
                 exp: profile.exp,
@@ -210,11 +229,14 @@ class CommunityController {
         }
     }
 
-    followCnt = async ({channel_id}: {channel_id: string})=>{
-        const user = await dbs.User.getProfile({channel_id:channel_id})
-        console.log(user)
-        const followCnt = await dbs.Follow.followCnt(user.id)
-        return followCnt
+    followingCnt = async ({user_id}: {user_id: number})=>{
+        const followingCnt = await dbs.Follow.followingCnt(user_id)
+        return followingCnt
+    }
+
+    followerCnt = async ({user_id}: {user_id: number})=>{
+        const followerCnt = await dbs.Follow.followerCnt(user_id)
+        return followerCnt
     }
 }
 
