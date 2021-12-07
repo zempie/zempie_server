@@ -157,7 +157,7 @@ class UserModel extends Model {
             _user.notify[eNotify.Alarm] = _user.setting.notify_alarm;
             _user.notify[eNotify.Battle] = _user.setting.notify_battle;
             _user.notify[eNotify.Beat] = _user.setting.notify_beat;
-            _user.notify[eNotify.Follow] = _user.setting.notify_follow;
+            // _user.notify[eNotify.Follow] = _user.setting.notify_follow;
             _user.notify[eNotify.Like] = _user.setting.notify_like;
             _user.notify[eNotify.Reply] = _user.setting.notify_reply;
             return _user;

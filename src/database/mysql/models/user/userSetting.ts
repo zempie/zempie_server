@@ -14,7 +14,7 @@ class UserSetting extends Model {
             notify_alarm:       { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: true },
             notify_battle:      { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: true },
             notify_beat:        { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: true },
-            notify_follow:      { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: true },
+            // notify_follow:      { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: true },
             notify_like:        { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: true },
             notify_reply:       { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: true },
         }

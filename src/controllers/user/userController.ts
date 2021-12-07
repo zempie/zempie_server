@@ -179,7 +179,7 @@ class UserController {
                 alarm: setting.notify_alarm,
                 battle: setting.notify_battle,
                 beat: setting.notify_beat,
-                follow: setting.notify_follow,
+                // follow: setting.notify_follow,
                 like: setting.notify_like,
                 reply: setting.notify_reply,
             } : undefined,
@@ -381,7 +381,7 @@ class UserController {
             if ( params.alarm )  setting.notify_alarm = params.alarm;
             if ( params.battle ) setting.notify_battle = params.battle;
             if ( params.beat )   setting.notify.beat = params.beat;
-            if ( params.follow ) setting.notify_follow = params.follow;
+            // if ( params.follow ) setting.notify_follow = params.follow;
             if ( params.like )   setting.notify_like = params.like;
             if ( params.reply )  setting.notify_reply = params.reply;
 

@@ -206,7 +206,7 @@ class CommunityController {
                 alarm: setting.notify_alarm,
                 battle: setting.notify_battle,
                 beat: setting.notify_beat,
-                follow: setting.notify_follow,
+                // follow: setting.notify_follow,
                 like: setting.notify_like,
                 reply: setting.notify_reply,
             } : undefined,
