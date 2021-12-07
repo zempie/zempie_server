@@ -1,13 +1,13 @@
-import Model from "../../../_base/model";
-import {DataTypes, Sequelize} from "sequelize";
+import Model from '../../../_base/model';
+import { DataTypes, Sequelize } from 'sequelize';
+
 
 class FollowModel extends Model {
     protected initialize() {
-
         this.name = 'follow';
         this.attributes = {
-            user_id:            {type: DataTypes.INTEGER},
-            follow_id:          {type: DataTypes.INTEGER},
+            user_id:            { type: DataTypes.INTEGER },
+            follow_id:          { type: DataTypes.INTEGER },
         }
         this.options = {
             freezeTableName: true
@@ -16,7 +16,6 @@ class FollowModel extends Model {
 
     async afterSync() {
         const desc = await this.model.sequelize.queryInterface.describeTable(this.model.tableName);
-
         if (!desc['user_id']) {
             this.model.sequelize.queryInterface.addColumn(this.model.tableName, 'user_id', {
                 type: DataTypes.INTEGER,
@@ -32,30 +31,22 @@ class FollowModel extends Model {
     }
 
     async followingCnt(user_id: number) {
-
-        const result = await this.model.count({
+        return await this.model.count({
             where: {
                 user_id: user_id
             }
         });
-
-        return result;
-
     }
 
     async followerCnt(user_id: number) {
-
-        const result = await this.model.count({
+        return await this.model.count({
             where: {
                 follow_id: user_id
             }
         });
-
-        return result;
-
     }
 
 
 }
 
-export default (rdb: Sequelize) => new FollowModel(rdb);
+export default (rdb: Sequelize) => new FollowModel(rdb)
