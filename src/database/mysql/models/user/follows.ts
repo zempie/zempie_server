@@ -6,8 +6,8 @@ class FollowModel extends Model {
 
         this.name = 'follow';
         this.attributes = {
-            user_id: {type: DataTypes.INTEGER},
-            follow_id: {type: DataTypes.INTEGER},
+            user_id:            {type: DataTypes.INTEGER},
+            follow_id:          {type: DataTypes.INTEGER},
         }
         this.options = {
             freezeTableName: true
