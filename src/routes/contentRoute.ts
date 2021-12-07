@@ -4,7 +4,7 @@ import { isAuthenticated, validateFirebaseIdToken } from './_common';
 import FileManager from "../services/fileManager";
 import TimelineController from '../controllers/timelineController';
 import NoticeController from '../controllers/noticeController';
-import SocialMediaController from '../controllers/socialMediaControlller';
+// import SocialMediaController from '../controllers/socialMediaControlller';
 import CommunityController from '../controllers/communityController';
 
 
@@ -17,10 +17,10 @@ export default (router: Router) => {
 
 
     // social media - follow
-    router.post(`${apiVer}/sm/follow`,      validateFirebaseIdToken,    convert(SocialMediaController.follow));
-    router.post(`${apiVer}/sm/un-follow`,   validateFirebaseIdToken,    convert(SocialMediaController.unFollow));
-    router.get(`${apiVer}/sm/following`,    validateFirebaseIdToken,    convert(SocialMediaController.following));
-    router.get(`${apiVer}/sm/followers`,    validateFirebaseIdToken,    convert(SocialMediaController.followers));
+    // router.post(`${apiVer}/sm/follow`,      validateFirebaseIdToken,    convert(SocialMediaController.follow));
+    // router.post(`${apiVer}/sm/un-follow`,   validateFirebaseIdToken,    convert(SocialMediaController.unFollow));
+    // router.get(`${apiVer}/sm/following`,    validateFirebaseIdToken,    convert(SocialMediaController.following));
+    // router.get(`${apiVer}/sm/followers`,    validateFirebaseIdToken,    convert(SocialMediaController.followers));
 
 
 
