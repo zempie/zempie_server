@@ -28,7 +28,7 @@ class NotifyService {
 
 
     async send({ topic, token, data }: INotify) {
-        if ( topic && token ) {
+        if ( !topic && !token ) {
             throw CreateError(ErrorCodes.INVALID_PARAMS);
         }
 
