@@ -29,6 +29,7 @@ export default {
         Redirect: 'http://gtest.fromthered.com:8280/redirect',
         Launcher: 'http://gtest.fromthered.com/zempie/launcher',
         LauncherRedirect: 'http://gtest.fromthered.com/zempie/launcher/redirect',
+        CommunityRedirect:'http://staging-zempie.s3-website.ap-northeast-2.amazonaws.com'
     },
 
     Deploy: {
