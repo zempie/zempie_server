@@ -26,7 +26,7 @@ export default {
         Host: 'http://gtest.fromthered.com:8280',
         DeployApiV1: 'http://gtest.fromthered.com:8288/api/v1',
         GameClient: 'http://localhost:8080/play',
-        Redirect: 'http://gtest.fromthered.com:8280/redirect',
+        Redirect: 'http://staging-zempie.s3-website.ap-northeast-2.amazonaws.com/redirect',
         Launcher: 'http://gtest.fromthered.com/zempie/launcher',
         LauncherRedirect: 'http://gtest.fromthered.com/zempie/launcher/redirect'
     },
