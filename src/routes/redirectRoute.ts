@@ -9,6 +9,8 @@ export default (router: Router) => {
     router.get(`/redirect/shared/:shared_uid`, RedirectController.shared);
     router.get(`/redirect/game/:pathname`, RedirectController.game);
 
+
+    router.get(`/redirect/community/:community_id`, RedirectController.community);
     // router.get('/test-php', ((req, res) => {
     //     res.send({state: 'good', name: 'raptor'})
     // }))

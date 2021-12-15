@@ -134,6 +134,11 @@ class RedirectController {
             res.redirect(`${Url.LauncherRedirect}/game/${req.params.pathname}`)
         }
     }
+
+    community = async (req: Request, res: Response) => {
+        res.redirect(`${Url.Redirect}/community/${req.params.community_id}/timeline`)
+    }
+
 }
 
 
