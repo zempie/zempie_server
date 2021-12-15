@@ -77,7 +77,7 @@ export default {
             'http://zempie.fromthered.com',
             'http://studio.fromthered.com',
             'http://launcher.fromthered.com',
-            'http://staging-zempie.s3-website.ap-northeast-2.amazonaws.com/'
+            'http://staging-zempie.s3-website.ap-northeast-2.amazonaws.com'
         ],
         secure: false,
         domain: '.fromthered.com',
