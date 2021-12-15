@@ -75,6 +75,7 @@ export default {
             'http://studio.zempie.com', 'https://studio.zempie.com',
             'http://support.zempie.com', 'https://support.zempie.com',
             'http://admin.zempie.com', 'https://admin.zempie.com',
+            'http://staging-zempie.s3-website.ap-northeast-2.amazonaws.com/'
         ],
         secure: false,
         domain: '.zempie.com',
