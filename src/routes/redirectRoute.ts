@@ -10,7 +10,7 @@ export default (router: Router) => {
     router.get(`/redirect/game/:pathname`, RedirectController.game);
 
 
-    router.get(`/redirect/community/:community_id`, RedirectController.community);
+    router.get(`/redirect/community/:community_id/timeline`, RedirectController.community);
     // router.get('/test-php', ((req, res) => {
     //     res.send({state: 'good', name: 'raptor'})
     // }))
