@@ -162,7 +162,7 @@ class CommunityController {
             target: channel
         }
     }
-    getTargetInfoByUserId = async ({user_id}: { user_id: string }, _: DecodedIdToken) => {
+    getTargetInfoByUserId = async ({user_id}: { user_id: string }, _user: DecodedIdToken) => {
         // let channel = await caches.user.getChannel(channel_id);
         // if ( !channel ) {
         // const user = await docs.User.getProfile({ channel_id });
@@ -170,11 +170,13 @@ class CommunityController {
         //     channel = await this.getUserDetailInfo(user);
         // }
         const user = await dbs.User.getProfileByUserID({user_id});
+        const followStatus = _user ? await dbs.Follow.followStatus(_user.uid, user.id) : null;
+        const isFollowing = followStatus ? true : false;
         if (!user) {
             throw CreateError(ErrorCodes.INVALID_CHANNEL_ID);
         }
 
-        const channel = await this.getUserDetailInfo(user)
+        const channel = await this.getUserDetailInfo(user, undefined, undefined, isFollowing)
         // caches.user.setChannel(channel_id, channel);
         // }
         return {
