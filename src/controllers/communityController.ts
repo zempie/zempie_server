@@ -200,8 +200,6 @@ class CommunityController {
             profile: {
                 level: profile.level,
                 exp: profile.exp,
-                following_cnt: profile.following_cnt,
-                followers_cnt: profile.followers_cnt,
                 state_msg: profile.state_msg,
                 description: profile.description,
                 url_banner: profile.url_banner,

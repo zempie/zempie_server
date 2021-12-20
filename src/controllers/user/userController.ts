@@ -155,6 +155,9 @@ class UserController {
         profile = profile || user.profile;
         setting = setting || user.setting;
 
+        const followingCnt = await dbs.Follow.followingCnt(user.id)
+        const followerCnt = await dbs.Follow.followerCnt(user.id)
+
         return {
             id:user.id,
             uid: user.uid,
@@ -163,6 +166,8 @@ class UserController {
             email: user.email,
             picture: user.picture,
             is_developer: user.is_developer,
+            following_cnt: followingCnt,
+            follower_cnt: followerCnt,
             profile: {
                 level: profile.level,
                 exp: profile.exp,
