@@ -1,13 +1,14 @@
 import Model from '../../../_base/model';
-import { DataTypes, Sequelize } from 'sequelize';
+import {dbs} from '../../../../commons/globals';
+import {DataTypes, Sequelize} from 'sequelize';
 
 
 class FollowModel extends Model {
     protected initialize() {
         this.name = 'follow';
         this.attributes = {
-            user_id:            { type: DataTypes.INTEGER },
-            follow_id:          { type: DataTypes.INTEGER },
+            user_id: {type: DataTypes.INTEGER},
+            follow_id: {type: DataTypes.INTEGER},
         }
         this.options = {
             freezeTableName: true
@@ -44,6 +45,15 @@ class FollowModel extends Model {
                 follow_id: user_id
             }
         });
+    }
+
+    async followStatus(user_uid: string, follow_id: number) {
+        const user = await dbs.User.findOne({ uid: user_uid })
+
+        return await this.model.findOne({
+            where: {user_id: user.id, follow_id}
+        })
+
     }
 
 
