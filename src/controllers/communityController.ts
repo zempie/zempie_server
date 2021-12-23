@@ -114,8 +114,8 @@ class CommunityController {
                 priority: idx,
                 url: data.Location,
                 size: file.size,
-                type: fType
-
+                type: fType,
+                name: file.name
             })
             idx++;
         }
