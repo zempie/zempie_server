@@ -11,6 +11,7 @@ export default (router: Router) => {
 
 
     router.get(`/redirect/community/:community_id/timeline`, RedirectController.community);
+    router.get(`/redirect/community/:community_id/members`, RedirectController.members);
     // router.get('/test-php', ((req, res) => {
     //     res.send({state: 'good', name: 'raptor'})
     // }))
