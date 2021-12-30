@@ -49,7 +49,7 @@ class UserController {
     }
 
 
-    signUp = async ({ name, registration_token }: any, _user: DecodedIdToken, {req, res}: any) => {
+    signUp = async ({ name,nickname, registration_token }: any, _user: DecodedIdToken, {req, res}: any) => {
         const record = await dbs.User.findOne({ uid: _user.uid });
         if ( record ) {
             throw CreateError(ErrorCodes.INVALID_USER_UID);
@@ -59,10 +59,14 @@ class UserController {
             if ( !await dbs.ForbiddenWords.isOk(name || _user.name) ) {
                 throw CreateError(ErrorCodes.FORBIDDEN_STRING);
             }
+            // else if ( !await dbs.ForbiddenWords.isOk(nickname) ) {
+            //     throw CreateError(ErrorCodes.FORBIDDEN_STRING);
+            // }
 
             const user = await dbs.User.create({
                 uid: _user.uid,
                 name: name || _user.name,
+                // nickname: nickname,
                 channel_id: _user.uid,
                 picture: _user.picture,
                 provider: _user.firebase.sign_in_provider,
@@ -162,6 +166,7 @@ class UserController {
             id:user.id,
             uid: user.uid,
             name: user.name,
+            // nickname: user.nickname,
             channel_id: user.channel_id,
             email: user.email,
             picture: user.picture,
@@ -325,6 +330,8 @@ class UserController {
             await user.save({ transaction });
 
             caches.user.delInfo(uid);
+
+            return {user: user}
         })
     }
 
@@ -497,6 +504,15 @@ class UserController {
     }
 
 
+    // hasNickname = async ({ nickname }: {nickname: string } ) =>{
+    //     const user = await dbs.User.hasNickname( nickname );
+    //
+    //     if( user ){
+    //         return true;
+    //     }
+    //     return false;
+    //
+    // }
 }
 
 
