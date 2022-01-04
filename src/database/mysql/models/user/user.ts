@@ -24,6 +24,7 @@ class UserModel extends Model {
             banned:             { type: DataTypes.SMALLINT, allowNull: false, defaultValue: EBan.not },
 
             name:               { type: DataTypes.STRING(20), allowNull: true },
+            nickname:           { type: DataTypes.STRING(50), allowNull: true },
             channel_id:         { type: DataTypes.STRING(36), allowNull: false },
             picture:            { type: DataTypes.STRING(250), allowNull: true },
             provider:           { type: DataTypes.STRING(20), allowNull: true, defaultValue: 'password' },
@@ -32,12 +33,13 @@ class UserModel extends Model {
             fcm_token:          { type: DataTypes.STRING },
             is_developer:       { type: DataTypes.BOOLEAN, defaultValue: false },
             last_log_in:        { type: DataTypes.DATE },
-            // follows:            {type: DataTypes.INTEGER}
+
         };
     }
 
     async afterSync(): Promise<void> {
         await super.afterSync()
+
         this.model.hasOne(dbs.UserProfile.model, { sourceKey: 'id', foreignKey: 'user_id', as: 'profile' });
         this.model.hasOne(dbs.UserSetting.model, { sourceKey: 'id', foreignKey: 'user_id', as: 'setting' });
         this.model.hasMany(dbs.UserGame.model, { sourceKey: 'uid', foreignKey: 'user_uid', as: 'gameRecords' });
@@ -46,16 +48,13 @@ class UserModel extends Model {
         this.model.hasMany(dbs.Game.model, { as: 'devGames' });
         this.model.hasMany(dbs.UserClaim.model, { as: 'claims' });
 
-        //follow
-        // this.model.hasMany(dbs.Follow.model);
-
-        // const desc = await this.model.sequelize.queryInterface.describeTable(this.model.tableName);
-        // if ( !desc['last_log_in'] ) {
-        //     this.model.sequelize.queryInterface.addColumn(this.model.tableName, 'last_log_in', {
-        //         type: DataTypes.DATE,
-        //         after: 'is_developer'
-        //     })
-        // }
+        const desc = await this.model.sequelize.queryInterface.describeTable(this.model.tableName);
+        if (!desc['nickname']) {
+            this.model.sequelize.queryInterface.addColumn(this.model.tableName, 'nickname', {
+                type: DataTypes.STRING,
+                after: 'name'
+            })
+        }
     }
 
     async getInfo({uid}: DecodedIdToken, transaction?: Transaction) {
@@ -96,9 +95,6 @@ class UserModel extends Model {
     }
 
     private getProfile = async (where: object, transaction?: Transaction) => {
-
-
-
         const user = await this.model.findOne({
             where,
             include: [{
@@ -236,6 +232,18 @@ class UserModel extends Model {
         });
 
         return claims.get({plain: true});
+    }
+
+    hasNickname = async ( nickname: string ) => {
+        return await this.model.findOne({
+            where: { nickname: nickname }
+        })
+    }
+
+    hasEmail = async ( email: string ) => {
+        return await this.model.findOne({
+            where: { email: email }
+        })
     }
 
 

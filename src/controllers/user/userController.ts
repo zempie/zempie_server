@@ -503,6 +503,16 @@ class UserController {
         admin.auth().setCustomUserClaims(userClaim.user_uid, claim);
     }
 
+    hasEmail = async ({ email }: {email: string } ) =>{
+        const hasEmail = await dbs.User.hasEmail( email );
+
+        if( hasEmail ){
+            return true;
+        }
+        return false;
+
+    }
+
 
     // hasNickname = async ({ nickname }: {nickname: string } ) =>{
     //     const user = await dbs.User.hasNickname( nickname );

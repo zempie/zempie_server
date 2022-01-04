@@ -20,6 +20,9 @@ export default (router: Router) => {
     router.post(`${apiVer}/user/leave-zempie`,      validateFirebaseIdToken,    convert(UserController.leaveZempie))
     router.post(`${apiVer}/user/verify-email`,      validateFirebaseIdToken,    convert(UserController.verifyEmail));
     router.post(`${apiVer}/user/verify-channel`,    validateFirebaseIdToken,    convert(UserController.verifyChannelId));
+    router.post(`${apiVer}/user/has-email`,      validateFirebaseIdToken,    convert(UserController.hasEmail));
+    // router.post(`${apiVer}/user/has-nickname`,    validateFirebaseIdToken,    convert(UserController.hasNickname));
+
 
     router.post(`${apiVer}/user/update/info`,       validateFirebaseIdToken,    FileManager.uploadImage2(1, 1),    convert(UserController.setInfo));
     router.post(`${apiVer}/user/update/banner`,     validateFirebaseIdToken,    FileManager.uploadImage2(10, 10),    convert(UserController.setBanner));
