@@ -9,7 +9,7 @@ import admin from 'firebase-admin';
 import DecodedIdToken = admin.auth.DecodedIdToken;
 import * as path from "path";
 import Opt from '../../../config/opt';
-import { eProjectState } from '../../commons/enums';
+import {eProjectStage, eProjectState} from '../../commons/enums';
 
 const replaceExt = require('replace-ext');
 
@@ -235,27 +235,29 @@ class StudioController {
             }, transaction );
             project.game_id = game.id;
 
-            const versionParams : IVersion = {};
+            if(parseInt(project.stage) !== eProjectStage.Dev) {
+                const versionParams: IVersion = {};
 
-            versionParams.project_id = project.id;
-            versionParams.game_id = game.id;
-            versionParams.number = 1;
-            versionParams.autoDeploy = params.autoDeploy || true;
-            versionParams.version = params.version || '1.0.0';
-            versionParams.startFile = params.startFile || '';
-            versionParams.size = params.size || 0;
-            versionParams.description = params.version_description || '';
+                versionParams.project_id = project.id;
+                versionParams.game_id = game.id;
+                versionParams.number = 1;
+                versionParams.autoDeploy = params.autoDeploy || true;
+                versionParams.version = params.version || '1.0.0';
+                versionParams.startFile = params.startFile || '';
+                versionParams.size = params.size || 0;
+                versionParams.description = params.version_description || '';
 
 
-            const versionFiles = files;
-            if( versionFiles && versionParams.startFile ) {
-                const subDir = `/project/${project.id}/${uuid()}`;
-                versionParams.url = await uploadVersionFile( versionFiles, uid, subDir, versionParams.startFile );
-                versionParams.state = 'process';
+                const versionFiles = files;
+                if (versionFiles && versionParams.startFile) {
+                    const subDir = `/project/${project.id}/${uuid()}`;
+                    versionParams.url = await uploadVersionFile(versionFiles, uid, subDir, versionParams.startFile);
+                    versionParams.state = 'process';
+                }
+
+                const version = await dbs.ProjectVersion.create(versionParams, transaction);
+                project.update_version_id = version.id;
             }
-
-            const version = await dbs.ProjectVersion.create( versionParams, transaction );
-            project.update_version_id = version.id;
 
 
 

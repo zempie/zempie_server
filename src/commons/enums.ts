@@ -120,3 +120,10 @@ export enum eItemUsingType {
     Period,
     Accumulated,
 }
+
+export enum eProjectStage {
+    Dev = 1,
+    Early,
+    Complete,
+    Monetization,
+}
