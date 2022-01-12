@@ -252,11 +252,16 @@ class StudioController {
                 if (versionFiles && versionParams.startFile) {
                     const subDir = `/project/${project.id}/${uuid()}`;
                     versionParams.url = await uploadVersionFile(versionFiles, uid, subDir, versionParams.startFile);
-                    versionParams.state = 'process';
+                    versionParams.state = (params.autoDeploy === true) ? 'deploy' : 'passed';
                 }
 
                 const version = await dbs.ProjectVersion.create(versionParams, transaction);
                 project.update_version_id = version.id;
+
+                if( params.autoDeploy === true ){
+                    project.deploy_version_id = version.id;
+                }
+
             }
 
 
@@ -461,13 +466,20 @@ class StudioController {
             const subDir = `/project/${project_id}/${uuid()}`;
             const url = await uploadVersionFile( files, uid, subDir, params.startFile );
             params.number = maxNum + 1;
-            params.state = 'process';
+
+            params.state = (params.autoDeploy === true) ? 'deploy' : 'passed';
             params.url = url;
             params.game_id = project.game_id;
 
             const version = await dbs.ProjectVersion.create( params, transaction );
             project.update_version_id = version.id;
+
+            if( params.autoDeploy === true){
+                project.deploy_version_id = version.id;
+            }
+
             await project.save({transaction});
+
             return version;
         })
     }
