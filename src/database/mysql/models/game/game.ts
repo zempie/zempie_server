@@ -1,7 +1,7 @@
 import * as _ from 'lodash';
 import { v4 as uuid } from 'uuid';
 import Model from '../../../_base/model';
-import { DataTypes, Sequelize } from 'sequelize';
+import {DataTypes, Op, Sequelize} from 'sequelize';
 import { dbs } from '../../../../commons/globals';
 import { parseBoolean } from '../../../../commons/utils';
 import { IGameListParams } from '../../../../controllers/_interfaces';
@@ -85,6 +85,9 @@ class GameModel extends Model {
         const where: any = {
             activated: true,
             enabled: true,
+            category:{
+                [Op.ne]: 2
+            }
         }
         if ( category ) {
             where.category = _.toNumber(category);
