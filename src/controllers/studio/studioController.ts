@@ -10,6 +10,7 @@ import DecodedIdToken = admin.auth.DecodedIdToken;
 import * as path from "path";
 import Opt from '../../../config/opt';
 import {eProjectStage, eProjectState} from '../../commons/enums';
+import {parseBoolean} from "../../commons/utils";
 
 const replaceExt = require('replace-ext');
 
@@ -256,7 +257,7 @@ class StudioController {
                 }
 
                 const version = await dbs.ProjectVersion.create(versionParams, transaction);
-                project.update_version_id = version.id;
+                // project.update_version_id = version.id;
 
                 if( params.autoDeploy){
                     project.deploy_version_id = version.id;
@@ -447,12 +448,15 @@ class StudioController {
         return dbs.ProjectVersion.getTransaction( async (transaction : Transaction)=>{
 
             const project = await dbs.Project.findOne( { id : project_id, user_id: user.id }, transaction );
+
             if( project.update_version_id ) {
                 const preUpdateVersion = await dbs.ProjectVersion.findOne( { id : project.update_version_id }, transaction );
                 if( preUpdateVersion.state !== 'fail' && preUpdateVersion.state !== 'passed' ) {
                     throw CreateError(ErrorCodes.ALREADY_EXIST_UPDATE_VERSION);
                 }
             }
+
+
 
             const result = await dbs.ProjectVersion.findAndCountAll( {
                 project_id
@@ -467,16 +471,26 @@ class StudioController {
             const url = await uploadVersionFile( files, uid, subDir, params.startFile );
             params.number = maxNum + 1;
 
-            params.state = (params.autoDeploy === true) ? 'deploy' : 'passed';
+            params.state = parseBoolean(params.autoDeploy) ? 'deploy' : 'passed';
             params.url = url;
             params.game_id = project.game_id;
 
             const version = await dbs.ProjectVersion.create( params, transaction );
-            project.update_version_id = version.id;
+            // project.update_version_id = version.id;
 
-            if( params.autoDeploy === true){
-                project.deploy_version_id = version.id;
+            if( parseBoolean(params.autoDeploy)){
+                if( project.deploy_version_id ) {
+                    const preDeployVersion = await dbs.ProjectVersion.findOne(  {
+                        id : project.deploy_version_id
+                    }, transaction );
+                    preDeployVersion.state = 'passed';
+
+                    await preDeployVersion.save({transaction});
+                }
+
             }
+
+
 
             await project.save({transaction});
 
@@ -514,22 +528,8 @@ class StudioController {
             if( project.deploy_version_id === version.id ) {
                 throw CreateError(ErrorCodes.ACTIVE_VERSION);
             }
-            const prj = await dbs.Project.getProject( { id : version.project_id, user_id: user.id } );
 
-            if( isChangeToDev( project, prj ) ){
-
-                const game = await dbs.Game.findOne( {
-                    id : project.game_id,
-                } );
-
-                game.stage = eProjectStage.Dev;
-                project.stage = eProjectStage.Dev;
-
-                await game.save({transaction});
-
-            }
-                await project.save({transaction});
-
+            await project.save({transaction});
             return await dbs.ProjectVersion.destroy( {
                 id : params.id
             } );
@@ -642,23 +642,4 @@ async function uploadVersionFile( files : any, uid : string, subDir : string, st
     return new Promise(function (resolve) {
         resolve(url);
     });
-}
-
-
-function isChangeToDev(currProject:any, project:any): boolean{
-
-    //프로젝트 길이가 1이고 stage가 dev 이상이면 프로젝트 stage dev로 하향
-
-    if(currProject.stage > eProjectStage.Dev){
-       if(project.projectVersions.length === 1){
-           return true;
-       }else{
-           return false;
-       }
-    }
-    else{
-        return false;
-    }
-
-
 }
