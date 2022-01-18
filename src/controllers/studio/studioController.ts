@@ -252,13 +252,13 @@ class StudioController {
                 if (versionFiles && versionParams.startFile) {
                     const subDir = `/project/${project.id}/${uuid()}`;
                     versionParams.url = await uploadVersionFile(versionFiles, uid, subDir, versionParams.startFile);
-                    versionParams.state = (params.autoDeploy === true) ? 'deploy' : 'passed';
+                    versionParams.state = params.autoDeploy  ? 'deploy' : 'passed';
                 }
 
                 const version = await dbs.ProjectVersion.create(versionParams, transaction);
                 project.update_version_id = version.id;
 
-                if( params.autoDeploy === true ){
+                if( params.autoDeploy){
                     project.deploy_version_id = version.id;
                 }
 
@@ -502,6 +502,7 @@ class StudioController {
         return dbs.ProjectVersion.getTransaction( async (transaction : Transaction)=>{
             const version = await dbs.ProjectVersion.findOne( { id : params.id } );
             const project = await dbs.Project.findOne( { id : version.project_id, user_id: user.id }, transaction );
+
             if ( !project ) {
                 throw CreateError(ErrorCodes.INVALID_ACCESS_PROJECT_ID);
             }
@@ -513,14 +514,26 @@ class StudioController {
             if( project.deploy_version_id === version.id ) {
                 throw CreateError(ErrorCodes.ACTIVE_VERSION);
             }
+            const prj = await dbs.Project.getProject( { id : params.id, user_id: user.id } );
 
-            await project.save({transaction});
+            if( isChangeToDev( project, prj ) ){
+
+                const game = await dbs.Game.findOne( {
+                    id : project.game_id,
+                } );
+
+                game.stage = eProjectStage.Dev;
+                project.stage = eProjectStage.Dev;
+
+                await game.save({transaction});
+
+            }
+                await project.save({transaction});
+
             return await dbs.ProjectVersion.destroy( {
                 id : params.id
             } );
         })
-
-
     }
 
     // updateVersion = async  ( params : any, {uid}: DecodedIdToken )=>{
@@ -629,4 +642,23 @@ async function uploadVersionFile( files : any, uid : string, subDir : string, st
     return new Promise(function (resolve) {
         resolve(url);
     });
+}
+
+
+function isChangeToDev(currProject:any, project:any): boolean{
+
+    //프로젝트 길이가 1이고 stage가 dev 이상이면 프로젝트 stage dev로 하향
+
+    if(currProject.stage > eProjectStage.Dev){
+       if(project.projectVersions.length === 1){
+           return true;
+       }else{
+           return false;
+       }
+    }
+    else{
+        return false;
+    }
+
+
 }
