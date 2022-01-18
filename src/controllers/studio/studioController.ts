@@ -514,7 +514,7 @@ class StudioController {
             if( project.deploy_version_id === version.id ) {
                 throw CreateError(ErrorCodes.ACTIVE_VERSION);
             }
-            const prj = await dbs.Project.getProject( { id : params.id, user_id: user.id } );
+            const prj = await dbs.Project.getProject( { id : version.project_id, user_id: user.id } );
 
             if( isChangeToDev( project, prj ) ){
 
