@@ -236,7 +236,6 @@ class StudioController {
             }, transaction );
             project.game_id = game.id;
 
-            if(parseInt(project.stage) !== eProjectStage.Dev) {
                 const versionParams: IVersion = {};
 
                 versionParams.project_id = project.id;
@@ -253,18 +252,15 @@ class StudioController {
                 if (versionFiles && versionParams.startFile) {
                     const subDir = `/project/${project.id}/${uuid()}`;
                     versionParams.url = await uploadVersionFile(versionFiles, uid, subDir, versionParams.startFile);
-                    versionParams.state = params.autoDeploy  ? 'deploy' : 'passed';
+                    versionParams.state = parseBoolean(params.autoDeploy)  ? 'deploy' : 'passed';
                 }
 
                 const version = await dbs.ProjectVersion.create(versionParams, transaction);
                 // project.update_version_id = version.id;
 
-                if( params.autoDeploy){
+                if( parseBoolean(params.autoDeploy) ){
                     project.deploy_version_id = version.id;
                 }
-
-            }
-
 
 
             return await project.save({transaction});
