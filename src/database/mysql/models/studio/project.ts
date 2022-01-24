@@ -142,7 +142,13 @@ class ProjectModel extends Model {
         }
 
         if( picture2 ) {
-            project.picture2 = picture2;
+            if( picture2 === 'rm_picture2' ) {
+                project.picture2 = null;
+            }
+            else{
+                project.picture2 = picture2;
+            }
+
         }
 
         if( picture_webp ) {

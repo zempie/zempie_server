@@ -219,10 +219,12 @@ class StudioController {
                 project.picture2 = data.Location;
             }
 
+            const isDirectDeploy = (parseInt(project.stage) !== eProjectStage.Dev) && (parseBoolean(params.autoDeploy));
+
             const game = await dbs.Game.create( {
                 // uid : uuid(),
-                activated : 0,
-                enabled : 0,
+                activated : isDirectDeploy ? 1 : 0,
+                enabled : isDirectDeploy ? 1 : 0,
                 user_id : user.id,
                 pathname : params.pathname,
                 title : project.name,
@@ -236,6 +238,7 @@ class StudioController {
             }, transaction );
             project.game_id = game.id;
 
+            if(parseInt(project.stage) !== eProjectStage.Dev) {
                 const versionParams: IVersion = {};
 
                 versionParams.project_id = project.id;
@@ -261,6 +264,9 @@ class StudioController {
                 if( parseBoolean(params.autoDeploy) ){
                     project.deploy_version_id = version.id;
                 }
+
+            }
+
 
 
             return await project.save({transaction});
@@ -429,6 +435,12 @@ class StudioController {
 
             if( params.stage ) {
                 game.stage = params.stage;
+            }
+
+            //file remove
+            if( params.file2 ) {
+                params.picture2 = 'rm_picture2';
+                game.url_thumb_gif = '';
             }
 
             await game.save({transaction});
