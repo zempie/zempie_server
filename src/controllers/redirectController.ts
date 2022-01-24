@@ -143,6 +143,10 @@ class RedirectController {
         res.redirect(`${Url.Redirect}/community/${req.params.community_id}/members`)
     }
 
+    user = async (req: Request, res: Response) => {
+        res.redirect(`${Url.Redirect}/user/${req.params.community_id}`)
+    }
+
 }
 
 
