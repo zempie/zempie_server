@@ -144,7 +144,7 @@ class RedirectController {
     }
 
     user = async (req: Request, res: Response) => {
-        res.redirect(`${Url.Redirect}/user/${req.params.user_id}`)
+        res.redirect(`${Url.Redirect}/user/${req.params.user_id}/settings`)
     }
 
 }
