@@ -7,6 +7,7 @@ import { dbs } from '../commons/globals';
 import { IZempieClaims } from '../controllers/_interfaces';
 import admin from 'firebase-admin';
 import { updateZempieClaims } from '../commons/utils';
+import redirectRoute from "../routes/redirectRoute";
 
 
 class StudioServer extends Server {
@@ -29,6 +30,7 @@ class StudioServer extends Server {
         studioRoute(app);
         // contentRoute(app);
         // gameRoute(app);
+        redirectRoute(app);
     }
 
     async setDeveloper() {
