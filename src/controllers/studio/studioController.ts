@@ -245,7 +245,7 @@ class StudioController {
                 versionParams.game_id = game.id;
                 versionParams.number = 1;
                 versionParams.autoDeploy = params.autoDeploy || true;
-                versionParams.version = params.version || '1.0.0';
+                versionParams.version = params.version || '1.0.1';
                 versionParams.startFile = params.startFile || '';
                 versionParams.size = params.size || 0;
                 versionParams.description = params.version_description || '';
@@ -466,6 +466,8 @@ class StudioController {
 
 
 
+
+
             const result = await dbs.ProjectVersion.findAndCountAll( {
                 project_id
             } );
@@ -487,13 +489,15 @@ class StudioController {
             // project.update_version_id = version.id;
 
             if( parseBoolean(params.autoDeploy)){
+
                 if( project.deploy_version_id ) {
                     const preDeployVersion = await dbs.ProjectVersion.findOne(  {
                         id : project.deploy_version_id
                     }, transaction );
                     preDeployVersion.state = 'passed';
-
+                    project.deploy_version_id = version.id;
                     await preDeployVersion.save({transaction});
+
                 }
 
             }
