@@ -51,10 +51,9 @@ class GameModel extends Model {
             this.model.sequelize.queryInterface.addColumn(this.model.tableName, 'stage', {
                 type: DataTypes.INTEGER,
                 allowNull: false,
-                after: 'update_version_id'
+                after: 'version'
             })
         }
-
         // if ( !desc['category'] ) {
         //     this.model.sequelize.queryInterface.addColumn(this.model.tableName, 'category', {
         //         type: DataTypes.SMALLINT,
