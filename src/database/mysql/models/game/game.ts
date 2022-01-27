@@ -24,6 +24,7 @@ class GameModel extends Model {
             title:              { type: DataTypes.STRING(50), allowNull: false, defaultValue: '' },
             description:        { type: DataTypes.STRING(2000), defaultValue: '' },
             version:            { type: DataTypes.STRING(20), defaultValue: '0.0.1' },
+            stage:              { type: DataTypes.INTEGER, allowNull: false},
 
             control_type:       { type: DataTypes.SMALLINT, defaultValue: 0 },
             hashtags:           { type: DataTypes.STRING, allowNull: false },
@@ -44,7 +45,16 @@ class GameModel extends Model {
         this.model.belongsTo(dbs.User.model);
         this.model.hasOne(dbs.GameEmotion.model, { sourceKey: 'id', foreignKey: 'game_id', as: 'emotions' });
 
-        // const desc = await this.model.sequelize.queryInterface.describeTable(this.model.tableName);
+        const desc = await this.model.sequelize.queryInterface.describeTable(this.model.tableName);
+
+        if ( !desc['stage'] ) {
+            this.model.sequelize.queryInterface.addColumn(this.model.tableName, 'stage', {
+                type: DataTypes.INTEGER,
+                allowNull: false,
+                after: 'update_version_id'
+            })
+        }
+
         // if ( !desc['category'] ) {
         //     this.model.sequelize.queryInterface.addColumn(this.model.tableName, 'category', {
         //         type: DataTypes.SMALLINT,

@@ -58,6 +58,7 @@ interface IProject {
     pathname : string,
     hashtags? : string,
     size? : number,
+    stage? : number
 }
 
 interface IVersion {
@@ -230,6 +231,7 @@ class StudioController {
                 title : project.name,
                 description : project.description,
                 hashtags : project.hashtags,
+                stage : params.stage,
                 // version : version.version,
                 // url_game : version.url,
                 url_thumb : project.picture,
@@ -367,6 +369,8 @@ class StudioController {
 
                 params.picture_webp = data2.Location;
                 game.url_thumb_webp = params.picture_webp;
+
+                game.stage = params.stage;
             }
 
             if ( file2 ) {
