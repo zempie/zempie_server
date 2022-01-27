@@ -240,7 +240,7 @@ class StudioController {
             }, transaction );
             project.game_id = game.id;
 
-            if(parseInt(project.stage) !== eProjectStage.Dev) {
+            if(params.startFile) {
                 const versionParams: IVersion = {};
 
                 versionParams.project_id = project.id;
@@ -268,8 +268,6 @@ class StudioController {
                 }
 
             }
-
-
 
             return await project.save({transaction});
         })
