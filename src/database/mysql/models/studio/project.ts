@@ -20,7 +20,7 @@ class ProjectModel extends Model {
             game_id:            { type: DataTypes.INTEGER, allowNull: true },
             deploy_version_id:  { type: DataTypes.INTEGER, allowNull: true },
             update_version_id:  { type: DataTypes.INTEGER, allowNull: true },
-            stage:              { type: DataTypes.INTEGER, allowNull: false},
+            stage:              { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0},
         }
     }
 

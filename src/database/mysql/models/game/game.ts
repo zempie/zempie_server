@@ -24,7 +24,7 @@ class GameModel extends Model {
             title:              { type: DataTypes.STRING(50), allowNull: false, defaultValue: '' },
             description:        { type: DataTypes.STRING(2000), defaultValue: '' },
             version:            { type: DataTypes.STRING(20), defaultValue: '0.0.1' },
-            stage:              { type: DataTypes.INTEGER, allowNull: false},
+            stage:              { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0},
 
             control_type:       { type: DataTypes.SMALLINT, defaultValue: 0 },
             hashtags:           { type: DataTypes.STRING, allowNull: false },
