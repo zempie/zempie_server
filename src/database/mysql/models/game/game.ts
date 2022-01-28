@@ -118,7 +118,7 @@ class GameModel extends Model {
         // }
 
         let order = [];
-        sort = sort.toLowerCase();
+        sort = sort.toString().toLowerCase();
         if ( sort === 'play' || sort === 'p' ) {
             order.push(['count_over', dir]);
             order.push(['id', dir])
