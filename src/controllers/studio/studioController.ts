@@ -258,6 +258,8 @@ class StudioController {
                     const subDir = `/project/${project.id}/${uuid()}`;
                     versionParams.url = await uploadVersionFile(versionFiles, uid, subDir, versionParams.startFile);
                     versionParams.state = parseBoolean(params.autoDeploy)  ? 'deploy' : 'passed';
+                    game.url_game = versionParams.url;
+                    await game.save( {transaction} );
                 }
 
                 const version = await dbs.ProjectVersion.create(versionParams, transaction);
