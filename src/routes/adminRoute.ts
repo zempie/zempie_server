@@ -140,6 +140,6 @@ export default (router: Router) => {
      * 신고
      *
      */
-    router.get(`${apiVer}/report/user/list`,            validateAdminIdToken,   convert(AdminCommunityController.userReportList));
+    router.get(`${apiVer}/admin/report/user/list`,            validateAdminIdToken,   convert(AdminCommunityController.userReportList));
 
 }

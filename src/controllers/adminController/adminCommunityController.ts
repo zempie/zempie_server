@@ -8,21 +8,25 @@ class AdminCommunityController {
 
     userReportList = async ({limit = 20, offset = 0, sort = 'created_at', dir = 'asc'}: any) => {
 
-        const records = await dbs.UserReport.getUserReportList({limit , offset, sort, dir });
+        const {count, rows} = await dbs.UserReport.getUserReportList({limit, offset, sort, dir});
 
-        return _.map(records, (record: any) => {
-            return{
-                id:record.id,
-                user: record.reporterUser,
-                target_user: record.targetUser,
-                reason_num: record.reason_num,
-                reason: record.reason,
-                is_done: record.is_done,
-                url_img: record.url_img,
-                created_at: record.created_at
+        return {
+            count,
+            lists: _.map(rows, (row: any) => {
+                return {
+                    id: row.id,
+                    user: row.reporterUser,
+                    target_user: row.targetUser,
+                    reason_num: row.reason_num,
+                    reason: row.reason,
+                    is_done: row.is_done,
+                    url_img: row.url_img,
+                    created_at: row.created_at
 
-            }
-        })
+                }
+            })
+        }
+
     }
 }
 
