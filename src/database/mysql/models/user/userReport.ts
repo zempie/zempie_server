@@ -34,7 +34,7 @@ class UserReportModel extends Model {
     }
 
     async getUserReportList({limit = 20, offset = 0, sort = 'created_at', dir = 'asc'}: any) {
-        return await this.model.findAll({
+        return await this.model.findAndCountAll({
             limit: _.toNumber(limit),
             offset: _.toNumber(offset),
             order: [[sort, dir]],
