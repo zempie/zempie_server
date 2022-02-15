@@ -1,5 +1,5 @@
 import Model from '../../../_base/model';
-import { DataTypes, Sequelize } from 'sequelize';
+import {DataTypes, Op, Sequelize} from 'sequelize';
 import { dbs } from '../../../../commons/globals';
 
 
@@ -20,6 +20,20 @@ class UserBanModel extends Model {
         this.model.belongsTo(dbs.User.model);
         this.model.belongsTo(dbs.Admin.model);
     }
+
+    async getUserBan({ user_id } : { user_id: number }){
+        const result = await this.model.findOne({
+                where: {
+                    user_id,
+                    period:{
+                        [Op.gt] : new Date()
+                    }},
+            }
+        )
+        return result;
+    }
+
+
 }
 
 

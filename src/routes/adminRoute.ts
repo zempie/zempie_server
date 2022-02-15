@@ -9,8 +9,7 @@ import AdminContentsController from '../controllers/adminController/adminContent
 import {adminTracking, isAuthenticated, validateAdminIdToken, validateFirebaseIdToken} from './_common';
 import FileManager from '../services/fileManager';
 import CommunityController from "../controllers/communityController";
-import adminController from "../controllers/adminController/adminController";
-import communityController from "../controllers/communityController";
+import AdminCommunityController from "../controllers/adminController/adminCommunityController"
 
 
 const apiVer = `/api/v1`;
@@ -130,6 +129,17 @@ export default (router: Router) => {
     router.post(`${apiVer}/admin/studio/survey/u`,      validateAdminIdToken,   adminTracking,  convert(AdminStudioController.updateSurvey));
     router.post(`${apiVer}/admin/studio/survey/d`,      validateAdminIdToken,   adminTracking,  convert(AdminStudioController.deleteSurvey));
 
-    /* 커뮤니티 */
-    router.post(`${apiVer}/admin/community/att`,      validateAdminIdToken,   adminTracking, FileManager.uploadFiles(200, 40),   convert(communityController.uploadFile));
+    /**
+     * 커뮤니티
+     *
+     */
+    router.post(`${apiVer}/admin/community/att`,        validateAdminIdToken,   adminTracking, FileManager.uploadFiles(200, 40),   convert(CommunityController.uploadFile));
+    router.put(`${apiVer}/admin/report/state`,          validateAdminIdToken,   convert(AdminCommunityController.manageReport));
+
+    /**
+     * 신고
+     *
+     */
+    router.get(`${apiVer}/report/user/list`,            validateAdminIdToken,   convert(AdminCommunityController.userReportList));
+
 }

@@ -48,6 +48,7 @@ class AdminStudioController {
                     game.enabled = true;
                     game.version = version.version;
                     game.url_game = version.url;
+
                     params.state = 'deploy';
 
                     if( project.deploy_version_id ) {
