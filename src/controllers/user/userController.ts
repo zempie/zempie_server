@@ -120,6 +120,16 @@ class UserController {
             caches.user.setInfo(uid, user);
         }
 
+        const userBan = await dbs.UserBan.getUserBan({user_id: user.id})
+
+        if( userBan ){
+            return {
+                ban : {
+                    reason : userBan.reason,
+                    period : userBan.period
+                }
+            };
+        }
         return {
             user
         }
