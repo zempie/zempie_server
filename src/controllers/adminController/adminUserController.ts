@@ -2,11 +2,10 @@ import {IAdmin} from '../_interfaces';
 import {dbs} from '../../commons/globals';
 import * as _ from 'lodash';
 import {EBan} from '../../database/mysql/models/user/user';
+
 import {Transaction} from 'sequelize';
 import NotifyService from '../../services/notifyService';
 import {CreateError, ErrorCodes} from '../../commons/errorCodes';
-import {eMailCategory} from '../../commons/enums';
-
 
 /**
  * 사용자
@@ -68,7 +67,8 @@ class AdminUserController {
         const isUserBan = await dbs.UserBan.getUserBan({user_id})
 
         if( isUserBan ) {
-            return;
+            await dbs.UserReport.update({is_done: true}, {id: report_id})
+            throw CreateError(ErrorCodes.ALREADY_BANNED_USER);
         }
         await dbs.UserBan.getTransaction(async (transaction: Transaction) => {
             await dbs.UserReport.update({is_done: true}, {id: report_id})
@@ -80,6 +80,18 @@ class AdminUserController {
                 period,
             }, transaction)
         })
+    }
+
+    async cancelBanUser({report_id, user_id}: any, admin: IAdmin ) {
+        await dbs.UserBan.getTransaction(async (transaction: Transaction) => {
+            await dbs.UserReport.update({is_done: true}, {id: report_id});
+
+            await dbs.UserBan.update({
+                period : new Date(),
+
+            }, {user_id:user_id})
+        })
+
     }
 
 

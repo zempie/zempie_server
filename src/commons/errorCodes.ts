@@ -70,6 +70,8 @@ export const ErrorCodes = {
 
     INVALID_PROJECT_VERSION_STATE:  { code: 53001, message: '프로젝트 버젼의 상태 부적합' },
 
+
+
     /*
         Studio
      */
@@ -82,6 +84,11 @@ export const ErrorCodes = {
     ALREADY_EXIST_GAME_PATH:            { code: 64001, message: '이미 존재하는 게임 경로입니다.' },
     ACTIVE_VERSION:                     { code: 64002, message: '사용중인 버전 입니다.' },
     ALREADY_EXIST_UPDATE_VERSION:       { code: 64003, message: '이미 등록된 버전이 있습니다.' },
+
+    /*
+         Report
+      */
+    ALREADY_BANNED_USER:            { code: 70001, message: '이미 신고로 인해 정지된 유저입니다.' },
 
     /**
      * 안쓰임

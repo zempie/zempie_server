@@ -33,9 +33,10 @@ export default (router: Router) => {
     /**
      * 사용자
      */
-    router.get(`${apiVer}/admin/user/list`,         validateAdminIdToken,   convert(AdminUserController.getUsers));
-    router.get(`${apiVer}/admin/user/profile`,      validateAdminIdToken,   convert(AdminUserController.getUserProfile));
-    router.post(`${apiVer}/admin/user/ban`,         validateAdminIdToken,   adminTracking,  convert(AdminUserController.banUser));
+    router.get(`${apiVer}/admin/user/list`,                validateAdminIdToken,   convert(AdminUserController.getUsers));
+    router.get(`${apiVer}/admin/user/profile`,             validateAdminIdToken,   convert(AdminUserController.getUserProfile));
+    router.post(`${apiVer}/admin/user/ban`,                validateAdminIdToken,   adminTracking,  convert(AdminUserController.banUser));
+    router.post(`${apiVer}/admin/user/ban/cancel`,         validateAdminIdToken,   adminTracking,  convert(AdminUserController.cancelBanUser));
 
 
     /**
