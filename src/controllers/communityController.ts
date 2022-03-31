@@ -243,6 +243,30 @@ class CommunityController {
     followerCnt = async ({user_id}: { user_id: number }) => {
        return await dbs.Follow.followerCnt(user_id);
     }
+
+
+    callbackSurvey = async ({ formId: form_id, results }: any, user: any, {req}: IRoute) => {
+        let user_uid = '';
+        const u = _.some(results, (r: any) => {
+            if ( r.type.toUpperCase() === 'TEXT' && r.title.toLowerCase().includes('uid') ) {
+                user_uid = r.response;
+                return true;
+            }
+            return false;
+        });
+
+        if ( u ) {
+            const user = await dbs.User.findOne({ uid: user_uid });
+            if ( !user ) {
+                throw CreateError(ErrorCodes.INVALID_SURVEY_USER_UID);
+            }
+            const survey = await dbs.Survey.findOne({ form_id });
+            if ( !survey ) {
+                throw CreateError(ErrorCodes.INVALID_SURVEY_FORM_ID);
+            }
+            await dbs.SurveyResult.create({ user_uid, survey_id: survey.id });
+        }
+    }
 }
 
 
