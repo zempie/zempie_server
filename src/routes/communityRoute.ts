@@ -13,6 +13,6 @@ export default (router: Router) => {
     router.get(`${apiVer}/community/user/:user_id`,        validateFirebaseIdToken,     convert(CommunityController.getTargetInfoByUserId));
 
 
-    router.post(`${apiVer}/gf/survey`,   convert(CommunityController.callbackSurvey));
+
 
 }
