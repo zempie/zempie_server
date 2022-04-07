@@ -203,7 +203,12 @@ class UserController {
                 like: setting.notify_like,
                 reply: setting.notify_reply,
             } : undefined,
-            games:user.devGames,
+            games: _.map(user.devGames, (game: any) => {
+                return {
+                    activated: game.activated,
+                    ...getGameData(game),
+                }
+            }),
             dev_games: user.is_developer? _.map(user.devGames, (game: any) => {
                 return {
                     activated: game.activated,
