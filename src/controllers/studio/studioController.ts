@@ -298,8 +298,9 @@ class StudioController {
             game.pathname = `d_${game.pathname}`;
             game.url_game = null;
             game.deleted_at = new Date();
+
             await game.save({ transaction });
-            // await dbs.Game.destroy({ id : project.game_id }, transaction );
+            await dbs.Game.destroy({ id : project.game_id }, transaction );
             return await dbs.Project.destroy( { id : params.id }, transaction );
         });
     }
