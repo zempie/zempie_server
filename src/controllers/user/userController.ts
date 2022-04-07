@@ -153,6 +153,7 @@ class UserController {
             //     channel = await this.getUserDetailInfo(user);
             // }
             const user = await dbs.User.getProfileByChannelId({ channel_id });
+
             if ( !user ) {
                 throw CreateError(ErrorCodes.INVALID_CHANNEL_ID);
             }
@@ -183,6 +184,7 @@ class UserController {
             is_developer: user.is_developer,
             following_cnt: followingCnt,
             follower_cnt: followerCnt,
+            projects:user.projects,
             profile: {
                 level: profile.level,
                 exp: profile.exp,
@@ -203,7 +205,12 @@ class UserController {
                 like: setting.notify_like,
                 reply: setting.notify_reply,
             } : undefined,
-            games:user.devGames,
+            games: _.map(user.devGames, (game: any) => {
+                return {
+                    activated: game.activated,
+                    ...getGameData(game),
+                }
+            }),
             dev_games: user.is_developer? _.map(user.devGames, (game: any) => {
                 return {
                     activated: game.activated,
