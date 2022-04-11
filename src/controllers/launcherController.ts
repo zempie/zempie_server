@@ -21,21 +21,24 @@ class LauncherController {
         let ret = await caches.game.getByPathname(pathname);
         if ( !ret ) {
             const game = await dbs.Game.getInfo({ pathname });
+            const gameHeart = await dbs.GameHeart.isLike(game.id, user.uid)
             ret = {
                 game: getGameData(game),
+                is_like:gameHeart?.activated
             }
-            caches.game.setByPathname(ret, pathname);
+
+            // caches.game.setByPathname(ret, pathname);
         }
 
-        MQ.send({
-            topic: 'gameLoaded',
-            messages: [{
-                value: JSON.stringify({
-                    user_uid: user?.uid,
-                    game_id: ret.game.id,
-                })
-            }]
-        })
+        // MQ.send({
+        //     topic: 'gameLoaded',
+        //     messages: [{
+        //         value: JSON.stringify({
+        //             user_uid: user?.uid,
+        //             game_id: ret.game.id,
+        //         })
+        //     }]
+        // })
         // const game = await dbs.Game.getInfo({ pathname });
         // const ret = {
         //     game: getGameData(game),
