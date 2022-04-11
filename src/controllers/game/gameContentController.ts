@@ -29,16 +29,17 @@ class GameContentController {
 
         if ( changed ) {
             caches.game.delByPathname(game.pathname, user_uid);
-            MQ.send({
-                topic: 'gameHeart',
-                messages: [{
-                    value: JSON.stringify({
-                        user_uid,
-                        game_id,
-                        activated: on,
-                    })
-                }]
-            })
+
+            // MQ.send({
+            //     topic: 'gameHeart',
+            //     messages: [{
+            //         value: JSON.stringify({
+            //             user_uid,
+            //             game_id,
+            //             activated: on,
+            //         })
+            //     }]
+            // })
         }
 
         return {
