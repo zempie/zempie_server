@@ -232,7 +232,7 @@ class StudioController {
                 description : project.description,
                 hashtags : project.hashtags,
                 stage : params.stage,
-                // version : version.version,
+                version : '1.0.1',
                 // url_game : version.url,
                 url_thumb : project.picture,
                 url_thumb_webp : project.picture_webp,
