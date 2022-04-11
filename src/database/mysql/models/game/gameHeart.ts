@@ -32,7 +32,10 @@ class GameHeartModel extends Model {
             }
             else {
                 await this.create({ game_id, user_uid, activated: true });
+                game.count_heart +=1;
+                await game.save({transaction});
                 changed = true;
+
             }
             return changed;
         })

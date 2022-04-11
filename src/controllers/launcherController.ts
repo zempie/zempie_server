@@ -21,11 +21,20 @@ class LauncherController {
         let ret = await caches.game.getByPathname(pathname);
         if ( !ret ) {
             const game = await dbs.Game.getInfo({ pathname });
-            const gameHeart = await dbs.GameHeart.isLike(game.id, user.uid)
-            ret = {
-                game: getGameData(game),
-                is_like:gameHeart?.activated
+            if(user){
+                const gameHeart = await dbs.GameHeart.isLike(game.id, user.uid)
+                ret = {
+                    game: getGameData(game),
+                    is_like:gameHeart?.activated
+                }
+            }else{
+                ret = {
+                    game: getGameData(game),
+
+                }
             }
+
+
 
             // caches.game.setByPathname(ret, pathname);
         }
