@@ -1,5 +1,5 @@
 export function getGameData (game: any) {
-    const { user, emotions } = game;
+    const { user, emotions, gameJam } = game;
     return {
         id: game.id,
         // official: game.official,
@@ -17,6 +17,10 @@ export function getGameData (game: any) {
         url_thumb: game.url_thumb,
         url_thumb_webp: game.url_thumb_webp,
         url_thumb_gif: game.url_thumb_gif,
+        game_jam: gameJam? {
+            is_awarded:gameJam.is_awarded,
+            jam_id:gameJam.jam_id
+        } : undefined,
         // share_url: user? `${Url.Redirect}/${game.pathname}/${user.uid}` : undefined,
         user: user? {
             uid: user.uid,

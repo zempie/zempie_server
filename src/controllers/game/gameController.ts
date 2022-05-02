@@ -238,6 +238,7 @@ class GameController {
         let games = await caches.game.getList(query);
         if ( !games ) {
             const rows = await dbs.Game.getList({ category, limit, offset, sort, dir });
+
             games = _.map(rows, game => getGameData(game))
 
             // caches.game.setList(games, query);

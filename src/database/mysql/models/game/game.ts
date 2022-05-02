@@ -44,6 +44,7 @@ class GameModel extends Model {
     async afterSync(): Promise<void> {
         this.model.belongsTo(dbs.User.model);
         this.model.hasOne(dbs.GameEmotion.model, { sourceKey: 'id', foreignKey: 'game_id', as: 'emotions' });
+        this.model.hasOne(dbs.GameJam.model,    { sourceKey: 'id', foreignKey: 'game_id', as: 'gameJam' })
 
         const desc = await this.model.sequelize.queryInterface.describeTable(this.model.tableName);
 
@@ -141,6 +142,12 @@ class GameModel extends Model {
 
         return this.getListWithUser(where, {
             order,
+            include:[
+                {
+                    model: dbs.GameJam.model,
+                    as: 'gameJam',
+                }
+            ],
             limit: _.toNumber(limit),
             offset: _.toNumber(offset),
         });

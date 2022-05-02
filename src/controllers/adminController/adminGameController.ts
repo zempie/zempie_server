@@ -11,6 +11,10 @@ class AdminGameController {
         const { rows, count } = await dbs.Game.findAndCountAll({}, {
             include: [{
                 model: dbs.User.model,
+            },
+            {
+                model: dbs.GameJam.model,
+                as: 'gameJam',
             }],
             where: {
                 category,
@@ -95,7 +99,14 @@ class AdminGameController {
 
         await dbs.Game.getTransaction(async (transaction: Transaction) => {
             const game = await dbs.Game.findOne({ id : game_id }, transaction);
-
+            if(category === 3){
+                const payload = {
+                    game_id:game.id,
+                    user_id:game.user_id,
+                    is_awarded:false
+                }
+                await dbs.GameJam.create( payload, transaction );
+            }
             if ( !!category ) {
                 game.category = _.toNumber(category);
             }
@@ -114,6 +125,23 @@ class AdminGameController {
 
             await game.save({ transaction });
         })
+    }
+
+    updateGameJam = async ({game_id}: any) => {
+        await dbs.Game.getTransaction(async (transaction: Transaction) => {
+            const gameJam = await dbs.GameJam.findOne({ game_id : game_id }, transaction);
+
+            if(!gameJam){
+                throw CreateError(ErrorCodes.NOT_FOUND_GAME_JAM);
+            }
+
+            gameJam.is_awarded = !gameJam.is_awarded
+
+            await gameJam.save({ transaction });
+
+        })
+
+
     }
 }
 
