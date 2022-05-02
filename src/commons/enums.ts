@@ -21,6 +21,7 @@ export enum eGameCategory {
     Challenge,
     Certified,
     Affiliated,
+    ZemJam
 }
 export enum eGameEmotion {
     Excellent,

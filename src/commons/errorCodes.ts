@@ -67,8 +67,10 @@ export const ErrorCodes = {
     ALREADY_ADMIN_USER_READ_MAIL:   { code: 51001, message: '이미 읽은 우편' },
 
     ADMIN_GAME_PATHNAME_DUPLICATED: { code: 52001, message: '게임 Pathname 중복' },
+    INVALID_GAME_CATEGORY        :  { code: 52002, message: '존재하지 않는 카테고리'},
 
     INVALID_PROJECT_VERSION_STATE:  { code: 53001, message: '프로젝트 버젼의 상태 부적합' },
+
 
 
 

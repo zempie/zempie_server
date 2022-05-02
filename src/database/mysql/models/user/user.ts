@@ -23,7 +23,7 @@ class UserModel extends Model {
             activated:          { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: true },
             banned:             { type: DataTypes.SMALLINT, allowNull: false, defaultValue: EBan.not },
 
-            name:               { type: DataTypes.STRING(20), allowNull: true },
+            name:               { type: DataTypes.STRING(100), allowNull: true },
             nickname:           { type: DataTypes.STRING(50), allowNull: true },
             channel_id:         { type: DataTypes.STRING(36), allowNull: false },
             picture:            { type: DataTypes.STRING(250), allowNull: true },
@@ -46,6 +46,7 @@ class UserModel extends Model {
         this.model.hasMany(dbs.UserPublishing.model, { sourceKey: 'uid', foreignKey: 'user_uid', as: 'publishing' });
         this.model.hasMany(dbs.UserExternalLink.model, { as: 'externalLink' });
         this.model.hasMany(dbs.Game.model, { as: 'devGames' });
+        this.model.hasMany(dbs.Project.model, {as: 'projects'})
         this.model.hasMany(dbs.UserClaim.model, { as: 'claims' });
 
         const desc = await this.model.sequelize.queryInterface.describeTable(this.model.tableName);
@@ -103,7 +104,8 @@ class UserModel extends Model {
                 attributes: {
                     exclude: ['created_at', 'updated_at', 'deleted_at'],
                 }
-            }, {
+            },
+            {
                 model: dbs.UserGame.model,
                 as: 'gameRecords',
                 attributes: {
@@ -112,9 +114,14 @@ class UserModel extends Model {
                 include: [{
                     model: dbs.Game.model,
                 }]
-            }, {
+            },
+            {
                 model: dbs.Game.model,
                 as: 'devGames',
+            },
+             {
+                model:dbs.Project.model,
+                as:'projects'
             }],
             transaction
         });
