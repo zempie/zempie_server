@@ -93,9 +93,9 @@ class AdminGameController {
         }
         const { game_id, official, category, enabled, activated } = params;
 
-        if(!Object.values(eGameCategory).includes(category)){
-            throw CreateError(ErrorCodes.INVALID_GAME_CATEGORY);
-        }
+        // if(!Object.values(eGameCategory).includes(category)){
+        //     throw CreateError(ErrorCodes.INVALID_GAME_CATEGORY);
+        // }
 
         await dbs.Game.getTransaction(async (transaction: Transaction) => {
             const game = await dbs.Game.findOne({ id : game_id }, transaction);
