@@ -146,6 +146,9 @@ class GameModel extends Model {
                 {
                     model: dbs.GameJam.model,
                     as: 'gameJam',
+                },
+                {
+                    model: dbs.User.model,
                 }
             ],
             limit: _.toNumber(limit),
