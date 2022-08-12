@@ -38,7 +38,7 @@ class UserController {
             res.setHeader('Access-Control-Allow-Origin', req.headers.origin);
             res.setHeader('Access-Control-Allow-Credentials', 'true');
             res.setHeader('Access-Control-Allow-Headers', 'Authorization');
-            res.setHeader('Set-Cookie', cookie.serialize('_Zid', user.uid, {
+            res.setHeader('Set-Cookie', cookie.serialize('_Zc', user.uid, {
                 domain: CORS.domain,
                 path: '/',
                 maxAge: 60 * 60,
