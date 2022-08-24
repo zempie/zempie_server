@@ -28,7 +28,7 @@ class FileManager {
             req.files = files;
             next();
         }
-        catch(e) {
+        catch(e : any) {
             responseError(res, e);
         }
     }
@@ -54,7 +54,7 @@ class FileManager {
                     next();
                 }
             }
-            catch(e) {
+            catch(e: any) {
                 responseError(res, e);
             }
         }

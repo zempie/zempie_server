@@ -51,8 +51,11 @@ abstract class WSController {
     }
 
 
+    //@ts-ignore
     protected abstract onConnected = (ws: zWS): void => {}
+    //@ts-ignore
     protected abstract onMessage = (ws: zWS, message: string): void => {};
+    //@ts-ignore
     protected abstract onClosed = (ws: zWS): void => {};
     protected onPeerDisconnect = (ws: zWS) => {
         this.onClosed(ws);

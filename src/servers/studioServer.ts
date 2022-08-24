@@ -46,7 +46,7 @@ class StudioServer extends Server {
                 await admin.auth().setCustomUserClaims(userClaim.user_uid, claim);
                 console.log(claim);
             }
-            catch (e) {
+            catch (e: any) {
                 console.error(e.message);
             }
 

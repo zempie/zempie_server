@@ -65,7 +65,7 @@ class RpcController {
 
             return onSuccess(result);
         }
-        catch( e ) {
+        catch( e : any) {
             return onError({
                 code: -32601,
                 message: e.message,
