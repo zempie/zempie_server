@@ -25,7 +25,7 @@ i18n.configure({
 class GameController {
     featuredList = async ({ lang = 'ko' }: { lang: string }) => {
         let ret = await caches.game.getFeatured();
-        if ( !ret ) {
+        if (!ret) {
             const popular = await dbs.Game.getListWithUser({
                 activated: true,
                 enabled: true
@@ -35,8 +35,8 @@ class GameController {
             const recommended = await dbs.Game.getListWithUser({
                 activated: true,
                 enabled: true,
-                category: {[Op.ne]: 2},
-                id: {[Op.ne]: ids},
+                category: { [Op.ne]: 2 },
+                id: { [Op.ne]: ids },
             }, { order: Sequelize.literal('rand()'), limit: 5 });
             // const latest = await dbs.Game.getListWithUser({ activated: true, enabled: true }, { order: [['id', 'asc']], limit: 5 });
             // const certified = await dbs.Game.getListWithUser({ category: eGameCategory.Certified, activated: true, enabled: true }, { order: Sequelize.literal('rand()'), limit: 5 });
@@ -85,7 +85,7 @@ class GameController {
 
 
     playGame = async ({ pathname, user_uid }: IGamePlayParams) => {
-        if ( !user_uid ) {
+        if (!user_uid) {
             return;
         }
 
@@ -103,7 +103,7 @@ class GameController {
     redirectGame = ({ pathname, pid }: any, user: any, { req, res }: IRoute) => {
         // const { pathname, pid } = _.assignIn({}, req.body, req.query, req.params);
         let url = `${Url.GameClient}/${pathname}`;
-        if ( pid ) {
+        if (pid) {
             url += `/${pid}`;
         }
         res.redirect(url);
@@ -117,7 +117,7 @@ class GameController {
     //     res.redirect(url);
     // }
 
-    gameStart = async ({game_id}: IGameParams, user: DecodedIdToken) => {
+    gameStart = async ({ game_id }: IGameParams, user: DecodedIdToken) => {
         // const user_uid = user.uid;
         // await dbs.GameLog.create({
         //     user_uid: uid,
@@ -140,7 +140,7 @@ class GameController {
 
 
     gameOver = async ({ score, pid }: IGameParams, _user: DecodedIdToken) => {
-        if ( !pid ) {
+        if (!pid) {
             throw CreateError(ErrorCodes.INVALID_PLAY);
         }
 
@@ -170,21 +170,21 @@ class GameController {
             }]
         })
 
-        if ( !user_uid ) {
-            return ;
+        if (!user_uid) {
+            return;
         }
 
         return await dbs.UserGame.getTransaction(async (transaction: Transaction) => {
-            const record = await dbs.UserGame.findOne({user_uid, game_id}, transaction);
-            const previous_score = record? record.score : 0;
+            const record = await dbs.UserGame.findOne({ user_uid, game_id }, transaction);
+            const previous_score = record ? record.score : 0;
             const new_record = score > previous_score;
 
-            if ( new_record ) {
-                if ( record ) {
+            if (new_record) {
+                if (record) {
                     record.score = score;
-                    await record.save({transaction});
+                    await record.save({ transaction });
                 } else {
-                    await dbs.UserGame.create({user_uid, game_id, score}, transaction);
+                    await dbs.UserGame.create({ user_uid, game_id, score }, transaction);
                 }
             }
 
@@ -195,7 +195,7 @@ class GameController {
     }
 
 
-    getGame = async ({pathname}: any, user: DecodedIdToken) => {
+    getGame = async ({ pathname }: any, user: DecodedIdToken) => {
         // let game = await caches.game.getByPathname(pathname);
         // if ( !game ) {
         //     game = await dbs.Game.getInfo({ pathname });
@@ -206,21 +206,21 @@ class GameController {
         // return {
         //     game
         // };
-        const user_uid = user? user.uid : '';
+        const user_uid = user ? user.uid : '';
         const key = pathname + '_' + user_uid;
         let ret = await caches.game.getByPathname(key);
-        if ( !ret ) {
+        if (!ret) {
             const game = await dbs.Game.getInfo({ pathname });
             const my_heart = await dbs.GameHeart.findOne({ game_id: game.id, user_uid });
             const my_emotions: any = { e1: false, e2: false, e3: false, e4: false, e5: false };
             const emotions = await dbs.UserGameEmotion.findAll({ game_id: game.id, user_uid });
             _.forEach(emotions, (obj) => {
-                const e = obj.get({plain: true});
+                const e = obj.get({ plain: true });
                 my_emotions[e.emotion] = e.activated;
             })
             ret = {
                 game: getGameData(game),
-                my_heart: my_heart? my_heart.activated : false,
+                my_heart: my_heart ? my_heart.activated : false,
                 my_emotions,
             }
             // 임시 주석
@@ -236,7 +236,7 @@ class GameController {
     getGameList = async ({ category, limit = 50, offset = 0, sort, dir }: IGameListParams, user: DecodedIdToken, { req }: IRoute) => {
         const query = JSON.stringify(req.query);
         let games = await caches.game.getList(query);
-        if ( !games ) {
+        if (!games) {
             const rows = await dbs.Game.getList({ category, limit, offset, sort, dir });
 
             games = _.map(rows, game => getGameData(game))
@@ -250,7 +250,7 @@ class GameController {
     }
 
 
-    getHashTags = async ({ tag }: {tag: string}, user: DecodedIdToken) => {
+    getHashTags = async ({ tag }: { tag: string }, user: DecodedIdToken) => {
         const tags = await dbs.Hashtag.getTagsLike(tag);
 
         return {
@@ -264,8 +264,8 @@ class GameController {
     }
 
 
-    getHashTagById = async ({ id, limit = 50, offset = 0 }: {id: number, limit: number, offset: number}, user: DecodedIdToken) => {
-        const ref = await dbs.Hashtag.getGamesById(id, {limit, offset});
+    getHashTagById = async ({ id, limit = 50, offset = 0 }: { id: number, limit: number, offset: number }, user: DecodedIdToken) => {
+        const ref = await dbs.Hashtag.getGamesById(id, { limit, offset });
         return {
             tag: ref.name,
             games: _.map(ref.refTags, ref => {
@@ -280,7 +280,7 @@ class GameController {
         const { tag, limit = 50, offset = 0 } = params;
         const query = JSON.stringify(params);
         let games = await caches.hashtag.getGames(query)
-        if ( !games ) {
+        if (!games) {
             const record = await dbs.Hashtag.getGamesByTag(tag, { limit, offset });
             games = _.map(record.refTags, (r: any) => {
                 return getGameData(r.game);
@@ -294,7 +294,7 @@ class GameController {
 
 
 
-    sampleTest = async ({}, user: {}) => {
+    sampleTest = async ({ }, user: {}) => {
         const data = await MQ.send({
             topic: 'gameOver',
             messages: [{
@@ -318,7 +318,7 @@ class GameController {
             title: 'shark frenzy',
         }))
     }
-    cacheTest2 = async ({k}: any) => {
+    cacheTest2 = async ({ k }: any) => {
         const records = await caches.hashtag.findAll(k);
         return {
             records: _.map(records, JSON.parse)
@@ -327,7 +327,7 @@ class GameController {
 
 
     tagTest = async (params: any, user: DecodedIdToken) => {
-        if ( !dbs.BadWords.areOk(params) ) {
+        if (!dbs.BadWords.areOk(params)) {
             throw CreateError(ErrorCodes.FORBIDDEN_STRING);
         }
     }

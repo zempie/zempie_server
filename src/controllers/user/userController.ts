@@ -19,11 +19,11 @@ const replaceExt = require('replace-ext');
 
 class UserController {
     getCustomToken = async (_: any, __: any, { req, res }: any) => {
-        if( !req.headers.cookie ) {
+        if (!req.headers.cookie) {
             throw CreateError(ErrorCodes.INVALID_SESSION)
         }
 
-        if ( req.headers.origin && CORS.allowedOrigin.includes(req.headers.origin) ) {
+        if (req.headers.origin && CORS.allowedOrigin.includes(req.headers.origin)) {
             res.setHeader('Access-Control-Allow-Origin', req.headers.origin);
             res.setHeader('Access-Control-Allow-Credentials', 'true');
             const { _Zid: uid } = cookie.parse(req.headers.cookie);
@@ -34,29 +34,29 @@ class UserController {
         }
     }
     setCookie = async (_: any, user: DecodedIdToken, { req, res }: any) => {
-        if ( req.headers.origin && CORS.allowedOrigin.includes(req.headers.origin) ) {
+        if (req.headers.origin && CORS.allowedOrigin.includes(req.headers.origin)) {
             res.setHeader('Access-Control-Allow-Origin', req.headers.origin);
             res.setHeader('Access-Control-Allow-Credentials', 'true');
             res.setHeader('Access-Control-Allow-Headers', 'Authorization');
             res.setHeader('Set-Cookie', cookie.serialize('_Zc', user.uid, {
                 domain: CORS.domain,
                 path: '/',
-                maxAge: 60 * 60,
-                httpOnly: true,
+                maxAge: 60 * 60 * 24,
+                // httpOnly: true,
                 secure: CORS.secure,
             }));
         }
     }
 
 
-    signUp = async ({ name,nickname, registration_token }: any, _user: DecodedIdToken, {req, res}: any) => {
+    signUp = async ({ name, nickname, registration_token }: any, _user: DecodedIdToken, { req, res }: any) => {
         const record = await dbs.User.findOne({ uid: _user.uid });
-        if ( record ) {
+        if (record) {
             throw CreateError(ErrorCodes.INVALID_USER_UID);
         }
 
         return dbs.User.getTransaction(async (transaction: Transaction) => {
-            if ( !await dbs.ForbiddenWords.isOk(name || _user.name) ) {
+            if (!await dbs.ForbiddenWords.isOk(name || _user.name)) {
                 throw CreateError(ErrorCodes.FORBIDDEN_STRING);
             }
             // else if ( !await dbs.ForbiddenWords.isOk(nickname) ) {
@@ -96,12 +96,12 @@ class UserController {
     }
 
 
-    getInfo = async ({registration_token}: any, _user: DecodedIdToken, { req, res }: any) => {
+    getInfo = async ({ registration_token }: any, _user: DecodedIdToken, { req, res }: any) => {
         const { uid } = _user;
         let user = await caches.user.getInfo(uid);
-        if ( !user ) {
-            const userRecord = await dbs.User.getInfo({uid});
-            if ( !userRecord ) {
+        if (!user) {
+            const userRecord = await dbs.User.getInfo({ uid });
+            if (!userRecord) {
                 throw CreateError(ErrorCodes.INVALID_USER_UID);
             }
 
@@ -120,13 +120,13 @@ class UserController {
             caches.user.setInfo(uid, user);
         }
 
-        const userBan = await dbs.UserBan.getUserBan({user_id: user.id})
+        const userBan = await dbs.UserBan.getUserBan({ user_id: user.id })
 
-        if( userBan ){
+        if (userBan) {
             return {
-                ban : {
-                    reason : userBan.reason,
-                    period : userBan.period
+                ban: {
+                    reason: userBan.reason,
+                    period: userBan.period
                 }
             };
         }
@@ -136,8 +136,10 @@ class UserController {
     }
 
 
-    getTargetInfoByUid = async ({target_uid}: any, {uid}: DecodedIdToken) => {
+    getTargetInfoByUid = async ({ target_uid }: any, _user: DecodedIdToken) => {
         const user = await dbs.User.getProfileByUid({ uid: target_uid });
+
+
         const target = await this.getUserDetailInfo(user);
         return {
             target,
@@ -145,19 +147,30 @@ class UserController {
     }
 
 
-    getTargetInfoByChannelId = async ({channel_id}: {channel_id: string}, _: DecodedIdToken) => {
+    getTargetInfoByChannelId = async ({ channel_id }: { channel_id: string }, _user: DecodedIdToken) => {
         let channel = await caches.user.getChannel(channel_id);
-        if ( !channel ) {
+
+
+
+        if (!channel) {
             // const user = await docs.User.getProfile({ channel_id });
             // if ( user ) {
             //     channel = await this.getUserDetailInfo(user);
             // }
             const user = await dbs.User.getProfileByChannelId({ channel_id });
 
-            if ( !user ) {
+            if (!user) {
                 throw CreateError(ErrorCodes.INVALID_CHANNEL_ID);
             }
+            const followStatus = _user ? await dbs.Follow.followStatus(_user.uid, user.id) : null;
+            const isFollowing = followStatus ? true : false;
+
+            const postCount = await dbs.Post.findAndCountAll({ user_id: user.id })
+            user.post_cnt = postCount.count
+
             channel = await this.getUserDetailInfo(user)
+
+            channel.is_following = isFollowing
             // caches.user.setChannel(channel_id, channel);
         }
         return {
@@ -174,7 +187,7 @@ class UserController {
         const followerCnt = await dbs.Follow.followerCnt(user.id)
 
         return {
-            id:user.id,
+            id: user.id,
             uid: user.uid,
             name: user.name,
             // nickname: user.nickname,
@@ -184,7 +197,8 @@ class UserController {
             is_developer: user.is_developer,
             following_cnt: followingCnt,
             follower_cnt: followerCnt,
-            projects:user.projects,
+            post_cnt: user.post_cnt,
+            projects: user.projects,
             profile: {
                 level: profile.level,
                 exp: profile.exp,
@@ -194,7 +208,7 @@ class UserController {
                 description: profile.description,
                 url_banner: profile.url_banner,
             },
-            setting: setting? {
+            setting: setting ? {
                 theme: setting.app_theme,
                 theme_extra: setting.app_theme_extra,
                 language: setting.app_language,
@@ -211,13 +225,13 @@ class UserController {
                     ...getGameData(game),
                 }
             }),
-            dev_games: user.is_developer? _.map(user.devGames, (game: any) => {
+            dev_games: user.is_developer ? _.map(user.devGames, (game: any) => {
                 return {
                     activated: game.activated,
                     ...getGameData(game),
                 }
             }) : undefined,
-            game_records: user.game_records? _.map(user.game_records, (gr: any) => {
+            game_records: user.game_records ? _.map(user.game_records, (gr: any) => {
                 const game = gr.game;
                 return {
                     game_id: game.id,
@@ -230,9 +244,9 @@ class UserController {
     }
 
 
-    async verifyEmail ({}, user: DecodedIdToken) {
+    async verifyEmail({ }, user: DecodedIdToken) {
         const userRecord = await admin.auth().getUser(user.uid)
-        if ( userRecord.emailVerified ) {
+        if (userRecord.emailVerified) {
             await admin.auth().updateUser(user.uid, {
                 emailVerified: true,
             });
@@ -241,16 +255,16 @@ class UserController {
     }
 
 
-    async verifyChannelId ({ channel_id }: { channel_id: string }, user: DecodedIdToken) {
+    async verifyChannelId({ channel_id }: { channel_id: string }, user: DecodedIdToken) {
         // 규칙 확인
-        if ( !isOK_channelID(channel_id) ) {
+        if (!isOK_channelID(channel_id)) {
             throw CreateError(ErrorCodes.INVALID_CHANNEL_ID);
         }
 
         // if ok
         const encoded = urlencode(channel_id)
         const dup = await dbs.User.findOne({ channel_id: encoded });
-        if ( dup ) {
+        if (dup) {
             throw CreateError(ErrorCodes.USER_DUPLICATED_CHANNEL_ID);
         }
 
@@ -258,36 +272,36 @@ class UserController {
     }
 
 
-    setInfo = async (params: any, {uid}: DecodedIdToken, {req: {files: {file}}}: IRoute) => {
+    setInfo = async (params: any, { uid }: DecodedIdToken, { req: { files: { file } } }: IRoute) => {
         // 불량 단어 색출
-        if ( !dbs.BadWords.areOk(params) ) {
+        if (!dbs.BadWords.areOk(params)) {
             throw CreateError(ErrorCodes.FORBIDDEN_STRING);
         }
 
         return dbs.User.getTransaction(async (transaction: Transaction) => {
             const user = await dbs.User.getInfo({ uid }, transaction);
-            if ( !user ) {
+            if (!user) {
                 throw CreateError(ErrorCodes.INVALID_USER_UID);
             }
 
             const updateRequest: any = {};
 
-            if ( user.channel_id !== params.channel_id && params.channel_id ) {
+            if (user.channel_id !== params.channel_id && params.channel_id) {
                 // 규칙 확인
-                if ( !isOK_channelID(params.channel_id) ) {
+                if (!isOK_channelID(params.channel_id)) {
                     throw CreateError(ErrorCodes.INVALID_CHANNEL_ID);
                 }
                 user.channel_id = urlencode(params.channel_id);
             }
 
-            if ( params.registration_token ) {
+            if (params.registration_token) {
                 await admin.messaging().subscribeToTopic(params.registration_token, 'broadcast-topic');
                 user.fcm_token = params.registration_token;
             }
 
             // 이름 변경
-            if ( params.name ) {
-                if ( !await dbs.ForbiddenWords.isOk(params.name) ) {
+            if (params.name) {
+                if (!await dbs.ForbiddenWords.isOk(params.name)) {
                     throw CreateError(ErrorCodes.FORBIDDEN_STRING);
                 }
                 user.name = params.name;
@@ -297,23 +311,23 @@ class UserController {
 
             let profile;
             // 상태 메시지 변경
-            if ( params.state_msg ) {
+            if (params.state_msg) {
                 profile = await dbs.UserProfile.findOne({ user_id: user.id }, transaction);
                 profile.state_msg = params.state_msg;
             }
 
             // 채널 설명
-            if ( params.description ) {
+            if (params.description) {
                 profile = profile || await dbs.UserProfile.findOne({ user_id: user.id }, transaction);
                 profile.description = params.description;
             }
 
-            if ( profile ) {
+            if (profile) {
                 await profile.save({ transaction });
             }
 
             let data: any;
-            if ( file ) {
+            if (file) {
                 const webp = await FileManager.convertToWebp(file, 80);
                 // data = await FileManager.s3upload(replaceExt(/*file.name*/'profile', '.webp'), webp[0].destinationPath, uid);
                 // const data: any = await FileManager.s3upload(file.name, file.path, uid);
@@ -328,12 +342,12 @@ class UserController {
                 user.picture = data.Location;
                 updateRequest.photoURL = data.Location;
             }
-            else if ( params.rm_picture ) {
+            else if (params.rm_picture) {
                 user.picture = null;
                 updateRequest.photoURL = null;
             }
 
-            if ( Object.keys(updateRequest).length > 0 ) {
+            if (Object.keys(updateRequest).length > 0) {
                 await admin.auth().updateUser(uid, updateRequest);
             }
 
@@ -348,13 +362,13 @@ class UserController {
 
             caches.user.delInfo(uid);
 
-            return {user: user}
+            return { user: user }
         })
     }
 
 
-    setBanner = async ({}, { uid }: DecodedIdToken, {req: {files: {file}}}: IRoute) => {
-        if ( !file ) {
+    setBanner = async ({ }, { uid }: DecodedIdToken, { req: { files: { file } } }: IRoute) => {
+        if (!file) {
             throw CreateError(ErrorCodes.INVALID_PARAMS)
         }
         const user = await dbs.User.findOne({ uid });
@@ -379,14 +393,14 @@ class UserController {
 
     signOut = async (_: any, _user: DecodedIdToken, { req, res }: any) => {
         return dbs.User.getTransaction(async (transaction: Transaction) => {
-            const user = await dbs.User.getInfo({uid: _user.uid}, transaction);
-            if ( user.fcm_token ) {
+            const user = await dbs.User.getInfo({ uid: _user.uid }, transaction);
+            if (user.fcm_token) {
                 await admin.messaging().unsubscribeFromTopic(user.fcm_token, 'test-topic');
                 user.fcm_token = null;
-                await user.save({transaction});
+                await user.save({ transaction });
             }
 
-            if ( req.headers.origin && CORS.allowedOrigin.includes(req.headers.origin) ) {
+            if (req.headers.origin && CORS.allowedOrigin.includes(req.headers.origin)) {
                 res.setHeader('Access-Control-Allow-Origin', req.headers.origin);
                 res.setHeader('Access-Control-Allow-Credentials', 'true');
                 res.setHeader('Set-Cookie', cookie.serialize('uid', '', {
@@ -400,21 +414,21 @@ class UserController {
     }
 
 
-    updateSetting = async (params: any, {uid}: DecodedIdToken) => {
+    updateSetting = async (params: any, { uid }: DecodedIdToken) => {
         return dbs.UserSetting.getTransaction(async (transaction: Transaction) => {
-            const setting = await dbs.UserSetting.findOne({user_uid: uid}, transaction);
+            const setting = await dbs.UserSetting.findOne({ user_uid: uid }, transaction);
 
-            if ( params.theme )  setting.app_theme = params.theme;
-            if ( params.theme_extra) setting.app_theme_extra = params.theme_extra;
-            if ( params.lang )   setting.app_language = params.lang;
-            if ( params.alarm )  setting.notify_alarm = params.alarm;
-            if ( params.battle ) setting.notify_battle = params.battle;
-            if ( params.beat )   setting.notify.beat = params.beat;
+            if (params.theme) setting.app_theme = params.theme;
+            if (params.theme_extra) setting.app_theme_extra = params.theme_extra;
+            if (params.lang) setting.app_language = params.lang;
+            if (params.alarm) setting.notify_alarm = params.alarm;
+            if (params.battle) setting.notify_battle = params.battle;
+            if (params.beat) setting.notify.beat = params.beat;
             // if ( params.follow ) setting.notify_follow = params.follow;
-            if ( params.like )   setting.notify_like = params.like;
-            if ( params.reply )  setting.notify_reply = params.reply;
+            if (params.like) setting.notify_like = params.like;
+            if (params.reply) setting.notify_reply = params.reply;
 
-            await setting.save({transaction});
+            await setting.save({ transaction });
         });
     }
 
@@ -424,7 +438,7 @@ class UserController {
     }
 
 
-    deleteExternalLink = async ({ id }: { id: number}, { uid }: DecodedIdToken) => {
+    deleteExternalLink = async ({ id }: { id: number }, { uid }: DecodedIdToken) => {
         const user = await dbs.User.findOne({ uid });
         await dbs.UserExternalLink.destroy({ user_id: user.id, id })
     }
@@ -433,14 +447,14 @@ class UserController {
 
     filterBadWord = async ({ w }: { w: string }) => {
         // 불량 단어 색출
-        if ( !dbs.BadWords.isOk(w) || !await dbs.ForbiddenWords.isOk(w) ) {
+        if (!dbs.BadWords.isOk(w) || !await dbs.ForbiddenWords.isOk(w)) {
             throw CreateError(ErrorCodes.FORBIDDEN_STRING);
         }
     }
 
 
 
-    searchUser = async ({ search_name, limit = 100, offset = 0 }: any, {uid}: DecodedIdToken) => {
+    searchUser = async ({ search_name, limit = 100, offset = 0 }: any, { uid }: DecodedIdToken) => {
         const users = await dbs.User.search({ search_name, limit, offset });
         return {
             users: _.map(users, (user: any) => {
@@ -505,7 +519,7 @@ class UserController {
         //     console.log(JSON.stringify(claim))
         // }
 
-        const userClaim = await dbs.UserClaim.findOne({user_uid: user.uid});
+        const userClaim = await dbs.UserClaim.findOne({ user_uid: user.uid });
         const claim: IZempieClaims = JSON.parse(userClaim.data);
 
         claim.zempie.deny['reply'] = {
@@ -520,26 +534,19 @@ class UserController {
         admin.auth().setCustomUserClaims(userClaim.user_uid, claim);
     }
 
-    hasEmail = async ({ email }: {email: string } ) =>{
-        const hasEmail = await dbs.User.hasEmail( email );
+    hasEmail = async ({ email }: { email: string }) => {
+        const hasEmail = await dbs.User.hasEmail(email);
+        let success = true;
 
-        if( hasEmail ){
-            return true;
+        if (!hasEmail) {
+            success = false;
+
         }
-        return false;
+        return success;
 
     }
 
 
-    // hasNickname = async ({ nickname }: {nickname: string } ) =>{
-    //     const user = await dbs.User.hasNickname( nickname );
-    //
-    //     if( user ){
-    //         return true;
-    //     }
-    //     return false;
-    //
-    // }
 }
 
 

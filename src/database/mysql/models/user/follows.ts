@@ -52,9 +52,10 @@ class FollowModel extends Model {
 
         return await this.model.findOne({
             where: {user_id: user.id, follow_id}
-        })
-
+        }) ?? false
     }
+
+    // async isFollowing(user_uid: string, followe_id: number)
 
 
 }

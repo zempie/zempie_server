@@ -1,4 +1,4 @@
-export function getGameData (game: any) {
+export function getGameData(game: any) {
     const { user, emotions, gameJam } = game;
     return {
         id: game.id,
@@ -10,19 +10,20 @@ export function getGameData (game: any) {
         version: game.version,
         control_type: game.control_type,
         hashtags: game.hashtags,
-        stage:game.stage,
-        count_over: game.count_start > game.count_over? game.count_start : game.count_over,
+        stage: game.stage,
+        count_over: game.count_start > game.count_over ? game.count_start : game.count_over,
         count_heart: game.count_heart,
         url_game: game.url_game,
         url_thumb: game.url_thumb,
         url_thumb_webp: game.url_thumb_webp,
         url_thumb_gif: game.url_thumb_gif,
-        game_jam: gameJam? {
-            is_awarded:gameJam.is_awarded,
-            jam_id:gameJam.jam_id
+        game_jam: gameJam ? {
+            is_awarded: gameJam.is_awarded,
+            jam_id: gameJam.jam_id
         } : undefined,
         // share_url: user? `${Url.Redirect}/${game.pathname}/${user.uid}` : undefined,
-        user: user? {
+        user: user ? {
+            id: user.id,
             uid: user.uid,
             name: user.name,
             picture: user.picture,

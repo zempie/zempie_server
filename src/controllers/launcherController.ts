@@ -19,15 +19,15 @@ interface ILauncherParams {
 class LauncherController {
     async getGame({ pathname }: ILauncherParams, user: DecodedIdToken) {
         let ret = await caches.game.getByPathname(pathname);
-        if ( !ret ) {
+        if (!ret) {
             const game = await dbs.Game.getInfo({ pathname });
-            if(user){
+            if (user) {
                 const gameHeart = await dbs.GameHeart.isLike(game.id, user.uid)
                 ret = {
                     game: getGameData(game),
-                    is_like:gameHeart?.activated
                 }
-            }else{
+                ret.game['is_like'] = gameHeart?.activated ? true : false
+            } else {
                 ret = {
                     game: getGameData(game),
 
@@ -58,7 +58,7 @@ class LauncherController {
 
     async getBattleGame({ uid }: ILauncherParams) {
         let ret = await caches.game.getBattle(uid);
-        if ( !ret ) {
+        if (!ret) {
             const battle = await dbs.Battle.getInfo(uid);
             const { host, game } = battle;
             ret = {
@@ -85,8 +85,8 @@ class LauncherController {
 
     async getSharedGame({ uid }: ILauncherParams) {
         let ret = await caches.game.getShared(uid);
-        if ( !ret ) {
-            const sg = await dbs.SharedGame.getInfo({uid});
+        if (!ret) {
+            const sg = await dbs.SharedGame.getInfo({ uid });
             const { game, user } = sg;
             ret = {
                 user: {

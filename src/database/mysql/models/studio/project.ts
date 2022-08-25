@@ -113,6 +113,8 @@ class ProjectModel extends Model {
             },{
                 model: dbs.ProjectVersion.model,
             }],
+            order: [['created_at', 'desc']],
+            
             transaction
         });
 

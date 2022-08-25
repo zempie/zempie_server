@@ -1,7 +1,7 @@
 import * as _ from 'lodash';
 import { v4 as uuid } from 'uuid';
 import Model from '../../../_base/model';
-import {DataTypes, Op, Sequelize} from 'sequelize';
+import { DataTypes, Op, Sequelize } from 'sequelize';
 import { dbs } from '../../../../commons/globals';
 import { parseBoolean } from '../../../../commons/utils';
 import { IGameListParams } from '../../../../controllers/_interfaces';
@@ -13,30 +13,30 @@ class GameModel extends Model {
         this.name = 'game';
         this.attributes = {
             // uid:                { type: DataTypes.UUID, allowNull: false },
-            activated:          { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false },
-            enabled:            { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false },
+            activated: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false },
+            enabled: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false },
 
-            official:           { type: DataTypes.BOOLEAN, defaultValue: false },
-            category:           { type: DataTypes.INTEGER, allowNull: false, defaultValue: eGameCategory.Challenge },
-            user_id:            { type: DataTypes.INTEGER },
+            official: { type: DataTypes.BOOLEAN, defaultValue: false },
+            category: { type: DataTypes.INTEGER, allowNull: false, defaultValue: eGameCategory.Challenge },
+            user_id: { type: DataTypes.INTEGER },
 
-            pathname:           { type: DataTypes.STRING(50), allowNull: false, unique: true },
-            title:              { type: DataTypes.STRING(50), allowNull: false, defaultValue: '' },
-            description:        { type: DataTypes.STRING(2000), defaultValue: '' },
-            version:            { type: DataTypes.STRING(20), defaultValue: '0.0.1' },
-            stage:              { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0},
+            pathname: { type: DataTypes.STRING(50), allowNull: false, unique: true },
+            title: { type: DataTypes.STRING(50), allowNull: false, defaultValue: '' },
+            description: { type: DataTypes.STRING(2000), defaultValue: '' },
+            version: { type: DataTypes.STRING(20), defaultValue: '0.0.1' },
+            stage: { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0 },
 
-            control_type:       { type: DataTypes.SMALLINT, defaultValue: 0 },
-            hashtags:           { type: DataTypes.STRING, allowNull: false },
+            control_type: { type: DataTypes.SMALLINT, defaultValue: 0 },
+            hashtags: { type: DataTypes.STRING, allowNull: false },
 
-            count_start:        { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0 },
-            count_over:         { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0 },
-            count_heart:        { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0 },
+            count_start: { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0 },
+            count_over: { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0 },
+            count_heart: { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0 },
 
-            url_game:           { type: DataTypes.STRING },
-            url_thumb:          { type: DataTypes.STRING },
-            url_thumb_webp:     { type: DataTypes.STRING },
-            url_thumb_gif:      { type: DataTypes.STRING },
+            url_game: { type: DataTypes.STRING },
+            url_thumb: { type: DataTypes.STRING },
+            url_thumb_webp: { type: DataTypes.STRING },
+            url_thumb_gif: { type: DataTypes.STRING },
             // url_title:          { type: DataTypes.STRING },
         }
     }
@@ -44,11 +44,11 @@ class GameModel extends Model {
     async afterSync(): Promise<void> {
         this.model.belongsTo(dbs.User.model);
         this.model.hasOne(dbs.GameEmotion.model, { sourceKey: 'id', foreignKey: 'game_id', as: 'emotions' });
-        this.model.hasOne(dbs.GameJam.model,    { sourceKey: 'id', foreignKey: 'game_id', as: 'gameJam' })
+        this.model.hasOne(dbs.GameJam.model, { sourceKey: 'id', foreignKey: 'game_id', as: 'gameJam' })
 
         const desc = await this.model.sequelize.queryInterface.describeTable(this.model.tableName);
 
-        if ( !desc['stage'] ) {
+        if (!desc['stage']) {
             this.model.sequelize.queryInterface.addColumn(this.model.tableName, 'stage', {
                 type: DataTypes.INTEGER,
                 allowNull: false,
@@ -95,15 +95,15 @@ class GameModel extends Model {
         const where: any = {
             activated: true,
             enabled: true,
-            category:{
+            category: {
                 [Op.ne]: 2
             }
         }
-        if ( category ) {
+        if (category) {
             where.category = _.toNumber(category);
         }
         else {
-            if ( official ) {
+            if (official) {
                 where.official = parseBoolean(official)
             }
         }
@@ -120,29 +120,31 @@ class GameModel extends Model {
 
         let order = [];
         sort = sort.toString().toLowerCase();
-        if ( sort === 'play' || sort === 'p' ) {
+        if (sort === 'play' || sort === 'p') {
             order.push(['count_over', dir]);
             order.push(['id', dir])
         }
-        else if ( sort === 'heart' || sort === 'h' ) {
+        else if (sort === 'heart' || sort === 'h') {
             order.push(['count_heart', dir]);
             order.push(['id', dir])
         }
-        else if ( sort === 'title' || sort === 't' || sort === 'a' ) {
+        else if (sort === 'title' || sort === 't' || sort === 'a') {
             order.push(['title', 'asc']);
             order.push(['id', 'asc'])
         }
-        else if ( sort === 'latest' || sort === 'l' || sort === 'c' ) {
+        else if (sort === 'latest' || sort === 'l' || sort === 'c') {
             order.push(['created_at', 'desc']);
             order.push(['id', 'desc'])
         }
         else {
-            order.push(['id', 'asc'])
+            // order.push(['id', 'asc'])
+            order.push(['created_at', 'desc'])
+
         }
 
         return this.getListWithUser(where, {
             order,
-            include:[
+            include: [
                 {
                     model: dbs.GameJam.model,
                     as: 'gameJam',
