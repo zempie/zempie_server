@@ -1,23 +1,23 @@
 import * as fs from 'fs';
 import * as uniqid from 'uniqid';
 import * as FileType from 'file-type';
-import {IRoute} from './_interfaces';
-import {CreateError, ErrorCodes} from '../commons/errorCodes';
+import { IRoute } from './_interfaces';
+import { CreateError, ErrorCodes } from '../commons/errorCodes';
 import admin from 'firebase-admin';
 import DecodedIdToken = admin.auth.DecodedIdToken;
 import FileManager from "../services/fileManager";
 import Opt from '../../config/opt';
-import {caches, dbs} from "../commons/globals";
-import {eProjectState} from "../commons/enums";
+import { caches, dbs } from "../commons/globals";
+import { eProjectState } from "../commons/enums";
 import * as _ from "lodash";
-import {getGameData} from "./_common";
+import { getGameData } from "./_common";
 
-const {AWS} = Opt;
+const { AWS } = Opt;
 const replaceExt = require('replace-ext');
 
 
 class CommunityController {
-    uploadImage = async (params: any, {uid}: DecodedIdToken, {req: {files: {file}}}: IRoute) => {
+    uploadImage = async (params: any, { uid }: DecodedIdToken, { req: { files: { file } } }: IRoute) => {
         if (!file) {
             throw CreateError(ErrorCodes.INVALID_PARAMS);
         }
@@ -38,7 +38,7 @@ class CommunityController {
     }
 
 
-    uploadFile = async (params: any, {uid}: DecodedIdToken, {req: {files}}: IRoute) => {
+    uploadFile = async (params: any, { uid }: DecodedIdToken, { req: { files } }: IRoute) => {
         if (!files) {
             throw CreateError(ErrorCodes.INVALID_PARAMS);
         }
@@ -56,7 +56,7 @@ class CommunityController {
             let filePath = file.path;
             let subDir = 'c';
             const Body = fs.createReadStream(file.path);
-            const {fileType}: any = await FileType.stream(Body);
+            const { fileType }: any = await FileType.stream(Body);
             if (!fileType) {
                 fs.unlink(file.path, () => {
                 });
@@ -67,6 +67,9 @@ class CommunityController {
 
             switch (fileType.mime) {
                 case 'image/jpeg':
+                case 'image/gif':
+                    fType = 'image';
+                    break;
                 case 'image/png':
                     const webp = await FileManager.convertToWebp(file, 80);
                     size = webp[0].data.length;
@@ -131,14 +134,14 @@ class CommunityController {
 
         // const user1 = await dbs.User.findOne({ uid });
 
-        const prj = await dbs.Project.getProject({id: params.id});
+        const prj = await dbs.Project.getProject({ id: params.id });
         if (!prj || prj.state !== eProjectState.Normal) {
             throw CreateError(ErrorCodes.INVALID_ACCESS_PROJECT_ID);
         }
         return prj;
     }
 
-    getTargetInfoByChannelId = async ({channel_id}: { channel_id: string }, _user: DecodedIdToken) => {
+    getTargetInfoByChannelId = async ({ channel_id }: { channel_id: string }, _user: DecodedIdToken) => {
         let channel = await caches.user.getChannel(channel_id);
         if (!channel) {
             // const user = await docs.User.getProfile({ channel_id });
@@ -146,7 +149,7 @@ class CommunityController {
             //     channel = await this.getUserDetailInfo(user);
             // }
 
-            const user = await dbs.User.getProfileByChannelId({channel_id});
+            const user = await dbs.User.getProfileByChannelId({ channel_id });
 
             const followStatus = _user ? await dbs.Follow.followStatus(_user.uid, user.id) : null;
             const isFollowing = followStatus ? true : false;
@@ -162,14 +165,14 @@ class CommunityController {
             target: channel
         }
     }
-    getTargetInfoByUserId = async ({user_id}: { user_id: string }, _user: DecodedIdToken) => {
+    getTargetInfoByUserId = async ({ user_id }: { user_id: string }, _user: DecodedIdToken) => {
         // let channel = await caches.user.getChannel(channel_id);
         // if ( !channel ) {
         // const user = await docs.User.getProfile({ channel_id });
         // if ( user ) {
         //     channel = await this.getUserDetailInfo(user);
         // }
-        const user = await dbs.User.getProfileByUserID({user_id});
+        const user = await dbs.User.getProfileByUserID({ user_id });
         const followStatus = _user ? await dbs.Follow.followStatus(_user.uid, user.id) : null;
         const isFollowing = followStatus ? true : false;
         if (!user) {
@@ -186,8 +189,8 @@ class CommunityController {
     private getUserDetailInfo = async (user: any, profile?: any, setting?: any, isFollowing?: boolean) => {
         profile = profile || user.profile;
         setting = setting || user.setting;
-        const followingCnt = await this.followingCnt({user_id: user.id})
-        const followerCnt = await this.followerCnt({user_id: user.id})
+        const followingCnt = await this.followingCnt({ user_id: user.id })
+        const followerCnt = await this.followerCnt({ user_id: user.id })
         return {
             id: user.id,
             uid: user.uid,
@@ -236,32 +239,32 @@ class CommunityController {
         }
     }
 
-    followingCnt = async ({user_id}: { user_id: number }) => {
+    followingCnt = async ({ user_id }: { user_id: number }) => {
         return await dbs.Follow.followingCnt(user_id);
     }
 
-    followerCnt = async ({user_id}: { user_id: number }) => {
-       return await dbs.Follow.followerCnt(user_id);
+    followerCnt = async ({ user_id }: { user_id: number }) => {
+        return await dbs.Follow.followerCnt(user_id);
     }
 
 
-    callbackSurvey = async ({ formId: form_id, results }: any, user: any, {req}: IRoute) => {
+    callbackSurvey = async ({ formId: form_id, results }: any, user: any, { req }: IRoute) => {
         let user_uid = '';
         const u = _.some(results, (r: any) => {
-            if ( r.type.toUpperCase() === 'TEXT' && r.title.toLowerCase().includes('uid') ) {
+            if (r.type.toUpperCase() === 'TEXT' && r.title.toLowerCase().includes('uid')) {
                 user_uid = r.response;
                 return true;
             }
             return false;
         });
 
-        if ( u ) {
+        if (u) {
             const user = await dbs.User.findOne({ uid: user_uid });
-            if ( !user ) {
+            if (!user) {
                 throw CreateError(ErrorCodes.INVALID_SURVEY_USER_UID);
             }
             const survey = await dbs.Survey.findOne({ form_id });
-            if ( !survey ) {
+            if (!survey) {
                 throw CreateError(ErrorCodes.INVALID_SURVEY_FORM_ID);
             }
             await dbs.SurveyResult.create({ user_uid, survey_id: survey.id });
