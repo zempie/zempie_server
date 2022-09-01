@@ -79,6 +79,7 @@ export default {
             'http://launcher.fromthered.com',
             'http://staging-zempie.s3-website.ap-northeast-2.amazonaws.com',
             'http://3.38.27.85',
+            'http://3.38.27.85:4001',
             'http://dev.zempie.com',
             'https://dev.zempie.com',
         ],
