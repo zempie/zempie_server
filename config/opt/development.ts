@@ -48,7 +48,7 @@ export default {
     },
 
     password: {
-        salt : '@#FP)UVuOWJF)@#MJ',
+        salt: '@#FP)UVuOWJF)@#MJ',
         iteration: 100000
     },
 
@@ -64,9 +64,9 @@ export default {
         refresh: {
             secret: '*I^H%$HG%#!@GF#%GH@',
             options: {
-                algorithm : 'HS256',
-                expiresIn : '30d',
-                issuer    : 'from the red'
+                algorithm: 'HS256',
+                expiresIn: '30d',
+                issuer: 'from the red'
             },
         }
     },
@@ -79,7 +79,8 @@ export default {
             'http://launcher.fromthered.com',
             'http://staging-zempie.s3-website.ap-northeast-2.amazonaws.com',
             'http://3.38.27.85',
-            'http://3.38.27.85:4001'
+            'http://dev.zempie.com',
+            'https://dev.zempie.com',
         ],
         secure: false,
         domain: '.fromthered.com',
