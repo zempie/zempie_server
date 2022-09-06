@@ -14,7 +14,7 @@ export default (router: Router) => {
     router.get(`${apiVer}/community/user/:user_id`, validateFirebaseIdToken, convert(CommunityController.getTargetInfoByUserId));
 
     router.post(`${apiVer}/translate`, convert(GoogleController.translateText))
-
+    router.post(`${apiVer}/detect-lang`, convert(GoogleController.detectLanguage))
 
 
 

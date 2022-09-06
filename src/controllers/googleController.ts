@@ -27,10 +27,12 @@ class GoogleController {
     const { languageCode, confidence } = await this.detectLanguage(params.text)
 
 
+
+
     const request = {
       parent: `projects/${projectId}/locations/${location}`,
       contents: [params.text],
-      mimeType: 'text/plain', // mime types: text/plain, text/html
+      mimeType: 'text/html', // mime types: text/plain, text/html
       sourceLanguageCode: languageCode,
       targetLanguageCode: params.target,
     };
