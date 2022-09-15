@@ -19,20 +19,21 @@ class UserModel extends Model {
     protected initialize() {
         this.name = 'user';
         this.attributes = {
-            uid:                { type: DataTypes.STRING(36), allowNull: false, unique: true },
-            activated:          { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: true },
-            banned:             { type: DataTypes.SMALLINT, allowNull: false, defaultValue: EBan.not },
+            uid: { type: DataTypes.STRING(36), allowNull: false, unique: true },
+            activated: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: true },
+            banned: { type: DataTypes.SMALLINT, allowNull: false, defaultValue: EBan.not },
 
-            name:               { type: DataTypes.STRING(100), allowNull: true },
-            nickname:           { type: DataTypes.STRING(50), allowNull: true },
-            channel_id:         { type: DataTypes.STRING(36), allowNull: false },
-            picture:            { type: DataTypes.STRING(250), allowNull: true },
-            provider:           { type: DataTypes.STRING(20), allowNull: true, defaultValue: 'password' },
-            email:              { type: DataTypes.STRING(50), allowNull: true },
-            email_verified:     { type: DataTypes.BOOLEAN, defaultValue: false },
-            fcm_token:          { type: DataTypes.STRING },
-            is_developer:       { type: DataTypes.BOOLEAN, defaultValue: false },
-            last_log_in:        { type: DataTypes.DATE },
+            name: { type: DataTypes.STRING(100), allowNull: true },
+            nickname: { type: DataTypes.STRING(50), allowNull: true },
+            channel_id: { type: DataTypes.STRING(36), allowNull: false },
+            picture: { type: DataTypes.STRING(250), allowNull: true },
+            url_banner: { type: DataTypes.STRING(250), allowNull: true },
+            provider: { type: DataTypes.STRING(20), allowNull: true, defaultValue: 'password' },
+            email: { type: DataTypes.STRING(50), allowNull: true },
+            email_verified: { type: DataTypes.BOOLEAN, defaultValue: false },
+            fcm_token: { type: DataTypes.STRING },
+            is_developer: { type: DataTypes.BOOLEAN, defaultValue: false },
+            last_log_in: { type: DataTypes.DATE },
 
         };
     }
@@ -46,7 +47,7 @@ class UserModel extends Model {
         this.model.hasMany(dbs.UserPublishing.model, { sourceKey: 'uid', foreignKey: 'user_uid', as: 'publishing' });
         this.model.hasMany(dbs.UserExternalLink.model, { as: 'externalLink' });
         this.model.hasMany(dbs.Game.model, { as: 'devGames' });
-        this.model.hasMany(dbs.Project.model, {as: 'projects'})
+        this.model.hasMany(dbs.Project.model, { as: 'projects' })
         this.model.hasMany(dbs.UserClaim.model, { as: 'claims' });
 
         const desc = await this.model.sequelize.queryInterface.describeTable(this.model.tableName);
@@ -56,9 +57,15 @@ class UserModel extends Model {
                 after: 'name'
             })
         }
+        if (!desc['url_banner']) {
+            this.model.sequelize.queryInterface.addColumn(this.model.tableName, 'url_banner', {
+                type: DataTypes.STRING,
+                after: 'picture'
+            })
+        }
     }
 
-    async getInfo({uid}: DecodedIdToken, transaction?: Transaction) {
+    async getInfo({ uid }: DecodedIdToken, transaction?: Transaction) {
         return this.model.findOne({
             where: { uid },
             include: [
@@ -119,15 +126,15 @@ class UserModel extends Model {
                 model: dbs.Game.model,
                 as: 'devGames',
             },
-             {
-                model:dbs.Project.model,
-                as:'projects'
+            {
+                model: dbs.Project.model,
+                as: 'projects'
             }],
             transaction
         });
 
-        if( user ) {
-            return user.get({plain: true});
+        if (user) {
+            return user.get({ plain: true });
         }
     }
 
@@ -139,10 +146,10 @@ class UserModel extends Model {
         return this.getProfile({ channel_id });
     }
     getProfileByUserID = async ({ user_id }: { user_id: number }) => {
-        return this.getProfile({ id:user_id });
+        return this.getProfile({ id: user_id });
     }
 
-    async getSetting({uid}: DecodedIdToken, transaction?: Transaction) {
+    async getSetting({ uid }: DecodedIdToken, transaction?: Transaction) {
         const user = await this.model.findOne({
             where: { uid },
             include: [{
@@ -154,8 +161,8 @@ class UserModel extends Model {
             }],
             transaction
         });
-        if( user ) {
-            const _user = user.get({plain:true});
+        if (user) {
+            const _user = user.get({ plain: true });
             _user.notify = {};
             _user.notify[eNotify.Alarm] = _user.setting.notify_alarm;
             _user.notify[eNotify.Battle] = _user.setting.notify_battle;
@@ -183,7 +190,7 @@ class UserModel extends Model {
     }
 
 
-    async getProfileAll({limit = 50, offset = 0, sort = 'id', dir = 'asc'}, transaction?: Transaction) {
+    async getProfileAll({ limit = 50, offset = 0, sort = 'id', dir = 'asc' }, transaction?: Transaction) {
         return await this.model.findAndCountAll({
             where: {},
             attributes: {
@@ -238,16 +245,16 @@ class UserModel extends Model {
             }],
         });
 
-        return claims.get({plain: true});
+        return claims.get({ plain: true });
     }
 
-    hasNickname = async ( nickname: string ) => {
+    hasNickname = async (nickname: string) => {
         return await this.model.findOne({
             where: { nickname: nickname }
         })
     }
 
-    hasEmail = async ( email: string ) => {
+    hasEmail = async (email: string) => {
         return await this.model.findOne({
             where: { email: email }
         })
