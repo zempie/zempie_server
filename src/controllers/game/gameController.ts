@@ -13,8 +13,11 @@ import { eGameCategory } from '../../commons/enums';
 import { CreateError, ErrorCodes } from '../../commons/errorCodes';
 import { signJWT } from '../../commons/utils';
 import * as jwt from 'jsonwebtoken';
-const { Url } = Opt;
+import FileManager from '../../services/fileManager';
 import * as i18n from 'i18n';
+
+const replaceExt = require('replace-ext');
+const { Url } = Opt;
 i18n.configure({
     locales: ['ko', 'en', 'uk-UA'],
     defaultLocale: 'ko',
@@ -292,6 +295,99 @@ class GameController {
         }
     }
 
+    //게임 페이지
+    setBanner = async (params: any, { uid }: DecodedIdToken, { req: { files: { file } } }: IRoute) => {
+        if (!file) {
+            throw CreateError(ErrorCodes.INVALID_PARAMS)
+        }
+
+        const user = await dbs.User.findOne({ uid });
+
+
+        return dbs.Game.getTransaction(async (transaction: Transaction) => {
+
+
+            const game = await dbs.Game.findOne({
+                id: params.game_id,
+                user_id: user.id
+            });
+
+            const webp = await FileManager.convertToWebp(file, 80, false);
+
+            const data: any = await FileManager.s3upload({
+                bucket: Opt.AWS.Bucket.RscPublic,
+                // key : file.name,
+                key: replaceExt('thumb', '.webp'),
+                filePath: webp[0].destinationPath,
+                uid,
+                subDir: `/game/${game.id}/thumb`
+            });
+
+            game.url_banner = data.Location;
+
+            await game.save({ transaction });
+
+            return {
+                url_banner: data.Location
+            }
+
+
+        })
+
+
+    }
+
+    updateBanner = async (params: any, { uid }: DecodedIdToken, { req: { files: { file } } }: IRoute) => {
+
+        if (!file) {
+            throw CreateError(ErrorCodes.INVALID_PARAMS)
+        }
+        const user = await dbs.User.findOne({ uid });
+
+        const game = await dbs.Game.findOne({
+            id: params.game_id,
+            user_id: user.id
+        });
+        const webp = await FileManager.convertToWebp(file, 80, false);
+
+        const data: any = await FileManager.s3upload({
+            bucket: Opt.AWS.Bucket.RscPublic,
+            // key : file.name,
+            key: replaceExt('thumb', '.webp'),
+            filePath: webp[0].destinationPath,
+            uid,
+            subDir: `/game/${game.id}/thumb`
+        });
+
+        await dbs.Game.update({ url_banner: data.Location }, { user_id: user.id })
+
+        return {
+            url_banner: data.Location
+        }
+
+    }
+
+    deleteBanner = async (params: any, { uid }: DecodedIdToken) => {
+
+        const user = await dbs.User.findOne({ uid });
+
+        return dbs.Game.getTransaction(async (transaction: Transaction) => {
+
+            const game = await dbs.Game.findOne({
+                id: params.game_id,
+                user_id: user.id
+            });
+            game.url_banner = null;
+
+            await game.save({ transaction });
+
+            return {
+                url_banner: null
+            }
+        })
+
+    }
+
 
 
     sampleTest = async ({ }, user: {}) => {
@@ -340,6 +436,9 @@ class GameController {
             games: _.map(r?.refTags, (ref: any) => getGameData(ref.game))
         }
     }
+
+
+
 }
 
 

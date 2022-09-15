@@ -37,6 +37,10 @@ class GameModel extends Model {
             url_thumb: { type: DataTypes.STRING },
             url_thumb_webp: { type: DataTypes.STRING },
             url_thumb_gif: { type: DataTypes.STRING },
+
+            url_banner: { type: DataTypes.STRING }
+
+
             // url_title:          { type: DataTypes.STRING },
         }
     }
@@ -53,6 +57,13 @@ class GameModel extends Model {
                 type: DataTypes.INTEGER,
                 allowNull: false,
                 after: 'version'
+            })
+        }
+        if (!desc['url_banner']) {
+            this.model.sequelize.queryInterface.addColumn(this.model.tableName, 'url_banner', {
+                type: DataTypes.STRING,
+                allowNull: true,
+                after: 'stage'
             })
         }
         // if ( !desc['category'] ) {
