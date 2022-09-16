@@ -194,6 +194,7 @@ class UserController {
             channel_id: user.channel_id,
             email: user.email,
             picture: user.picture,
+            url_banner: user.url_banner,
             is_developer: user.is_developer,
             following_cnt: followingCnt,
             follower_cnt: followerCnt,
@@ -272,7 +273,7 @@ class UserController {
     }
 
 
-    setInfo = async (params: any, { uid }: DecodedIdToken, { req: { files: { file } } }: IRoute) => {
+    setInfo = async (params: any, { uid }: DecodedIdToken, { req: { files: { file, banner_file } } }: IRoute) => {
         // 불량 단어 색출
         if (!dbs.BadWords.areOk(params)) {
             throw CreateError(ErrorCodes.FORBIDDEN_STRING);
@@ -327,6 +328,7 @@ class UserController {
             }
 
             let data: any;
+            // 프로필 사진
             if (file) {
                 const webp = await FileManager.convertToWebp(file, 80);
                 // data = await FileManager.s3upload(replaceExt(/*file.name*/'profile', '.webp'), webp[0].destinationPath, uid);
@@ -344,6 +346,26 @@ class UserController {
             }
             else if (params.rm_picture) {
                 user.picture = null;
+                updateRequest.photoURL = null;
+            }
+
+            if (banner_file) {
+                const webp = await FileManager.convertToWebp(banner_file, 80);
+
+                data = await FileManager.s3upload({
+                    bucket: Opt.AWS.Bucket.Rsc,
+                    key: replaceExt('banner', '.webp'),
+                    filePath: webp[0].destinationPath,
+                    uid,
+                    subDir: '/banner',
+                });
+
+                user.url_banner = data.Location;
+                updateRequest.photoURL = data.Location;
+            }
+
+            else if (params.rm_banner) {
+                user.url_banner = null;
                 updateRequest.photoURL = null;
             }
 

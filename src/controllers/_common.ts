@@ -17,6 +17,7 @@ export function getGameData(game: any) {
         url_thumb: game.url_thumb,
         url_thumb_webp: game.url_thumb_webp,
         url_thumb_gif: game.url_thumb_gif,
+        url_banner: game.url_banner,
         game_jam: gameJam ? {
             is_awarded: gameJam.is_awarded,
             jam_id: gameJam.jam_id
