@@ -10,16 +10,13 @@ module.exports = {
             watch: false,
             ignore_watch : ["node_modules", "public"],
             env: {
-                NODE_ENV: 'development',
-                GOOGLE_APPLICATION_CREDENTIALS:'./config/firebase/client-secret.json'
+                NODE_ENV: 'development'
             },
             env_production: {
-                NODE_ENV: 'production',
-                GOOGLE_APPLICATION_CREDENTIALS:'./config/firebase/client-secret.json'
+                NODE_ENV: 'production'
             },
             env_staging: {
-                NODE_ENV: 'staging',
-                GOOGLE_APPLICATION_CREDENTIALS:'./config/firebase/client-secret.json'
+                NODE_ENV: 'staging'
             }
         }
     ],

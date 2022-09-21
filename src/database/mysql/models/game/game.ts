@@ -107,11 +107,14 @@ class GameModel extends Model {
             activated: true,
             enabled: true,
             category: {
-                [Op.ne]: 2
+                [Op.ne]: 2,
             }
         }
+
+
         if (category) {
-            where.category = _.toNumber(category);
+            const ctgry = String(category).split(',')
+            where.category = { [Op.in]: ctgry };
         }
         else {
             if (official) {
