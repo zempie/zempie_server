@@ -48,14 +48,14 @@ class ApiServer extends Server {
     }
 
     protected afterStart = async (): Promise<void> => {
-        // const options: IMessageQueueOptions = {
-        //     groupId: 'api-server',
-        //     autoCommit: true,
-        //     // addTopics: mq.addTopics(),
-        //     addGateways: mq.addGateway(),
-        //     eachMessage: mq.eachMessage.bind(mq),
-        // }
-        // await this.setMessageQueue(options);
+        const options: IMessageQueueOptions = {
+            groupId: 'api-server',
+            autoCommit: true,
+            // addTopics: mq.addTopics(),
+            addGateways: mq.addGateway(),
+            eachMessage: mq.eachMessage.bind(mq),
+        }
+        await this.setMessageQueue(options);
     }
 }
 
