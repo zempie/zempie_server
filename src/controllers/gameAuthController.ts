@@ -3,11 +3,12 @@ var jwt = require('jsonwebtoken');
 import * as _ from "lodash";
 import { CreateError, ErrorCodes } from '../commons/errorCodes';
 import { dbs } from "../commons/globals";
-const secretKey = require('crypto').randomBytes(48).toString('hex');
+const crypto = require('crypto');
+const secretKey = crypto.randomBytes(48).toString('hex');
 
 class GameAuthController {
 
-  async createToken({ uid }: { uid: string }) {
+  async createUserToken({ uid }: { uid: string }) {
 
     const user = await dbs.User.getInfo({ uid });
 
@@ -19,7 +20,7 @@ class GameAuthController {
         picture: user.picture,
         name: user.name
       }
-      return { token: jwt.sign(payload, secretKey, { expiresIn: 60 * 1, issuer: 'zempie' }) };
+      return { token: jwt.sign(payload, secretKey, { expiresIn: 60 * 60, issuer: 'zempie' }) };
     } else {
       throw CreateError(ErrorCodes.UNAUTHORIZED);
     }
@@ -42,6 +43,11 @@ class GameAuthController {
     return { user: user }
 
   }
+
+  // async createGameToken() {
+  //   crypto.createCipheriv
+
+  // }
 
 }
 
