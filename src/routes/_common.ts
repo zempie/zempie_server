@@ -175,7 +175,7 @@ export const adminTracking = async (req: Request, res: Response, next: NextFunct
 export const validateGameToken = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const idToken = getIdToken(req);
-        req.user = await gameAuthController.verifyToken({ token: idToken });
+        req.user = (await gameAuthController.verifyToken({ token: idToken })).info;
         return next();
     }
     catch (error) {

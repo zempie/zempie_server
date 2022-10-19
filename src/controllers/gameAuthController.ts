@@ -19,7 +19,7 @@ class GameAuthController {
         picture: user.picture,
         name: user.name
       }
-      return jwt.sign(payload, secretKey, { expiresIn: 60 * 1, issuer: 'zempie' });
+      return { token: jwt.sign(payload, secretKey, { expiresIn: 60 * 1, issuer: 'zempie' }) };
     } else {
       throw CreateError(ErrorCodes.UNAUTHORIZED);
     }
@@ -29,7 +29,7 @@ class GameAuthController {
   async verifyToken({ token }: { token: string }) {
 
     try {
-      return jwt.verify(token, secretKey)
+      return { info: jwt.verify(token, secretKey) }
 
     } catch (err) {
       throw CreateError(ErrorCodes.INVALID_TOKEN);
@@ -39,7 +39,7 @@ class GameAuthController {
   async getInfo({ }, { uid }: any) {
     const user = await dbs.User.getInfo({ uid })
 
-    return user
+    return { user: user }
 
   }
 
