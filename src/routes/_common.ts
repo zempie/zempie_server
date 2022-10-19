@@ -7,6 +7,7 @@ import cfgOption from '../../config/opt';
 import { logger } from '../commons/logger';
 import { CreateError, ErrorCodes } from '../commons/errorCodes';
 import { responseError } from '../controllers/_convert';
+import gameAuthController from '../controllers/gameAuthController';
 
 
 export function throwError(res: Response, e: string, statusCode = 401) {
@@ -19,10 +20,10 @@ export function throwError(res: Response, e: string, statusCode = 401) {
 
 export const validateUid = async (req: Request, res: Response, next: Function) => {
     const { game_path, publisher_uid } = req.params;
-    if ( !game_path ) {
+    if (!game_path) {
         return throwError(res, 'invalid game_path')
     }
-    if ( !publisher_uid ) {
+    if (!publisher_uid) {
         // return throwError(res, 'invalid publisher_uid')
     }
 
@@ -33,17 +34,17 @@ export const validateUid = async (req: Request, res: Response, next: Function) =
 export const readyToPlay = async (req: Request, res: Response, next: Function) => {
     const { game_path, publisher_uid, user_uid } = req.params;
 
-    if ( !game_path ) {
+    if (!game_path) {
         return throwError(res, 'invalid game');
     }
 
     await dbs.Game.getTransaction(async (transaction: Transaction) => {
         const game = await dbs.Game.findOne({ pathname: game_path }, transaction);
 
-        if ( publisher_uid ) {
+        if (publisher_uid) {
             let publisherRecord = await dbs.Publisher.findOne({ uid: publisher_uid }, transaction);
 
-            if ( user_uid ) {
+            if (user_uid) {
 
             }
         }
@@ -83,7 +84,7 @@ declare global {
 
 
 export const isAuthenticated = (req: Request, res: Response, next: NextFunction) => {
-    if ( !req.user ) {
+    if (!req.user) {
         return responseError(res, CreateError(ErrorCodes.UNAUTHORIZED), 401);
     }
     next();
@@ -111,7 +112,7 @@ export const getIdToken = (req: Request) => {
         // console.log('Found "Authorization" header');
         // Read the ID Token from the Authorization header.
         idToken = req.headers.authorization.split('Bearer ')[1];
-    } else if(req.cookies) {
+    } else if (req.cookies) {
         logger.debug('Found "__session" cookie');
         // Read the ID Token from cookie.
         idToken = req.cookies.__session;
@@ -126,7 +127,8 @@ export const getIdToken = (req: Request) => {
 export const validateFirebaseIdToken = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const idToken = getIdToken(req);
-        if ( idToken ) {
+
+        if (idToken) {
             req.user = await admin.auth().verifyIdToken(idToken);
         }
         return next();
@@ -152,7 +154,7 @@ export const validateAdminIdToken = async (req: Request, res: Response, next: Ne
 export const checkUserDenied = (name: string) => {
     return (req: Request, res: Response, next: NextFunction) => {
         const claim = req.user.zempie;
-        if ( claim?.deny[name]?.state && claim.deny[name].date >= Date.now() ) {
+        if (claim?.deny[name]?.state && claim.deny[name].date >= Date.now()) {
             return responseError(res, CreateError(ErrorCodes.ACCESS_DENY), 403);
             // return throwError(res, `Access Denied: ${name}`, 403)
         }
@@ -168,4 +170,15 @@ export const adminTracking = async (req: Request, res: Response, next: NextFunct
         body: JSON.stringify(req.body)
     })
     return next();
+}
+
+export const validateGameToken = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const idToken = getIdToken(req);
+        req.user = await gameAuthController.verifyToken({ token: idToken });
+        return next();
+    }
+    catch (error) {
+        return responseError(res, CreateError(ErrorCodes.UNAUTHORIZED), 401);
+    }
 }
