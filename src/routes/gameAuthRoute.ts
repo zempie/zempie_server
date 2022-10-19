@@ -15,7 +15,7 @@ export default (router: Router) => {
   //게임 서버 
   router.get(`${apiVer}/game/user/info`, validateGameToken, convert(gameAuthController.getInfo))
 
-  router.get(`${apiVer}/game/access-token`, convert(gameAuthController.createGameToken))
+  // router.get(`${apiVer}/game/access-token`, convert(gameAuthController.createGameToken))
 
 
 }
