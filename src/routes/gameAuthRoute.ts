@@ -1,5 +1,6 @@
 import { Router } from 'express';
-import convert from '../controllers/_convert';
+// import convert from '../controllers/_convert';
+import convert from '../controllers/_gameConvert';
 import gameAuthController from '../controllers/gameAuthController';
 import { validateGameToken } from './_common';
 
