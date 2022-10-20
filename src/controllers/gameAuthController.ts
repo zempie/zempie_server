@@ -33,7 +33,7 @@ class GameAuthController {
 
   }
 
-  async verifyToken({ token }: { token: string }) {
+  async verifyToken({ token }: { token: any }) {
 
     try {
       return { info: jwt.verify(token, SECRET_KEY) }
