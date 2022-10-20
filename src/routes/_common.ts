@@ -172,11 +172,23 @@ export const adminTracking = async (req: Request, res: Response, next: NextFunct
     return next();
 }
 
+//게임서버 유저 토큰 확인
+
 export const validateGameToken = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const idToken = getIdToken(req);
-        req.user = (await gameAuthController.verifyToken({ token: idToken })).info;
-        return next();
+        const apiKey = req.query.key
+        const isApiKeyValid = await gameAuthController.verifyGameToken(apiKey)
+
+        if (isApiKeyValid) {
+            const idToken = getIdToken(req);
+            req.user = (await gameAuthController.verifyToken({ token: idToken })).info;
+            return next();
+        } else {
+            return responseError(res, CreateError(ErrorCodes.UNAUTHORIZED), 401);
+
+        }
+
+
     }
     catch (error) {
         return responseError(res, CreateError(ErrorCodes.UNAUTHORIZED), 401);
