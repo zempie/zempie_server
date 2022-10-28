@@ -10,13 +10,14 @@ module.exports = {
             watch: false,
             ignore_watch : ["node_modules", "public"],
             env: {
-                NODE_ENV: 'development'
+                NODE_ENV: 'development',
+                ZEMPLAY_UID:'BXh9SxBmVKSeaK8GuLYkSdYRcyN2'
             },
             env_production: {
                 NODE_ENV: 'production'
             },
             env_staging: {
-                NODE_ENV: 'staging'
+                NODE_ENV: 'staging',
             }
         }
     ],

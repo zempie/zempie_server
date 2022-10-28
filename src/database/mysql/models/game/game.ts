@@ -108,7 +108,7 @@ class GameModel extends Model {
             enabled: true,
             category: {
                 [Op.ne]: 2,
-            }
+            },
         }
 
 
@@ -165,6 +165,12 @@ class GameModel extends Model {
                 },
                 {
                     model: dbs.User.model,
+                    where: {
+                        uid: {
+                            //zemplay 관리 계정
+                            [Op.ne]: process.env.ZEMPLAY_UID
+                        }
+                    }
                 }
             ],
             limit: _.toNumber(limit),
