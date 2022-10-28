@@ -11,6 +11,7 @@ import { IMessageQueueOptions, IServerOptions } from '../commons/interfaces';
 import mq from '../controllers/messageQueues/apiMQ';
 import redirectRoute from '../routes/redirectRoute';
 import communityRoute from '../routes/communityRoute'
+import gameAuthRoute from '../routes/gameAuthRoute';
 
 class ApiServer extends Server {
 
@@ -40,6 +41,7 @@ class ApiServer extends Server {
         redirectRoute(app);
 
         communityRoute(app)
+        gameAuthRoute(app)
 
         // tcpRoute(app);
 
