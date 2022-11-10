@@ -13,32 +13,34 @@ class GameModel extends Model {
         this.name = 'game';
         this.attributes = {
             // uid:                { type: DataTypes.UUID, allowNull: false },
-            activated: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false },
-            enabled: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false },
+            activated:          { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false },
+            enabled:            { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false },
 
-            official: { type: DataTypes.BOOLEAN, defaultValue: false },
-            category: { type: DataTypes.INTEGER, allowNull: false, defaultValue: eGameCategory.Challenge },
-            user_id: { type: DataTypes.INTEGER },
+            official:           { type: DataTypes.BOOLEAN, defaultValue: false },
+            category:           { type: DataTypes.INTEGER, allowNull: false, defaultValue: eGameCategory.Challenge },
+            user_id:            { type: DataTypes.INTEGER },
 
-            pathname: { type: DataTypes.STRING(50), allowNull: false, unique: true },
-            title: { type: DataTypes.STRING(50), allowNull: false, defaultValue: '' },
-            description: { type: DataTypes.STRING(2000), defaultValue: '' },
-            version: { type: DataTypes.STRING(20), defaultValue: '0.0.1' },
-            stage: { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0 },
+            pathname:           { type: DataTypes.STRING(50), allowNull: false, unique: true },
+            title:              { type: DataTypes.STRING(50), allowNull: false, defaultValue: '' },
+            description:        { type: DataTypes.STRING(2000), defaultValue: '' },
+            version:            { type: DataTypes.STRING(20), defaultValue: '0.0.1' },
+            stage:              { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0 },
+            support_platform:   { type: DataTypes.INTEGER,  defaultValue: 0 },
+            game_type:          { type: DataTypes.INTEGER, defaultValue: 1 },
 
-            control_type: { type: DataTypes.SMALLINT, defaultValue: 0 },
-            hashtags: { type: DataTypes.STRING, allowNull: false },
+            control_type:       { type: DataTypes.SMALLINT, defaultValue: 0 },
+            hashtags:           { type: DataTypes.STRING, allowNull: false },
 
-            count_start: { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0 },
-            count_over: { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0 },
-            count_heart: { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0 },
+            count_start:        { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0 },
+            count_over:         { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0 },
+            count_heart:        { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0 },
 
-            url_game: { type: DataTypes.STRING },
-            url_thumb: { type: DataTypes.STRING },
-            url_thumb_webp: { type: DataTypes.STRING },
-            url_thumb_gif: { type: DataTypes.STRING },
+            url_game:           { type: DataTypes.STRING },
+            url_thumb:          { type: DataTypes.STRING },
+            url_thumb_webp:     { type: DataTypes.STRING },
+            url_thumb_gif:      { type: DataTypes.STRING },
 
-            url_banner: { type: DataTypes.STRING }
+            url_banner:         { type: DataTypes.STRING }
 
 
             // url_title:          { type: DataTypes.STRING },
@@ -63,7 +65,21 @@ class GameModel extends Model {
             this.model.sequelize.queryInterface.addColumn(this.model.tableName, 'url_banner', {
                 type: DataTypes.STRING,
                 allowNull: true,
+                after: 'url_thumb_gif'
+            })
+        }
+        if (!desc['support_platform']) {
+            this.model.sequelize.queryInterface.addColumn(this.model.tableName, 'support_platform', {
+                type: DataTypes.INTEGER,
+                defaultValue: 0,
                 after: 'stage'
+            })
+        }
+        if (!desc['game_type']) {
+            this.model.sequelize.queryInterface.addColumn(this.model.tableName, 'game_type', {
+                type: DataTypes.INTEGER,
+                defaultValue: 1,
+                after: 'support_platform'
             })
         }
         // if ( !desc['category'] ) {
@@ -168,7 +184,7 @@ class GameModel extends Model {
                     where: {
                         uid: {
                             //zemplay 관리 계정
-                            [Op.ne]: process.env.ZEMPLAY_UID
+                            [Op.ne]: process.env.ZEMPLAY_UID || ''
                         }
                     }
                 }

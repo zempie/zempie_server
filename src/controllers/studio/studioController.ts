@@ -46,6 +46,7 @@ const replaceExt = require('replace-ext');
 // }
 
 interface ICreateProject extends IVersion, IProject {
+    category?:number
 
 }
 
@@ -58,7 +59,8 @@ interface IProject {
     pathname : string,
     hashtags? : string,
     size? : number,
-    stage? : number
+    stage? : number,
+    
 }
 
 interface IVersion {
@@ -73,6 +75,8 @@ interface IVersion {
     state? : string,
     autoDeploy? : boolean,
     size? : number,
+    file_type?: number,
+    support_platform?:number
 }
 
 class StudioController {
@@ -237,7 +241,11 @@ class StudioController {
                 url_thumb : project.picture,
                 url_thumb_webp : project.picture_webp,
                 url_thumb_gif : project.picture2,
+                category : params.category,
+                support_platform : params.support_platform,
+                game_type : params.file_type         
             }, transaction );
+
             project.game_id = game.id;
 
             if(params.startFile) {
@@ -251,6 +259,8 @@ class StudioController {
                 versionParams.startFile = params.startFile || '';
                 versionParams.size = params.size || 0;
                 versionParams.description = params.version_description || '';
+                versionParams.file_type = params.file_type || 1;
+                versionParams.support_platform = params.support_platform || 0;
 
 
                 const versionFiles = files;
@@ -397,6 +407,10 @@ class StudioController {
 
             if( params.hashtags ) {
                 game.hashtags = params.hashtags;
+            }
+
+            if( params.category ) {
+                game.category = params.category;
             }
 
             if( parseInt(params.deploy_version_id) === 0 ) {
@@ -604,6 +618,25 @@ class StudioController {
             await dbs.SurveyResult.create({ user_uid, survey_id: survey.id });
         }
     }
+
+    //upload all type of game files
+    uploadGameFile = async ( params : any, { uid }: DecodedIdToken, {req:{files}}: IRoute) => {
+         console.log(params)
+        if(files){
+        return   
+        // await FileManager.s3upload({
+        //         bucket: Opt.AWS.Bucket.RscPublic,
+        //         // key : file2.name,
+        //         key : replaceExt( 'thumb', path.extname(files.name) ),
+        //         filePath : files.path,
+        //         uid,
+        //         subDir: `/project/${files.id}/file`
+        //     });
+            
+        }else{
+            return {}
+        }
+    }
 }
 
 
@@ -660,3 +693,4 @@ async function uploadVersionFile( files : any, uid : string, subDir : string, st
         resolve(url);
     });
 }
+

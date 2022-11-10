@@ -128,3 +128,16 @@ export enum eProjectStage {
     Complete,
     Monetization,
 }
+
+
+export enum eGameType {
+    Html = 1,
+    Download
+}
+  
+export enum ePlatformType {
+    Window = 1,
+    Mac,
+    Android,
+    Ios
+}
