@@ -39,7 +39,7 @@ class ApiMQ extends SrvMQ {
     }
 
     private processBulk = async () =>{
-        dbs.GameLog.bulkCreate(this.game_logs);
+        dbs.GameLog?.bulkCreate(this.game_logs);
         this.game_logs = [];
 
         // 게임 오버 카운팅
