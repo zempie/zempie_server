@@ -11,7 +11,6 @@ import * as path from "path";
 import Opt from '../../../config/opt';
 import {eProjectStage, eProjectState} from '../../commons/enums';
 import {parseBoolean} from "../../commons/utils";
-import { logger } from 'src/commons/logger';
 
 const replaceExt = require('replace-ext');
 
@@ -160,7 +159,6 @@ class StudioController {
 
     createProject = async ( params : ICreateProject, {uid}: DecodedIdToken, {req:{files}}: IRoute) => {
 
-        logger.debug(params)
 
         // 불량 단어 색출
         if ( !dbs.BadWords.areOk(params) ) {

@@ -170,7 +170,7 @@ export default class Server {
             serviceAccount = require('../../config/firebase/service-account.json');
         }
         else {
-            serviceAccount = require('../../config/firebase/zempie-dev-firebase-adminsdk-mt5jv-9e05cbc8f2.json');
+            serviceAccount = require('../../config/firebase/client-secret.json');
         }
         admin.initializeApp({
             credential: admin.credential.cert(serviceAccount),
