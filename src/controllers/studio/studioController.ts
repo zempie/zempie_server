@@ -159,6 +159,8 @@ class StudioController {
 
     createProject = async ( params : ICreateProject, {uid}: DecodedIdToken, {req:{files}}: IRoute) => {
 
+        console.log(params)
+
         // 불량 단어 색출
         if ( !dbs.BadWords.areOk(params) ) {
             throw CreateError(ErrorCodes.FORBIDDEN_STRING);
@@ -482,10 +484,6 @@ class StudioController {
                     throw CreateError(ErrorCodes.ALREADY_EXIST_UPDATE_VERSION);
                 }
             }
-
-
-
-
 
             const result = await dbs.ProjectVersion.findAndCountAll( {
                 project_id
