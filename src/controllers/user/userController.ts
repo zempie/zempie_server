@@ -11,7 +11,7 @@ import FileManager from '../../services/fileManager';
 import { CreateError, ErrorCodes } from '../../commons/errorCodes';
 import { getGameData } from '../_common';
 import { isOK_channelID } from '../../commons/utils';
-import { ClientSession } from 'mongoose';
+// import { ClientSession } from 'mongoose';
 import Opt from '../../../config/opt';
 const { Url, CORS } = Opt;
 const replaceExt = require('replace-ext');
@@ -504,21 +504,21 @@ class UserController {
     }
 
 
-    testMongo = async () => {
-        await docs.User2.getTransaction(async (session: ClientSession) => {
-            await docs.Sample.create({
-                name: 'wndhrl',
-                text: 'wndhrdlajrdjdtjdkgksmsep'
-            }, session);
-            await docs.Sample2.create({
-                name: 'gpfk',
-                text: 'gpfkakswlrhtlvek'
-            }, session);
-            // const doc = await docs.Sample.findOne({name: 'wndhrl' }, { session });
-            // doc.text = 'wndhrlEkajrj'
-            // doc.save({ session });
-        });
-    }
+    // testMongo = async () => {
+    //     await docs.User2.getTransaction(async (session: ClientSession) => {
+    //         await docs.Sample.create({
+    //             name: 'wndhrl',
+    //             text: 'wndhrdlajrdjdtjdkgksmsep'
+    //         }, session);
+    //         await docs.Sample2.create({
+    //             name: 'gpfk',
+    //             text: 'gpfkakswlrhtlvek'
+    //         }, session);
+    //         // const doc = await docs.Sample.findOne({name: 'wndhrl' }, { session });
+    //         // doc.text = 'wndhrlEkajrj'
+    //         // doc.save({ session });
+    //     });
+    // }
 
 
     testClaim = async (params: any, user: DecodedIdToken) => {

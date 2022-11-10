@@ -9,7 +9,7 @@ import * as ws from 'ws';
 import * as getPort from 'get-port';
 
 import { Request, Response, Router } from 'express';
-import {  } from 'express-ws'
+import { } from 'express-ws'
 import { Sequelize } from 'sequelize';
 
 import * as admin from 'firebase-admin';
@@ -17,7 +17,7 @@ import { firebase } from '../commons/globals';
 
 import MySql from '../database/mysql';
 import Redis from '../database/redis';
-import Mongo from '../database/mongodb';
+// import Mongo from '../database/mongodb';
 
 import { IMessageQueueOptions, IServerOptions } from '../commons/interfaces';
 import * as Pkg from '../../package.json';
@@ -101,7 +101,7 @@ export default class Server {
 
 
     protected setEJS() {
-        if ( !!this.app ) {
+        if (!!this.app) {
             this.app.set('views', path.join(__dirname, '..', '..', '/views'));
             this.app.set('view engine', 'ejs');
             this.app.engine('html', ejs.renderFile);
@@ -110,7 +110,7 @@ export default class Server {
 
 
     protected setSwagger() {
-        if ( !!this.app && process.env.NODE_ENV !== 'production' ) {
+        if (!!this.app && process.env.NODE_ENV !== 'production') {
             const options = {
                 // explorer: true
             };
@@ -120,7 +120,7 @@ export default class Server {
 
 
     protected setGraphQL() {
-        if ( !!this.app ) {
+        if (!!this.app) {
             const models: any = {
                 Sequelize,
                 sequelize: this.db,
@@ -144,14 +144,14 @@ export default class Server {
                         return Promise.resolve();
                     }
                     catch (e) {
-                        return  Promise.reject(e);
+                        return Promise.reject(e);
                     }
                 }
             }
             const { generateSchema } = require('sequelize-graphql-schema')(options);
             const schema = generateSchema(models);
             const hooker: any = (req: Request, res: Response, next: any) => {
-                if ( req.method.toUpperCase() !== 'GET' && req.body?.query?.includes('Post') ) {
+                if (req.method.toUpperCase() !== 'GET' && req.body?.query?.includes('Post')) {
                     return adminTracking(req, res, next);
                 }
                 next();
@@ -166,7 +166,7 @@ export default class Server {
 
     protected setFirebase() {
         let serviceAccount;
-        if ( process.env.NODE_ENV === 'production' ) {
+        if (process.env.NODE_ENV === 'production') {
             serviceAccount = require('../../config/firebase/service-account.json');
         }
         else {
@@ -186,10 +186,10 @@ export default class Server {
         // await Consumer.connect(options.groupId, options.autoCommit, options.onMessage)
         // Consumer.addTopic(options.addTopics);
         await Kafka.initialize(options.groupId);
-        if ( options.addTopics ) {
+        if (options.addTopics) {
             await Kafka.addTopics(options.addTopics);
         }
-        if ( options.addGateways ) {
+        if (options.addGateways) {
             await Kafka.addGateways(options.addGateways);
         }
         await Kafka.run(options.eachMessage);
@@ -197,12 +197,12 @@ export default class Server {
 
 
 
-    protected setExpress(options : IServerOptions) : void {
+    protected setExpress(options: IServerOptions): void {
         this.app = express();
-        if ( this.app ) {
-            if ( !!options.static_path && options.static_path instanceof Array ) {
+        if (this.app) {
+            if (!!options.static_path && options.static_path instanceof Array) {
                 options.static_path.forEach((obj: any) => {
-                    if ( this.app ) {
+                    if (this.app) {
                         this.app.use(obj.path, express.static(obj.route));
                     }
                 })
@@ -210,7 +210,7 @@ export default class Server {
 
             this.app.use(cors({ credentials: true, origin: CORS.allowedOrigin }));
             this.app.use(bodyParser.json());
-            this.app.use(bodyParser.urlencoded({ extended:false }));
+            this.app.use(bodyParser.urlencoded({ extended: false }));
 
             options.tcp && this.setTcp();
             this.routes(this.app);
@@ -231,7 +231,7 @@ export default class Server {
 
 
     protected setTcp() {
-        if ( this.app ) {
+        if (this.app) {
             const instance = expressWs(this.app);
             this.wss = instance.getWss()
         }
@@ -258,13 +258,13 @@ export default class Server {
 
 
 
-    public start = async () : Promise<void> => {
+    public start = async (): Promise<void> => {
         await this.beforeStart();
 
         // const port = await getPort({ port: getPort.makeRange(this.options.port, this.options.port+100)});
         const port = this.options.port;
         const errorCallback: any = (err: Error) => {
-            if ( err ) {
+            if (err) {
                 console.error(err.stack);
                 return
             }
@@ -273,14 +273,14 @@ export default class Server {
             logger.info(`[${process.env.NODE_ENV || 'local'}] Api Server [ver.${Pkg.version}] has started. (port: ${port})`.cyan.bold)
         };
 
-        if ( !!this.app ) {
+        if (!!this.app) {
             this.app.listen(port, errorCallback);
         }
 
         await this.afterStart();
     }
 
-    protected beforeStart = async(): Promise<void> => {
+    protected beforeStart = async (): Promise<void> => {
     }
 
     protected afterStart = async (): Promise<void> => {
