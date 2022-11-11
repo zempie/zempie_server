@@ -76,7 +76,7 @@ interface IVersion {
     autoDeploy? : boolean,
     size? : number,
     file_type?: number,
-    support_platform?:number
+    support_platform?:string
 }
 
 class StudioController {
@@ -170,8 +170,6 @@ class StudioController {
 
 
         return dbs.Project.getTransaction( async (transaction : Transaction)=>{
-            // const dev = await dbs.Developer.findOne( {user_uid : uid} );
-            // params.developer_id = dev.id;
 
             const user = await dbs.User.findOne( { uid } );
             params.user_id = user.id;
@@ -261,7 +259,7 @@ class StudioController {
                 versionParams.size = params.size || 0;
                 versionParams.description = params.version_description || '';
                 versionParams.file_type = params.file_type || 1;
-                versionParams.support_platform = params.support_platform || 0;
+                versionParams.support_platform = params.support_platform || '';
 
 
                 const versionFiles = files;
@@ -295,7 +293,7 @@ class StudioController {
                 versionParams.size = params.size || 0;
                 versionParams.description = params.version_description || '';
                 versionParams.file_type = params.file_type || 1;
-                versionParams.support_platform = params.support_platform || 0;
+                versionParams.support_platform = params.support_platform || '';
 
                 const versionFiles = files;
 

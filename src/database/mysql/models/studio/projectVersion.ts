@@ -21,7 +21,7 @@ class ProjectVersionModel extends Model {
             reason:             { type: DataTypes.STRING, allowNull: true },
             autoDeploy:         { type: DataTypes.BOOLEAN, defaultValue: false },
             file_type:          { type: DataTypes.INTEGER, defaultValue: 1 },  
-            support_platform:   { type: DataTypes.INTEGER, defaultValue: 0 },
+            support_platform:   { type: DataTypes.STRING(50), defaultValue: '' },
         }
     }
 
@@ -52,8 +52,8 @@ class ProjectVersionModel extends Model {
         }
         if ( !desc['support_platform'] ) {
             this.model.sequelize.queryInterface.addColumn(this.model.tableName, 'support_platform', {
-                type: DataTypes.INTEGER,
-                defaultValue: 0,
+                type: DataTypes.STRING(50),
+                defaultValue: '',
                 after: 'file_type'
             })
         }
