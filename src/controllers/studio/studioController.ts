@@ -9,7 +9,7 @@ import admin from 'firebase-admin';
 import DecodedIdToken = admin.auth.DecodedIdToken;
 import * as path from "path";
 import Opt from '../../../config/opt';
-import {eProjectStage, eProjectState} from '../../commons/enums';
+import {eGameType, eProjectStage, eProjectState} from '../../commons/enums';
 import {parseBoolean} from "../../commons/utils";
 
 const replaceExt = require('replace-ext');
@@ -248,6 +248,7 @@ class StudioController {
 
             project.game_id = game.id;
 
+            //HTML startfile 있는 경우
             if(params.startFile) {
                 const versionParams: IVersion = {};
 
@@ -271,7 +272,7 @@ class StudioController {
                     game.url_game = versionParams.url;
                     await game.save( {transaction} );
                 }
-
+                
                 const version = await dbs.ProjectVersion.create(versionParams, transaction);
                 // project.update_version_id = version.id;
 
@@ -280,6 +281,39 @@ class StudioController {
                 }
 
             }
+
+            //다운로드 파일인경우
+            if( _.toNumber(params.file_type) === eGameType.Download ) {
+                const versionParams: IVersion = {};
+
+                versionParams.project_id = project.id;
+                versionParams.game_id = game.id;
+                versionParams.number = 1;
+                versionParams.autoDeploy = params.autoDeploy || true;
+                versionParams.version = params.version || '1.0.1';
+                versionParams.startFile ='';
+                versionParams.size = params.size || 0;
+                versionParams.description = params.version_description || '';
+                versionParams.file_type = params.file_type || 1;
+                versionParams.support_platform = params.support_platform || 0;
+
+                const versionFiles = files;
+
+                if (versionFiles ) {
+                    const subDir = `/project/${project.id}/${uuid()}`;
+                    versionParams.url = await uploadDownVersionFile(versionFiles, uid, subDir);
+                    versionParams.state = parseBoolean(params.autoDeploy)  ? 'deploy' : 'passed';
+                    game.url_game = versionParams.url;
+                    await game.save( {transaction} );
+                }
+
+                const version = await dbs.ProjectVersion.create(versionParams, transaction);
+
+                if( parseBoolean(params.autoDeploy) ){
+                    project.deploy_version_id = version.id;
+                }
+            }
+
 
             return await project.save({transaction});
         })
@@ -615,24 +649,6 @@ class StudioController {
         }
     }
 
-    //upload all type of game files
-    uploadGameFile = async ( params : any, { uid }: DecodedIdToken, {req:{files}}: IRoute) => {
-         console.log(params)
-        if(files){
-        return   
-        // await FileManager.s3upload({
-        //         bucket: Opt.AWS.Bucket.RscPublic,
-        //         // key : file2.name,
-        //         key : replaceExt( 'thumb', path.extname(files.name) ),
-        //         filePath : files.path,
-        //         uid,
-        //         subDir: `/project/${files.id}/file`
-        //     });
-            
-        }else{
-            return {}
-        }
-    }
 }
 
 
@@ -682,6 +698,29 @@ async function uploadVersionFile( files : any, uid : string, subDir : string, st
             if( file.name === startFile ) {
                 url = data.Location;
             }
+        }
+    }
+
+    return new Promise(function (resolve) {
+        resolve(url);
+    });
+}
+
+
+async function uploadDownVersionFile( files : any, uid : string, subDir : string ) : Promise<string> {
+
+    let url = '';
+    for( let key in files ) {
+        const file = files[key];
+        if( file ) {
+            const data = await FileManager.s3upload( {
+                bucket: Opt.AWS.Bucket.Rsc,
+                key : file.name,
+                filePath : file.path,
+                uid,
+                subDir,
+            }) as any;  
+            url = data.Location;         
         }
     }
 

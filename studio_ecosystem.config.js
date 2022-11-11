@@ -20,16 +20,4 @@ module.exports = {
             }
         }
     ],
-
-    deploy: {
-        development: {
-            user: 'dev103',
-            host: [{host:'192.168.0.10', port:'2105'}],
-            ref : 'origin/master',
-            repo: 'git@192.168.0.36:raptor/platform-api-server.git',
-            path: '/home/dev103/projects/zempie/studio-api-server',
-            ssh_options: '',
-            'post-deploy': 'npm install && tsc && pm2 startOrRestart studio_ecosystem.config.js --env development'
-        },
-    }
 };

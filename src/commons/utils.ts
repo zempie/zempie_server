@@ -169,6 +169,9 @@ export function getContentType(file : any) {
     else if ( ext.includes('.mp4') ) {
         return 'video/mp4'
     }
+    else if ( ext.includes('.zip') ) {
+        return 'application/zip'
+    }
     else {
         return undefined
     }
