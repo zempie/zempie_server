@@ -20,6 +20,8 @@ class ProjectVersionModel extends Model {
             description:        { type: DataTypes.STRING, allowNull: true },
             reason:             { type: DataTypes.STRING, allowNull: true },
             autoDeploy:         { type: DataTypes.BOOLEAN, defaultValue: false },
+            file_type:          { type: DataTypes.INTEGER, defaultValue: 1 },  
+            support_platform:   { type: DataTypes.STRING(50), defaultValue: '' },
         }
     }
 
@@ -40,9 +42,24 @@ class ProjectVersionModel extends Model {
                 after: 'url'
             })
         }
+
+        if ( !desc['file_type'] ) {
+            this.model.sequelize.queryInterface.addColumn(this.model.tableName, 'file_type', {
+                type: DataTypes.INTEGER,
+                defaultValue: 1,
+                after: 'size'
+            })
+        }
+        if ( !desc['support_platform'] ) {
+            this.model.sequelize.queryInterface.addColumn(this.model.tableName, 'support_platform', {
+                type: DataTypes.STRING(50),
+                defaultValue: '',
+                after: 'file_type'
+            })
+        }
     }
 
-    async create( { project_id, game_id, version, url, description, number, state, autoDeploy, size } : any, transaction?: Transaction ) {
+    async create( { project_id, game_id, version, url, description, number, state, autoDeploy, size, file_type, support_platform } : any, transaction?: Transaction ) {
 
         const value : any = {
             project_id,
@@ -68,10 +85,19 @@ class ProjectVersionModel extends Model {
             value.size = size;
         }
 
+        if( file_type ) {
+            value.file_type = file_type;
+
+        }
+
+        if( support_platform ) {
+            value.support_platform = support_platform;
+
+        }
         return super.create( value, transaction );
     }
 
-    async updateVersion( { id, state, url, description, reason, autoDeploy } : any, transaction?: Transaction ) {
+    async updateVersion( { id, state, url, description, reason, autoDeploy, file_type, support_platform } : any, transaction?: Transaction ) {
         const version = await super.findOne( { id }, transaction );
 
 
@@ -94,6 +120,15 @@ class ProjectVersionModel extends Model {
         if( autoDeploy === false || autoDeploy ) {
             version.autoDeploy = autoDeploy;
         }
+
+        if( file_type ) {
+            version.file_type = file_type;
+        }
+        
+        if( support_platform ) {
+            version.support_platform = support_platform;
+        }
+
 
         await version.save({ transaction });
     }

@@ -41,7 +41,7 @@ class ApiMQ extends SrvMQ {
         }, 1000 * 10);
     }
 
-    private processBulk = async () => {
+    private processBulk = async () =>{
         dbs.GameLog?.bulkCreate(this.game_logs);
         this.game_logs = [];
 

@@ -13,6 +13,8 @@ export function getGameData(game: any) {
         stage: game.stage,
         count_over: game.count_start > game.count_over ? game.count_start : game.count_over,
         count_heart: game.count_heart,
+        support_platform:game.support_platform,
+        game_type:game.game_type,
         url_game: game.url_game,
         url_thumb: game.url_thumb,
         url_thumb_webp: game.url_thumb_webp,

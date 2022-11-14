@@ -62,6 +62,6 @@ export default (router: Router) => {
 
 
     // for testing
-    router.get(`${apiVer}/test-mongo`, convert(UserController.testMongo));
+    // router.get(`${apiVer}/test-mongo`, convert(UserController.testMongo));
     router.post(`${apiVer}/test-claim`, validateFirebaseIdToken, checkUserDenied('reply'), convert(UserController.testClaim));
 }

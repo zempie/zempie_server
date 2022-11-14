@@ -9,7 +9,7 @@ import admin from 'firebase-admin';
 import DecodedIdToken = admin.auth.DecodedIdToken;
 import * as path from "path";
 import Opt from '../../../config/opt';
-import {eProjectStage, eProjectState} from '../../commons/enums';
+import {eGameType, eProjectStage, eProjectState} from '../../commons/enums';
 import {parseBoolean} from "../../commons/utils";
 
 const replaceExt = require('replace-ext');
@@ -46,6 +46,7 @@ const replaceExt = require('replace-ext');
 // }
 
 interface ICreateProject extends IVersion, IProject {
+    category?:number
 
 }
 
@@ -58,7 +59,8 @@ interface IProject {
     pathname : string,
     hashtags? : string,
     size? : number,
-    stage? : number
+    stage? : number,
+    
 }
 
 interface IVersion {
@@ -73,6 +75,8 @@ interface IVersion {
     state? : string,
     autoDeploy? : boolean,
     size? : number,
+    file_type?: number,
+    support_platform?:string
 }
 
 class StudioController {
@@ -154,7 +158,7 @@ class StudioController {
 
 
     createProject = async ( params : ICreateProject, {uid}: DecodedIdToken, {req:{files}}: IRoute) => {
-
+      
         // 불량 단어 색출
         if ( !dbs.BadWords.areOk(params) ) {
             throw CreateError(ErrorCodes.FORBIDDEN_STRING);
@@ -166,8 +170,6 @@ class StudioController {
 
 
         return dbs.Project.getTransaction( async (transaction : Transaction)=>{
-            // const dev = await dbs.Developer.findOne( {user_uid : uid} );
-            // params.developer_id = dev.id;
 
             const user = await dbs.User.findOne( { uid } );
             params.user_id = user.id;
@@ -237,9 +239,14 @@ class StudioController {
                 url_thumb : project.picture,
                 url_thumb_webp : project.picture_webp,
                 url_thumb_gif : project.picture2,
+                category : params.category,
+                support_platform : params.support_platform,
+                game_type : params.file_type         
             }, transaction );
+
             project.game_id = game.id;
 
+            //HTML startfile 있는 경우
             if(params.startFile) {
                 const versionParams: IVersion = {};
 
@@ -251,6 +258,8 @@ class StudioController {
                 versionParams.startFile = params.startFile || '';
                 versionParams.size = params.size || 0;
                 versionParams.description = params.version_description || '';
+                versionParams.file_type = params.file_type || 1;
+                versionParams.support_platform = params.support_platform || '';
 
 
                 const versionFiles = files;
@@ -261,7 +270,7 @@ class StudioController {
                     game.url_game = versionParams.url;
                     await game.save( {transaction} );
                 }
-
+                
                 const version = await dbs.ProjectVersion.create(versionParams, transaction);
                 // project.update_version_id = version.id;
 
@@ -270,6 +279,39 @@ class StudioController {
                 }
 
             }
+
+            //다운로드 파일인경우
+            if( _.toNumber(params.file_type) === eGameType.Download ) {
+                const versionParams: IVersion = {};
+
+                versionParams.project_id = project.id;
+                versionParams.game_id = game.id;
+                versionParams.number = 1;
+                versionParams.autoDeploy = params.autoDeploy || true;
+                versionParams.version = params.version || '1.0.1';
+                versionParams.startFile ='';
+                versionParams.size = params.size || 0;
+                versionParams.description = params.version_description || '';
+                versionParams.file_type = params.file_type || 1;
+                versionParams.support_platform = params.support_platform || '';
+
+                const versionFiles = files;
+
+                if (versionFiles ) {
+                    const subDir = `/project/${project.id}/${uuid()}`;
+                    versionParams.url = await uploadDownVersionFile(versionFiles, uid, subDir);
+                    versionParams.state = parseBoolean(params.autoDeploy)  ? 'deploy' : 'passed';
+                    game.url_game = versionParams.url;
+                    await game.save( {transaction} );
+                }
+
+                const version = await dbs.ProjectVersion.create(versionParams, transaction);
+
+                if( parseBoolean(params.autoDeploy) ){
+                    project.deploy_version_id = version.id;
+                }
+            }
+
 
             return await project.save({transaction});
         })
@@ -399,6 +441,10 @@ class StudioController {
                 game.hashtags = params.hashtags;
             }
 
+            if( params.category ) {
+                game.category = params.category;
+            }
+
             if( parseInt(params.deploy_version_id) === 0 ) {
                 if( project.deploy_version_id ) {
                     const preDeployVersion = await dbs.ProjectVersion.findOne(  {
@@ -468,10 +514,6 @@ class StudioController {
                     throw CreateError(ErrorCodes.ALREADY_EXIST_UPDATE_VERSION);
                 }
             }
-
-
-
-
 
             const result = await dbs.ProjectVersion.findAndCountAll( {
                 project_id
@@ -604,6 +646,7 @@ class StudioController {
             await dbs.SurveyResult.create({ user_uid, survey_id: survey.id });
         }
     }
+
 }
 
 
@@ -660,3 +703,27 @@ async function uploadVersionFile( files : any, uid : string, subDir : string, st
         resolve(url);
     });
 }
+
+
+async function uploadDownVersionFile( files : any, uid : string, subDir : string ) : Promise<string> {
+
+    let url = '';
+    for( let key in files ) {
+        const file = files[key];
+        if( file ) {
+            const data = await FileManager.s3upload( {
+                bucket: Opt.AWS.Bucket.Rsc,
+                key : file.name,
+                filePath : file.path,
+                uid,
+                subDir,
+            }) as any;  
+            url = data.Location;         
+        }
+    }
+
+    return new Promise(function (resolve) {
+        resolve(url);
+    });
+}
+
