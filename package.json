@@ -4,7 +4,7 @@
   "main": "index.js",
   "scripts": {
     "build": "tsc",
-    "start": "export GOOGLE_APPLICATION_CREDENTIALS='./config/firebase/service-account.json' && node ./dist/src/run.js",
+    "start": "node ./dist/src/run.js",
     "startStudio": "node ./dist/src/runStudio.js",
     "startAdmin": "node ./dist/src/runAdmin.js",
     "startContent": "node ./dist/src/runContent.js",
