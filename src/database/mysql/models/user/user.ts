@@ -116,11 +116,12 @@ class UserModel extends Model {
                 model: dbs.UserGame.model,
                 as: 'gameRecords',
                 attributes: {
-                    exclude: ['created_at', 'updated_at', 'deleted_at'],
+                    exclude: ['updated_at', 'deleted_at'],
                 },
                 include: [{
                     model: dbs.Game.model,
-                }]
+                }],
+                order:['created_at','desc']
             },
             {
                 model: dbs.Game.model,
