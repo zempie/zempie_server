@@ -6,6 +6,7 @@ export function getGameData(game: any) {
         category: game.category,
         title: game.title,
         description: game.description,
+        created_at:game.created_at,
         pathname: game.pathname,
         version: game.version,
         control_type: game.control_type,
