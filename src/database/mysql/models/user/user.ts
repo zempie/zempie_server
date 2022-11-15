@@ -121,11 +121,12 @@ class UserModel extends Model {
                 include: [{
                     model: dbs.Game.model,
                 }],
+                order: [['created_at', 'desc']],
             },
             {
                 model: dbs.Game.model,
                 as: 'devGames',
-                order:['created_at','desc']
+                order: [['created_at', 'desc']],
             },
             {
                 model: dbs.Project.model,
