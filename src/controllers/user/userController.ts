@@ -100,7 +100,7 @@ class UserController {
         const { uid } = _user;
         let user = await caches.user.getInfo(uid);
         if (!user) {
-            const userRecord = await dbs.User.getInfo({ uid, id:_user.id });
+            const userRecord = await dbs.User.getInfo({ uid });
             if (!userRecord) {
                 throw CreateError(ErrorCodes.INVALID_USER_UID);
             }

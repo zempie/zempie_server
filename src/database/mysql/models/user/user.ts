@@ -65,7 +65,7 @@ class UserModel extends Model {
         }
     }
 
-    async getInfo({ uid, id }: DecodedIdToken, transaction?: Transaction) {
+    async getInfo({ uid }: DecodedIdToken, transaction?: Transaction) {
         return this.model.findOne({
             where: { uid },
             include: [
@@ -95,10 +95,7 @@ class UserModel extends Model {
                 // },
                 {
                     model: dbs.Game.model,
-                    as: 'devGames',
-                    where:{
-                        id:id
-                    }
+                    as: 'devGames',                   
                 },
             ],
             transaction
