@@ -1,4 +1,3 @@
-
 var jwt = require('jsonwebtoken');
 import * as _ from "lodash";
 import { CreateError, ErrorCodes } from '../commons/errorCodes';
@@ -26,7 +25,7 @@ class GameAuthController {
         picture: user.picture,
         name: user.name
       }
-      return { token: jwt.sign(payload, SECRET_KEY, { expiresIn: 60 * 60, issuer: 'zempie' }) };
+      return { token: jwt.sign(payload, SECRET_KEY) };
     } else {
       throw CreateError(ErrorCodes.UNAUTHORIZED);
     }
@@ -52,30 +51,13 @@ class GameAuthController {
 
   async createGameToken({ text }: { text: string }) {
 
-
-    let cipher = crypto.createCipheriv(
-      ALGORITHM, Buffer.from(CRYPTO_KEY), IV);
-
-    // Updating text
-    let encrypted = cipher.update(text);
-
-    // Using concatenation
-    encrypted = Buffer.concat([encrypted, cipher.final()]);
-
-    // Returning iv and encrypted data
-    return { encryptedData: encrypted.toString('hex') }
-
+    return { token: jwt.sign(text, SECRET_KEY) };
 
   }
 
-  async verifyGameToken(key: any) {
+  async verifyGameToken(token: string) {
 
-    const decipher = crypto.createDecipheriv(ALGORITHM, CRYPTO_KEY, Buffer.from(IV, 'hex'))
-
-    const decrpyted = Buffer.concat([decipher.update(Buffer.from(key, 'hex')), decipher.final()])
-
-
-    return API_AUTH_KEY === decrpyted.toString()
+    return { decodedToken: jwt.verify(token, SECRET_KEY) }
   }
 
 }
