@@ -9,14 +9,15 @@ const apiVer = `/api/v1`;
 export default (router: Router) => {
 
   //게임 토큰
-  router.post(`${apiVer}/create/token`, convert(gameAuthController.createUserToken));
-  router.post(`${apiVer}/verify/token`, convert(gameAuthController.verifyToken));
+  router.post(`${apiVer}/create/token`,            convert(gameAuthController.createUserToken));
+  router.post(`${apiVer}/verify/token`,            convert(gameAuthController.verifyToken));
+
+  //게임 서버 유저
+  router.get(`${apiVer}/game/user/info`,           validateGameToken, convert(gameAuthController.getInfo))
 
   //게임 서버 
-  router.get(`${apiVer}/game/user/info`, validateGameToken, convert(gameAuthController.getInfo))
-
-  router.post(`${apiVer}/game/auth/access-token`, convert(gameAuthController.createGameToken))
-  router.get(`${apiVer}/game/auth/verify-token`, convert(gameAuthController.verifyGameToken))
+  router.post(`${apiVer}/game/auth/access-token`,  convert(gameAuthController.createGameToken))
+  router.get(`${apiVer}/game/auth/verify-token`,   convert(gameAuthController.verifyGameToken))
 
 
 }

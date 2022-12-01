@@ -176,13 +176,12 @@ export const adminTracking = async (req: Request, res: Response, next: NextFunct
 
 export const validateGameToken = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const token = req.query.token
         const apiKey = getIdToken(req)
 
-        const isApiKeyValid = await gameAuthController.verifyGameToken(apiKey)
+        const {decodedToken} = await gameAuthController.verifyGameToken(apiKey)
 
-        if (isApiKeyValid) {
-            req.user = (await gameAuthController.verifyToken({ token })).info;
+        if (decodedToken) {
+            req.user = req.query
             return next();
         } else {
             return responseError(res, CreateError(ErrorCodes.UNAUTHORIZED), 401);
