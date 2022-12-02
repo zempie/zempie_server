@@ -8,8 +8,6 @@ const SECRET_KEY = crypto.randomBytes(48).toString('hex');
 const ALGORITHM = 'aes-256-cbc';
 const CRYPTO_KEY = crypto.randomBytes(16).toString('hex');
 const IV = crypto.randomBytes(16);
-const API_AUTH_KEY = 'zempie2022'
-
 
 class GameAuthController {
 

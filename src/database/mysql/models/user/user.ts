@@ -19,21 +19,21 @@ class UserModel extends Model {
     protected initialize() {
         this.name = 'user';
         this.attributes = {
-            uid: { type: DataTypes.STRING(36), allowNull: false, unique: true },
-            activated: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: true },
-            banned: { type: DataTypes.SMALLINT, allowNull: false, defaultValue: EBan.not },
+            uid:             { type: DataTypes.STRING(36), allowNull: false, unique: true },
+            activated:       { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: true },
+            banned:          { type: DataTypes.SMALLINT, allowNull: false, defaultValue: EBan.not },
 
-            name: { type: DataTypes.STRING(100), allowNull: true },
-            nickname: { type: DataTypes.STRING(50), allowNull: true },
-            channel_id: { type: DataTypes.STRING(36), allowNull: false },
-            picture: { type: DataTypes.STRING(250), allowNull: true },
-            url_banner: { type: DataTypes.STRING(250), allowNull: true },
-            provider: { type: DataTypes.STRING(20), allowNull: true, defaultValue: 'password' },
-            email: { type: DataTypes.STRING(50), allowNull: true },
-            email_verified: { type: DataTypes.BOOLEAN, defaultValue: false },
-            fcm_token: { type: DataTypes.STRING },
-            is_developer: { type: DataTypes.BOOLEAN, defaultValue: false },
-            last_log_in: { type: DataTypes.DATE },
+            name:            { type: DataTypes.STRING(100), allowNull: true },
+            nickname:        { type: DataTypes.STRING(50), allowNull: true },
+            channel_id:      { type: DataTypes.STRING(36), allowNull: false },
+            picture:         { type: DataTypes.STRING(250), allowNull: true },
+            url_banner:      { type: DataTypes.STRING(250), allowNull: true },
+            provider:        { type: DataTypes.STRING(20), allowNull: true, defaultValue: 'password' },
+            email:           { type: DataTypes.STRING(50), allowNull: true },
+            email_verified:  { type: DataTypes.BOOLEAN, defaultValue: false },
+            fcm_token:       { type: DataTypes.STRING },
+            is_developer:    { type: DataTypes.BOOLEAN, defaultValue: false },
+            last_log_in:     { type: DataTypes.DATE },
 
         };
     }
