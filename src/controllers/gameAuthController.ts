@@ -33,24 +33,18 @@ class GameAuthController {
   }
 
   async verifyToken({ token }: { token: any }) {
-
     try {
       return { info: jwt.verify(token, SECRET_KEY) }
-
     } catch (err) {
       throw CreateError(ErrorCodes.INVALID_TOKEN);
     }
   }
 
-  async getInfo({ }, { uid }: any) {
-    const user = await dbs.User.getInfo({ uid })
-
-    return { user: user }
-
+  async getInfo({ token }: { token: any }) {
+    return {user:jwt.verify(token, SECRET_KEY)}
   }
 
   async createGameToken({ text }: { text: string }) {
-
     return { token: jwt.sign(text, SECRET_KEY) };
 
   }
