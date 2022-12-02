@@ -1,4 +1,3 @@
-
 var jwt = require('jsonwebtoken');
 import * as _ from "lodash";
 import { CreateError, ErrorCodes } from '../commons/errorCodes';

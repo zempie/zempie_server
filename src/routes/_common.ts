@@ -178,7 +178,7 @@ export const validateGameToken = async (req: Request, res: Response, next: NextF
     try {
         const apiKey = getIdToken(req)
 
-        const {decodedToken} = await gameAuthController.verifyGameToken(apiKey)
+        const { decodedToken } = await gameAuthController.verifyGameToken(apiKey)
 
         if (decodedToken) {
             req.user = req.query
