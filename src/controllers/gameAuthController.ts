@@ -43,7 +43,9 @@ class GameAuthController {
   }
 
   async createGameToken({ text }: { text: string }) {
-    return { token: jwt.sign(text, SECRET_KEY, { expiresIn: '9999 years' }) };
+    const token = jwt.sign(text, SECRET_KEY)
+
+    return { token };
 
   }
 
