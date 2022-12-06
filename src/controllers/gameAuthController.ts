@@ -23,7 +23,7 @@ class GameAuthController {
         picture: user.picture,
         name: user.name
       }
-      return { token: jwt.sign(payload, SECRET_KEY) };
+      return { token: jwt.sign(payload, SECRET_KEY ) };
     } else {
       throw CreateError(ErrorCodes.UNAUTHORIZED);
     }
@@ -43,7 +43,7 @@ class GameAuthController {
   }
 
   async createGameToken({ text }: { text: string }) {
-    return { token: jwt.sign(text, SECRET_KEY) };
+    return { token: jwt.sign(text, SECRET_KEY, { expiresIn: '9999 years' }) };
 
   }
 
