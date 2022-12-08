@@ -36,10 +36,12 @@ class GameAuthController {
     } catch (err) {
       throw CreateError(ErrorCodes.INVALID_TOKEN);
     }
+
   }
 
   async getInfo({ token }: { token: any }) {
-    return {user:jwt.verify(token, SECRET_KEY)}
+    const result = {user:jwt.verify(token, SECRET_KEY)}
+    return result
   }
 
   async createGameToken({ text }: { text: string }) {
