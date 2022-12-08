@@ -2,16 +2,16 @@ var jwt = require('jsonwebtoken');
 import * as _ from "lodash";
 import { CreateError, ErrorCodes } from '../commons/errorCodes';
 import { dbs } from "../commons/globals";
-const crypto = require('crypto');
 
+import admin from 'firebase-admin';
+import DecodedIdToken = admin.auth.DecodedIdToken;
+
+const crypto = require('crypto');
 const SECRET_KEY = crypto.randomBytes(48).toString('hex');
-const ALGORITHM = 'aes-256-cbc';
-const CRYPTO_KEY = crypto.randomBytes(16).toString('hex');
-const IV = crypto.randomBytes(16);
 
 class GameAuthController {
 
-  async createUserToken({ uid }: { uid: string }) {
+  async createUserToken(params: any, { uid }: DecodedIdToken,) {
 
     const user = await dbs.User.getInfo({ uid });
 
