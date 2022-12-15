@@ -117,7 +117,7 @@ class GameModel extends Model {
     }
 
 
-    async getList({ official, category, limit = 50, offset = 0, sort = 'id', dir = 'desc' }: IGameListParams) {
+    async getList({ official, category, filter, limit = 50, offset = 0, sort = 'id', dir = 'desc'}: IGameListParams) {
         // where
         const where: any = {
             activated: true,
@@ -126,7 +126,9 @@ class GameModel extends Model {
                 [Op.ne]: 2,
             },
         }
-
+        if(filter){
+            where.stage = { [Op.eq]: filter };
+        }
 
         if (category) {
             const ctgry = String(category).split(',')

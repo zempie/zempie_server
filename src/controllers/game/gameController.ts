@@ -236,11 +236,11 @@ class GameController {
         return ret;
     }
 
-    getGameList = async ({ category, limit = 50, offset = 0, sort, dir }: IGameListParams, user: DecodedIdToken, { req }: IRoute) => {
+    getGameList = async ({ category, limit = 50, offset = 0, sort, dir, filter }: IGameListParams, user: DecodedIdToken, { req }: IRoute) => {
         const query = JSON.stringify(req.query);
         let games = await caches.game.getList(query);
         if (!games) {
-            const rows = await dbs.Game.getList({ category, limit, offset, sort, dir });
+            const rows = await dbs.Game.getList({ category, limit, offset, sort, dir, filter });
 
             games = _.map(rows, game => getGameData(game))
 
