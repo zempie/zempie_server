@@ -1,7 +1,8 @@
 import Model from '../../../_base/model';
-import { DataTypes, Sequelize } from "sequelize";
+import { DataTypes, Sequelize, Transaction } from "sequelize";
 import { dbs } from "../../../../commons/globals";
 import { eAppLang, eAppTheme } from '../../../../commons/enums';
+
 
 class UserSetting extends Model {
     protected initialize(): void {

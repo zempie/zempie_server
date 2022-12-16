@@ -1,21 +1,15 @@
-
 var jwt = require('jsonwebtoken');
 import * as _ from "lodash";
 import { CreateError, ErrorCodes } from '../commons/errorCodes';
+import cfgOption from '../../config/opt';
 import { dbs } from "../commons/globals";
-const crypto = require('crypto');
-
-const SECRET_KEY = crypto.randomBytes(48).toString('hex');
-const ALGORITHM = 'aes-256-cbc';
-const CRYPTO_KEY = crypto.randomBytes(16).toString('hex');
-const IV = crypto.randomBytes(16);
-const API_AUTH_KEY = 'zempie2022'
-
-
+import admin from 'firebase-admin';
+import DecodedIdToken = admin.auth.DecodedIdToken;
 class GameAuthController {
+  
 
-  async createUserToken({ uid }: { uid: string }) {
-
+  async createUserToken(params: any, { uid }: DecodedIdToken,) {
+    const { secret } = cfgOption.JWT.access;
     const user = await dbs.User.getInfo({ uid });
 
     if (user) {
@@ -26,7 +20,7 @@ class GameAuthController {
         picture: user.picture,
         name: user.name
       }
-      return { token: jwt.sign(payload, SECRET_KEY, { expiresIn: 60 * 60, issuer: 'zempie' }) };
+      return { token: jwt.sign(payload, secret ) };
     } else {
       throw CreateError(ErrorCodes.UNAUTHORIZED);
     }
@@ -34,48 +28,38 @@ class GameAuthController {
   }
 
   async verifyToken({ token }: { token: any }) {
+    const { secret } = cfgOption.JWT.access;
 
     try {
-      return { info: jwt.verify(token, SECRET_KEY) }
-
+      return { info: jwt.verify(token, secret) }
     } catch (err) {
       throw CreateError(ErrorCodes.INVALID_TOKEN);
     }
+
   }
 
-  async getInfo({ }, { uid }: any) {
-    const user = await dbs.User.getInfo({ uid })
+  async getInfo({ token }: { token: any }) {
+    const { secret } = cfgOption.JWT.access;
 
-    return { user: user }
-
+    const result = {user:jwt.verify(token, secret)}
+    return result
   }
 
   async createGameToken({ text }: { text: string }) {
+    const { secret } = cfgOption.JWT.access;
+    const payload = {
+      content: text
+    }
+    const token = jwt.sign(payload, secret, { expiresIn:'9999 years',  issuer: 'zempie' })
 
-
-    let cipher = crypto.createCipheriv(
-      ALGORITHM, Buffer.from(CRYPTO_KEY), IV);
-
-    // Updating text
-    let encrypted = cipher.update(text);
-
-    // Using concatenation
-    encrypted = Buffer.concat([encrypted, cipher.final()]);
-
-    // Returning iv and encrypted data
-    return { encryptedData: encrypted.toString('hex') }
-
+    return { token };
 
   }
 
-  async verifyGameToken(key: any) {
+  async verifyGameToken(token: string) {
+    const { secret } = cfgOption.JWT.access;
 
-    const decipher = crypto.createDecipheriv(ALGORITHM, CRYPTO_KEY, Buffer.from(IV, 'hex'))
-
-    const decrpyted = Buffer.concat([decipher.update(Buffer.from(key, 'hex')), decipher.final()])
-
-
-    return API_AUTH_KEY === decrpyted.toString()
+    return { decodedToken: jwt.verify(token, secret) }
   }
 
 }

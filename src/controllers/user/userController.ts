@@ -107,6 +107,8 @@ class UserController {
 
             await this.setCookie(null, _user, { req, res });
 
+            
+
             const udi = await this.getUserDetailInfo(userRecord);
             user = {
                 ...udi,
@@ -114,9 +116,20 @@ class UserController {
                 email_verified: userRecord.email_verified,
             };
 
+            const userMeta =  await dbs.UserMeta.findOne({user_id:user.id})
+            let newCount = 0
+            
+            if( userMeta ){
+                const { notification_check_time } = userMeta
+                user.new_noti_count = await dbs.Notification.count(notification_check_time, new Date())
+                
+            }
+            
+            userRecord.new_noti_count = newCount           
             userRecord.last_log_in = new Date();
             userRecord.save();
 
+           
             caches.user.setInfo(uid, user);
         }
 
@@ -139,7 +152,6 @@ class UserController {
     getTargetInfoByUid = async ({ target_uid }: any, _user: DecodedIdToken) => {
         const user = await dbs.User.getProfileByUid({ uid: target_uid });
 
-
         const target = await this.getUserDetailInfo(user);
         return {
             target,
@@ -149,8 +161,6 @@ class UserController {
 
     getTargetInfoByChannelId = async ({ channel_id }: { channel_id: string }, _user: DecodedIdToken) => {
         let channel = await caches.user.getChannel(channel_id);
-
-
 
         if (!channel) {
             // const user = await docs.User.getProfile({ channel_id });
@@ -178,6 +188,15 @@ class UserController {
         }
     }
 
+    updateAlarmStatus = async ({alarm_state}: {alarm_state: boolean}, _user: DecodedIdToken) => {
+        const { uid } = _user;
+        const userRecord = await dbs.User.getInfo({ uid });
+
+        const [result] = await dbs.UserSetting.update({notify_alarm:alarm_state}, { user_id: userRecord.id})
+        
+        return  result ? 'success' : 'fail'
+
+    }
 
     private getUserDetailInfo = async (user: any, profile?: any, setting?: any) => {
         profile = profile || user.profile;
@@ -200,11 +219,10 @@ class UserController {
             follower_cnt: followerCnt,
             post_cnt: user.post_cnt,
             projects: user.projects,
+            new_noti_count: user.new_noti_count,
             profile: {
                 level: profile.level,
                 exp: profile.exp,
-                following_cnt: profile.following_cnt,
-                followers_cnt: profile.followers_cnt,
                 state_msg: profile.state_msg,
                 description: profile.description,
                 url_banner: profile.url_banner,
