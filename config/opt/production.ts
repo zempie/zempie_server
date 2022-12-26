@@ -75,7 +75,7 @@ export default {
             'http://support.zempie.com', 'https://support.zempie.com',
             'http://admin.zempie.com', 'https://admin.zempie.com',
             'http://community.zempie.com','https://community.zempie.com',
-            'https://script.google.com',
+            'https://script.google.com', 'http://gtest.fromthered.com'
         ],
         secure: false,
         domain: '.zempie.com',
