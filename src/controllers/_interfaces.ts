@@ -173,3 +173,13 @@ export interface IGameKey {
     secret_id: number,
     end_at?: Date
 }
+
+export interface IEvent {
+    id: number,
+    title: string,
+    desc: string,
+    start_date: Date,
+    end_date: Date,
+    type: number
+    category: number
+}

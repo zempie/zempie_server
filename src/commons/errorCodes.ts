@@ -92,6 +92,12 @@ export const ErrorCodes = {
       */
     ALREADY_BANNED_USER: { code: 70001, message: '이미 신고로 인해 정지된 유저입니다.' },
 
+
+    /*
+         Report
+      */
+    INVALID_ACCESS_EVENT_ID : { code: 80001, message: '잘못된 이벤트 접근' },
+
     /**
      * 안쓰임
      */

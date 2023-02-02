@@ -10,6 +10,7 @@ import {adminTracking, isAuthenticated, validateAdminIdToken, validateFirebaseId
 import FileManager from '../services/fileManager';
 import CommunityController from "../controllers/communityController";
 import AdminCommunityController from "../controllers/adminController/adminCommunityController"
+import EventController from '../controllers/eventController';
 
 
 const apiVer = `/api/v1`;
@@ -120,7 +121,7 @@ export default (router: Router) => {
      *
      */
 
-    router.get(`${apiVer}/admin/studio/version`,       validateAdminIdToken,   convert(AdminStudioController.getVersion));
+    router.get(`${apiVer}/admin/studio/version`,        validateAdminIdToken,   convert(AdminStudioController.getVersion));
     router.get(`${apiVer}/admin/studio/versions`,       validateAdminIdToken,   convert(AdminStudioController.getVersions));
     router.post(`${apiVer}/admin/studio/version`,       validateAdminIdToken,   convert(AdminStudioController.setVersion));
 
@@ -136,6 +137,16 @@ export default (router: Router) => {
      */
     router.post(`${apiVer}/admin/community/att`,        validateAdminIdToken,   adminTracking, FileManager.uploadFiles(200, 40),   convert(CommunityController.uploadFile));
     router.put(`${apiVer}/admin/report/state`,          validateAdminIdToken,   convert(AdminCommunityController.manageReport));
+
+    /**
+     * 이벤트
+     */
+    router.post(`${apiVer}/admin/event`,                validateAdminIdToken,    FileManager.uploadImage2(),      convert(EventController.creatEvent));
+    router.get(`${apiVer}/admin/events`,                validateAdminIdToken,    convert(EventController.getEventList));
+    router.patch(`${apiVer}/admin/event/:id`,           validateAdminIdToken,    convert(EventController.updateEvent));
+    router.delete(`${apiVer}/admin/event/:id`,          validateAdminIdToken,    convert(EventController.deleteEvent));
+
+    
 
     /**
      * 신고
