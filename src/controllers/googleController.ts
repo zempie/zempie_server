@@ -1,10 +1,7 @@
-const path = require('path');
-
 const { TranslationServiceClient } = require('@google-cloud/translate');
 
 const projectId = 'zempie-dev'
 const location = 'global';
-const GOOGLE_APPLICATION_CREDENTIALS = './config/firebase/client-secret.json'
 class GoogleController {
 
   detectLanguage = async (text: string) => {
@@ -25,9 +22,6 @@ class GoogleController {
     const translationClient = new TranslationServiceClient();
 
     const { languageCode, confidence } = await this.detectLanguage(params.text)
-
-
-
 
     const request = {
       parent: `projects/${projectId}/locations/${location}`,
