@@ -508,6 +508,7 @@ class StudioController {
 
             const project = await dbs.Project.findOne( { id : project_id, user_id: user.id }, transaction );
 
+
             if( project.update_version_id ) {
                 const preUpdateVersion = await dbs.ProjectVersion.findOne( { id : project.update_version_id }, transaction );
                 if( preUpdateVersion.state !== 'fail' && preUpdateVersion.state !== 'passed' ) {
@@ -524,8 +525,15 @@ class StudioController {
                 maxNum = lastVersion.number;
             }
 
+            const game = await dbs.Game.findOne( { id : project.game_id})
+
             const subDir = `/project/${project_id}/${uuid()}`;
-            const url = await uploadVersionFile( files, uid, subDir, params.startFile );
+            let url = ''
+            if( game.game_type === eGameType.Download ){
+                url = await uploadDownVersionFile( files, uid, subDir );
+            }else{
+                 url = await uploadVersionFile( files, uid, subDir, params.startFile );
+            }
             params.number = maxNum + 1;
 
             params.state = parseBoolean(params.autoDeploy) ? 'deploy' : 'passed';
