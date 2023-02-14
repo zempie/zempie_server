@@ -154,4 +154,10 @@ export default (router: Router) => {
      */
     router.get(`${apiVer}/admin/report/user/list`,            validateAdminIdToken,   convert(AdminCommunityController.userReportList));
 
+    /**
+     * 이미지 업로드 -> s3 public
+     */
+    router.post(`${apiVer}/admin/img`,          validateAdminIdToken,       FileManager.uploadImage2(),             convert(AdminController.uploadPublicImage)   )
+    router.get(`${apiVer}/admin/img`,           validateAdminIdToken,       convert(AdminController.getUploadedImage)  )
+
 }

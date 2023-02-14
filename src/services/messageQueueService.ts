@@ -9,7 +9,7 @@ class KafkaService {
     private consumer?: Consumer
     private gateways: any = {};
 
-    async initialize (groupId: string) {
+    async initialize(groupId: string) {
         const kafka = new Kafka({
             clientId: config.Kafka.clientId,
             brokers: config.Kafka.brokers,
@@ -30,18 +30,18 @@ class KafkaService {
 
             this._isRunning = true;
         }
-        catch(e) {
+        catch (e) {
             console.error(e);
             this.producer = undefined;
             this.consumer = undefined;
         }
     }
 
-    get isRunning () { return this._isRunning }
+    get isRunning() { return this._isRunning }
 
-    async addTopics (topics: Array<string>) {
+    async addTopics(topics: Array<string>) {
         _.forEach(topics, async (topic: string) => {
-            if ( this.consumer ) {
+            if (this.consumer) {
                 await this.consumer.subscribe({
                     topic,
                     fromBeginning: true
@@ -50,9 +50,9 @@ class KafkaService {
         })
     }
 
-    async addGateways (gateways: any) {
+    async addGateways(gateways: any) {
         _.forEach(gateways, async (obj: any) => {
-            if ( this.isRunning && this.consumer ) {
+            if (this.isRunning && this.consumer) {
                 await this.consumer.subscribe({
                     topic: obj.topic,
                     fromBeginning: true
@@ -64,11 +64,11 @@ class KafkaService {
         })
     }
 
-    async run (eachMessage: any) {
-        if ( this.consumer ) {
+    async run(eachMessage: any) {
+        if (this.consumer) {
             await this.consumer.run({
                 eachMessage: async ({ topic, partition, message }) => {
-                    if ( message && message.value ) {
+                    if (message && message.value) {
                         eachMessage(topic, message.value.toString())
                     }
                 }
@@ -76,8 +76,8 @@ class KafkaService {
         }
     }
 
-    async send (payloads: {topic: string, messages: Message[]}) {
-        if ( this.isRunning && this.producer ) {
+    async send(payloads: { topic: string, messages: Message[] }) {
+        if (this.isRunning && this.producer) {
             return this.producer.send({
                 ...payloads,
                 compression: CompressionTypes.GZIP
@@ -85,7 +85,7 @@ class KafkaService {
         }
         else {
             _.forEach(payloads.messages, (message: Message) => {
-                this.gateways[payloads.topic](message.value);
+                // this.gateways[payloads.topic](message.value);
             })
         }
     }

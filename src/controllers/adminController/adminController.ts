@@ -1,11 +1,13 @@
-import { IAdmin } from '../_interfaces';
+import { IAdmin, IRoute } from '../_interfaces';
 import { dbs } from '../../commons/globals';
 import { CreateError, ErrorCodes } from '../../commons/errorCodes';
 import { makePassword, signJWT, verifyPassword } from '../../commons/utils';
 import { Transaction } from 'sequelize';
 import * as _ from 'lodash';
 import { v4 as uuid } from 'uuid';
-
+import FileManager from "../../services/fileManager";
+import Opt from '../../../config/opt';
+const replaceExt = require('replace-ext');
 
 class AdminController {
     async login(params: any, admin: IAdmin) {
@@ -192,6 +194,27 @@ class AdminController {
 
         await admin.save()
     }
+    async uploadPublicImage({title} : any, _admin: IAdmin, { req: { files: { file } } }: IRoute ) {
+        if (!file) {
+            throw CreateError(ErrorCodes.INVALID_PARAMS);
+          }
+          const webp = await FileManager.convertToWebp(file, 80);
+          const data: any = await FileManager.s3upload({
+              bucket: Opt.AWS.Bucket.RscPublic,
+              key: replaceExt(`${title}`, '.webp'),
+              filePath: webp[0].destinationPath,
+              uid: '',
+              subDir: '/img',
+          });
+         return data.Location;
+    }
+
+    async getUploadedImage() {
+
+        return FileManager.getS3Img()
+   
+    }
+
 }
 
 
