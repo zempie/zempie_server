@@ -197,6 +197,30 @@ class FileManager {
             })
         })
     }
+
+    getS3Img = async () => {
+        const bucketName =  Opt.AWS.Bucket.PublicBase
+        const prefix = 'v1/img/'
+
+        const params = {
+            Bucket: bucketName,
+            Prefix: prefix
+        };
+        
+        const result = await s3.listObjectsV2(params).promise();
+        const objects = result.Contents
+        if(objects){
+            const urls=   objects
+            .map((image) => {
+                return {
+                    name:image.Key?.replace(prefix, ''),
+                    url:`https://${bucketName}.s3.amazonaws.com/${image.Key}`
+                }}
+            );
+                return urls
+        }
+    }
+
 }
 
 

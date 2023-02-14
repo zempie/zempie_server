@@ -41,10 +41,12 @@ export default {
 
     AWS: {
         Bucket: {
+            PublicBase:'dev-zempie',
             Rsc: 'dev-zempie/v1',
             RscPublic: 'dev-zempie/v1',
             Static: 'dev-zempie/static',
-        }
+        },
+        
     },
 
     password: {

@@ -36,6 +36,7 @@ export default {
     AWS: {
         // Bucket: 'zempie-rsc/v1',
         Bucket: {
+            PublicBase:'zempie-rsc-pb',
             Rsc: 'zempie-rsc/v1',
             RscPublic: 'zempie-rsc-pb/v1',
             Static: 'zempie-rsc/static',
