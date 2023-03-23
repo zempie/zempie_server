@@ -26,7 +26,7 @@ export default (router: Router) => {
 
 
     //meta-tag
-    router.get(`${apiVer}/og-tag`,      convert(CommunityController.getOgTag));
+    // router.get(`${apiVer}/og-tag`,      convert(CommunityController.getOgTag));
 
 
 
