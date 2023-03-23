@@ -158,12 +158,12 @@ class AdminUserController {
             }
         })
         return dbs.User.getTransaction(async (transaction: Transaction) => {
-            users.forEach(async (user:any) => {
-                    const [email] = user.email.split('@')
-                    await dbs.User.update({
-                        nickname: email
-                    }, {uid:user.uid}, transaction)            
-                });
+            for(const user of users){
+                const [email] = user.email.split('@')
+                await dbs.User.update({
+                    nickname: email
+                }, {uid:user.uid}, transaction)            
+            }
         })
     }
 }
