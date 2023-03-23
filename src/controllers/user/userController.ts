@@ -62,11 +62,12 @@ class UserController {
             // else if ( !await dbs.ForbiddenWords.isOk(nickname) ) {
             //     throw CreateError(ErrorCodes.FORBIDDEN_STRING);
             // }
+            const [emailId] =_user.email!.split('@')
 
             const user = await dbs.User.create({
                 uid: _user.uid,
                 name: name || _user.name,
-                // nickname: nickname,
+                nickname: nickname || emailId,
                 channel_id: _user.uid,
                 picture: _user.picture,
                 provider: _user.firebase.sign_in_provider,
@@ -209,7 +210,7 @@ class UserController {
             id: user.id,
             uid: user.uid,
             name: user.name,
-            // nickname: user.nickname,
+            nickname: user.nickname,
             channel_id: user.channel_id,
             email: user.email,
             picture: user.picture,
@@ -327,6 +328,13 @@ class UserController {
                 updateRequest.displayName = params.name;
             }
 
+            // 닉네임 변경
+            if(params.nickname){
+                if (!await dbs.ForbiddenWords.isOk(params.name)) {
+                    throw CreateError(ErrorCodes.FORBIDDEN_STRING);
+                }
+                user.nickname = params.nickname
+            }
 
             let profile;
             // 상태 메시지 변경
@@ -390,6 +398,8 @@ class UserController {
             if (Object.keys(updateRequest).length > 0) {
                 await admin.auth().updateUser(uid, updateRequest);
             }
+
+            
 
             // if ( params.name || data ) {
             //     await admin.auth().updateUser(uid, {
@@ -586,6 +596,15 @@ class UserController {
 
     }
 
+    hasNickname = async ({ nickname }: { nickname: string }) => {
+        const hasNickname =  await dbs.User.hasNickname(nickname);
+        let success = true;
+
+        if (!hasNickname) {
+            success = false;
+        }
+        return {success: success};
+    }
 
 }
 

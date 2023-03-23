@@ -11,18 +11,23 @@ const apiVer = `/api/v1`;
 export default (router: Router) => {
 
     //커뮤니티
-    router.get(`${apiVer}/community/project/:id`, validateFirebaseIdToken, convert(CommunityController.getProject));
-    router.get(`${apiVer}/community/channel/:channel_id`, validateFirebaseIdToken, convert(CommunityController.getTargetInfoByChannelId));
-    router.get(`${apiVer}/community/user/:user_id`, validateFirebaseIdToken, convert(CommunityController.getTargetInfoByUserId));
+    router.get(`${apiVer}/community/project/:id`,           validateFirebaseIdToken, convert(CommunityController.getProject));
+    router.get(`${apiVer}/community/channel/:channel_id`,   validateFirebaseIdToken, convert(CommunityController.getTargetInfoByChannelId));
+    router.get(`${apiVer}/community/user/:user_id`,         validateFirebaseIdToken, convert(CommunityController.getTargetInfoByUserId));
 
     //번역
-    router.post(`${apiVer}/translate`, convert(GoogleController.translateText))
-    router.post(`${apiVer}/detect-lang`, convert(GoogleController.detectLanguage))
+    router.post(`${apiVer}/translate`,      convert(GoogleController.translateText))
+    router.post(`${apiVer}/detect-lang`,    convert(GoogleController.detectLanguage))
 
     //게임 페이지
-    router.post(`${apiVer}/game/banner`, validateFirebaseIdToken, FileManager.uploadFiles(40, 40), convert(gameController.setBanner))
-    router.put(`${apiVer}/game/banner`, validateFirebaseIdToken, FileManager.uploadFiles(40, 40), convert(gameController.updateBanner))
-    router.delete(`${apiVer}/game/banner`, validateFirebaseIdToken, convert(gameController.deleteBanner))
+    router.post(`${apiVer}/game/banner`,        validateFirebaseIdToken, FileManager.uploadFiles(40, 40), convert(gameController.setBanner))
+    router.put(`${apiVer}/game/banner`,         validateFirebaseIdToken, FileManager.uploadFiles(40, 40), convert(gameController.updateBanner))
+    router.delete(`${apiVer}/game/banner`,      validateFirebaseIdToken, convert(gameController.deleteBanner))
+
+
+    //meta-tag
+    router.get(`${apiVer}/og-tag`,      convert(CommunityController.getOgTag));
+
 
 
 }

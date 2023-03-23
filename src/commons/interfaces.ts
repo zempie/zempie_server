@@ -1,5 +1,4 @@
 import { Message } from 'kafka-node';
-import { KafkaMessage } from 'kafkajs';
 
 export interface IServerOptions {
     tcp: boolean,
