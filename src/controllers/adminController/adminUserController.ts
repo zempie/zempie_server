@@ -3,7 +3,7 @@ import {dbs} from '../../commons/globals';
 import * as _ from 'lodash';
 import {EBan} from '../../database/mysql/models/user/user';
 
-import {Transaction} from 'sequelize';
+import {Op, Transaction} from 'sequelize';
 import NotifyService from '../../services/notifyService';
 import {CreateError, ErrorCodes} from '../../commons/errorCodes';
 
@@ -148,6 +148,23 @@ class AdminUserController {
 
     async setForbiddenWord({id, activated}: { id: number, activated: boolean }, admin: IAdmin) {
         await dbs.ForbiddenWords.update({activated}, {id});
+    }
+
+
+    async updateAllNickname ()  {
+        const users = await dbs.User.findAll({
+            nickname : {
+                [Op.eq] : null
+            }
+        })
+        return dbs.User.getTransaction(async (transaction: Transaction) => {
+            for(const user of users){
+                const [email] = user.email.split('@')
+                await dbs.User.update({
+                    nickname: email
+                }, {uid:user.uid}, transaction)            
+            }
+        })
     }
 }
 

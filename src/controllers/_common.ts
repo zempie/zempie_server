@@ -30,6 +30,7 @@ export function getGameData(game: any) {
             id: user.id,
             uid: user.uid,
             name: user.name,
+            nickname: user.nickname,
             picture: user.picture,
             channel_id: user.channel_id,
         } : undefined,

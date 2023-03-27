@@ -1,6 +1,5 @@
 import { Message } from 'kafka-node';
 import * as _ from 'lodash';
-import { KafkaMessage } from 'kafkajs';
 
 
 export class SrvMQ {

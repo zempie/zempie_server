@@ -160,4 +160,10 @@ export default (router: Router) => {
     router.post(`${apiVer}/admin/img`,          validateAdminIdToken,       FileManager.uploadImage2(),             convert(AdminController.uploadPublicImage)   )
     router.get(`${apiVer}/admin/img`,           validateAdminIdToken,       convert(AdminController.getUploadedImage)  )
 
+
+
+    // nickname 일괄 삽입
+    router.patch(`${apiVer}/users/all/nickname`,    validateAdminIdToken,   convert(AdminUserController.updateAllNickname)     )
+
+
 }

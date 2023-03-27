@@ -21,7 +21,7 @@ export default (router: Router) => {
     router.post(`${apiVer}/user/verify-email`,       validateFirebaseIdToken, convert(UserController.verifyEmail));
     router.post(`${apiVer}/user/verify-channel`,     validateFirebaseIdToken, convert(UserController.verifyChannelId));
     router.post(`${apiVer}/user/has-email`,          validateFirebaseIdToken, convert(UserController.hasEmail));
-    // router.post(`${apiVer}/user/has-nickname`,    validateFirebaseIdToken,    convert(UserController.hasNickname));
+    router.post(`${apiVer}/user/has-nickname`,       validateFirebaseIdToken, convert(UserController.hasNickname));
 
 
     router.post(`${apiVer}/user/update/info`,       validateFirebaseIdToken, FileManager.uploadImage2(1, 2), convert(UserController.setInfo));
@@ -66,4 +66,6 @@ export default (router: Router) => {
     // for testing
     // router.get(`${apiVer}/test-mongo`, convert(UserController.testMongo));
     router.post(`${apiVer}/test-claim`, validateFirebaseIdToken, checkUserDenied('reply'), convert(UserController.testClaim));
+
+
 }
