@@ -11,6 +11,8 @@ import { caches, dbs } from "../commons/globals";
 import { eProjectState } from "../commons/enums";
 import * as _ from "lodash";
 import { getGameData } from "./_common";
+import { getLinkPreview } from "link-preview-js";
+
 
 const { AWS } = Opt;
 const replaceExt = require('replace-ext');
@@ -270,6 +272,12 @@ class CommunityController {
             await dbs.SurveyResult.create({ user_uid, survey_id: survey.id });
         }
     }
+    getOgTag = async ({url} : {url:string}) => {
+        
+        return await getLinkPreview(url)
+
+    }
+
 }
 
 
