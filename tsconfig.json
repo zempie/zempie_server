@@ -10,7 +10,7 @@
     "pretty": true,
     "outDir": "dist",
     "baseUrl": ".",
-    "watch" : true
+    // "watch" : true
     //    "paths": {
     //      "@/*": [
     //        "src/*"
