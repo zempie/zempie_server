@@ -57,7 +57,7 @@ class ApiServer extends Server {
             addGateways: mq.addGateway(),
             eachMessage: mq.eachMessage.bind(mq),
         }
-        await this.setMessageQueue(options);
+        // await this.setMessageQueue(options);
     }
 }
 

@@ -297,7 +297,7 @@ class StudioController {
 
                 const versionFiles = files;
 
-                if (versionFiles ) {
+                if ( versionFiles ) {
                     const subDir = `/project/${project.id}/${uuid()}`;
                     versionParams.url = await uploadDownVersionFile(versionFiles, uid, subDir);
                     versionParams.state = parseBoolean(params.autoDeploy)  ? 'deploy' : 'passed';
