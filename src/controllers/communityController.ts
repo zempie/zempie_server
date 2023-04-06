@@ -274,6 +274,10 @@ class CommunityController {
     }
     getOgTag = async ({url} : {url:string}) => {
         
+        if(url.includes('https://youtu.be/')){
+            const youtube_path= new URL(url).pathname.substring(1);
+            url = "https://www.youtube.com/watch?v=" + youtube_path
+        }
         return await getLinkPreview(url)
 
     }
