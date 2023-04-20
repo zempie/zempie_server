@@ -444,6 +444,9 @@ class StudioController {
             if( params.category ) {
                 game.category = params.category;
             }
+            if( params.pathname ){
+                game.pathname = params.pathname
+            }
 
             if( parseInt(params.deploy_version_id) === 0 ) {
                 if( project.deploy_version_id ) {
