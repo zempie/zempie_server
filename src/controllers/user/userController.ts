@@ -411,8 +411,9 @@ class UserController {
             await user.save({ transaction });
 
             caches.user.delInfo(uid);
-
-            return { user: user }
+            
+            const userInfo =  await this.getUserDetailInfo(user, profile)
+            return { user: userInfo }
         })
     }
 
