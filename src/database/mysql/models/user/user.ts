@@ -43,6 +43,7 @@ class UserModel extends Model {
 
         this.model.hasOne(dbs.UserProfile.model, { sourceKey: 'id', foreignKey: 'user_id', as: 'profile' });
         this.model.hasOne(dbs.UserSetting.model, { sourceKey: 'id', foreignKey: 'user_id', as: 'setting' });
+        this.model.hasOne(dbs.UserCoin.model, { sourceKey: 'id', foreignKey: 'user_id', as: 'coin' });
         this.model.hasMany(dbs.UserGame.model, { sourceKey: 'uid', foreignKey: 'user_uid', as: 'gameRecords' });
         this.model.hasMany(dbs.UserPublishing.model, { sourceKey: 'uid', foreignKey: 'user_uid', as: 'publishing' });
         this.model.hasMany(dbs.UserExternalLink.model, { as: 'externalLink' });
@@ -79,6 +80,13 @@ class UserModel extends Model {
                 {
                     model: dbs.UserSetting.model,
                     as: 'setting',
+                    attributes: {
+                        exclude: ['created_at', 'updated_at', 'deleted_at'],
+                    }
+                },
+                {
+                    model: dbs.UserCoin.model,
+                    as: 'coin',
                     attributes: {
                         exclude: ['created_at', 'updated_at', 'deleted_at'],
                     }
@@ -248,6 +256,24 @@ class UserModel extends Model {
         });
 
         return claims.get({ plain: true });
+    }
+
+    getCoin = async (where: object, transaction?: Transaction) => {
+        const userCoin = await this.model.findOne({
+            where,
+            include: [{
+                model: dbs.UserCoin.model,
+                as: 'coins',
+                attributes: {
+                    exclude: ['created_at', 'updated_at', 'deleted_at'],
+                }
+            }],
+            transaction
+        });
+
+        if (userCoin) {
+            return userCoin.get({ plain: true });
+        }
     }
 
     hasNickname = async (nickname: string) => {
