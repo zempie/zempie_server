@@ -188,6 +188,11 @@ class UserController {
             target: channel
         }
     }
+    getTargetInfoByNickname = async ({nickname} : {nickname: string}, _user:DecodedIdToken) => {
+        const channelId = await dbs.User.getChannelIdByNickname(nickname)
+        return this.getTargetInfoByChannelId(channelId, _user)
+    }
+
 
     updateAlarmStatus = async ({alarm_state}: {alarm_state: boolean}, _user: DecodedIdToken) => {
         const { uid } = _user;
