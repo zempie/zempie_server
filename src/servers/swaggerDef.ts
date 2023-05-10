@@ -22,6 +22,10 @@ const swaggerDefinition = {
     },
     servers: [
         {
+            url: 'https://api-dev.zempie.com/api/v1',
+            description: 'dev server'
+        },
+        {
             url: 'http://localhost:8280/api/v1',
             description: 'localhost'
         },
