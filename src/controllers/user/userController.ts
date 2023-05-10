@@ -79,13 +79,14 @@ class UserController {
             const user_id = user.id;
             const profile = await dbs.UserProfile.create({ user_id }, transaction);
             const setting = await dbs.UserSetting.create({ user_id }, transaction);
+            const coin = await dbs.UserCoin.create({ user_id }, transaction);
 
             // following 에 자신 추가 - 나중을 위해...
             // await dbs.Follow.create({ user_uid: _user.uid, target_uid: _user.uid }, transaction);
 
             await this.setCookie(null, _user, { req, res });
 
-            const udi = await this.getUserDetailInfo(user, profile, setting);
+            const udi = await this.getUserDetailInfo(user, profile, setting, coin);
             return {
                 user: {
                     ...udi,
@@ -204,9 +205,10 @@ class UserController {
 
     }
 
-    private getUserDetailInfo = async (user: any, profile?: any, setting?: any) => {
+    private getUserDetailInfo = async (user: any, profile?: any, setting?: any, coin?: any) => {
         profile = profile || user.profile;
         setting = setting || user.setting;
+        coin = coin || user.coin;
 
         const followingCnt = await dbs.Follow.followingCnt(user.id)
         const followerCnt = await dbs.Follow.followerCnt(user.id)
@@ -243,6 +245,10 @@ class UserController {
                 // follow: setting.notify_follow,
                 like: setting.notify_like,
                 reply: setting.notify_reply,
+            } : undefined,
+            coin: coin ? {
+                zem: coin.zem,
+                pie: coin.pie
             } : undefined,
             games: _.map(user.devGames, (game: any) => {
                 return {

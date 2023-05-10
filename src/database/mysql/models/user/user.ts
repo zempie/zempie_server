@@ -67,7 +67,7 @@ class UserModel extends Model {
     }
 
     async getInfo({ uid }: DecodedIdToken, transaction?: Transaction) {
-        return this.model.findOne({
+        let userInfo = await this.model.findOne({
             where: { uid },
             include: [
                 {
@@ -108,6 +108,14 @@ class UserModel extends Model {
             ],
             transaction
         })
+
+        // 유저 정보가 없으면 생성
+        if( userInfo && !userInfo.coin ) {
+            let user_id = userInfo.id;
+            userInfo.coin = await dbs.UserCoin.create({user_id},transaction);
+        }
+
+        return userInfo
     }
 
     private getProfile = async (where: object, transaction?: Transaction) => {

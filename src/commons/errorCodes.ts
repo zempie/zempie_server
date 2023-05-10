@@ -23,6 +23,15 @@ export const ErrorCodes = {
     USER_INVALID_VERIFIED_EMAIL: { code: 20102, message: '이메일 인증 안됨' },
     USER_DUPLICATED_CHANNEL_ID: { code: 20103, message: 'Channel ID 중복' },
 
+    /*
+        User Payment
+     */
+    USER_PAYMENT_BOOTPAY_RECEIPT_VERIFY_FAIL: { code: 20201, message: 'receipt id 검증 실패' },
+    USER_PAYMENT_RECEIPT_GOOGLE_VERIFY_FAIL: { code: 20202, message: 'google receipt id 검증 실패' },
+    USER_PAYMENT_RECEIPT_APPLE_VERIFY_FAIL: { code: 20202, message: 'apple receipt id 검증 실패' },
+
+    USER_PAYMENT_NO_ITEM_TO_BE_GIVEN: { code: 20210, message: '지급할 아이템이 없음.' },
+    USER_PAYMENT_ALREADY_USED_RECEIPT: { code: 20211, message: '이미 사용된 영수증' },
 
     /*
         Game

@@ -8,6 +8,8 @@ import AlarmController from '../controllers/alarmController';
 import ContentController from '../controllers/contentController';
 import FileManager from '../services/fileManager';
 import PublishingController from '../controllers/publishingController';
+import ShopController from '../controllers/shopController';
+import PaymentController from '../controllers/paymentController';
 
 
 const apiVer = `/api/v1`;
@@ -62,6 +64,14 @@ export default (router: Router) => {
 
     router.put(`${apiVer}/alarm`,                   validateFirebaseIdToken, isAuthenticated, convert(UserController.updateAlarmStatus));
 
+    router.get(`${apiVer}/items`,             validateFirebaseIdToken, convert(ShopController.getRefItemsAndShopItems));
+    
+    // 테스트 코드 지워라. 
+    router.post(`${apiVer}/items/buy`,             validateFirebaseIdToken, convert(ShopController.testItemBuy));
+
+    
+    router.post(`${apiVer}/payment/iap`,             validateFirebaseIdToken, convert(PaymentController.validateReceiptIAP));
+    router.post(`${apiVer}/payment/web`,             validateFirebaseIdToken, convert(PaymentController.validateReceiptBootpay));
 
 
     // for testing
