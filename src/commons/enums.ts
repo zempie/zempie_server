@@ -115,11 +115,22 @@ export enum ePubType {
     AD,     // AD
 }
 
+export enum eItemState {
+    Packaged,     // 아직 안깐 아이템. 받은 그대로이다. 
+    None,       // 아이템을 받았지만 아직 사용하지 않았다.
+    Using,      // 사용중 또는 장착중 
+    Used,       // 사용했다.  더이상 사용할 수 없다. 
+    Expired,
+}
+
 export enum eItemUsingType {
+    Zem,
+    Pie,
     Permanent,
     Once,
     Period,
     Accumulated,
+    Package,
 }
 
 export enum eProjectStage {

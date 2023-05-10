@@ -13,6 +13,7 @@
   },
   "license": "MIT",
   "dependencies": {
+    "@bootpay/backend-js": "^2.1.8",
     "@google-cloud/bigquery": "^5.9.2",
     "@google-cloud/translate": "^7.0.1",
     "@types/body-parser": "^1.19.0",
@@ -41,6 +42,7 @@
     "@types/urlencode": "^1.1.2",
     "@types/uuid": "^7.0.2",
     "aws-sdk": "^2.682.0",
+    "axios": "^1.4.0",
     "capitalize": "^2.0.2",
     "colors": "^1.4.0",
     "cookie": "^0.4.1",
@@ -56,6 +58,7 @@
     "get-port": "^5.1.1",
     "graphql": "^14.6.0",
     "i18n": "^0.13.2",
+    "iap": "^1.1.1",
     "imagemin": "^7.0.1",
     "imagemin-webp": "^5.1.0",
     "ioredis": "^4.16.3",
