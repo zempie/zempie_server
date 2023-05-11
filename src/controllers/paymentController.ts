@@ -381,7 +381,7 @@ CREATE TABLE `receipt` (
         throw CreateError(ErrorCodes.USER_PAYMENT_BOOTPAY_RECEIPT_VERIFY_FAIL);
       }
 
-      refitem_id = ret.metadata.id || 0
+      refitem_id = ret.metadata.refitem_id ?  ret.metadata.refitem_id : ret.metadata.id
       const shop = await dbs.Shop.findOne({refitem_id, store_type: 3})
       if (!shop) {
         throw CreateError(ErrorCodes.USER_PAYMENT_NO_ITEM_TO_BE_GIVEN);
@@ -393,7 +393,6 @@ CREATE TABLE `receipt` (
       }
 
       return await dbs.UserReceipt.getTransaction(async (transaction: Transaction) => {
-
         const userReceipt = await dbs.UserReceipt.findOne({ user_id, purchase_token: ret.receipt_id }, transaction)
         if (userReceipt) {
           console.log('>> 중복된 영수증..', ret)
@@ -420,7 +419,8 @@ CREATE TABLE `receipt` (
           message: '결제되었습니다. 영수증을 확인하세요.',
           data: {
             receipt_url: ret.receipt_url,
-            update
+            update,
+            metadata: ret.metadata
           }
         }
       })

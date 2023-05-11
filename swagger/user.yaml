@@ -103,31 +103,6 @@ paths:
         403:
           $ref: '#/components/responses/UnauthorizedError'
 
-  /items/buy:
-    post:
-      tags:
-        - Zempie Shop 
-      summary: (테스트용) 아이템 지급
-      security:
-        - bearerAuth: [ ]
-      requestBody:
-        content:
-          application/x-www-form-urlencoded:
-            schema:
-              type: object
-              properties:
-                refitem_id:
-                  type: number
-                  description: 아이템 ID
-              required:
-                - refitem_id
-      responses:
-        200:
-          $ref: '#/components/responses/Okay'
-        403:
-          $ref: '#/components/responses/UnauthorizedError'
-
-
   /payment/iap:
     post:
       tags:
@@ -145,7 +120,7 @@ paths:
     post:
       tags:
         - Zempie Shop 
-      summary: ( TODO ) 결제, Bootpay
+      summary: 결제, Bootpay
       security:
         - bearerAuth: [ ]
       requestBody:
