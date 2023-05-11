@@ -8,7 +8,7 @@ class ShopModel extends Model {
     protected initialize(): void {
         this.name = 'shop';
         this.attributes = {
-            refitem_idx: {type: DataTypes.INTEGER,defaultValue: 0,},
+            refitem_id: {type: DataTypes.INTEGER,defaultValue: 0,},
             shop: {type: DataTypes.TINYINT,defaultValue: 0,},
             sort: {type: DataTypes.INTEGER,defaultValue: 0,allowNull: false,},
             order: {type: DataTypes.INTEGER,defaultValue: 0,allowNull: false,},
@@ -33,12 +33,12 @@ class ShopModel extends Model {
         const itemCount = await this.model.count();
         if (itemCount === 0) {
           const initData:any = [
-            { refitem_idx: 1, quantity: 10, store_code: 'zem_10', price:  1200},
-            { refitem_idx: 2, quantity: 50, store_code: 'zem_50', price:  6000},
-            { refitem_idx: 3, quantity: 100, store_code: 'zem_100', price: 12000},
-            { refitem_idx: 4, quantity: 300, store_code: 'zem_300', price:  36000},
-            { refitem_idx: 5, quantity: 500, store_code: 'zem_500', price:  60000},
-            { refitem_idx: 6, quantity: 1000, store_code: 'zem_1000', price:  120000},
+            { refitem_id: 1, quantity: 10, store_code: 'zem_10', price:  1200},
+            { refitem_id: 2, quantity: 50, store_code: 'zem_50', price:  6000},
+            { refitem_id: 3, quantity: 100, store_code: 'zem_100', price: 12000},
+            { refitem_id: 4, quantity: 300, store_code: 'zem_300', price:  36000},
+            { refitem_id: 5, quantity: 500, store_code: 'zem_500', price:  60000},
+            { refitem_id: 6, quantity: 1000, store_code: 'zem_1000', price:  120000},
           ];
     
           this.bulkCreate(initData);

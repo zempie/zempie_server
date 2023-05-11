@@ -5,6 +5,7 @@ import { NextFunction, Request, Response } from 'express';
 import Opt from '../../config/opt';
 const { PAYMENT } = Opt;
 import { Sequelize, Transaction } from 'sequelize';
+import shopController from "./shopController";
 
 import admin from 'firebase-admin';
 import axios from 'axios';
@@ -26,7 +27,7 @@ class PaymentController {
   }
 
   // Bootpay 영수증을 확인한다. 
-  async verifyBootpay(receip_id: string): Promise<any> {
+  private verifyBootpay = async (receip_id: string) =>{
     try {
       await Bootpay.getAccessToken();
       const res = await Bootpay.receiptPayment(receip_id);
@@ -39,7 +40,7 @@ class PaymentController {
   }
 
   // 결제를 취소한다. 
-  async bootpayCancel(receip_id: string): Promise<any>  {
+  async bootpayCancel(receip_id: string)  {
   }
 
   /**
@@ -123,7 +124,7 @@ class PaymentController {
     }
   }
 
-  async validateAppleReceipt(receiptData:string, transactionId:string, productId:string) {
+  validateAppleReceipt = async (receiptData:string, transactionId:string, productId:string) =>{
     try {
       // console.log(`receiptData: ${receiptData}` )
 
@@ -176,34 +177,33 @@ class PaymentController {
     }
   }
 
-  async checkDatabase (user_id: number, result:any) {
+  private checkDatabase = async  (user_id: number, result:any) => {
     try {
       // let itemShopDAO = await ItemShop.findOne('store_code', result.productId)
       let price = 10000;
 
       let userReceiptDAO = await dbs.UserReceipt.findOne({user_id, purchase_token: result.purchase_token})
-      if (userReceiptDAO === undefined) { // 없으면
-        // DB에 저장
-        const values = [
+      if (!userReceiptDAO) { // 없으면 // DB에 저장
+        const values = {
           user_id,
-          result.store,
-          result.packageName,
-          result.productId,
+          store: result.store,
+          packageName: result.packageName,
+          productId: result.productId,
           price,
-          result.purchase_token,
-          JSON.stringify(result.receipt),
-          result.subscription,
-          result.isConsume
-        ]
+          purchase_token: result.purchase_token,
+          receipt: JSON.stringify(result.receipt),
+          subscription: result.subscription,
+          isConsume: result.isConsume
+        }
         userReceiptDAO = await dbs.UserReceipt.create(values)
         return { verifyReceipt: result }
+
       } else { // 있다면
+
         if (userReceiptDAO.state === 0) { // DB에서 소비 대기 중이라면
           return { verifyReceipt: result, userReceiptDAO } // return { isConsume: result.isConsume, userReceiptDAO, productId: result.productId };
-        } else {
-          // 소비를 했다면
+        } else { // 소비를 했다면
           throw CreateError(ErrorCodes.USER_PAYMENT_ALREADY_USED_RECEIPT);
-          // throw { ecode: 409, error: 'UsedReceipt' }
         }
       }
     } catch (error) {
@@ -239,7 +239,7 @@ CREATE TABLE `receipt` (
    * @param next 
    * @returns 
    */
-  async validateReceiptIAP({ product_id, receipt, subscription, platform }: { product_id:string, receipt:any, subscription:any, platform:string }, _user: DecodedIdToken) {
+  validateReceiptIAP = async ({ product_id, receipt, subscription, platform }: { product_id:string, receipt:any, subscription:any, platform:string }, _user: DecodedIdToken) =>{
     try {
       const uid = _user.uid;
       const user = await dbs.User.findOne({ uid });
@@ -277,10 +277,8 @@ CREATE TABLE `receipt` (
       }
 
       const verifyData:any = await this.checkDatabase(user.id, returned_receipt)
-
-      if (verifyData.receiptDAO !== undefined) {
+      if (verifyData.receiptDAO ) {
         //if (verifyData.verifyReceipt.isConsume === 1) { // 영수증에 소비가 되었다면
-        
         const update = await this.giveProductId(uid, verifyData)
 
         const r = {
@@ -312,65 +310,124 @@ CREATE TABLE `receipt` (
 
     } catch (err) {
       console.error(err)
+      throw err
     }
   }
 
-  async validateReceiptBootpay({ receipt }: { receipt:any }, _user: DecodedIdToken) {
+
+  /**
+   * receipt = 
+     {
+        "receipt_id": "645c58be755e270022e1e8db",
+        "order_id": "TEST_ORDER_ID",
+        "price": 1200,
+        "tax_free": 0,
+        "cancelled_price": 0,
+        "cancelled_tax_free": 0,
+        "order_name": "ZEM 구매",
+        "company_name": "젬파이-테스트",
+        "gateway_url": "https://gw.bootpay.co.kr",
+        "metadata": {
+            "id": 1                                     <-- refitem_id
+        },
+        "sandbox": true,
+        "pg": "나이스페이먼츠",
+        "method": "카드",
+        "method_symbol": "card",
+        "method_origin": "카드",
+        "method_origin_symbol": "card",
+        "purchased_at": "2023-05-11T11:54:22+09:00",
+        "requested_at": "2023-05-11T11:53:50+09:00",
+        "status_locale": "결제완료",
+        "currency": "KRW",
+        "receipt_url": "https://door.bootpay.co.kr/receipt/NFhKZWNTVW80RXJYRFBWQkdRT1R3MTlOOXFJZ20xaUk3dmtDbUVpNVlENVdN%0AZz09LS1WbVhNMW0wZnk4YUhwd2VBLS11VGswbmQ3cFZKOFF4WTNxTEhjK2NB%0APT0%3D%0A",
+        "status": 1,
+        "card_data": {
+            "tid": "nicepay00m01012305111154214509",
+            "card_approve_no": "49397854",
+            "card_no": "94352017****6169",
+            "card_interest": "0",
+            "card_quota": "00",
+            "card_company_code": "01",
+            "card_company": "비씨",
+            "card_type": "신용",
+            "card_owner_type": "개인",
+            "point": 0,
+            "coupon": 0,
+            "receipt_url": "https://npg.nicepay.co.kr/issue/IssueLoader.do?type=0&InnerWin=Y&TID=nicepay00m01012305111154214509"
+        }
+    }
+   */
+  validateReceiptBootpay = async ({ receipt }: { receipt:any }, _user: DecodedIdToken) => {
     try {
+      receipt = typeof receipt == 'string' ? JSON.parse(receipt) : receipt;
+
+      let refitem_id : number
+      let price: number = 0
       const uid = _user.uid;
       const user = await dbs.User.findOne({ uid });
       if (!user) throw CreateError(ErrorCodes.INVALID_USER_UID);
+      const user_id = user.id;
       
-      const items = receipt.params.items
-      ////  영수증 검사
-      const ret = await this.verifyBootpay(receipt.receipt_id)
-      if (ret.error) throw CreateError(ErrorCodes.USER_PAYMENT_BOOTPAY_RECEIPT_VERIFY_FAIL);
+      //  영수증 검사
+      const ret:any = await this.verifyBootpay(receipt.receipt_id)
+      if( ret.cancelled_price > 0 ){
+        console.log('>> 취소된 결제..', ret)
+        throw CreateError(ErrorCodes.USER_PAYMENT_CANCELED_RECEIPT);
+      }
 
-      // TODO: 영수증 정보 검사. 가격변조 가능성 있음..
-      // TODO: ret.status == 1 이 아닌경우 처리 취소처리...
+      if( ret.status != 1 ){
+        console.log('>> 결제 실패..', ret)
+        throw CreateError(ErrorCodes.USER_PAYMENT_BOOTPAY_RECEIPT_VERIFY_FAIL);
+      }
 
-      // console.log('>> ret', ret)
-      /// 검증이 된거고.
-      // console.log(items)
-
-      //// 영수증 처리..아이템
-      const shopDAO = await dbs.Shop.findOne('idx', items[0].item_idx)
-      if (!shopDAO) {
+      refitem_id = ret.metadata.id || 0
+      const shop = await dbs.Shop.findOne({refitem_id, store_type: 3})
+      if (!shop) {
         throw CreateError(ErrorCodes.USER_PAYMENT_NO_ITEM_TO_BE_GIVEN);
         // TODO:: 취소처리.
       }
 
-      let itemReceiptData = {
-        productId: shopDAO.store_code,
-        purchase_token: ret.receipt_id,
-        store: ret.pg,
-        subscription: 0,
-        isConsume: 0,
-        receipt: { ...ret, ...items }
+      if( shop.price != ret.price ) {
+        throw CreateError(ErrorCodes.USER_PAYMENT_NO_ITEM_TO_BE_GIVEN);
       }
 
-      let verifyData:any = await this.checkDatabase(user.id, itemReceiptData)
+      return await dbs.UserReceipt.getTransaction(async (transaction: Transaction) => {
 
-      if (!verifyData.receiptDAO) {
-        const receiptDAO = await dbs.UserReceipt.findOne('purchase_token', verifyData.verifyReceipt.purchase_token)
-        if (receiptDAO) {
-          verifyData.receiptDAO = receiptDAO
-        } else {
-          throw CreateError(ErrorCodes.USER_PAYMENT_BOOTPAY_RECEIPT_VERIFY_FAIL);
+        const userReceipt = await dbs.UserReceipt.findOne({ user_id, purchase_token: ret.receipt_id }, transaction)
+        if (userReceipt) {
+          console.log('>> 중복된 영수증..', ret)
+          throw CreateError(ErrorCodes.USER_PAYMENT_ALREADY_USED_RECEIPT);
         }
-      }
-
-      // const update = await dbs.Item.ItemService.giveItemByIAP(req.user.uid, verifyData)
-
-      return {
-        message: '결제되었습니다. 영수증을 확인하세요.',
-        data: {
-          receipt_url: ret.receipt_url,
-          //update: update.update
+  
+        let userReceiptData = {
+          user_id,
+          state: 1, //  지급됨.
+          store: ret.pg,
+          package_name: 'zempie.com',
+          product_id: shop.store_code,
+          price: shop.price,
+          purchase_token: ret.receipt_id,
+          subscription: 0,
+          receipt: JSON.stringify({ ...ret}),
+          is_consume: 1
         }
-      }
+        await dbs.UserReceipt.create(userReceiptData, transaction)
+  
+        let update = await shopController.giveItem( uid, refitem_id)
+        
+        return {
+          message: '결제되었습니다. 영수증을 확인하세요.',
+          data: {
+            receipt_url: ret.receipt_url,
+            update
+          }
+        }
+      })
+
     } catch (err) {
       console.error(err)
+      throw err
     }
   }
 
@@ -378,7 +435,7 @@ CREATE TABLE `receipt` (
 
 
   // User에게 UserCoins의 zem또는 pie를 지급한다.
-  async giveProductId(uid: string, verifyData: any) {
+  giveProductId = async (uid: string, verifyData: any) => {
     try {
 
       // const { userReceiptDAO, verifyReceipt } = verifyData
