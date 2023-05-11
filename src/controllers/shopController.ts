@@ -43,7 +43,7 @@ class ShopController {
     /*
     *   아이템 구매 --> 인벤토리에 추가
     */
-    async buyItem ({ refitem_id }: IShopParams, user: DecodedIdToken) {
+    buyItem = async ({ refitem_id }: IShopParams, user: DecodedIdToken) => {
         const refitem = await dbs.RefItem.findOne({ id: refitem_id });
         if ( !refitem ) {
             throw CreateError(ErrorCodes.INVALID_ITEM_ID);
@@ -95,10 +95,46 @@ class ShopController {
 
         // 구매 - 인벤토리에 추가
         // await dbs.Inventory.create({ user_id, item_id }, transaction);
-
     }
 
-    async useItem({ refitem_id }: IShopParams, user: DecodedIdToken) {
+    giveItem = async ( uid: string, refitem_id: number) => {
+        try{
+            let update:any = {}
+            const user = await dbs.User.findOne({ uid });
+            const user_id = user.id;
+            const refitem = await dbs.RefItem.findOne({ id: refitem_id });
+            if ( !refitem ) {
+                throw CreateError(ErrorCodes.INVALID_ITEM_ID);
+            }
+
+            switch( refitem.used_type ){
+                case eItemUsingType.Zem:
+                    return await dbs.UserCoin.getTransaction(async (transaction: Transaction) => {
+                        const userCoin = await dbs.UserCoin.findOne({ user_id }, transaction);
+                        let before_zem = userCoin.zem;
+                        userCoin.zem += refitem.quantity;
+                        await userCoin.save({ transaction });
+    
+                        update.user = {}
+                        update.user.coin = {
+                            zem: userCoin.zem,
+                            pie: userCoin.pie,
+                            before_zem
+                        }
+                        
+                        // TODO: log 추가
+    
+                        return update;
+                    });
+                break;
+            }
+
+        }catch(e){
+            throw e
+        }
+    }
+
+    useItem = async ({ refitem_id }: IShopParams, user: DecodedIdToken) => {
         const userRecord = await dbs.User.findOne({ uid: user.uid });
         const user_id = userRecord.id;
         await dbs.Inventory.getTransaction(async (transaction: Transaction) => {
