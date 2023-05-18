@@ -107,9 +107,25 @@ paths:
     post:
       tags:
         - Zempie Shop 
-      summary: ( TODO ) 결제, Unity / Flutter 
+      summary: 결제, Unity / Flutter 
       security:
         - bearerAuth: [ ]
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                receipt:
+                  type: object
+                  description: 영수증 
+                  required: true
+                product_id:
+                  type: string
+                  description: 상품명
+                  required: true
+              required:
+                - receipt
       responses:
         200:
           $ref: '#/components/responses/Okay'
