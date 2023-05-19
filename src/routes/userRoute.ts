@@ -65,6 +65,7 @@ export default (router: Router) => {
     router.put(`${apiVer}/alarm`,                   validateFirebaseIdToken, isAuthenticated, convert(UserController.updateAlarmStatus));
 
     router.get(`${apiVer}/items`,             validateFirebaseIdToken, convert(ShopController.getRefItemsAndShopItems));
+    router.get(`${apiVer}/items/:store_type`,             validateFirebaseIdToken, convert(ShopController.getRefItemsAndShopItems));
     
     router.post(`${apiVer}/payment/iap`,             validateFirebaseIdToken, convert(PaymentController.validateReceiptIAP));
     router.post(`${apiVer}/payment/web`,             validateFirebaseIdToken, convert(PaymentController.validateReceiptBootpay));

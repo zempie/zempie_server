@@ -13,10 +13,11 @@ interface IShopParams {
 }
 class ShopController {
 
-    getRefItemsAndShopItems = async ( no:any, _user: DecodedIdToken) => {
+    getRefItemsAndShopItems = async ( { store_type }: { store_type: number }, _user: DecodedIdToken) => {
         try{
+            store_type = Number(store_type || 3) || 3;
             const refitems = await dbs.RefItem.findAll();
-            const shipitems = await dbs.Shop.findAll();
+            const shipitems = await dbs.Shop.findAll({store_type});
             return {
                 refitems,
                 shipitems
