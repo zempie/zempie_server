@@ -32,6 +32,7 @@ export const ErrorCodes = {
 
     USER_PAYMENT_NO_ITEM_TO_BE_GIVEN: { code: 20210, message: '지급할 아이템이 없음.' },
     USER_PAYMENT_ALREADY_USED_RECEIPT: { code: 20211, message: '이미 사용된 영수증' },
+    USER_PAYMENT_CANCELED_RECEIPT: { code: 20212, message: '지급할 아이템이 없음.' },
 
     /*
         Game
