@@ -84,6 +84,7 @@ export default {
             'http://3.38.27.85:4000',
             'http://dev.zempie.com',
             'https://dev.zempie.com',
+            'https://beta.zempie.com'
             
         ],
         secure: false,
