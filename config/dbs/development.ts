@@ -28,7 +28,7 @@ export default {
     },
     redis: {
         host: '61.73.7.153',
-        port: 6379,
+        port: 26379,
         family: 4,
         password: 'ftred103',
         db: 0,
