@@ -62,12 +62,18 @@ class UserController {
             // else if ( !await dbs.ForbiddenWords.isOk(nickname) ) {
             //     throw CreateError(ErrorCodes.FORBIDDEN_STRING);
             // }
-            const [emailId] =_user.email!.split('@')
+            
+            //임시 닉네임
+            let tempNickname = ''
+            if(_user.email){
+               const [emailId] =_user.email.split('@')    
+               tempNickname = emailId
+            }
 
             const user = await dbs.User.create({
                 uid: _user.uid,
                 name: name || _user.name,
-                nickname: nickname || emailId,
+                nickname: nickname || tempNickname,
                 channel_id: _user.uid,
                 picture: _user.picture,
                 provider: _user.firebase.sign_in_provider,
