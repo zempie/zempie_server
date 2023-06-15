@@ -93,7 +93,9 @@ export interface IGameListParams {
     dir: string,
     official?: string,
     category?: number,
-    filter?:number
+    filter?:number,
+    game_type?:number,
+    support_platform?:string
 }
 
 export interface IS3Upload {
