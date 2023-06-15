@@ -117,7 +117,7 @@ class GameModel extends Model {
     }
 
 
-    async getList({ official, category, filter, limit = 50, offset = 0, sort = 'id', dir = 'desc'}: IGameListParams) {
+    async getList({ official, category, filter, game_type, support_platform, limit = 50, offset = 0, sort = 'id', dir = 'desc'}: IGameListParams) {
         // where
         const where: any = {
             activated: true,
@@ -128,6 +128,16 @@ class GameModel extends Model {
         }
         if(filter){
             where.stage = { [Op.eq]: filter };
+        }
+
+        if(support_platform){
+            const platforms = String(support_platform).split(',')
+            where.support_platform = { [Op.in]: platforms };
+        }
+
+        if(game_type){
+            where.game_type = { [Op.eq]: game_type };
+
         }
 
         if (category) {
