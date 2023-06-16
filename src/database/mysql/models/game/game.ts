@@ -132,6 +132,7 @@ class GameModel extends Model {
 
         if(support_platform){
             const platforms = String(support_platform).split(',').sort()
+            const pf =  platforms.sort().join(',')
            
             let opLikes : any[] = []
 
@@ -141,7 +142,7 @@ class GameModel extends Model {
             });
             where[Op.or] = [
                 {support_platform: {[Op.in]: platforms} },
-                opLikes
+                ...opLikes
             ]
         }
 
