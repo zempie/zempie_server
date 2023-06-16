@@ -236,7 +236,7 @@ class GameController {
         return ret;
     }
 
-    getGameList = async ({ category, limit = 50, offset = 0, sort, dir, filter,support_platform, game_type  }: IGameListParams, user: DecodedIdToken, { req }: IRoute) => {
+    getGameList = async ({ category, limit = 50, offset = 0, sort, dir, filter, support_platform, game_type  }: IGameListParams, user: DecodedIdToken, { req }: IRoute) => {
         const query = JSON.stringify(req.query);
         let games = await caches.game.getList(query);
         if (!games) {
