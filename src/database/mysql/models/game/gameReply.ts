@@ -55,7 +55,7 @@ class GameReplyModel extends Model {
                 required: false,
             })
         }
-        return await this.model.findAll({
+        const { count, rows } = await this.model.findAndCountAll({
             where: {
                 game_id,
                 parent_reply_id: null,
@@ -65,6 +65,11 @@ class GameReplyModel extends Model {
             limit: _.toNumber(limit),
             offset: _.toNumber(offset),
         })
+
+        return {
+            count,
+            replies: rows
+        }
     }
 
 
@@ -84,15 +89,20 @@ class GameReplyModel extends Model {
                 },
             })
         }
-        return await this.model.findAll({
+        const { count, rows } = await this.model.findAndCountAll({
             where: {
                 parent_reply_id: reply_id,
-            },
+            },          
             include,
             order: [['created_at', 'desc']],
             limit: _.toNumber(limit),
             offset: _.toNumber(offset),
         })
+
+        return {
+            count,
+            replies: rows
+        }
     }
 }
 
