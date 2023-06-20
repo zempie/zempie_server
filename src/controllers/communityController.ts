@@ -221,6 +221,7 @@ class CommunityController {
                 // follow: setting.notify_follow,
                 like: setting.notify_like,
                 reply: setting.notify_reply,
+                dm_alarm: setting.notify_chat
             } : undefined,
             games: user.devGames,
             dev_games: user.is_developer ? _.map(user.devGames, (game: any) => {
