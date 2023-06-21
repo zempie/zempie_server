@@ -38,6 +38,14 @@ class GameReplyModel extends Model {
                 after: 'count_bad'
             })
         }
+        if ( !desc['activated'] ) {
+            this.model.sequelize.queryInterface.addColumn(this.model.tableName, 'activated', {
+                type: DataTypes.BOOLEAN,
+                allowNull: false,
+                defaultValue: true,
+                before: 'game_id'
+            })
+        }
     }
 
 
