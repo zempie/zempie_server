@@ -161,18 +161,24 @@ class GameContentController {
             if ( !rp ) {
                 throw CreateError(ErrorCodes.INVALID_PARAMS);
             }
+            rp.count_reply += 1
+            rp.save()
+            
         }
 
         const reply = await dbs.GameReply.create({
             game_id,
             user_uid: user.uid,
             parent_reply_id: reply_id || null,
-            target_uid: reply_id && target_uid? target_uid : null,
+            target_uid: reply_id && target_uid ? target_uid : null,
             content,
         });
+
         const userInfo = await dbs.User.findOne({uid: user.uid})
+        
 
         if ( reply_id ) {
+            
             MQ.send({
                 topic: 'gameReply',
                 messages: [{
@@ -250,6 +256,28 @@ class GameContentController {
         }
 
         return { reaction };
+    }
+
+    deleteReply = async ({id } : {id: string} , { uid }: DecodedIdToken) =>{
+        const user = await dbs.User.findOne({ uid });
+        
+        return dbs.GameReply.getTransaction(async (transaction: Transaction) => {
+
+            const reply = await dbs.GameReply.findOne({
+                id: Number(id)         
+            });
+            if ( !reply ) {
+                throw CreateError(ErrorCodes.INVALID_REPLY);
+            }
+
+            if ( user.uid !== reply.user_uid  ) {
+                throw CreateError(ErrorCodes.INVALID_USER_UID)
+            }
+
+            return reply.destroy({transaction});
+        })
+
+        
     }
 
 
