@@ -152,3 +152,18 @@ export enum ePlatformType {
     Android,
     Ios
 }
+
+
+export enum eNotificationType {
+    Notice = 1,
+    Post,
+    Post_like,
+    Comment,
+    Comment_like,
+    Report,
+    Retweet,
+    Follow,
+    Recomment,
+    Dm
+}
+  
