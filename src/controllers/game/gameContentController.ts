@@ -175,7 +175,6 @@ class GameContentController {
         });
 
         const userInfo = await dbs.User.findOne({uid: user.uid})
-        
 
         if ( reply_id ) {
             
@@ -202,7 +201,9 @@ class GameContentController {
             my_reply: reply.my_reply,
             target: reply.target,
             updated_at: reply.updated_at,
-            user : userInfo}
+            user : userInfo,
+            game_id
+        }
     }
 
 
@@ -277,7 +278,34 @@ class GameContentController {
             return reply.destroy({transaction});
         })
 
-        
+    }
+    
+    updateReply = async (params : any, { uid }: DecodedIdToken) =>{
+        return dbs.GameReply.getTransaction(async (transaction: Transaction) => {
+            const user = await dbs.User.getInfo({ uid }, transaction);
+            if (!user) {
+                throw CreateError(ErrorCodes.INVALID_USER_UID);
+            }
+            
+            const reply = await dbs.GameReply.findOne({
+                id: params.id
+            })
+
+            if ( !reply ) {
+                throw CreateError(ErrorCodes.INVALID_PARAMS);
+            }
+
+            if(uid !== reply.user_uid){
+                throw CreateError(ErrorCodes.UNAUTHORIZED);
+            }
+            
+            await dbs.GameReply.update({content: params.content}, {id: reply.id})
+            reply.content = params.content
+            await reply.save({transaction})
+
+            return reply
+
+        })
     }
 
 

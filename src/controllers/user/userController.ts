@@ -13,6 +13,7 @@ import { getGameData } from '../_common';
 import { isOK_channelID } from '../../commons/utils';
 // import { ClientSession } from 'mongoose';
 import Opt from '../../../config/opt';
+import { eNotificationType } from '../../commons/enums';
 const { Url, CORS } = Opt;
 const replaceExt = require('replace-ext');
 
@@ -204,13 +205,30 @@ class UserController {
     }
 
 
-    updateAlarmStatus = async ({alarm_state}: {alarm_state: boolean}, _user: DecodedIdToken) => {
-        const { uid } = _user;
-        const userRecord = await dbs.User.getInfo({ uid });
+    updateAlarmStatus = async ({alarm_state, type}: {alarm_state: boolean, type: eNotificationType}, {uid}: DecodedIdToken) => {
+        return dbs.User.getTransaction(async (transaction: Transaction) => {
+            const user = await dbs.User.getInfo({ uid }, transaction);
+            if (!user) {
+                throw CreateError(ErrorCodes.INVALID_USER_UID);
+            }
 
-        const [result] = await dbs.UserSetting.update({notify_alarm:alarm_state}, { user_id: userRecord.id})
-        
-        return  result ? 'success' : 'fail'
+            let targetCol
+            switch(type){
+                case eNotificationType.Dm:
+                    targetCol = {notify_chat:alarm_state}
+                    break;
+                default:
+                    targetCol = {notify_alarm:alarm_state}
+            }
+
+            await dbs.UserSetting.update(targetCol, { user_id: user.id})
+            
+            await user.save({ transaction });
+            caches.user.delInfo(uid);
+            
+            return { user_setting: user.setting }
+
+        })
 
     }
 
