@@ -27,10 +27,14 @@ export default (router: Router) => {
     router.post(`${apiVer}/game/emotion`,       validateFirebaseIdToken,    isAuthenticated,    convert(GameContentController.emotion));
 
     // 게임 댓글
-    router.get(`${apiVer}/game/reply`,              validateFirebaseIdToken,    convert(GameContentController.getReplies));
-    router.get(`${apiVer}/game/rereply`,            validateFirebaseIdToken,    convert(GameContentController.getReReplies));
-    router.post(`${apiVer}/game/reply`,             validateFirebaseIdToken,    isAuthenticated,    convert(GameContentController.leaveReply));
-    router.post(`${apiVer}/game/reply/reaction`,    validateFirebaseIdToken,    isAuthenticated,    convert(GameContentController.reactReply));
+    router.get(`${apiVer}/game/reply`,                 validateFirebaseIdToken,    convert(GameContentController.getReplies));
+    router.get(`${apiVer}/game/rereply`,               validateFirebaseIdToken,    convert(GameContentController.getReReplies));
+    router.post(`${apiVer}/game/reply`,                validateFirebaseIdToken,    isAuthenticated,    convert(GameContentController.leaveReply));
+    router.post(`${apiVer}/game/reply/reaction`,       validateFirebaseIdToken,    isAuthenticated,    convert(GameContentController.reactReply));
+    router.delete(`${apiVer}/game/reply/:id`,          validateFirebaseIdToken,    convert(GameContentController.deleteReply));
+    router.put(`${apiVer}/game/reply/:id`,             validateFirebaseIdToken,    convert(GameContentController.updateReply));
+
+
 
     // 도전 게임 - 평가 리포트
     router.get(`${apiVer}/game/ch-report`,      validateFirebaseIdToken,    convert(GameContentController.getReports));

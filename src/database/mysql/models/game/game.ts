@@ -131,16 +131,27 @@ class GameModel extends Model {
         }
 
         if(support_platform){
-            const platforms = String(support_platform).split(',')
-            where.support_platform = { [Op.in]: platforms };
+            const platforms = String(support_platform).split(',').sort()
+            const pf =  platforms.sort().join(',')
+           
+            let opLikes : any[] = []
+
+            platforms.forEach((pl: string) => {
+                opLikes.push(
+                    {support_platform: {[Op.like]: `%${pl}%`} })
+            });
+            where[Op.or] = [
+                {support_platform: {[Op.in]: platforms} },
+                ...opLikes
+            ]
         }
 
         if(game_type){
             where.game_type = { [Op.eq]: game_type };
-
         }
 
         if (category) {
+           
             const ctgry = String(category).split(',')
             where.category = { [Op.in]: ctgry };
         }

@@ -61,8 +61,7 @@ export default (router: Router) => {
     router.get(`${apiVer}/user/search`,             validateFirebaseIdToken, convert(UserController.searchUser));
     router.get(`${apiVer}/user/alarm`,              validateFirebaseIdToken, convert(AlarmController.getList));
     router.get(`${apiVer}/user/publishing`,         validateFirebaseIdToken, convert(PublishingController.getList));
-
-    router.put(`${apiVer}/alarm`,                   validateFirebaseIdToken, isAuthenticated, convert(UserController.updateAlarmStatus));
+    router.put(`${apiVer}/user/alarm`,              validateFirebaseIdToken, isAuthenticated, convert(UserController.updateAlarmStatus));
 
     router.get(`${apiVer}/items`,             validateFirebaseIdToken, convert(ShopController.getRefItemsAndShopItems));
     

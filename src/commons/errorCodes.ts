@@ -42,6 +42,9 @@ export const ErrorCodes = {
     BATTLE_OVER: { code: 31001, message: '배틀 끝났다' },
     INVALID_BATTLE: { code: 31002, message: '배틀 오류' },
 
+    INVALID_REPLY: { code: 32101, message: '존재하지 않는 댓글입니다.' },
+
+
 
     /*
         Contents

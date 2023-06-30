@@ -38,6 +38,14 @@ class GameReplyModel extends Model {
                 after: 'count_bad'
             })
         }
+        if ( !desc['activated'] ) {
+            this.model.sequelize.queryInterface.addColumn(this.model.tableName, 'activated', {
+                type: DataTypes.BOOLEAN,
+                allowNull: false,
+                defaultValue: true,
+                before: 'game_id'
+            })
+        }
     }
 
 
@@ -74,22 +82,24 @@ class GameReplyModel extends Model {
 
 
     getReReplies = async (reply_id: number, { limit = 50, offset = 0 }, user_uid?: string) => {
+      
         const include: any = [{
             model: dbs.User.model,
         }, {
             as: 'target',
             model: dbs.User.model,
         }];
-        if ( user_uid ) {
-            include.push({
-                as: 'my_reply',
-                model: dbs.UserGameReplyReaction.model,
-                where: {
-                    user_uid,
-                },
-            })
-        }
-        const { count, rows } = await this.model.findAndCountAll({
+
+        // if ( user_uid ) {
+        //     include.push({
+        //         as: 'my_reply',
+        //         model: dbs.UserGameReplyReaction.model,
+        //         where: {
+        //             user_uid,
+        //         },
+        //     })
+        // }
+        return await this.model.findAll({
             where: {
                 parent_reply_id: reply_id,
             },          
@@ -98,11 +108,6 @@ class GameReplyModel extends Model {
             limit: _.toNumber(limit),
             offset: _.toNumber(offset),
         })
-
-        return {
-            count,
-            replies: rows
-        }
     }
 }
 

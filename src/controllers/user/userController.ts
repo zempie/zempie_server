@@ -13,6 +13,7 @@ import { getGameData } from '../_common';
 import { isOK_channelID } from '../../commons/utils';
 // import { ClientSession } from 'mongoose';
 import Opt from '../../../config/opt';
+import { eNotificationType } from '../../commons/enums';
 const { Url, CORS } = Opt;
 const replaceExt = require('replace-ext');
 
@@ -62,12 +63,18 @@ class UserController {
             // else if ( !await dbs.ForbiddenWords.isOk(nickname) ) {
             //     throw CreateError(ErrorCodes.FORBIDDEN_STRING);
             // }
-            const [emailId] =_user.email!.split('@')
+            
+            //임시 닉네임
+            let tempNickname = ''
+            if(_user.email){
+               const [emailId] =_user.email.split('@')    
+               tempNickname = emailId
+            }
 
             const user = await dbs.User.create({
                 uid: _user.uid,
                 name: name || _user.name,
-                nickname: nickname || emailId,
+                nickname: nickname || tempNickname,
                 channel_id: _user.uid,
                 picture: _user.picture,
                 provider: _user.firebase.sign_in_provider,
@@ -198,13 +205,32 @@ class UserController {
     }
 
 
-    updateAlarmStatus = async ({alarm_state}: {alarm_state: boolean}, _user: DecodedIdToken) => {
-        const { uid } = _user;
-        const userRecord = await dbs.User.getInfo({ uid });
+    updateAlarmStatus = async ({alarm_state, type}: {alarm_state: boolean, type: eNotificationType}, {uid}: DecodedIdToken) => {
+        return dbs.User.getTransaction(async (transaction: Transaction) => {
+            const user = await dbs.User.getInfo({ uid }, transaction);
+            if (!user) {
+                throw CreateError(ErrorCodes.INVALID_USER_UID);
+            }
 
-        const [result] = await dbs.UserSetting.update({notify_alarm:alarm_state}, { user_id: userRecord.id})
-        
-        return  result ? 'success' : 'fail'
+            let targetCol
+            switch(type){
+                case eNotificationType.Dm:
+                    targetCol = 'notify_chat'
+                    break;
+                default:
+                    targetCol = 'notify_alarm'
+            }
+
+            await dbs.UserSetting.update({targetCol : alarm_state}, { user_id: user.id})
+            
+            user.setting[targetCol] = alarm_state
+            await user.save({ transaction });
+
+            caches.user.delInfo(uid);
+            
+            return { user_setting: user.setting }
+
+        })
 
     }
 
