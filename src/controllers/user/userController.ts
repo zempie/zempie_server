@@ -215,15 +215,17 @@ class UserController {
             let targetCol
             switch(type){
                 case eNotificationType.Dm:
-                    targetCol = {notify_chat:alarm_state}
+                    targetCol = 'notify_chat'
                     break;
                 default:
-                    targetCol = {notify_alarm:alarm_state}
+                    targetCol = 'notify_alarm'
             }
 
-            await dbs.UserSetting.update(targetCol, { user_id: user.id})
+            await dbs.UserSetting.update({targetCol : alarm_state}, { user_id: user.id})
             
+            user.setting[targetCol] = alarm_state
             await user.save({ transaction });
+
             caches.user.delInfo(uid);
             
             return { user_setting: user.setting }
