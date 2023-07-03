@@ -89,7 +89,6 @@ paths:
         403:
           $ref: '#/components/responses/UnauthorizedError'
 
-
   /items:
     get:
       tags:
@@ -103,11 +102,32 @@ paths:
         403:
           $ref: '#/components/responses/UnauthorizedError'
 
-  /items/buy:
+
+  /items/{store_type}:
+    get:
+      tags:
+        - Zempie Shop 
+      summary: 사용자 참조 아이템, 샾 아이템 목록
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: "store_type"
+          in: "path"
+          description: "스토어 타입 ( 1 = play store,  2 = app store, 3 = web"
+          type: "number"
+          required: false
+
+      responses:
+        200:
+          $ref: '#/components/responses/Okay'
+        403:
+          $ref: '#/components/responses/UnauthorizedError'
+
+  /payment/iap:
     post:
       tags:
         - Zempie Shop 
-      summary: (테스트용) 아이템 지급
+      summary: 결제, Unity / Flutter 
       security:
         - bearerAuth: [ ]
       requestBody:
@@ -116,25 +136,16 @@ paths:
             schema:
               type: object
               properties:
-                refitem_id:
-                  type: number
-                  description: 아이템 ID
+                receipt:
+                  type: object
+                  description: 영수증 
+                  required: true
+                product_id:
+                  type: string
+                  description: 상품명
+                  required: true
               required:
-                - refitem_id
-      responses:
-        200:
-          $ref: '#/components/responses/Okay'
-        403:
-          $ref: '#/components/responses/UnauthorizedError'
-
-
-  /payment/iap:
-    post:
-      tags:
-        - Zempie Shop 
-      summary: ( TODO ) 결제, Unity / Flutter 
-      security:
-        - bearerAuth: [ ]
+                - receipt
       responses:
         200:
           $ref: '#/components/responses/Okay'
@@ -145,7 +156,7 @@ paths:
     post:
       tags:
         - Zempie Shop 
-      summary: ( TODO ) 결제, Bootpay
+      summary: 결제, Bootpay
       security:
         - bearerAuth: [ ]
       requestBody:

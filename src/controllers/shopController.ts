@@ -13,10 +13,11 @@ interface IShopParams {
 }
 class ShopController {
 
-    getRefItemsAndShopItems = async ( no:any, _user: DecodedIdToken) => {
+    getRefItemsAndShopItems = async ( { store_type }: { store_type: number }, _user: DecodedIdToken) => {
         try{
+            store_type = Number(store_type || 3) || 3;
             const refitems = await dbs.RefItem.findAll();
-            const shipitems = await dbs.Shop.findAll();
+            const shipitems = await dbs.Shop.findAll({store_type});
             return {
                 refitems,
                 shipitems
@@ -24,77 +25,6 @@ class ShopController {
         }catch(e){
             console.error(e)
         }
-    }
-
-    testItemBuy = async ( {refitem_id}: IShopParams, _user: DecodedIdToken) => {
-        try{
-            let update = await this.buyItem ({ refitem_id }, _user)
-
-            return { 
-                message: "Success",
-                update 
-            }
-
-        }catch(e){
-            console.error(e)
-        }
-    }
-
-    /*
-    *   아이템 구매 --> 인벤토리에 추가
-    */
-    buyItem = async ({ refitem_id }: IShopParams, user: DecodedIdToken) => {
-        const refitem = await dbs.RefItem.findOne({ id: refitem_id });
-        if ( !refitem ) {
-            throw CreateError(ErrorCodes.INVALID_ITEM_ID);
-        }
-        let update:any = {}
-
-        const userRecord = await dbs.User.findOne({ uid: user.uid });
-        const user_id = userRecord.id;
-
-        // await dbs.Inventory.getTransaction(async (transaction: Transaction) => {
-        //     const quantity = refitem.quantity;
-        //     const item = await dbs.Inventory.create({
-        //         user_id,
-        //         refitem_id,
-        //         used_type: refitem.used_type,
-        //         quantity, 
-        //         state: eItemState.Packaged,
-        //         time_limit
-        //     }, transaction);
-        // })
-
-        // 구입 가능한지 확인
-        // 중복 확인
-        switch( refitem.used_type ){
-            case eItemUsingType.Zem:
-                await dbs.UserCoin.getTransaction(async (transaction: Transaction) => {
-                    const userCoin = await dbs.UserCoin.findOne({ user_id }, transaction);
-                    let before_zem = userCoin.zem;
-                    userCoin.zem += refitem.quantity;
-                    await userCoin.save({ transaction });
-
-                    update.user = {}
-                    update.user.coin = {
-                        zem: userCoin.zem,
-                        pie: userCoin.pie,
-                        before_zem
-                    }
-                    
-                    // TODO: log 추가
-
-                    return update;
-                });
-            break;
-        }
-
-        // 돈 있나 확인
-
-        // 구매 - 포인트 차감
-
-        // 구매 - 인벤토리에 추가
-        // await dbs.Inventory.create({ user_id, item_id }, transaction);
     }
 
     giveItem = async ( uid: string, refitem_id: number) => {
@@ -134,6 +64,48 @@ class ShopController {
         }
     }
 
+
+    giveZem = async ( fromUid:string, toUid: string, zem: number ) => {
+        try{
+            let update:any = {}
+            const fromUser = await dbs.User.findOne({ uid: fromUid });
+            const toUser = await dbs.User.findOne({ uid: toUid });
+            if( !fromUser || !toUser ){
+                throw CreateError(ErrorCodes.INVALID_USER_UID);
+            }
+
+            return await dbs.UserCoin.getTransaction(async (transaction: Transaction) => {
+                const fromUserCoin = await dbs.UserCoin.findOne({ user_id: fromUser.id }, transaction);
+                const toUserCoin = await dbs.UserCoin.findOne({ user_id: toUser.id }, transaction);
+
+                let fromZem = fromUserCoin.zem;
+                if( fromZem < zem ){
+                    throw CreateError(ErrorCodes.USER_COIN_NOT_ENOUGH_ZEM);
+                }
+                let before_zem = fromUserCoin.zem;
+                fromUserCoin.zem -= zem;
+                toUserCoin.zem += zem;
+
+                await fromUserCoin.save({ transaction });
+                await toUserCoin.save({ transaction });
+                
+                update.user.coin = {
+                    zem: fromUserCoin.zem,
+                    pie: fromUserCoin.pie,
+                    before_zem
+                }
+                
+                // TODO: log 추가
+    
+                return update;
+            });
+
+        }catch(e){
+            throw e;
+        }
+    }
+
+
     useItem = async ({ refitem_id }: IShopParams, user: DecodedIdToken) => {
         const userRecord = await dbs.User.findOne({ uid: user.uid });
         const user_id = userRecord.id;
@@ -144,6 +116,9 @@ class ShopController {
             }
         })
     }
+
+
+
 }
 
 

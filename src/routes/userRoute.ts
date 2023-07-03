@@ -64,10 +64,7 @@ export default (router: Router) => {
     router.put(`${apiVer}/user/alarm`,              validateFirebaseIdToken, isAuthenticated, convert(UserController.updateAlarmStatus));
 
     router.get(`${apiVer}/items`,             validateFirebaseIdToken, convert(ShopController.getRefItemsAndShopItems));
-    
-    // 테스트 코드 지워라. 
-    router.post(`${apiVer}/items/buy`,             validateFirebaseIdToken, convert(ShopController.testItemBuy));
-
+    router.get(`${apiVer}/items/:store_type`,             validateFirebaseIdToken, convert(ShopController.getRefItemsAndShopItems));
     
     router.post(`${apiVer}/payment/iap`,             validateFirebaseIdToken, convert(PaymentController.validateReceiptIAP));
     router.post(`${apiVer}/payment/web`,             validateFirebaseIdToken, convert(PaymentController.validateReceiptBootpay));
