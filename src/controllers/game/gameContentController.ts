@@ -93,12 +93,7 @@ class GameContentController {
                     count_reply: r.count_reply,
                     created_at: r.created_at,
                     updated_at: r.updated_at,
-                    user: {
-                        uid: user.uid,
-                        name: user.name,
-                        picture: user.picture,
-                        channel_id: user.channel_id,
-                    },
+                    user,
                     target: target? {
                         uid: target.uid,
                         name: target.name,
@@ -121,8 +116,11 @@ class GameContentController {
             if ( user ) {
                 user_uid = user.uid;
             }
-            const replies = await dbs.GameReply.getReplies(game_id, { limit, offset }, user_uid);
-            ret = this.getRetReplies(replies);
+            const {count, replies} = await dbs.GameReply.getReplies(game_id, { limit, offset }, user_uid);
+            
+            ret = {
+                totalCount: count,
+               ...this.getRetReplies(replies)};
 
             caches.reply.setData(ret, `zempie:game:reply:${game_id}`, JSON.stringify(params));
         }
@@ -163,17 +161,23 @@ class GameContentController {
             if ( !rp ) {
                 throw CreateError(ErrorCodes.INVALID_PARAMS);
             }
+            rp.count_reply += 1
+            rp.save()
+            
         }
 
-        await dbs.GameReply.create({
+        const reply = await dbs.GameReply.create({
             game_id,
             user_uid: user.uid,
             parent_reply_id: reply_id || null,
-            target_uid: reply_id && target_uid? target_uid : null,
+            target_uid: reply_id && target_uid ? target_uid : null,
             content,
         });
 
+        const userInfo = await dbs.User.findOne({uid: user.uid})
+
         if ( reply_id ) {
+            
             MQ.send({
                 topic: 'gameReply',
                 messages: [{
@@ -185,6 +189,20 @@ class GameContentController {
                     })
                 }]
             })
+        }
+
+        return {
+            content:reply.content ,
+            count_bad: reply.count_bad,
+            count_good: reply.count_good,
+            count_reply: reply.count_reply,
+            created_at: reply.created_at,
+            id: reply.id,
+            my_reply: reply.my_reply,
+            target: reply.target,
+            updated_at: reply.updated_at,
+            user : userInfo,
+            game_id
         }
     }
 
@@ -239,6 +257,55 @@ class GameContentController {
         }
 
         return { reaction };
+    }
+
+    deleteReply = async ({id } : {id: string} , { uid }: DecodedIdToken) =>{
+        const user = await dbs.User.findOne({ uid });
+        
+        return dbs.GameReply.getTransaction(async (transaction: Transaction) => {
+
+            const reply = await dbs.GameReply.findOne({
+                id: Number(id)         
+            });
+            if ( !reply ) {
+                throw CreateError(ErrorCodes.INVALID_REPLY);
+            }
+
+            if ( user.uid !== reply.user_uid  ) {
+                throw CreateError(ErrorCodes.INVALID_USER_UID)
+            }
+
+            return reply.destroy({transaction});
+        })
+
+    }
+    
+    updateReply = async (params : any, { uid }: DecodedIdToken) =>{
+        return dbs.GameReply.getTransaction(async (transaction: Transaction) => {
+            const user = await dbs.User.getInfo({ uid }, transaction);
+            if (!user) {
+                throw CreateError(ErrorCodes.INVALID_USER_UID);
+            }
+            
+            const reply = await dbs.GameReply.findOne({
+                id: params.id
+            })
+
+            if ( !reply ) {
+                throw CreateError(ErrorCodes.INVALID_PARAMS);
+            }
+
+            if(uid !== reply.user_uid){
+                throw CreateError(ErrorCodes.UNAUTHORIZED);
+            }
+            
+            await dbs.GameReply.update({content: params.content}, {id: reply.id})
+            reply.content = params.content
+            await reply.save({transaction})
+
+            return reply
+
+        })
     }
 
 
