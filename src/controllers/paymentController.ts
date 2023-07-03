@@ -9,9 +9,11 @@ import shopController from "./shopController";
 
 import admin from 'firebase-admin';
 import axios from 'axios';
-import { iap } from 'iap';
+
 import { Bootpay } from '@bootpay/backend-js';
 import DecodedIdToken = admin.auth.DecodedIdToken;
+
+var iap = require('iap');
 
 interface Config {
   bootpay?: {
@@ -49,7 +51,7 @@ class PaymentController {
    * @param subscription 
    * @returns 
    */
-  async validateGoogleReceipt (payload:any, subscription:boolean = false){
+  validateGoogleReceipt  = async  (payload:any, subscription:boolean = false)=>{
     let receipt
 
     if (payload.json === undefined) {
@@ -89,6 +91,10 @@ class PaymentController {
           console.log('검증 받은 영수증 ' + result.receipt.purchaseState)
           console.log(token)
           console.log(result.receipt)
+
+          // TODO:  debug
+          // result.receipt.purchaseState = 0;
+
           if (result.receipt.purchaseState === 0) {
             // 구매
             resolve({
@@ -179,21 +185,29 @@ class PaymentController {
 
   private checkDatabase = async  (user_id: number, result:any) => {
     try {
-      // let itemShopDAO = await ItemShop.findOne('store_code', result.productId)
+      let itemShopDAO = await dbs.ShopItemShop.findOne('store_code', result.productId)
       let price = 10000;
+
+
+
+
+
+
+
+
 
       let userReceiptDAO = await dbs.UserReceipt.findOne({user_id, purchase_token: result.purchase_token})
       if (!userReceiptDAO) { // 없으면 // DB에 저장
         const values = {
           user_id,
           store: result.store,
-          packageName: result.packageName,
-          productId: result.productId,
+          package_name: result.packageName,
+          product_id: result.productId,
           price,
           purchase_token: result.purchase_token,
           receipt: JSON.stringify(result.receipt),
           subscription: result.subscription,
-          isConsume: result.isConsume
+          is_consume: result.isConsume
         }
         userReceiptDAO = await dbs.UserReceipt.create(values)
         return { verifyReceipt: result }
@@ -227,6 +241,19 @@ CREATE TABLE `receipt` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
   */
 
+
+/**
+{
+  "receipt": {
+    "Payload": "{\"orderId\":\"GPA.3358-7367-8755-86716\",\"packageName\":\"com.fromthered.zempie.dev\",\"productId\":\"zem_10\",\"purchaseTime\":1684311136931,\"purchaseState\":0,\"purchaseToken\":\"gdkdjjccgoppgjdcedbnfddg.AO-J1Owbwo6DLqrHQCJvC2vpfWNwfVWRAyqhLpYgJSovq2i52IALLnPWbBxVdymBuEnlym4VAaqsAzC_DjWrvCXgUW6hufuX7m6CwW3f9JzLCAQb9kHSNso\",\"quantity\":1,\"acknowledged\":false}",
+    "TransactionID": "GPA.3358-7367-8755-86716",
+    "Store": "GooglePlay"
+  },
+  "product_id": "zem_10",
+  "subscription": false
+}
+ */
+
   /**
    * Unity Flutter 에서 보낸 영수증을 체크하고 아이템을 지급한다. 
    * 
@@ -239,74 +266,129 @@ CREATE TABLE `receipt` (
    * @param next 
    * @returns 
    */
-  validateReceiptIAP = async ({ product_id, receipt, subscription, platform }: { product_id:string, receipt:any, subscription:any, platform:string }, _user: DecodedIdToken) =>{
+  validateReceiptIAP = async ({ product_id, receipt, subscription }: { product_id:string, receipt:any, subscription:any }, _user: DecodedIdToken) =>{
+    
     try {
+      receipt = typeof receipt == 'string' ? JSON.parse(receipt) : receipt;
+      subscription = subscription === 'true' ? true : false
+
+      let payload = typeof receipt.Payload == 'string' ? JSON.parse(receipt.Payload) : receipt.Payload
+
       const uid = _user.uid;
       const user = await dbs.User.findOne({ uid });
       if (!user) throw CreateError(ErrorCodes.INVALID_USER_UID);
+      const user_id = user.id;
 
-      let returned_receipt:any = undefined
-
-      if( platform === 'flutter' ){
-        if (receipt.Store === 'GooglePlay') {
-          subscription = subscription === 'true'
-          returned_receipt = await this.validateGoogleReceipt(receipt, subscription)
-        } else if (receipt.Store === 'AppleAppStore') {
-          returned_receipt = await this.validateAppleReceipt(receipt, receipt.TransactionID, product_id)
+      let ret:any = undefined
+      let store_type = -1
+      let store = receipt.Store
+      
+      if (store === 'GooglePlay') {
+        if (subscription === 'True') {
+          subscription = true
         } else {
-          throw {
-            message: 'BadRequest'
-          }
+          subscription = false
         }
-      }else{ // from Unity 
-        receipt = JSON.parse(receipt)
-        if (receipt.Store === 'GooglePlay') {
-          if (subscription === 'True') {
-            subscription = true
-          } else {
-            subscription = false
-          }
-          returned_receipt = await this.validateGoogleReceipt(JSON.parse(receipt.Payload), subscription)
-        } else if (receipt.Store === 'AppleAppStore') {
-          returned_receipt = await this.validateAppleReceipt(receipt.Payload, receipt.TransactionID, product_id)
-        } else {
-          throw {
-            message: 'BadRequest'
-          }
+
+        
+        ret = await this.validateGoogleReceipt(payload, subscription)
+        store_type = 1
+      } else if (store === 'AppleAppStore') {
+        ret = await this.validateAppleReceipt(JSON.stringify(payload), receipt.TransactionID, product_id)
+        store_type = 2
+      } else {
+        throw {
+          message: 'BadRequest'
         }
       }
 
-      const verifyData:any = await this.checkDatabase(user.id, returned_receipt)
-      if (verifyData.receiptDAO ) {
-        //if (verifyData.verifyReceipt.isConsume === 1) { // 영수증에 소비가 되었다면
-        const update = await this.giveProductId(uid, verifyData)
+      let store_code = ret.productId
+      const shop = await dbs.Shop.findOne({store_code, store_type})
+      if (!shop) {
+        throw CreateError(ErrorCodes.USER_PAYMENT_NO_ITEM_TO_BE_GIVEN);
+      }
 
-        const r = {
-          message: 'Consume',
-          receipt: returned_receipt.receipt,
-          // update: update.update
+
+      return await dbs.UserReceipt.getTransaction(async (transaction: Transaction) => {
+        const userReceipt = await dbs.UserReceipt.findOne({ user_id, purchase_token: payload.purchaseToken }, transaction)
+        if (userReceipt) {
+          console.log('>> 중복된 영수증..', ret)
+          throw CreateError(ErrorCodes.USER_PAYMENT_ALREADY_USED_RECEIPT);
         }
-
-        console.log(`Consume  validateReceipt: user.idx: ${user.id}  ${user.nickname}   product_id: ${product_id} `);
-        console.log(`receipt from client: ${JSON.stringify(receipt)} ` )
-        console.log(`receipt : ${JSON.stringify(returned_receipt)} ` )
-        console.log(`res.status:200   ${JSON.stringify(r)} `)
-
-        return r
-      } else {
-
-        const r = {
-          message: 'Pending',
-          receipt: returned_receipt.receipt
+  
+        let userReceiptData = {
+          user_id,
+          state: 1, //  지급됨.
+          store,
+          package_name: 'zempie.com',
+          product_id: shop.store_code,
+          price: shop.price,
+          purchase_token: payload.purchaseToken,
+          subscription: 0,
+          receipt: JSON.stringify({ ...ret}),
+          is_consume: 1
         }
+        await dbs.UserReceipt.create(userReceiptData, transaction)
+  
+        let update = await shopController.giveItem( uid, shop.refitem_id)
+        
+        return {
+          message: '결제되었습니다. 영수증을 확인하세요..',
+          data: {
+            receipt_url: null,
+            update,
+            metadata: null,
+            receipt: ret.receipt
+          }
+        }
+      })
 
-        console.log(`Pending   validateReceipt: user.idx: ${user.id}  ${user.nickname}   product_id: ${product_id} `);
-        console.log(`receipt from client: ${JSON.stringify(receipt)} ` )
-        console.log(`receipt : ${JSON.stringify(returned_receipt)} ` )
-        console.log(`res.status:201   ${JSON.stringify(r)} `)
 
-        return r
-      }      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      // const verifyData:any = await this.checkDatabase(user.id, returned_receipt)
+      // if (verifyData.receiptDAO ) {
+      //   //if (verifyData.verifyReceipt.isConsume === 1) { // 영수증에 소비가 되었다면
+      //   const update = await this.giveProductId(uid, verifyData)
+
+      //   const r = {
+      //     message: 'Consume',
+      //     receipt: returned_receipt.receipt,
+      //     // update: update.update
+      //   }
+
+      //   console.log(`Consume  validateReceipt: user.idx: ${user.id}  ${user.nickname}   product_id: ${product_id} `);
+      //   console.log(`receipt from client: ${JSON.stringify(receipt)} ` )
+      //   console.log(`receipt : ${JSON.stringify(returned_receipt)} ` )
+      //   console.log(`res.status:200   ${JSON.stringify(r)} `)
+
+      //   return r
+      // } else {
+
+      //   const r = {
+      //     message: 'Pending',
+      //     receipt: returned_receipt.receipt
+      //   }
+
+      //   console.log(`Pending   validateReceipt: user.idx: ${user.id}  ${user.nickname}   product_id: ${product_id} `);
+      //   console.log(`receipt from client: ${JSON.stringify(receipt)} ` )
+      //   console.log(`receipt : ${JSON.stringify(returned_receipt)} ` )
+      //   console.log(`res.status:201   ${JSON.stringify(r)} `)
+
+      //   return r
+      // }      
 
     } catch (err) {
       console.error(err)
@@ -381,7 +463,7 @@ CREATE TABLE `receipt` (
         throw CreateError(ErrorCodes.USER_PAYMENT_BOOTPAY_RECEIPT_VERIFY_FAIL);
       }
 
-      refitem_id = ret.metadata.id || 0
+      refitem_id = ret.metadata.refitem_id ?  ret.metadata.refitem_id : ret.metadata.id
       const shop = await dbs.Shop.findOne({refitem_id, store_type: 3})
       if (!shop) {
         throw CreateError(ErrorCodes.USER_PAYMENT_NO_ITEM_TO_BE_GIVEN);
@@ -393,7 +475,6 @@ CREATE TABLE `receipt` (
       }
 
       return await dbs.UserReceipt.getTransaction(async (transaction: Transaction) => {
-
         const userReceipt = await dbs.UserReceipt.findOne({ user_id, purchase_token: ret.receipt_id }, transaction)
         if (userReceipt) {
           console.log('>> 중복된 영수증..', ret)
@@ -420,7 +501,8 @@ CREATE TABLE `receipt` (
           message: '결제되었습니다. 영수증을 확인하세요.',
           data: {
             receipt_url: ret.receipt_url,
-            update
+            update,
+            metadata: ret.metadata
           }
         }
       })

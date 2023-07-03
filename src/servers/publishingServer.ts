@@ -2,7 +2,6 @@ import Server from './server';
 import { IMessageQueueOptions, IServerOptions } from '../commons/interfaces';
 import mq from '../controllers/messageQueues/publishMQ'
 
-
 class PublishingServer extends Server {
     protected afterStart = async () => {
         const options: IMessageQueueOptions = {
@@ -12,7 +11,7 @@ class PublishingServer extends Server {
             addGateways: mq.addGateway(),
             eachMessage: mq.eachMessage.bind(mq),
         }
-        // await this.setMessageQueue(options)
+        await this.setMessageQueue(options)
     }
 }
 

@@ -150,3 +150,16 @@ export default {
   * start : 젬파이 커뮤니티 및 유저 정보 호출 서버 
   * startStudio: 스튜디오 실행 서버
   * startAdmin : 어드민 실행 서버
+
+---
+참고사항 
+=======
+ * 접속시 :  
+    * VScode 로 빌드하지 말 것!
+    * 반드시 ssh로 접속할 것!
+        ```
+        ssh -i C:\Users\hongd\.ssh\zempie_community.pem ec2-user@3.38.27.85
+        ```
+ 
+
+
