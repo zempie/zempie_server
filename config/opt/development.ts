@@ -92,6 +92,7 @@ export default {
     },
 
     Kafka: {
+        enable: false,
         clientId: 'zempie',
         brokers: ['localhost:9092']
     },
