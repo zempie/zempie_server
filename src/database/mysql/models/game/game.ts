@@ -193,8 +193,7 @@ class GameModel extends Model {
         }
         else if( sort =='recommend' ){
             const sequelize = this.model.sequelize;
-            [[sequelize.literal(`(IF(count_over >= 1000, 10, count_over / 100) + IF(DATEDIFF(NOW(), created_at) <= 30, 10 - DATEDIFF(NOW(), created_at) * 10 / 30, 0))`), 
-             'DESC']]
+            order.push([sequelize.literal(`(IF(count_over >= 1000, 10, count_over / 100) + IF(DATEDIFF(NOW(), created_at) <= 30, 10 - DATEDIFF(NOW(), created_at) * 10 / 30, 0))`), 'DESC']);
         }
         else{
             // order.push(['id', 'asc'])
