@@ -174,6 +174,12 @@ class GameModel extends Model {
         // }
 
         let order = [];
+        let attributes = [];
+        const weightedScoreSQL = `
+        (IF(game.count_over >= 1000, 10, count_over / 100) +
+         IF(DATEDIFF(NOW(), game.created_at) <= 30, 10 - DATEDIFF(NOW(), game.created_at) * 10 / 30, 0)
+        )`;
+
         sort = sort.toString().toLowerCase();
         if (sort === 'play' || sort === 'p') {
             order.push(['count_over', dir]);
@@ -192,8 +198,8 @@ class GameModel extends Model {
             order.push(['id', 'desc'])
         }
         else if( sort =='recommend' ){
-            const sequelize = this.model.sequelize;
-            order.push([sequelize.literal(`(IF(count_over >= 1000, 10, count_over / 100) + IF(DATEDIFF(NOW(), created_at) <= 30, 10 - DATEDIFF(NOW(), created_at) * 10 / 30, 0))`), 'DESC']);
+            attributes.push([Sequelize.literal(weightedScoreSQL), 'weighted'])
+            order.push(['weighted', 'DESC']);
         }
         else{
             // order.push(['id', 'asc'])
@@ -217,6 +223,7 @@ class GameModel extends Model {
                     }
                 }
             ],
+            attributes,
             limit: _.toNumber(limit),
             offset: _.toNumber(offset),
         });
