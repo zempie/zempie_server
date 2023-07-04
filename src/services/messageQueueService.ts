@@ -85,7 +85,7 @@ class KafkaService {
         }
         else {
             _.forEach(payloads.messages, (message: Message) => {
-                // this.gateways[payloads.topic](message.value);
+                this.gateways[payloads.topic](message.value);
             })
         }
     }
