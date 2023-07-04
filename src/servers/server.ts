@@ -26,7 +26,7 @@ import { dbs } from '../commons/globals';
 import dbOptions from '../../config/dbs';
 
 import cfgOption from '../../config/opt';
-const { CORS } = cfgOption;
+const { CORS, Kafka } = cfgOption;
 
 import RpcController from '../controllers/rpcController';
 
@@ -42,7 +42,7 @@ import swaggerDef from './swaggerDef';
 // colors
 import * as colors from 'colors';
 import { logger } from '../commons/logger';
-import Kafka from '../services/messageQueueService';
+import KafkaService from '../services/messageQueueService';
 import { adminTracking, getIdToken, validateAdminIdToken } from '../routes/_common';
 import { IncomingMessage } from 'http';
 import { verifyJWT } from '../commons/utils';
@@ -185,14 +185,17 @@ export default class Server {
         // await Producer.connect()
         // await Consumer.connect(options.groupId, options.autoCommit, options.onMessage)
         // Consumer.addTopic(options.addTopics);
-        await Kafka.initialize(options.groupId);
+        if( !Kafka.enable){
+            return;
+        }
+        await KafkaService.initialize(options.groupId);
         if (options.addTopics) {
-            await Kafka.addTopics(options.addTopics);
+            await KafkaService.addTopics(options.addTopics);
         }
         if (options.addGateways) {
-            await Kafka.addGateways(options.addGateways);
+            await KafkaService.addGateways(options.addGateways);
         }
-        await Kafka.run(options.eachMessage);
+        await KafkaService.run(options.eachMessage);
     }
 
 
