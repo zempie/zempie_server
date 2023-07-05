@@ -174,7 +174,7 @@ class GameModel extends Model {
         // }
 
         let order = [];
-        let attributes = [];
+        let attributes = undefined;
         const weightedScoreSQL = `
         (IF(game.count_over >= 1000, 10, count_over / 100) +
          IF(DATEDIFF(NOW(), game.created_at) <= 30, 10 - DATEDIFF(NOW(), game.created_at) * 10 / 30, 0)
@@ -198,7 +198,9 @@ class GameModel extends Model {
             order.push(['id', 'desc'])
         }
         else if( sort =='recommend' ){
-            attributes.push([Sequelize.literal(weightedScoreSQL), 'weighted'])
+            attributes = {
+                include: [[Sequelize.literal(weightedScoreSQL), 'weighted']]
+            }
             order.push(['weighted', 'DESC']);
         }
         else{
