@@ -40,7 +40,8 @@ class GameModel extends Model {
             url_thumb_webp:     { type: DataTypes.STRING },
             url_thumb_gif:      { type: DataTypes.STRING },
 
-            url_banner:         { type: DataTypes.STRING }
+            url_banner:         { type: DataTypes.STRING },
+            weighted:           { type: DataTypes.DOUBLE, defaultValue: 0 }   
 
 
             // url_title:          { type: DataTypes.STRING },
@@ -80,6 +81,13 @@ class GameModel extends Model {
                 type: DataTypes.INTEGER,
                 defaultValue: 1,
                 after: 'support_platform'
+            })
+        }
+        if (!desc['weighted']) {
+            this.model.sequelize.queryInterface.addColumn(this.model.tableName, 'weighted', {
+                type: DataTypes.DOUBLE,
+                defaultValue: 0,
+                after: 'created_at'
             })
         }
         // if ( !desc['category'] ) {
@@ -130,8 +138,6 @@ class GameModel extends Model {
             where.stage = { [Op.eq]: filter };
         }
 
-
-
         if(support_platform){
             const platforms = String(support_platform).split(',').sort()
             const pf =  platforms.sort().join(',')
@@ -153,7 +159,6 @@ class GameModel extends Model {
         }
 
         if (category) {
-           
             const ctgry = String(category).split(',')
             where.category = { [Op.in]: ctgry };
         }

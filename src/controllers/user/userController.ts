@@ -189,7 +189,7 @@ class UserController {
             channelInfo.post_cnt = postCount.count
 
             channel = await this.getUserDetailInfo(channelInfo)
-            
+
             if(_user){
                 const followStatus = _user ? await dbs.Follow.followStatus(_user.uid, channelInfo.id) : null;
                 const isFollowing = followStatus ? true : false;
@@ -200,10 +200,6 @@ class UserController {
                 channel.is_blocked = is_blocked ? true : false
 
             }
-           
-
-
-          
             // caches.user.setChannel(channel_id, channel);
         }
         return {
