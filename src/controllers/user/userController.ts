@@ -179,20 +179,23 @@ class UserController {
             // if ( user ) {
             //     channel = await this.getUserDetailInfo(user);
             // }
-            const user = await dbs.User.getProfileByChannelId({ channel_id });
+            const channelInfo = await dbs.User.getProfileByChannelId({ channel_id });
 
-            if (!user) {
+            if (!channelInfo) {
                 throw CreateError(ErrorCodes.INVALID_CHANNEL_ID);
             }
-            const followStatus = _user ? await dbs.Follow.followStatus(_user.uid, user.id) : null;
+            const followStatus = _user ? await dbs.Follow.followStatus(_user.uid, channelInfo.id) : null;
             const isFollowing = followStatus ? true : false;
 
-            const postCount = await dbs.Post.findAndCountAll({ user_id: user.id })
-            user.post_cnt = postCount.count
+            const postCount = await dbs.Post.findAndCountAll({ user_id: channelInfo.id })
+            channelInfo.post_cnt = postCount.count
 
-            channel = await this.getUserDetailInfo(user)
+            channel = await this.getUserDetailInfo(channelInfo)
 
             channel.is_following = isFollowing
+            const user = await dbs.User.findOne({uid: _user.uid})
+            const is_blocked = await dbs.Block.findOne({target_id:channel.id, user_id: user.id})
+            channel.is_blocked = is_blocked ? true : false
             // caches.user.setChannel(channel_id, channel);
         }
         return {
@@ -200,8 +203,9 @@ class UserController {
         }
     }
     getTargetInfoByNickname = async ({nickname} : {nickname: string}, _user:DecodedIdToken) => {
-        const channelId = await dbs.User.getChannelIdByNickname(nickname)
-        return this.getTargetInfoByChannelId(channelId, _user)
+        const channelInfo = await dbs.User.getChannelIdByNickname(nickname)
+   
+        return this.getTargetInfoByChannelId(channelInfo, _user)
     }
 
 

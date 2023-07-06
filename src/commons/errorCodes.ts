@@ -60,6 +60,8 @@ export const ErrorCodes = {
     INVALID_TIMELINE_USER_UID: { code: 42110, message: '타임라인 유저 아이디 오류' },
     ALREADY_FOLLOWING_TARGET: { code: 42201, message: '이미 팔로잉 중입니다' },
     ALREADY_UNFOLLOW_TARGET: { code: 42202, message: '팔로우 중이 아닙니다' },
+    BLOCK_USER: { code: 42203, message: '상호작용이 불가능한 유저입니다.' },
+
 
     INVALID_QNA_PARAMS: { code: 43101, message: 'QnA 파라미터 오류' },
 
