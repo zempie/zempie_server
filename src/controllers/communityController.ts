@@ -12,6 +12,7 @@ import { eProjectState } from "../commons/enums";
 import * as _ from "lodash";
 import { getGameData } from "./_common";
 import { getLinkPreview } from "link-preview-js";
+import { parseBoolean } from '../commons/utils';
 
 
 const { AWS } = Opt;
@@ -120,7 +121,8 @@ class CommunityController {
                 url: data.Location,
                 size: file.size,
                 type: fType,
-                name: file.name
+                name: file.name,
+                is_blind: parseBoolean(params.is_blind)
             })
             idx++;
         }

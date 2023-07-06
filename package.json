@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc --watch",
     "start": "node ./dist/src/run.js",
     "startStudio": "node ./dist/src/runStudio.js",
     "startAdmin": "node ./dist/src/runAdmin.js",
