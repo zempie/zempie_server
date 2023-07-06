@@ -184,6 +184,12 @@ class UserController {
             if (!channelInfo) {
                 throw CreateError(ErrorCodes.INVALID_CHANNEL_ID);
             }
+
+            const postCount = await dbs.Post.findAndCountAll({ user_id: channelInfo.id })
+            channelInfo.post_cnt = postCount.count
+
+            channel = await this.getUserDetailInfo(channelInfo)
+            
             if(_user){
                 const followStatus = _user ? await dbs.Follow.followStatus(_user.uid, channelInfo.id) : null;
                 const isFollowing = followStatus ? true : false;
@@ -196,10 +202,6 @@ class UserController {
             }
            
 
-            const postCount = await dbs.Post.findAndCountAll({ user_id: channelInfo.id })
-            channelInfo.post_cnt = postCount.count
-
-            channel = await this.getUserDetailInfo(channelInfo)
 
           
             // caches.user.setChannel(channel_id, channel);

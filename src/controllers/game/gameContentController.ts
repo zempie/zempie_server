@@ -24,6 +24,7 @@ class GameContentController {
         if ( !game ) {
             throw CreateError(ErrorCodes.INVALID_GAME_ID);
         }
+        
         const _user = await dbs.User.findOne({uid: user_uid})
 
         const is_blocked = await dbs.Block.findOne({target_id:game.userId, user_id: _user.id})
