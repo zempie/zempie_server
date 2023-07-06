@@ -184,18 +184,24 @@ class UserController {
             if (!channelInfo) {
                 throw CreateError(ErrorCodes.INVALID_CHANNEL_ID);
             }
-            const followStatus = _user ? await dbs.Follow.followStatus(_user.uid, channelInfo.id) : null;
-            const isFollowing = followStatus ? true : false;
+            if(_user){
+                const followStatus = _user ? await dbs.Follow.followStatus(_user.uid, channelInfo.id) : null;
+                const isFollowing = followStatus ? true : false;
+                channel.is_following = isFollowing
+
+                const user = await dbs.User.findOne({uid: _user.uid})
+                const is_blocked = await dbs.Block.findOne({target_id:channel.id, user_id: user.id})
+                channel.is_blocked = is_blocked ? true : false
+
+            }
+           
 
             const postCount = await dbs.Post.findAndCountAll({ user_id: channelInfo.id })
             channelInfo.post_cnt = postCount.count
 
             channel = await this.getUserDetailInfo(channelInfo)
 
-            channel.is_following = isFollowing
-            const user = await dbs.User.findOne({uid: _user.uid})
-            const is_blocked = await dbs.Block.findOne({target_id:channel.id, user_id: user.id})
-            channel.is_blocked = is_blocked ? true : false
+          
             // caches.user.setChannel(channel_id, channel);
         }
         return {
