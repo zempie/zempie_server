@@ -41,7 +41,7 @@ class GameModel extends Model {
             url_thumb_gif:      { type: DataTypes.STRING },
 
             url_banner:         { type: DataTypes.STRING },
-            weighted:           { type: DataTypes.DOUBLE, defaultValue: 0 }   
+            
 
 
             // url_title:          { type: DataTypes.STRING },
@@ -181,7 +181,7 @@ class GameModel extends Model {
         let order = [];
         let attributes = undefined;
         const weightedScoreSQL = `
-        (IF(game.count_over >= 1000, 10, count_over / 100) +
+        (IF(game.count_start >= 2000, 10, game.count_start / 200) +
          IF(DATEDIFF(NOW(), game.created_at) <= 30, 10 - DATEDIFF(NOW(), game.created_at) * 10 / 30, 0)
         )`;
 
@@ -206,6 +206,7 @@ class GameModel extends Model {
             attributes = {
                 include: [[Sequelize.literal(weightedScoreSQL), 'weighted']]
             }
+            // order.push( Sequelize.literal('weighted DESC'))
             order.push(['weighted', 'DESC']);
         }
         else{
