@@ -24,6 +24,14 @@ class GameContentController {
         if ( !game ) {
             throw CreateError(ErrorCodes.INVALID_GAME_ID);
         }
+        
+        const _user = await dbs.User.findOne({uid: user_uid})
+
+        const is_blocked = await dbs.Block.findOne({target_id:game.userId, user_id: _user.id})
+
+        if(is_blocked){
+            throw CreateError(ErrorCodes.BLOCK_USER);
+        }
 
         const changed = await dbs.GameHeart.likeIt(game_id, user_uid, on);
 
@@ -150,6 +158,17 @@ class GameContentController {
         // 불량 단어 색출
         if ( !dbs.BadWords.isOk(content) ) {
             throw CreateError(ErrorCodes.FORBIDDEN_STRING);
+        }
+        const game = await dbs.Game.findOne({ id: game_id });
+        if ( !game ) {
+            throw CreateError(ErrorCodes.INVALID_GAME_ID);
+        }
+
+        const _user = await dbs.User.findOne({uid: user.uid})
+        const is_blocked = await dbs.Block.findOne({target_id:game.userId, user_id: _user.id})
+
+        if(is_blocked){
+            throw CreateError(ErrorCodes.BLOCK_USER);
         }
 
         if ( reply_id ) {

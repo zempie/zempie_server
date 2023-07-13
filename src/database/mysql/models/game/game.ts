@@ -40,7 +40,8 @@ class GameModel extends Model {
             url_thumb_webp:     { type: DataTypes.STRING },
             url_thumb_gif:      { type: DataTypes.STRING },
 
-            url_banner:         { type: DataTypes.STRING }
+            url_banner:         { type: DataTypes.STRING },
+            
 
 
             // url_title:          { type: DataTypes.STRING },
@@ -82,6 +83,13 @@ class GameModel extends Model {
                 after: 'support_platform'
             })
         }
+        // if (!desc['weighted']) {
+        //     this.model.sequelize.queryInterface.addColumn(this.model.tableName, 'weighted', {
+        //         type: DataTypes.DOUBLE,
+        //         defaultValue: 0,
+        //         after: 'created_at'
+        //     })
+        // }
         // if ( !desc['category'] ) {
         //     this.model.sequelize.queryInterface.addColumn(this.model.tableName, 'category', {
         //         type: DataTypes.SMALLINT,
@@ -151,7 +159,6 @@ class GameModel extends Model {
         }
 
         if (category) {
-           
             const ctgry = String(category).split(',')
             where.category = { [Op.in]: ctgry };
         }
@@ -172,6 +179,12 @@ class GameModel extends Model {
         // }
 
         let order = [];
+        let attributes = undefined;
+        const weightedScoreSQL = `
+        (IF(game.count_over >= 2000, 10, game.count_over / 200) +
+         IF(DATEDIFF(NOW(), game.created_at) <= 30, 10 - DATEDIFF(NOW(), game.created_at) * 10 / 30, 0)
+        )`;
+
         sort = sort.toString().toLowerCase();
         if (sort === 'play' || sort === 'p') {
             order.push(['count_over', dir]);
@@ -189,10 +202,16 @@ class GameModel extends Model {
             order.push(['created_at', 'desc']);
             order.push(['id', 'desc'])
         }
-        else {
+        else if( sort =='recommend' ){
+            attributes = {
+                include: [[Sequelize.literal(weightedScoreSQL), 'weighted']]
+            }
+            order.push( Sequelize.literal('weighted DESC'))
+            // order.push(['weighted', 'DESC']);
+        }
+        else{
             // order.push(['id', 'asc'])
             order.push(['created_at', 'desc'])
-
         }
 
         return this.getListWithUser(where, {
@@ -212,6 +231,7 @@ class GameModel extends Model {
                     }
                 }
             ],
+            attributes,
             limit: _.toNumber(limit),
             offset: _.toNumber(offset),
         });
