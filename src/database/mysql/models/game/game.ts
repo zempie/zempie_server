@@ -83,6 +83,13 @@ class GameModel extends Model {
                 after: 'support_platform'
             })
         }
+        // if (!desc['weighted']) {
+        //     this.model.sequelize.queryInterface.addColumn(this.model.tableName, 'weighted', {
+        //         type: DataTypes.DOUBLE,
+        //         defaultValue: 0,
+        //         after: 'created_at'
+        //     })
+        // }
         // if ( !desc['category'] ) {
         //     this.model.sequelize.queryInterface.addColumn(this.model.tableName, 'category', {
         //         type: DataTypes.SMALLINT,
@@ -174,7 +181,7 @@ class GameModel extends Model {
         let order = [];
         let attributes = undefined;
         const weightedScoreSQL = `
-        (IF(game.count_start >= 2000, 10, game.count_start / 200) +
+        (IF(game.count_over >= 2000, 10, game.count_over / 200) +
          IF(DATEDIFF(NOW(), game.created_at) <= 30, 10 - DATEDIFF(NOW(), game.created_at) * 10 / 30, 0)
         )`;
 
@@ -199,7 +206,8 @@ class GameModel extends Model {
             attributes = {
                 include: [[Sequelize.literal(weightedScoreSQL), 'weighted']]
             }
-            order.push(['weighted', 'DESC']);
+            order.push( Sequelize.literal('weighted DESC'))
+            // order.push(['weighted', 'DESC']);
         }
         else{
             // order.push(['id', 'asc'])
