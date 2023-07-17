@@ -33,11 +33,19 @@ class UserReportModel extends Model {
         this.model.belongsTo(dbs.Game.model, {foreignKey: 'target_id', targetKey: 'id'});
     }
 
-    async getUserReportList({limit = 20, offset = 0, sort = 'created_at', dir = 'asc'}: any) {
+    async getUserReportList({limit = 20, offset = 0, sort = 'created_at', dir = 'asc', filter, filter_val}: any) {
+        let where = {}
+        if(filter){
+            where = {
+                [filter]: filter_val === 'true' ? true : filter_val 
+            }
+        }
+        
         return await this.model.findAndCountAll({
             limit: _.toNumber(limit),
             offset: _.toNumber(offset),
             order: [[sort, dir]],
+            where,
             include: [{
                 model: dbs.User.model,
                 as: 'targetUser',
