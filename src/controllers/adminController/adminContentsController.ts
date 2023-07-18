@@ -175,10 +175,10 @@ class AdminContentsController {
         })
         return _.map(records, (d: any) => d.get({ plain: true }))
     }
-    updatePunishUser = async({id} : any) => {
+    updatePunishUser = async({punished_id, user_id} : any) => {
         await dbs.UserPunished.getTransaction(async (transaction: Transaction) => {
 
-            const userPunish = await dbs.UserPunished.findOne({user_id : id})
+            const userPunish = await dbs.UserPunished.findOne({id:punished_id ,user_id})
             
             if(!userPunish){
                 throw CreateError(ErrorCodes.INVALID_PARAMS);
