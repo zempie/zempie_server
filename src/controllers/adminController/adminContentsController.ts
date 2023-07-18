@@ -5,6 +5,7 @@ import admin from 'firebase-admin';
 import { Transaction } from 'sequelize';
 import { eMailCategory, eProjectState, eProjectVersionState } from '../../commons/enums';
 import { CreateError, ErrorCodes } from '../../commons/errorCodes';
+import userPunished from 'src/database/mysql/models/user/userPunished';
 
 
 
@@ -67,10 +68,10 @@ class AdminContentsController {
     }
 
 
-    punishUser = async ({ user_id, category, reason, date }: any) => {
+    punishUser = async ({ user_id, category, reason, date, report_id, warns, warn_reason_msg }: any) => {
         const user = await dbs.User.findOne({ id: user_id });
         const userClaim = await dbs.UserClaim.getZempieClaim(user_id, user.uid);
-        const claim: IZempieClaims = JSON.parse(userClaim.data);
+        const claim: IZempieClaims =  typeof userClaim.data === 'string' ?  JSON.parse(userClaim.data) : userClaim.data ;
 
         claim.zempie.deny[category] = {
             state: true,
@@ -81,6 +82,16 @@ class AdminContentsController {
         userClaim.data = claim;
         userClaim.save();
 
+
+        if(warns && warns.length){
+            warns.forEach(async(warn : any) => {
+                await dbs.UserWarn.update({is_done : true, process_msg : warn_reason_msg }, {id: warn.id})
+            })
+        }
+        if(report_id)
+            await dbs.UserReport.update({is_done: true}, {id: report_id})
+
+
         await admin.auth().setCustomUserClaims(userClaim.user_uid, claim);
 
         await dbs.UserPunished.create({
@@ -88,7 +99,7 @@ class AdminContentsController {
             is_denied: true,
             category,
             reason,
-            end_at: new Date(date),
+            end_at: date ? new Date(date) : new Date(9999, 11, 31),
         });
 
         // send a mail
@@ -161,8 +172,23 @@ class AdminContentsController {
             order: [[sort, dir]],
             limit: _.toNumber(limit),
             offset: _.toNumber(offset),
-        });
+        })
         return _.map(records, (d: any) => d.get({ plain: true }))
+    }
+    updatePunishUser = async({id} : any) => {
+        await dbs.UserPunished.getTransaction(async (transaction: Transaction) => {
+
+            const userPunish = await dbs.UserPunished.findOne({user_id : id})
+            
+            if(!userPunish){
+                throw CreateError(ErrorCodes.INVALID_PARAMS);
+            }
+            userPunish.end_at = new Date();
+            userPunish.is_denied = false;
+           
+            await userPunish.save({ transaction });
+        });
+
     }
 }
 

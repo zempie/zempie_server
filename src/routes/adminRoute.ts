@@ -38,6 +38,9 @@ export default (router: Router) => {
     router.get(`${apiVer}/admin/user/profile`,             validateAdminIdToken,   convert(AdminUserController.getUserProfile));
     router.post(`${apiVer}/admin/user/ban`,                validateAdminIdToken,   adminTracking,  convert(AdminUserController.banUser));
     router.post(`${apiVer}/admin/user/ban/cancel`,         validateAdminIdToken,   adminTracking,  convert(AdminUserController.cancelBanUser));
+    router.post(`${apiVer}/admin/user/warn`,               validateAdminIdToken,   adminTracking,  convert(AdminUserController.warnUser));
+    router.post(`${apiVer}/admin/user/warn/cancel`,        validateAdminIdToken,   adminTracking,  convert(AdminUserController.cancelWarnUser));
+    router.get(`${apiVer}/admin/user/warn/list`,           validateAdminIdToken,   adminTracking,  convert(AdminUserController.getUserWarning));
 
 
     /**
@@ -53,11 +56,13 @@ export default (router: Router) => {
     /**
      * 이용 제재
      */
-    router.post(`${apiVer}/admin/punish/game`,  validateAdminIdToken,   adminTracking,  convert(AdminContentsController.punishGame));
-    router.post(`${apiVer}/admin/punish/user`,  validateAdminIdToken,   adminTracking,  convert(AdminContentsController.punishUser));
+    router.post(`${apiVer}/admin/punish/game`,          validateAdminIdToken,   adminTracking,  convert(AdminContentsController.punishGame));
+    router.post(`${apiVer}/admin/punish/user`,          validateAdminIdToken,   adminTracking,  convert(AdminContentsController.punishUser));
     router.post(`${apiVer}/admin/punish/game/release`,  validateAdminIdToken,   adminTracking,  convert(AdminContentsController.releasePunishedGame));
     router.post(`${apiVer}/admin/punish/user/release`,  validateAdminIdToken,   adminTracking,  convert(AdminContentsController.releasePunishedUser));
     router.get(`${apiVer}/admin/punish/user/list`,      validateAdminIdToken,   adminTracking,  convert(AdminContentsController.punishedUserList));
+    router.patch(`${apiVer}/admin/punish/user/:id`,     validateAdminIdToken,   adminTracking,  convert(AdminContentsController.updatePunishUser));
+
 
     /**
      * 우편함

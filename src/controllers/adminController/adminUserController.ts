@@ -63,21 +63,28 @@ class AdminUserController {
     }
 
 
-    async banUser({report_id, user_id, reason, period}: any, admin: IAdmin) {
+    async banUser({report_id, user_id, reason, period, warns}: any, admin: IAdmin) {
         const isUserBan = await dbs.UserBan.getUserBan({user_id})
 
         if( isUserBan ) {
-            await dbs.UserReport.update({is_done: true}, {id: report_id})
+            if(report_id)
+                await dbs.UserReport.update({is_done: true}, {id: report_id})
             throw CreateError(ErrorCodes.ALREADY_BANNED_USER);
         }
         await dbs.UserBan.getTransaction(async (transaction: Transaction) => {
-            await dbs.UserReport.update({is_done: true}, {id: report_id})
-
+            if(warns && warns.length){
+                warns.forEach(async(warn : any) => {
+                    await dbs.UserWarn.update({is_done : true}, {id: warn.id})
+                })
+            }
+            if(report_id)
+                await dbs.UserReport.update({is_done: true}, {id: report_id})
+            await dbs.User.update({banned: true}, {id: user_id})
             await dbs.UserBan.create({
                 user_id,
                 admin_id: admin.id,
                 reason,
-                period,
+                period : period? period : new Date(9999, 11, 31),
             }, transaction)
         })
     }
@@ -164,6 +171,42 @@ class AdminUserController {
                     nickname: email
                 }, {uid:user.uid}, transaction)            
             }
+        })
+    }
+    async warnUser({ user_id, reason_num, reason, report_id }:any, admin: IAdmin) {
+        return dbs.User.getTransaction(async (transaction: Transaction) => {
+
+            const warn = await dbs.UserWarn.create({
+                user_id,
+                admin_id: admin.id,
+                reason_num,
+                reason
+            })
+
+            if(report_id)
+                await dbs.UserReport.update({is_done: true}, {id: report_id }, transaction)
+            return warn
+         })
+    }
+    async getUserWarning({user_id}: any, admin:IAdmin){
+        return await dbs.UserWarn.userWarningList({user_id})
+    }
+
+    async cancelWarnUser({id, user_id, process_msg} : any ) {
+        await dbs.UserBan.getTransaction(async (transaction: Transaction) => {
+            const userWarn = await dbs.UserWarn.findOne( {user_id, id })
+
+            if(!userWarn){
+                throw CreateError(ErrorCodes.INVALID_PARAMS);
+            }
+
+            userWarn.is_done = true
+            if(process_msg)
+                userWarn.process_msg = process_msg
+
+            await userWarn.save({ transaction });
+
+            // await dbs.UserWarn.update({ is_done: true }, {user_id: user_id, id }, transaction);
         })
     }
 }

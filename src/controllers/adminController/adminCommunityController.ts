@@ -6,9 +6,9 @@ class AdminCommunityController {
 
     }
 
-    userReportList = async ({limit = 20, offset = 0, sort = 'created_at', dir = 'asc'}: any) => {
+    userReportList = async ({limit = 20, offset = 0, sort = 'created_at', dir = 'desc', filter, filter_val}: any) => {
 
-        const {count, rows} = await dbs.UserReport.getUserReportList({limit, offset, sort, dir});
+        const {count, rows} = await dbs.UserReport.getUserReportList({limit, offset, sort, dir, filter, filter_val});
 
         return {
             count,
@@ -21,7 +21,8 @@ class AdminCommunityController {
                     reason: row.reason,
                     is_done: row.is_done,
                     url_img: row.url_img,
-                    created_at: row.created_at
+                    created_at: row.created_at,
+                    updated_at: row.updated_at
 
                 }
             })
