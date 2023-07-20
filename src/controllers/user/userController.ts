@@ -148,12 +148,14 @@ class UserController {
         const userBan = await dbs.UserBan.getUserBan({ user_id: user.id })
 
         if (userBan) {
-            return {
-                ban: {
-                    reason: userBan.reason,
-                    period: userBan.period
-                }
-            };
+            return user = {
+                user: {
+                    ...user,
+                    ban: {
+                        reason: userBan.reason,
+                        period: userBan.period
+                    }
+            }};
         }
         return {
             user
