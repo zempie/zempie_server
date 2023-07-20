@@ -22,6 +22,7 @@ export const ErrorCodes = {
     USER_ALREADY_VERIFIED_EMAIL: { code: 20101, message: '이미 인증된 메일' },
     USER_INVALID_VERIFIED_EMAIL: { code: 20102, message: '이메일 인증 안됨' },
     USER_DUPLICATED_CHANNEL_ID: { code: 20103, message: 'Channel ID 중복' },
+    BANNED_USER: { code: 20201, message: '제재중인 유저' },
 
     /*
         User Payment , Coin,  Shop
