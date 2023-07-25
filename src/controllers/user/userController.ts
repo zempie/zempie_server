@@ -172,6 +172,16 @@ class UserController {
         }
     }
 
+    getTargetInfoById = async ({ user_id }: any, _user: DecodedIdToken) => {
+        const user = await dbs.User.getProfileByUserID({ user_id });
+
+        const target = await this.getUserDetailInfo(user);
+        
+        return {
+            target,
+        }
+    }
+
 
     getTargetInfoByChannelId = async ({ channel_id }: { channel_id: string }, _user: DecodedIdToken) => {
         let channel = await caches.user.getChannel(channel_id);
