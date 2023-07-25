@@ -37,6 +37,8 @@ export default (router: Router) => {
     router.get(`${apiVer}/user/info`,               validateFirebaseIdToken, isAuthenticated, convert(UserController.getInfo));
     router.get(`${apiVer}/user/:nickname`,          validateFirebaseIdToken, convert(UserController.getTargetInfoByNickname));
     router.get(`${apiVer}/channel/:channel_id`,     validateFirebaseIdToken, convert(UserController.getTargetInfoByChannelId));
+    router.get(`${apiVer}/user/info/:user_id`,      validateFirebaseIdToken, convert(UserController.getTargetInfoById));
+
 
 
     router.get(`${apiVer}/user/mails`,              validateFirebaseIdToken, isAuthenticated, convert(UserContentController.getMailbox));

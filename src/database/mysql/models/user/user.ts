@@ -159,6 +159,7 @@ class UserModel extends Model {
     getProfileByUid = async ({ uid }: { uid: string }) => {
         return this.getProfile({ uid });
     }
+  
     getChannelIdByNickname = async(nickname: string) => {
        return await this.findOne({
            nickname 
