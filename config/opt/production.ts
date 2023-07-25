@@ -36,7 +36,7 @@ export default {
     AWS: {
         // Bucket: 'zempie-rsc/v1',
         Bucket: {
-            PublicBase:'zempie-rsc-pb',
+            PublicBase: 'zempie-rsc-pb',
             Rsc: 'zempie-rsc/v1',
             RscPublic: 'zempie-rsc-pb/v1',
             Static: 'zempie-rsc/static',
@@ -44,7 +44,7 @@ export default {
     },
 
     password: {
-        salt : '@#FE)UFIOWJF)@#J',
+        salt: '@#FE)UFIOWJF)@#J',
         iteration: 100000
     },
 
@@ -60,9 +60,9 @@ export default {
         refresh: {
             secret: '*I^H%$HG%#!@GF#%GH@',
             options: {
-                algorithm : 'HS256',
-                expiresIn : '30d',
-                issuer    : 'from the red'
+                algorithm: 'HS256',
+                expiresIn: '30d',
+                issuer: 'from the red'
             },
         }
     },
@@ -70,13 +70,14 @@ export default {
     CORS: {
         allowedOrigin: [
             'http://zempie.com', 'https://zempie.com',
-            'http://www.zempie.com','https://www.zempie.com',
+            'http://www.zempie.com', 'https://www.zempie.com',
             'http://launcher.zempie.com', 'https://launcher.zempie.com',
             'http://studio.zempie.com', 'https://studio.zempie.com',
             'http://support.zempie.com', 'https://support.zempie.com',
             'http://admin.zempie.com', 'https://admin.zempie.com',
-            'http://community.zempie.com','https://community.zempie.com',
-            'https://script.google.com', 'http://gtest.fromthered.com'
+            'http://community.zempie.com', 'https://community.zempie.com',
+            'https://script.google.com', 'http://gtest.fromthered.com',
+            "https://dev.zempie.com"
         ],
         secure: false,
         domain: '.zempie.com',
