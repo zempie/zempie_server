@@ -84,7 +84,8 @@ export default {
             'http://3.38.27.85:4000',
             'http://dev.zempie.com',
             'https://dev.zempie.com',
-            'https://beta.zempie.com'
+            'https://beta.zempie.com',
+            'http://community.zempie.com.s3-website.ap-northeast-2.amazonaws.com'
             
         ],
         secure: false,
