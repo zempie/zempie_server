@@ -26,8 +26,8 @@ export default {
     },
 
     Url: {
-        Host: 'http://gtest.fromthered.com:8280',
-        DeployApiV1: 'http://gtest.fromthered.com:8288/api/v1',
+        Host: 'https://dev.zempie.com',
+        DeployApiV1: 'https://api-dev.zempie.com/api/v1',
         GameClient: 'http://localhost:8080/play',
         Redirect: 'http://staging-zempie.s3-website.ap-northeast-2.amazonaws.com/redirect',
         Launcher: 'http://gtest.fromthered.com/zempie/launcher',
@@ -89,7 +89,7 @@ export default {
             
         ],
         secure: false,
-        domain: '.fromthered.com',
+        domain: '.zempie.com',
     },
 
     Kafka: {
