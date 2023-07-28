@@ -12,8 +12,6 @@ import mq from '../controllers/messageQueues/apiMQ';
 import redirectRoute from '../routes/redirectRoute';
 import communityRoute from '../routes/communityRoute'
 import gameAuthRoute from '../routes/gameAuthRoute';
-import mogeraRoute from '../routes/mogeraRoute';
-
 
 class ApiServer extends Server {
 
@@ -44,7 +42,6 @@ class ApiServer extends Server {
 
         communityRoute(app)
         gameAuthRoute(app)
-        mogeraRoute(app)
 
         // tcpRoute(app);
 
