@@ -46,7 +46,8 @@ const replaceExt = require('replace-ext');
 // }
 
 interface ICreateProject extends IVersion, IProject {
-    category?:number
+    category?:number,
+    mogera_file_id?:number
 
 }
 
@@ -246,6 +247,35 @@ class StudioController {
 
             project.game_id = game.id;
 
+
+            if(params.mogera_file_id){
+                const mogeraFile = await dbs.MogeraFile.findOne({ user_uid: uid, id:params.mogera_file_id })
+                game.url_game = mogeraFile.url;
+                game.activated = 1
+                game.enabled = 1
+                mogeraFile.is_uploaded = true
+                await mogeraFile.save( {transaction} )
+                await game.save( {transaction} );
+
+                const versionParams: IVersion = {};
+
+                versionParams.project_id = project.id;
+                versionParams.game_id = game.id;
+                versionParams.number = 1;
+                versionParams.autoDeploy = true;
+                versionParams.version = params.version || '1.0.1';
+                versionParams.startFile ='';
+                versionParams.size = params.size || 0;
+                versionParams.description = project.description || '';
+                versionParams.file_type = params.file_type || 1;
+                versionParams.support_platform = params.support_platform || '';
+                versionParams.state = 'deploy' 
+                versionParams.url = mogeraFile.url
+
+                const version = await dbs.ProjectVersion.create(versionParams, transaction);
+                project.deploy_version_id = version.id;
+
+            }
             //HTML startfile 있는 경우
             if(params.startFile) {
                 const versionParams: IVersion = {};
@@ -690,7 +720,7 @@ class Version {
 
 }
 
-async function uploadVersionFile( files : any, uid : string, subDir : string, startFile : string ) : Promise<string> {
+export async function uploadVersionFile( files : any, uid : string, subDir : string, startFile : string ) : Promise<string> {
 
     let url = '';
     for( let key in files ) {
