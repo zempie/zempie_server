@@ -8,6 +8,7 @@ import { IZempieClaims } from '../controllers/_interfaces';
 import admin from 'firebase-admin';
 import { updateZempieClaims } from '../commons/utils';
 import redirectRoute from "../routes/redirectRoute";
+import mogeraRoute from '../routes/mogeraRoute';
 
 
 class StudioServer extends Server {
@@ -31,6 +32,8 @@ class StudioServer extends Server {
         // contentRoute(app);
         // gameRoute(app);
         redirectRoute(app);
+        mogeraRoute(app)
+
     }
 
     async setDeveloper() {

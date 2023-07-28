@@ -13,6 +13,7 @@ import redirectRoute from '../routes/redirectRoute';
 import communityRoute from '../routes/communityRoute'
 import gameAuthRoute from '../routes/gameAuthRoute';
 
+
 class ApiServer extends Server {
 
     initialize = async (options: IServerOptions) => {
