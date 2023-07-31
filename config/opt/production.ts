@@ -76,7 +76,8 @@ export default {
             'http://support.zempie.com', 'https://support.zempie.com',
             'http://admin.zempie.com', 'https://admin.zempie.com',
             'http://community.zempie.com','https://community.zempie.com',
-            'https://script.google.com', 'http://gtest.fromthered.com'
+            'https://script.google.com', 'http://gtest.fromthered.com',
+            'http://mogera-editor-dev.com.s3-website.ap-northeast-2.amazonaws.com'
         ],
         secure: false,
         domain: '.zempie.com',
