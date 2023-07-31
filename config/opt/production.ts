@@ -79,7 +79,7 @@ export default {
             'https://script.google.com', 'http://gtest.fromthered.com',
             'http://mogera-editor-dev.com.s3-website.ap-northeast-2.amazonaws.com',
             "https://dev.zempie.com",
-        ],
+å        ],
         secure: false,
         domain: '.zempie.com',
     },
