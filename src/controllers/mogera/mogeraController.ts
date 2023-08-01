@@ -13,17 +13,27 @@ interface ICreateMogeraFile{
   size:number
 }
 
+interface DecodedToken { 
+  
+  uid: string,
+  created_time: number,
+  email: string,
+  picture: string,
+  name: string,
+  iat: number
+}
+
 class MegeraController {
-    async createGameFile( params : ICreateMogeraFile, { uid }: DecodedIdToken, { req: { files } }: IRoute ) {
+    async createGameFile( params : ICreateMogeraFile, {decodedToken} :{decodedToken : DecodedToken}, { req: { files } }: IRoute ) {
 
       return dbs.MogeraFile.getTransaction( async (transaction : Transaction)=>{
+        const { uid } = decodedToken
         const subDir = `/mogera/user/${uid}/${uuid()}`;
         const url = await uploadVersionFile(files, uid, subDir, files.startFile.name)
-        
+
         const paylod = {
           user_uid : uid,
           url,
-          is_uploaded: false,
           size:params.size
         }
         return await dbs.MogeraFile.create( paylod, transaction );
@@ -34,7 +44,7 @@ class MegeraController {
 
     async getGameFile( params : ICreateMogeraFile, { uid } : DecodedIdToken ) {
 
-      const files = await dbs.MogeraFile.findAll({ user_uid: uid, is_uploaded: false },{
+      const files = await dbs.MogeraFile.findAll({ user_uid: uid },{
         order: [['created_at', 'desc']],
         limit: 2
        })

@@ -253,8 +253,7 @@ class StudioController {
                 game.url_game = mogeraFile.url;
                 game.activated = 1
                 game.enabled = 1
-                mogeraFile.is_uploaded = true
-                await mogeraFile.save( {transaction} )
+                
                 await game.save( {transaction} );
 
                 const versionParams: IVersion = {};
@@ -274,6 +273,9 @@ class StudioController {
 
                 const version = await dbs.ProjectVersion.create(versionParams, transaction);
                 project.deploy_version_id = version.id;
+
+                await dbs.MogeraFile.destroy({ user_uid: uid, id:params.mogera_file_id })
+
 
             }
             //HTML startfile 있는 경우
