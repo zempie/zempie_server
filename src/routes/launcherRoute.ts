@@ -10,7 +10,7 @@ import { isAuthenticated, validateFirebaseIdToken } from './_common';
 const apiVer = `/api/v1`
 export default (router: Router) => {
     // 게임 실행
-    router.get(`${apiVer}/launch/game/:pathname`, validateFirebaseIdToken,       convert(LauncherController.getGame));
+    router.get(`${apiVer}/launch/game/:pathname`, convert(LauncherController.getGame));
     router.get(`${apiVer}/launch/battle/:uid`,  convert(LauncherController.getBattleGame));
     router.get(`${apiVer}/launch/shared/:uid`,  convert(LauncherController.getSharedGame));
 
