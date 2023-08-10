@@ -6,9 +6,8 @@ class MogeraFileModel extends Model {
     protected initialize() {
         this.name = 'mogeraFile';
         this.attributes = {
-            user_uid:           { type: DataTypes.STRING(36), allowNull: false, unique: 'compositeIndex' },
+            user_uid:           { type: DataTypes.STRING(36), allowNull: false },
             url:                { type: DataTypes.STRING, allowNull: true },
-            is_uploaded:        { type: DataTypes.BOOLEAN, defaultValue: false },
             size:               { type: DataTypes.FLOAT, defaultValue: 0 },
 
         };

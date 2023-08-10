@@ -5,6 +5,7 @@ import cfgOption from '../../config/opt';
 import { dbs } from "../commons/globals";
 import admin from 'firebase-admin';
 import DecodedIdToken = admin.auth.DecodedIdToken;
+import { verifyJWT } from "../commons/utils";
 class GameAuthController {
   
 
@@ -39,9 +40,8 @@ class GameAuthController {
   }
 
   async getInfo({ token }: { token: any }) {
-    const { secret } = cfgOption.JWT.access;
 
-    const result = {user:jwt.verify(token, secret)}
+    const result =  await verifyJWT(token)  
     return result
   }
 

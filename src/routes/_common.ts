@@ -181,6 +181,7 @@ export const validateGameToken = async (req: Request, res: Response, next: NextF
         const result = await gameAuthController.verifyGameToken(apiKey)
 
         if (result) {
+            req.user = result
             return next();
         } else {
             return responseError(res, CreateError(ErrorCodes.UNAUTHORIZED), 401);
