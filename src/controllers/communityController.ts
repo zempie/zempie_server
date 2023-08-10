@@ -101,6 +101,11 @@ class CommunityController {
                     subDir = 'c/v';
                     fType = 'video';
                     break;
+                case 'video/quicktime':
+                    key = replaceExt(uniqid(), `.${fileType.ext}`);
+                    subDir = 'c/v';
+                    fType = 'video';
+                    break;
 
                 default:
                     fs.unlink(file.path, () => {
