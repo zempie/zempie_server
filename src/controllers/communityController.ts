@@ -65,14 +65,13 @@ class CommunityController {
                 });
                 throw CreateError(ErrorCodes.INVALID_FILE_TYPE);
             }
-
             let size = file.size;
 
             switch (fileType.mime) {
                 case 'image/jpeg':
                 case 'image/gif':
                     fType = 'image';
-                    break;
+                    // break;
                 case 'image/png':
                     const webp = await FileManager.convertToWebp(file, 80);
                     size = webp[0].data.length;
