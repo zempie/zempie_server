@@ -13,6 +13,7 @@ import * as _ from "lodash";
 import { getGameData } from "./_common";
 import { getLinkPreview } from "link-preview-js";
 import { parseBoolean } from '../commons/utils';
+import fileManager from '../services/fileManager';
 
 
 const { AWS } = Opt;
@@ -120,13 +121,17 @@ class CommunityController {
                 subDir,
             });
 
+            const bucket_url = await fileManager.hasBucketObject('thumbnail/' + data.key)
+
+
             ret.push({
                 priority: idx,
                 url: data.Location,
                 size: file.size,
                 type: fType,
                 name: file.name,
-                is_blind: parseBoolean(params.is_blind)
+                is_blind: parseBoolean(params.is_blind),
+                thumbnail: bucket_url
             })
             idx++;
         }

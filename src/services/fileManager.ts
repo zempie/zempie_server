@@ -210,7 +210,7 @@ class FileManager {
         const result = await s3.listObjectsV2(params).promise();
         const objects = result.Contents
         if(objects){
-            const urls=   objects
+            const urls = objects
             .map((image) => {
                 return {
                     name:image.Key?.replace(prefix, ''),
@@ -221,6 +221,32 @@ class FileManager {
         }
     }
 
+    hasBucketObject = async (key : string) => {
+        return new Promise((resolve, reject) => {
+            const bucketName =  Opt.AWS.Bucket.PublicBase
+
+
+            var params = {
+                Bucket: bucketName, 
+                Key: key
+            };
+            
+            const data =  s3.headObject(params, (err, data) => {
+                if (err) {
+                  if (err.code === 'NotFound') { 
+                    resolve(null);
+                  } else {
+                    reject(`Error checking object existence: ${err.message}`);
+                  }
+                } else {
+                  const objectUrl =  `https://${bucketName}.s3.amazonaws.com/${key}`;
+
+                  resolve(objectUrl);
+                }
+              })
+            });
+
+    }
 }
 
 
