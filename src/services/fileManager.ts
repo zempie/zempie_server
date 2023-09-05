@@ -221,25 +221,6 @@ class FileManager {
         }
     }
 
-    hasBucketObject = async (key : string) => {
-        // return new Promise((resolve, reject) => {
-            const bucketName =  Opt.AWS.Bucket.PublicBase
-
-            const params = {
-                Bucket: bucketName, 
-                Prefix: 'thumbnail'
-            };
-            const result = await s3.listObjectsV2(params).promise();
-            const objects = result.Contents
-            if(objects){
-                const object = objects
-                .find((image) => {
-                    if(image.Key === key)
-                       return image
-            });
-            return object ? `https://${bucketName}.s3.amazonaws.com/${object.Key}` : null
-            }
-    }
 }
 
 
