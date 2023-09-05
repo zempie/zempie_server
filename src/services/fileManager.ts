@@ -239,6 +239,8 @@ class FileManager {
                     reject(`Error checking object existence: ${err.message}`);
                   }
                 } else {
+                  // Generate the URL for the object without an expiration date
+                  console.log(`URL for the object: ${key}`);
                   const objectUrl =  `https://${bucketName}.s3.amazonaws.com/${key}`;
 
                   resolve(objectUrl);
