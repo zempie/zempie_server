@@ -222,37 +222,23 @@ class FileManager {
     }
 
     hasBucketObject = async (key : string) => {
-        return new Promise((resolve, reject) => {
+        // return new Promise((resolve, reject) => {
             const bucketName =  Opt.AWS.Bucket.PublicBase
 
-
-            var params = {
+            const params = {
                 Bucket: bucketName, 
-                Key: key
+                Prefix: 'thumbnail'
             };
-
-            console.log('param:', params)
-            
-            s3.headObject(params, (err, data) => {
-                console.log('err: ', err)
-                console.log('data: ', data)
-
-                if (err) {
-                  if (err.code === 'NotFound') { 
-                    resolve(null);
-                  } else {
-                    reject(`Error checking object existence: ${err.message}`);
-                  }
-                } else {
-                  // Generate the URL for the object without an expiration date
-                  console.log(`URL for the object: ${key}`);
-                  const objectUrl =  `https://${bucketName}.s3.amazonaws.com/${key}`;
-
-                  resolve(objectUrl);
-                }
-              })
+            const result = await s3.listObjectsV2(params).promise();
+            const objects = result.Contents
+            if(objects){
+                const object = objects
+                .find((image) => {
+                    if(image.Key === key)
+                       return image
             });
-
+            return object ? `https://${bucketName}.s3.amazonaws.com/${object.Key}` : null
+            }
     }
 }
 

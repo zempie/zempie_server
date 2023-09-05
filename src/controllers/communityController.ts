@@ -122,9 +122,6 @@ class CommunityController {
             });
 
             const bucket_url = await fileManager.hasBucketObject('thumbnail/' + data.key)
-            console.log(`bucket_url: ${bucket_url}`);
-
-
 
             ret.push({
                 priority: idx,
