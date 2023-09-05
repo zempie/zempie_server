@@ -230,8 +230,13 @@ class FileManager {
                 Bucket: bucketName, 
                 Key: key
             };
+
+            console.log('param:', params)
             
-            const data =  s3.headObject(params, (err, data) => {
+            s3.headObject(params, (err, data) => {
+                console.log('err: ', err)
+                console.log('data: ', data)
+
                 if (err) {
                   if (err.code === 'NotFound') { 
                     resolve(null);
