@@ -120,8 +120,6 @@ class CommunityController {
                 uid,
                 subDir,
             });
-            const bucketName =  Opt.AWS.Bucket.PublicBase
-
 
             ret.push({
                 priority: idx,
@@ -130,7 +128,6 @@ class CommunityController {
                 type: fType,
                 name: file.name,
                 is_blind: parseBoolean(params.is_blind),
-                thumbnail: `https://${bucketName}.s3.amazonaws.com/thumbnail/${data.key}`
             })
             idx++;
         }
