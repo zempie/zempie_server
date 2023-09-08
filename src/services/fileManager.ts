@@ -210,7 +210,7 @@ class FileManager {
         const result = await s3.listObjectsV2(params).promise();
         const objects = result.Contents
         if(objects){
-            const urls=   objects
+            const urls = objects
             .map((image) => {
                 return {
                     name:image.Key?.replace(prefix, ''),

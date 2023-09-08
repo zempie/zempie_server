@@ -241,7 +241,7 @@ class UserController {
                     targetCol = 'notify_alarm'
             }
 
-            await dbs.UserSetting.update({targetCol : alarm_state}, { user_id: user.id})
+            await dbs.UserSetting.update({[targetCol] : alarm_state}, { user_id: user.id})
             
             user.setting[targetCol] = alarm_state
             await user.save({ transaction });

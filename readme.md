@@ -1,5 +1,9 @@
 - npm install -force로 패키지 다운해주세요
 
+- 빌드가 되지 않는 경우 sequelize version support issue가 있을 수 있으므로 버전은 4.7.4로 맞춰주세요
+
+- mariadb 10.4.21
+
 - config/dbs, config/opt 에 local.ts 생성
 
 ```

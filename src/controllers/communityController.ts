@@ -13,6 +13,7 @@ import * as _ from "lodash";
 import { getGameData } from "./_common";
 import { getLinkPreview } from "link-preview-js";
 import { parseBoolean } from '../commons/utils';
+import fileManager from '../services/fileManager';
 
 
 const { AWS } = Opt;
@@ -65,14 +66,13 @@ class CommunityController {
                 });
                 throw CreateError(ErrorCodes.INVALID_FILE_TYPE);
             }
-
             let size = file.size;
 
             switch (fileType.mime) {
                 case 'image/jpeg':
                 case 'image/gif':
                     fType = 'image';
-                    break;
+                    // break;
                 case 'image/png':
                     const webp = await FileManager.convertToWebp(file, 80);
                     size = webp[0].data.length;
@@ -127,7 +127,7 @@ class CommunityController {
                 size: file.size,
                 type: fType,
                 name: file.name,
-                is_blind: parseBoolean(params.is_blind)
+                is_blind: parseBoolean(params.is_blind),
             })
             idx++;
         }
