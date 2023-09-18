@@ -126,6 +126,10 @@ class GameController {
         //     user_uid: uid,
         //     game_uid
         // });
+        const game = await dbs.Game.findOne({ id: game_id });
+        game.count_start += 1
+        await game.save();
+
         const pid = jwt.sign({
             game_id,
             user_uid: user?.uid,

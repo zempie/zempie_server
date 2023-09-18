@@ -39,16 +39,15 @@ class LauncherController {
             // caches.game.setByPathname(ret, pathname);
         }
 
-        MQ.send({
-            topic: 'gameLoaded',
-            messages: [{
-                value: JSON.stringify({
-                    user_uid: user?.uid,
-                    game_id: ret.game.id,
-                })
-            }]
-        })
-        
+        // MQ.send({
+        //     topic: 'gameLoaded',
+        //     messages: [{
+        //         value: JSON.stringify({
+        //             user_uid: user?.uid,
+        //             game_id: ret.game.id,
+        //         })
+        //     }]
+        // })
         // const game = await dbs.Game.getInfo({ pathname });
         // const ret = {
         //     game: getGameData(game),
