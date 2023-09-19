@@ -49,11 +49,12 @@ export abstract class PvpTeamGame extends PvpGame {
     public teams: Team[] = [];
 
     constructor(teams: mWS[][], handler: PvpGameHandler) {
-        let users: mWS[] = [];
-        teams.forEach((team) => {
-            users = users.concat(team);
-        });
-        super(users, handler);
+        super(
+            teams.reduce((prev, cur) => {
+                return prev.concat(cur);
+            }, []),
+            handler
+        );
     }
 }
 
