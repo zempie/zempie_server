@@ -5,7 +5,7 @@ import { logger } from '../../commons/logger';
 import { dbs, caches, docs } from '../../commons/globals';
 import * as admin from 'firebase-admin';
 import MatchManager, { PvpGameType } from '../../services/tcpMatchManager';
-import PvpGameManager from 'src/services/pvp/pvpGameManager';
+import PvpGameManager from '../../services/pvp/pvpGameManager';
 
 export class mWS extends zWS {
     isValid: boolean = false;
