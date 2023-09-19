@@ -128,7 +128,7 @@ export const validateFirebaseIdToken = async (req: Request, res: Response, next:
     try {
         const idToken = getIdToken(req);
 
-        if (idToken) {
+        if ( idToken &&  idToken !== 'undefined' ) {
             req.user = await admin.auth().verifyIdToken(idToken);
         }
         return next();

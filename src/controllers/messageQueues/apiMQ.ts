@@ -120,12 +120,11 @@ class ApiMQ extends SrvMQ {
         }
     }
 
-
     async gameLoaded(message: string) {
         const { user_uid, game_id }: any = JSON.parse(message);
 
         const game = this.getGameIds(game_id);
-        game.count_start += 1;
+        // game.count_start += 1;
     }
 
 
