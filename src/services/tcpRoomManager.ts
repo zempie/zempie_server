@@ -1,12 +1,11 @@
 import * as _ from 'lodash';
 import { v4 as uuid } from 'uuid';
-import { zWS } from '../controllers/tcp/wsController';
+import { gWS } from '../controllers/tcp/tcpController';
 import { Broadcast, SendPacket } from './packetService';
 
-
 interface IRoom {
-    id: string
-    members: { [key: string]: zWS }
+    id: string;
+    members: { [key: string]: gWS };
 }
 // interface IRooms {
 //     [Key: string]: IRoom
@@ -17,9 +16,9 @@ interface IRoom {
 interface IGame {
     [Key: string]: {
         [Key: string]: {
-            [Key: string]: IRoom
-        }
-    }
+            [Key: string]: IRoom;
+        };
+    };
 }
 
 class RoomManager {
@@ -37,43 +36,39 @@ class RoomManager {
             _.forEach(nums, (num: string) => {
                 const rooms = game[num];
                 games[name][num] = games[name][num] = {};
-            })
-        })
-    }
+            });
+        });
+    };
 
-    enter = (ws: zWS) => {
+    enter = (ws: gWS) => {
         let {
             uid: user_uid,
-            gameData: {
-                game_id,
-                num,
-                room_id,
-            }
+            gameData: { game_id, num, room_id },
         } = ws;
 
         // 이미 들어가 있는 방이 있으면 에러
-        if ( room_id ) {
+        if (room_id) {
             return SendPacket(ws, 'error');
         }
 
         // 게임별 방 목록
-        const game_rooms = this.games[game_id] = this.games[game_id] || {};
+        const game_rooms = (this.games[game_id] = this.games[game_id] || {});
 
         // 방 인원수별 방 목록
-        const rooms = game_rooms[num] = game_rooms[num] || {};
+        const rooms = (game_rooms[num] = game_rooms[num] || {});
 
         // 빈 방 찾기
         let room = _.find(rooms, (room: IRoom) => {
-            return Object.keys(room.members).length < _.toNumber(num)
+            return Object.keys(room.members).length < _.toNumber(num);
         });
 
         // 빈 방 없으면
-        if ( !room ) {
+        if (!room) {
             room_id = uuid();
             room = rooms[room_id] = {
                 id: room_id,
-                members: {}
-            }
+                members: {},
+            };
         }
 
         // 입장
@@ -82,8 +77,8 @@ class RoomManager {
         ws.gameData.room_id = room.id;
 
         // 다른 유저에게 알림
-        _.forEach(room.members, (_ws: zWS) => {
-            if ( _ws !== ws ) {
+        _.forEach(room.members, (_ws: gWS) => {
+            if (_ws !== ws) {
                 SendPacket(_ws, 'enter', { uid: user_uid });
             }
         });
@@ -93,48 +88,40 @@ class RoomManager {
         SendPacket(ws, 'enter_ok', { members });
 
         // 풀방?
-        if ( Object.keys(room.members).length === _.toNumber(num) ) {
+        if (Object.keys(room.members).length === _.toNumber(num)) {
             const members = Object.keys(room.members);
             Broadcast(room.members, ws, 'full', { members });
         }
-    }
+    };
 
-    leave = (ws: zWS) => {
+    leave = (ws: gWS) => {
         let {
             uid: user_uid,
-            gameData: {
-                game_id,
-                num,
-                room_id,
-            }
+            gameData: { game_id, num, room_id },
         } = ws;
 
         // 들어가 있는 방이 없으면 에러
-        if ( !room_id ) {
+        if (!room_id) {
             return SendPacket(ws, 'error');
         }
 
         const room = this.getCurrentRoom(game_id, num, room_id);
-        if ( !room ) {
-            SendPacket(ws, 'error', {message: 'invalid_room_id'});
+        if (!room) {
+            SendPacket(ws, 'error', { message: 'invalid_room_id' });
         }
 
         // 나가기
         this.leaveCurrentRoom(game_id, num, room_id, user_uid);
-    }
+    };
 
-    play = (ws: zWS, packetData: any) => {
+    play = (ws: gWS, packetData: any) => {
         let {
             uid: user_uid,
-            gameData: {
-                game_id,
-                num,
-                room_id,
-            }
+            gameData: { game_id, num, room_id },
         } = ws;
 
-        if ( !room_id ) {
-            return SendPacket(ws, 'error', {message: '넌 방에 없음'});
+        if (!room_id) {
+            return SendPacket(ws, 'error', { message: '넌 방에 없음' });
         }
 
         const room = this.getCurrentRoom(game_id, num, room_id);
@@ -149,76 +136,70 @@ class RoomManager {
             default:
                 this.defaultRouter(room, ws, packetData);
         }
-    }
-
+    };
 
     //////////////////////////////////
     // private functions
-    private save(ws: zWS, packetData: any) {
+    private save(ws: gWS, packetData: any) {
         const {
-            gameData: {
-                save_data,
-            }
+            gameData: { save_data },
         } = ws;
         const { type, data, saves } = packetData;
 
         _.forEach(saves, (save: any) => {
             const { type, key } = save;
 
-            if( type === '.save' ) {
+            if (type === '.save') {
                 save_data[key] = data[key];
-            }
-            else if( type === '.push' ) {
+            } else if (type === '.push') {
                 save_data[key].push(data[key]);
-            }
-            else if( type === '.pop' ) {
+            } else if (type === '.pop') {
                 save_data[key].pop();
             }
-        })
+        });
     }
 
     private getCurrentRoom(game_id: string, num: string, room_id: string) {
         // 게임별 방 목록
-        const game_rooms = this.games[game_id] = this.games[game_id] || {};
+        const game_rooms = (this.games[game_id] = this.games[game_id] || {});
 
         // 방 인원수 별 방 목록
-        const rooms = game_rooms[num] = game_rooms[num] || {};
+        const rooms = (game_rooms[num] = game_rooms[num] || {});
 
         return rooms[room_id];
     }
 
     private leaveCurrentRoom(game_id: string, num: string, room_id: string, user_uid: string) {
         const game_rooms = this.games[game_id];
-        const rooms = game_rooms[num]
+        const rooms = game_rooms[num];
         const room = rooms[room_id];
 
         delete room.members[user_uid];
 
-        if( Object.keys(room.members).length < 1 ) {
+        if (Object.keys(room.members).length < 1) {
             delete this.games[game_id][num][room_id];
         }
 
-        if( Object.keys(rooms).length < 1 ) {
+        if (Object.keys(rooms).length < 1) {
             delete this.games[game_id][num];
         }
 
-        if( Object.keys(game_rooms).length < 1 ) {
+        if (Object.keys(game_rooms).length < 1) {
             delete this.games[game_id];
         }
     }
 
-    private defaultRouter(room: IRoom, ws: zWS, packetData: any) {
+    private defaultRouter(room: IRoom, ws: gWS, packetData: any) {
         // 다른 유저에게 입장 알림
-        _.forEach(room.members, (_ws: zWS) => {
-            if( _ws !== ws ) {
+        _.forEach(room.members, (_ws: gWS) => {
+            if (_ws !== ws) {
                 SendPacket(_ws, 'play', {
                     from: ws.uid,
-                    data: packetData
+                    data: packetData,
                 });
             }
-        })
+        });
     }
 }
 
-
-export default new RoomManager()
+export default new RoomManager();

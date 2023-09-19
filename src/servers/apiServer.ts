@@ -1,20 +1,19 @@
-import { Router } from 'express'
-import Server from './server'
-import adminRoute from '../routes/adminRoute'
+import { Router } from 'express';
+import Server from './server';
+import adminRoute from '../routes/adminRoute';
 import contentRoute from '../routes/contentRoute';
 import userRoute from '../routes/userRoute';
-import gameRoute from "../routes/gameRoute";
+import gameRoute from '../routes/gameRoute';
 import launcherRoute from '../routes/launcherRoute';
 import supportRoute from '../routes/supportRoute';
 import tcpRoute from '../routes/tcpRoute';
 import { IMessageQueueOptions, IServerOptions } from '../commons/interfaces';
 import mq from '../controllers/messageQueues/apiMQ';
 import redirectRoute from '../routes/redirectRoute';
-import communityRoute from '../routes/communityRoute'
+import communityRoute from '../routes/communityRoute';
 import gameAuthRoute from '../routes/gameAuthRoute';
 
 class ApiServer extends Server {
-
     initialize = async (options: IServerOptions) => {
         this.options = options;
 
@@ -26,7 +25,7 @@ class ApiServer extends Server {
         // this.setEJS();
         this.setSwagger();
         this.setGraphQL();
-    }
+    };
 
     routes(app: Router) {
         super.routes(app);
@@ -40,10 +39,10 @@ class ApiServer extends Server {
 
         redirectRoute(app);
 
-        communityRoute(app)
-        gameAuthRoute(app)
+        communityRoute(app);
+        gameAuthRoute(app);
 
-        // tcpRoute(app);
+        tcpRoute(app);
 
         // scheduleService.start()
         // ExchangeManager.start()
@@ -56,11 +55,9 @@ class ApiServer extends Server {
             // addTopics: mq.addTopics(),
             addGateways: mq.addGateway(),
             eachMessage: mq.eachMessage.bind(mq),
-        }
+        };
         await this.setMessageQueue(options);
-    }
+    };
 }
 
-
 export default ApiServer;
-

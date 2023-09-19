@@ -5,54 +5,40 @@ import { Request } from 'express';
 import { logger } from '../../commons/logger';
 
 
+
 export class zWS extends ws {
-    uid!: string
-    gameData!: {
-        game_id: string
-        num: string
-        room_id: string
-        save_data: { [key: string]: any }
-    }
-    isAlive: boolean = false
+    uid!: string;
+    isAlive: boolean = false;
 }
 
 
 abstract class WSController {
     connected = (ws: zWS, req: Request) => {
         ws.uid = uniqid.time();
-
-        ws.gameData = {
-            game_id: req.params.pathname,
-            num: (req.params.num || 2).toString(),
-            room_id: '',
-            save_data: {}
-        };
-
         ws.isAlive = true;
         ws.on('pong', () => {
             ws.isAlive = true;
         });
-
         ws.on('message', (_message: string) => {
-            // return this.onMessage(ws, _message);
+            return this.onMessage(ws, _message);
         });
 
         ws.on('close', () => {
             logger.debug('onClosed');
-            // return this.onClosed(ws);
+            return this.onClosed(ws);
         });
 
         ws.on('error', () => {
             logger.debug('onError');
-            // return this.onPeerDisconnect(ws);
+            return this.onPeerDisconnect(ws);
         });
 
-        this.onConnected(ws);
+        this.onConnected(ws,req);
     }
 
 
     //@ts-ignore
-    protected abstract onConnected = (ws: zWS): void => {}
+    protected abstract onConnected = (ws: zWS, req:Request): void => {}
     //@ts-ignore
     protected abstract onMessage = (ws: zWS, message: string): void => {};
     //@ts-ignore
