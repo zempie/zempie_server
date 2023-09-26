@@ -210,10 +210,12 @@ class AdminController {
     }
 
     async getUploadedImage() {
-
         return FileManager.getS3Img()
-   
     }
+
+    async getBucketList ({bucketName, prefix} : any) {
+        await FileManager.getBucketList(bucketName, prefix)
+     }
 
 }
 

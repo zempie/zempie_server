@@ -15,6 +15,7 @@ import { logger } from '../commons/logger';
 import { IS3Upload } from '../controllers/_interfaces';
 import { CreateError, ErrorCodes } from '../commons/errorCodes';
 import { responseError } from '../controllers/_convert';
+import imageManager from './imageManager';
 
 AWS.config.loadFromPath('config/aws/credentials.json');
 const s3 = new AWS.S3({ apiVersion: '2006-03-01' });
@@ -219,6 +220,108 @@ class FileManager {
             );
                 return urls
         }
+    }
+
+
+    getBucketList = async (bucketName : string, prefix: string ) => {
+        let params : any = {
+            Bucket: bucketName,
+            Prefix: prefix,
+            Delimiter: '/'
+        };
+
+        let result
+        let objects : any = [];
+
+        try {
+                result = await s3.listObjectsV2(params).promise();
+                    for (const dir of result.CommonPrefixes) {
+                        const uploadDir = '/Users/hyeonjeonglee/projects/zempie/platform-api-server/aws/';
+                        params.Prefix = dir.Prefix
+                        
+
+                        const dirObj = await s3.listObjectsV2(params).promise();
+                       
+                       const uidDir = path.join(uploadDir + dir.Prefix)
+
+                        if( !fs.existsSync(uidDir ) ) {
+                            fs.mkdirSync( uidDir);
+                        }
+
+                        for (const dir of dirObj.CommonPrefixes) {
+                            if(dir.Prefix?.includes('/c/')){
+                                params.Prefix = dir.Prefix
+
+                                const comObj = await s3.listObjectsV2(params).promise();
+                                const cDir = path.join(uidDir + '/c')
+
+                                if( !fs.existsSync( cDir )) {
+                                    fs.mkdirSync( cDir );
+                                }
+
+                            for (const dir of comObj.CommonPrefixes) {
+                                params.Prefix = dir.Prefix
+                                if(dir.Prefix?.includes('/i/')){
+
+                                    const comObj = await s3.listObjectsV2(params).promise();
+                                    const iDir = path.join(cDir + '/i')
+
+                                    if( !fs.existsSync( iDir )) {
+                                        fs.mkdirSync( iDir );
+                                    }
+                                    for (const obj of comObj.Contents) {
+
+                                        await this.downloadFile(path.join(uploadDir + '/v1/'), params.Bucket, obj.Key)      
+                                    }
+                                }
+                            }
+
+                            }
+
+                        }
+                       
+                        // await this.downloadFile(params.Bucket, object.Key)
+                    }
+
+                objects = objects.concat(result.Contents.slice(1));
+                
+               
+            return objects;
+          } catch (error) {
+            console.error(error);
+            return false;
+          }
+
+
+ 
+    }
+
+    downloadFile = async (downloadPath: string, bucketName: string, objectKey: string) => {
+        await s3.getObject({ Bucket: bucketName, Key: objectKey }, async (err, data) => {
+            if (err) {
+              console.error('S3 객체 다운로드 오류:', err);
+            } else {
+              // 다운로드된 데이터를 로컬 파일에 저장
+
+
+            const fileName = objectKey.replace('v1/', '');
+            const localPath = path.join(downloadPath + fileName)
+
+            const image = {
+                name: fileName,
+                buffer: data.Body
+            }
+            const resizedImage = await imageManager.resizeImage(image)
+            
+              fs.writeFile(localPath, resizedImage, (err) => {
+                if (err) {
+                  console.error('파일 저장 오류:', err);
+                } else {
+                  console.log('S3 객체 다운로드 완료');
+                }
+              });
+            }
+          }).promise();
     }
 
 }

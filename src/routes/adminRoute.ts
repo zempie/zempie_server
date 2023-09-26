@@ -165,6 +165,7 @@ export default (router: Router) => {
     router.post(`${apiVer}/admin/img`,          validateAdminIdToken,       FileManager.uploadImage2(),             convert(AdminController.uploadPublicImage)   )
     router.get(`${apiVer}/admin/img`,           validateAdminIdToken,       convert(AdminController.getUploadedImage)  )
 
+    router.get(`${apiVer}/admin/s3-list`,       convert(AdminController.getBucketList)  )
 
 
     // nickname 일괄 삽입
