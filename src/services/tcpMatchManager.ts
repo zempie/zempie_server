@@ -9,6 +9,7 @@ import {
     StartMatchingBody,
     WaitingRoomListBody,
     ChangeOwnerBody,
+    WaitingRoomEnterBody,
 } from './tcpProtocols';
 import { dbs } from './../commons/globals';
 import { v4 as uuid } from 'uuid';
@@ -167,13 +168,14 @@ class MatchManager {
         }
     }
 
-    matchRoomEnter(ws: mWS, option: WaitingRoomIdBody) {
+    matchRoomEnter(ws: mWS, option: WaitingRoomEnterBody) {
         const match_id = option.match_id || '';
         let room: WaitingRoom | undefined;
         if (match_id === '') {
             room = new WaitingRoom();
             room.players.push(ws);
             room.owner = ws;
+            room.gameType = option.game_type || -1;
             this.waitingRoomsPush(room);
         } else {
             room = this.getMatchRoom(match_id);
@@ -272,7 +274,6 @@ class MatchManager {
         if (room.owner !== ws) return;
         if (room.matchMode !== MatchingMode.Wait) return;
 
-        if (option?.hasOwnProperty('game_type')) room.gameType = option?.game_type || -1;
         if (option?.hasOwnProperty('target_id')) room.targetId = option?.target_id || '';
         room.matchMode = room.targetId !== '' ? MatchingMode.Custom : MatchingMode.Random;
         room.players.forEach((player) => {

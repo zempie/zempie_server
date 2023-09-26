@@ -3,7 +3,7 @@ export enum CSProtocol {
 
     WAITING_ROOM_LIST = 'waiting_room_list', // BaseBody
 
-    WAITING_ROOM_ENTER = 'waiting_room_enter', // WaitingRoomIdBody
+    WAITING_ROOM_ENTER = 'waiting_room_enter', // WaitingRoomEnterBody
     WAITING_ROOM_LEAVE = 'waiting_room_leave', // WaitingRoomIdBody
 
     WAITING_ROOM_START_MATCHING = 'waiting_room_matching_start', // StartMatchingBody
@@ -124,10 +124,11 @@ export type TokenBody = Token;
 export type ReasonBody = Reason;
 export type WaitingRoomChangeOwnerBody = WaitingRoomID & WaitingRoomOwner;
 export type WaitingRoomIdBody = WaitingRoomID;
+export type WaitingRoomEnterBody = WaitingRoomID & GameType;
 export type WaitingRoomBody = WaitingRoom;
 export type WaitingRoomListBody = WaitingRoomList;
 export type AcceptIDBody = AcceptID;
-export type StartMatchingBody = WaitingRoomID & GameType & TargetID;
+export type StartMatchingBody = WaitingRoomID & TargetID;
 export type WaitingRoomMemberLeaveBody = WaitingRoomID & UserID;
 export type GameRoomIDBody = GameRoomID;
 export type UpdateGameScoreBody = GameRoomID & Score;
