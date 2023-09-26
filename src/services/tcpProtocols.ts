@@ -1,6 +1,8 @@
 export enum CSProtocol {
     AUTHOLIZATION = 'token', //TokenBody
 
+    WAITING_ROOM_LIST = 'waiting_room_list', // BaseBody
+
     WAITING_ROOM_ENTER = 'waiting_room_enter', // WaitingRoomIdBody
     WAITING_ROOM_LEAVE = 'waiting_room_leave', // WaitingRoomIdBody
 
@@ -20,6 +22,12 @@ export enum SCProtocol {
 
     AUTHOLIZATION_FAIL = 'auth_fail', // BodyBase
     AUTHOLIZATION_SUCCESS = 'auth_ok', // BodyBase
+
+    WAITING_ROOM_LIST = 'waiting_room_list', // WaitingRoomListBody
+
+    WAITING_ROOM_CREATED = 'waiting_room_created', // WaitingRoomBody
+    WAITING_ROOM_DELETED = 'waiting_room_deleted', // WaitingRoomIdBody
+    WAITING_ROOM_UPDATED = 'waiting_room_updated', // WaitingRoomBody
 
     WAITING_ROOM_ENTER_FAIL = 'waiting_room_enter_fail', // ReasonBody
     WAITING_ROOM_ENTER_SUCCESS = 'waiting_room_enter_ok', // WaitingRoomBody
@@ -90,10 +98,19 @@ type Score = {
     score?: number;
 };
 
+type Matching = {
+    matching: boolean;
+};
+
 type GameRoomBaseInfo = GameRoomID & GameType;
 
 type GameResult = {
     win?: boolean;
+};
+
+type WaitingRoom = WaitingRoomID & WaitingRoomOwner & WaitingRoomMembers & GameType & TargetID & Matching;
+type WaitingRoomList = {
+    rooms: WaitingRoom[];
 };
 
 // Packet
@@ -107,7 +124,8 @@ export type TokenBody = Token;
 export type ReasonBody = Reason;
 export type WaitingRoomChangeOwnerBody = WaitingRoomID & WaitingRoomOwner;
 export type WaitingRoomIdBody = WaitingRoomID;
-export type WaitingRoomBody = WaitingRoomID & WaitingRoomOwner & WaitingRoomMembers & GameType & TargetID;
+export type WaitingRoomBody = WaitingRoom;
+export type WaitingRoomListBody = WaitingRoomList;
 export type AcceptIDBody = AcceptID;
 export type StartMatchingBody = WaitingRoomID & GameType & TargetID;
 export type WaitingRoomMemberLeaveBody = WaitingRoomID & UserID;
@@ -117,3 +135,4 @@ export type GameRoomBaseInfoBody = GameRoomBaseInfo;
 export type ScoreBody = Score;
 export type UserScoreBody = GameRoomID & UserID & Score;
 export type GameResultBody = GameRoomID & GameResult & Score;
+export type ChangeOwnerBody = WaitingRoomID & WaitingRoomOwner;

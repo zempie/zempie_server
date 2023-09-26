@@ -44,7 +44,11 @@ class TcpMatchController extends WSController {
                     SendPacket(ws, SCProtocol.AUTHOLIZATION_FAIL);
                     mws.close(1000, 'autholization fail');
                 }
+                MatchManager.enterLobby(mws);
                 SendPacket(ws, SCProtocol.AUTHOLIZATION_SUCCESS);
+                break;
+            case CSProtocol.WAITING_ROOM_LIST:
+                MatchManager.getWaitingRoomList(mws);
                 break;
             case CSProtocol.WAITING_ROOM_ENTER:
                 MatchManager.matchRoomEnter(mws, packet.body);

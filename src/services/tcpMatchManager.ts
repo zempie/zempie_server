@@ -7,6 +7,8 @@ import {
     WaitingRoomMemberLeaveBody,
     WaitingRoomIdBody,
     StartMatchingBody,
+    WaitingRoomListBody,
+    ChangeOwnerBody,
 } from './tcpProtocols';
 import { dbs } from './../commons/globals';
 import { v4 as uuid } from 'uuid';
@@ -111,8 +113,59 @@ const WIN_CONSTANTS = 10;
 const MATCH_LEVEL_DATA: { min_rate: number; max_rate: number; sec?: number }[] = [{ min_rate: 0.4, max_rate: 0.6 }];
 
 class MatchManager {
+    inLobbyUsers: mWS[] = [];
     waitingRooms: WaitingRoom[] = [];
     acceptRooms: AcceptRoom[] = [];
+
+    enterLobby(ws: mWS) {
+        if (!this.inLobbyUsers.includes(ws)) this.inLobbyUsers.push(ws);
+    }
+    leaveLobby(ws: mWS) {
+        if (this.inLobbyUsers.includes(ws)) this.inLobbyUsers.splice(this.inLobbyUsers.indexOf(ws), 1);
+    }
+
+    getWaitingRoomList(ws: mWS) {
+        const body: WaitingRoomListBody = {
+            rooms: this.waitingRooms.map((room) => {
+                return {
+                    match_id: room.id,
+                    owner: room.owner?.userData.id,
+                    players: room.players.map((item) => item.userData.id),
+                    game_type: room.gameType,
+                    target_id: room.targetId,
+                    matching: room.matchMode !== MatchingMode.Wait,
+                };
+            }),
+        };
+        SendPacket(ws, SCProtocol.WAITING_ROOM_LIST, body);
+    }
+
+    private waitingRoomsPush(room: WaitingRoom) {
+        this.waitingRooms.push(room);
+
+        const body: WaitingRoomBody = {
+            match_id: room.id,
+            owner: room.owner?.userData.id,
+            players: room.players.map((item) => item.userData.id),
+            game_type: room.gameType,
+            target_id: room.targetId,
+            matching: room.matchMode !== MatchingMode.Wait,
+        };
+
+        for (const user of this.inLobbyUsers) {
+            SendPacket(user, SCProtocol.WAITING_ROOM_CREATED, body);
+        }
+    }
+    private waitingRoomsDelete(room: WaitingRoom) {
+        const idx = this.waitingRooms.indexOf(room);
+        if (idx === -1) return;
+        this.waitingRooms.splice(idx, 1);
+        room.timeoutId != undefined && clearTimeout(room.timeoutId);
+        for (const user of this.inLobbyUsers) {
+            const body: WaitingRoomIdBody = { match_id: room.id };
+            SendPacket(user, SCProtocol.WAITING_ROOM_DELETED, body);
+        }
+    }
 
     matchRoomEnter(ws: mWS, option: WaitingRoomIdBody) {
         const match_id = option.match_id || '';
@@ -121,7 +174,7 @@ class MatchManager {
             room = new WaitingRoom();
             room.players.push(ws);
             room.owner = ws;
-            this.waitingRooms.push(room);
+            this.waitingRoomsPush(room);
         } else {
             room = this.getMatchRoom(match_id);
             if (!room) {
@@ -153,7 +206,9 @@ class MatchManager {
             players: room.players.map((item) => item.userData.id),
             game_type: room.gameType,
             target_id: room.targetId,
+            matching: room.matchMode !== MatchingMode.Wait,
         };
+
         SendPacket(ws, SCProtocol.WAITING_ROOM_ENTER_SUCCESS, body);
     }
 
@@ -171,25 +226,18 @@ class MatchManager {
             SendPacket(ws, SCProtocol.WAITING_ROOM_LEAVE_FAIL, body);
             return;
         }
+        let room_deleted = false;
         const players = [...room.players];
         room.players.splice(idx, 1);
         room.timeoutId != undefined && clearTimeout(room.timeoutId);
         if (room.matchMode !== MatchingMode.Wait) {
-            room.matchMode = MatchingMode.Wait;
-            let body: ReasonBody = { reason: 'User leave' };
-            SendPacket(ws, SCProtocol.WAITING_ROOM_STOP_MATCHING, body);
+            this.stopMatching(ws, { match_id: room.id }, 'User leave');
         }
         if (room.players.length === 0) {
-            const room_idx = this.waitingRooms.indexOf(room);
-            this.waitingRooms.splice(room_idx, 1);
-            room.timeoutId != undefined && clearTimeout(room.timeoutId);
+            room_deleted = true;
+            this.waitingRoomsDelete(room);
         } else if (room.owner === ws) {
-            room.owner = room.players[0];
-            const body: WaitingRoomChangeOwnerBody = {
-                match_id: room.id,
-                owner: room.owner?.userData.id,
-            };
-            SendPacket(ws, SCProtocol.WAITING_ROOM_OWNER_CHANGED, body);
+            this.changeOwner(ws, { match_id: room.id, owner: room.players[0].userData.id });
         }
         players.forEach((item) => {
             if (item === ws) {
@@ -202,6 +250,20 @@ class MatchManager {
                 SendPacket(item, SCProtocol.WAITING_ROOM_MEMBER_LEAVE, body);
             }
         });
+        if (!room_deleted) {
+            const body: WaitingRoomBody = {
+                match_id: room.id,
+                owner: room.owner?.userData.id,
+                players: room.players.map((item) => item.userData.id),
+                game_type: room.gameType,
+                target_id: room.targetId,
+                matching: room.matchMode !== MatchingMode.Wait,
+            };
+
+            for (const user of this.inLobbyUsers) {
+                SendPacket(user, SCProtocol.WAITING_ROOM_UPDATED, body);
+            }
+        }
     }
 
     startMatching(ws: mWS, option: StartMatchingBody) {
@@ -216,11 +278,22 @@ class MatchManager {
         room.players.forEach((player) => {
             SendPacket(player, SCProtocol.WAITING_ROOM_START_MATCHING);
         });
+        const body: WaitingRoomBody = {
+            match_id: room.id,
+            owner: room.owner?.userData.id,
+            players: room.players.map((item) => item.userData.id),
+            game_type: room.gameType,
+            target_id: room.targetId,
+            matching: true,
+        };
+        for (const user of this.inLobbyUsers) {
+            SendPacket(user, SCProtocol.WAITING_ROOM_UPDATED, body);
+        }
         this.setMatchLevelTimeout(room);
         this.matching();
     }
 
-    stopMatching(ws: mWS, option: WaitingRoomIdBody) {
+    stopMatching(ws: mWS, option: WaitingRoomIdBody, reason: string = '') {
         const room = this.getMatchRoom(option.match_id || '');
         if (!room) return;
         if (room.owner !== ws) return;
@@ -228,6 +301,49 @@ class MatchManager {
 
         room.matchMode = MatchingMode.Wait;
         this.clearMatchLevelTimeout(room);
+
+        const body: WaitingRoomBody = {
+            match_id: room.id,
+            owner: room.owner?.userData.id,
+            players: room.players.map((item) => item.userData.id),
+            game_type: room.gameType,
+            target_id: room.targetId,
+            matching: room.matchMode !== MatchingMode.Wait,
+        };
+
+        for (const user of this.inLobbyUsers) {
+            SendPacket(user, SCProtocol.WAITING_ROOM_UPDATED, body);
+        }
+
+        let reasonBody: ReasonBody = { reason };
+        SendPacket(ws, SCProtocol.WAITING_ROOM_STOP_MATCHING, reasonBody);
+    }
+
+    changeOwner(ws: mWS, option: ChangeOwnerBody) {
+        const room = this.getMatchRoom(option.match_id || '');
+        if (!room) return;
+        if (room.owner?.userData.id !== option.owner) return;
+        const newOwner = room.players.find((item) => item.userData.id === option.owner);
+        if (!newOwner) return;
+        room.owner = newOwner;
+        const ownerBody: WaitingRoomChangeOwnerBody = {
+            match_id: room.id,
+            owner: room.owner?.userData.id,
+        };
+        SendPacket(ws, SCProtocol.WAITING_ROOM_OWNER_CHANGED, ownerBody);
+
+        const body: WaitingRoomBody = {
+            match_id: room.id,
+            owner: room.owner?.userData.id,
+            players: room.players.map((item) => item.userData.id),
+            game_type: room.gameType,
+            target_id: room.targetId,
+            matching: room.matchMode !== MatchingMode.Wait,
+        };
+
+        for (const user of this.inLobbyUsers) {
+            SendPacket(user, SCProtocol.WAITING_ROOM_UPDATED, body);
+        }
     }
 
     acceptMatch(ws: mWS, option: AcceptIDBody) {
@@ -317,13 +433,13 @@ class MatchManager {
                                 return;
                             }
                             for (const acc of accept) {
-                                this.waitingRooms.push(acc);
+                                this.waitingRoomsPush(acc);
                                 if (acc.owner && acc.targetId === '')
                                     this.startMatching(acc.owner, { match_id: acc.id });
                             }
 
                             for (const dec of decline) {
-                                this.waitingRooms.push(dec);
+                                this.waitingRoomsPush(dec);
                                 dec.matchMode = MatchingMode.Wait;
                                 dec.players.forEach((player) => {
                                     const body: ReasonBody = {
@@ -383,12 +499,12 @@ class MatchManager {
                     return;
                 }
                 for (const acc of accept) {
-                    this.waitingRooms.push(acc);
+                    this.waitingRoomsPush(acc);
                     if (acc.owner && acc.targetId === '') this.startMatching(acc.owner, { match_id: acc.id });
                 }
 
                 for (const dec of decline) {
-                    this.waitingRooms.push(dec);
+                    this.waitingRoomsPush(dec);
                     dec.matchMode = MatchingMode.Wait;
                     dec.players.forEach((player) => {
                         const body: ReasonBody = {
@@ -406,7 +522,7 @@ class MatchManager {
         }
 
         removeRooms.forEach((item) => {
-            this.waitingRooms.splice(this.waitingRooms.indexOf(item), 1);
+            this.waitingRoomsDelete(item);
         });
     }
 
@@ -494,6 +610,7 @@ class MatchManager {
         for (const room of acceptRooms) {
             this.declineMatch(ws, { accept_id: room.id });
         }
+        this.leaveLobby(ws);
     }
 }
 
