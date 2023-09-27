@@ -17,6 +17,7 @@ import { CreateError, ErrorCodes } from '../commons/errorCodes';
 import { responseError } from '../controllers/_convert';
 import imageManager from './imageManager';
 import * as sharp from 'sharp'
+import * as exifr from 'exifr'
 
 AWS.config.loadFromPath('config/aws/credentials.json');
 const s3 = new AWS.S3({ apiVersion: '2006-03-01' });
@@ -162,6 +163,7 @@ class FileManager {
                 }
                 resolve(data);
             })
+
             // const upload = new AWS.S3.ManagedUpload({ service: s3, params });
             // upload.send((err, data) => {
             //     fs.unlink(filePath, (err) => {
@@ -232,7 +234,7 @@ class FileManager {
             Delimiter: '/'
         };
 
-        let result
+        let result : any
         let objects : any = [];
 
         try {
@@ -242,7 +244,7 @@ class FileManager {
                         params.Prefix = dir.Prefix
                         
 
-                        const dirObj = await s3.listObjectsV2(params).promise();
+                        const dirObj :any = await s3.listObjectsV2(params).promise();
                        
                        const uidDir = path.join(uploadDir + dir.Prefix)
 
@@ -254,7 +256,7 @@ class FileManager {
                             if(dir.Prefix?.includes('/c/')){
                                 params.Prefix = dir.Prefix
 
-                                const comObj = await s3.listObjectsV2(params).promise();
+                                const comObj :any = await s3.listObjectsV2(params).promise();
                                 const cDir = path.join(uidDir + '/c')
 
                                 if( !fs.existsSync( cDir )) {
@@ -265,7 +267,7 @@ class FileManager {
                                 params.Prefix = dir.Prefix
                                 if(dir.Prefix?.includes('/i/')){
 
-                                    const comObj = await s3.listObjectsV2(params).promise();
+                                    const comObj : any = await s3.listObjectsV2(params).promise();
                                     const iDir = path.join(cDir + '/i')
 
                                     if( !fs.existsSync( iDir )) {
