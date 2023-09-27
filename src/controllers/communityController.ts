@@ -61,6 +61,7 @@ class CommunityController {
             let subDir = 'c';
             const Body = fs.createReadStream(file.path);
             const { fileType }: any = await FileType.stream(Body);
+
             if (!fileType) {
                 fs.unlink(file.path, () => {
                 });
@@ -74,6 +75,7 @@ class CommunityController {
                     fType = 'image';
                     // break;
                 case 'image/png':
+                    await fileManager.orientationToZero(file)
                     const webp = await FileManager.convertToWebp(file, 80);
                     size = webp[0].data.length;
                     key = replaceExt(uniqid(), '.webp');

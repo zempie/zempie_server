@@ -16,6 +16,7 @@ import { IS3Upload } from '../controllers/_interfaces';
 import { CreateError, ErrorCodes } from '../commons/errorCodes';
 import { responseError } from '../controllers/_convert';
 import imageManager from './imageManager';
+import * as sharp from 'sharp'
 
 AWS.config.loadFromPath('config/aws/credentials.json');
 const s3 = new AWS.S3({ apiVersion: '2006-03-01' });
@@ -114,6 +115,7 @@ class FileManager {
     }
 
 
+    // 안쓰는 거 같음..
     s3upload3 = ({ key, filePath, uid, bucket }: IS3Upload) => {
         return new Promise((resolve, reject) => {
             const params = {
@@ -322,6 +324,69 @@ class FileManager {
               });
             }
           }).promise();
+    }
+
+    orientationToZero = async (file: any) => {
+        try{
+            const orientation = await exifr.orientation(file.path)
+            let rotatedBuffer = null
+            switch(orientation) {
+                case 2:
+                     rotatedBuffer = await sharp(file.path)
+                    .flop(true)
+                    .toBuffer()
+                    break;
+                case 3:
+                    rotatedBuffer = await sharp(file.path)
+                    .rotate(-180)
+                    .toBuffer()
+                    break;
+                case 4:
+                    rotatedBuffer = await sharp(file.path)
+                    .flip(true)
+                    .toBuffer()
+                    break;
+                case 5:
+                    rotatedBuffer = await sharp(file.path)
+                    .flop(true)
+                    .rotate(270)
+                    .toBuffer()
+                    break;
+                case 6:
+                    rotatedBuffer = await sharp(file.path)
+                    .rotate(90)
+                    .toBuffer()
+                    break;
+                case 7:
+                    rotatedBuffer = await sharp(file.path)
+                    .flop(true)
+                    .rotate(90)
+                    .toBuffer()
+                    break;
+                case 8:
+                    rotatedBuffer = await sharp(file.path)
+                    .rotate(270)
+                    .toBuffer()
+                    break;
+            }
+
+            fs.writeFile(file.path, rotatedBuffer, (err) => {
+                if (err) {
+                  console.error('파일 저장 오류:', err);
+                } else {
+                  console.log('rotated file 저장');
+                }
+              });
+           
+            
+
+      return await exifr.orientation(file.path)
+
+        }catch(err){
+            console.log(err)
+        }
+
+        
     }
 
 }
