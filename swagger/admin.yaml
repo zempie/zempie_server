@@ -24,6 +24,55 @@ paths:
           $ref: '#/components/responses/Okay'
         403:
           $ref: '#/components/responses/UnauthorizedError'
+  /admin/build:
+    post:
+      tags:
+        - "Admin"
+      summary: 배포 버전 업데이트
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                type:
+                  type: number
+                  description: "3: 안드로이드, 4: ios"
+                build_num:
+                  type: number
+                  description: 빌드 버전
+              required:
+                - type
+                - build_num
+      responses:
+        200:
+           content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: number,
+                    example: 1,
+                  and_build_no: 
+                    type: number,
+                    example: 65
+                  ios_build_no: 
+                    type: number,
+                    example: 65
+                  created_at: 
+                    type: string,
+                    example: "2023-10-19T02:56:13.000Z"  
+                  updated_at: 
+                    type: string,
+                    example: "2023-10-19T02:56:13.000Z"
+                  deleted_at: 
+                    type: string,
+                    example: null
+        403:
+          $ref: '#/components/responses/UnauthorizedError'
 
   /admin/game/c/p:
     post:

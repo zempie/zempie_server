@@ -169,7 +169,22 @@ export default (router: Router) => {
 
 
     // nickname 일괄 삽입
-    router.patch(`${apiVer}/users/all/nickname`,    validateAdminIdToken,   convert(AdminUserController.updateAllNickname)     )
+    router.patch(`${apiVer}/users/all/nickname`,    validateAdminIdToken,   convert(AdminUserController.updateAllNickname) )
+
+    // 버전 관리
+    router.post(`${apiVer}/admin/build`,      validateAdminIdToken,     convert(AdminUserController.updateBuildVersion) )
+
+     /**
+     * 결제, 환전
+     *
+     */
+    router.post(`${apiVer}/admin/commission/info`)
+    
+    router.get(`${apiVer}/admin/redemption/list`)
+    router.post(`${apiVer}/admin/redemption/list`)
+    router.patch(`${apiVer}/admin/redemption/:id`)
+
+
 
 
 }

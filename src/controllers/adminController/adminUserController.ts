@@ -6,6 +6,7 @@ import {EBan} from '../../database/mysql/models/user/user';
 import {Op, Transaction} from 'sequelize';
 import NotifyService from '../../services/notifyService';
 import {CreateError, ErrorCodes} from '../../commons/errorCodes';
+import { ePlatformType } from '../../commons/enums';
 
 /**
  * 사용자
@@ -208,6 +209,30 @@ class AdminUserController {
 
             // await dbs.UserWarn.update({ is_done: true }, {user_id: user_id, id }, transaction);
         })
+    }
+
+    async updateBuildVersion({ type, build_num }: { type: ePlatformType, build_num: number}, admin: IAdmin) {
+       return await dbs.UserBan.getTransaction(async (transaction: Transaction) => {
+            
+            const target_type = Number(type)
+            const build_no = Number(build_num)
+
+            const recentVersion = await dbs.Meta.getRecetnVersion()
+
+            switch(target_type){
+                case ePlatformType.Android:
+                    recentVersion.and_build_no = build_no
+                    break
+                case ePlatformType.Ios:
+                    recentVersion.ios_build_no = build_no
+                    break
+            }
+            
+            await recentVersion.save({transaction})
+            return recentVersion
+        })
+
+
     }
 }
 

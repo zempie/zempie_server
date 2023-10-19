@@ -1,4 +1,25 @@
 paths:
+  /init:
+    get:
+      tags:
+        - Zempie
+      summary: 젬파이 초기 데이터
+      responses:
+        200:
+         content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  and_build_no: 
+                    type: number,
+                    example: 65
+                  ios_build_no: 
+                    type: number,
+                    example: 65
+                  updated_at: 
+                    type: string,
+                    example: "2023-10-19T02:56:13.000Z"
   /featured:
     get:
       tags:
