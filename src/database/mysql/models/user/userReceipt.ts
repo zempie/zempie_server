@@ -21,12 +21,21 @@ class UserReceiptModel extends Model {
             purchase_token: { type: DataTypes.TEXT, allowNull: false, default: '' },
             receipt:        { type: DataTypes.TEXT, allowNull: false, default: '' },
             subscription:   { type: DataTypes.INTEGER, allowNull: false },
-            is_consume:   { type: DataTypes.BOOLEAN, allowNull: false, default: false },
+            is_consume:     { type: DataTypes.BOOLEAN, allowNull: false, default: false },
         };
     }
 
     async afterSync(): Promise<void> {
         this.model.belongsTo(dbs.User.model, { foreignKey: 'user_id', targetKey: 'id' });
+
+        const desc = await this.model.sequelize.queryInterface.describeTable(this.model.tableName);
+        
+        if (!desc['user_id']) {
+            this.model.sequelize.queryInterface.addColumn(this.model.tableName, 'user_id', {
+                type: DataTypes.INTEGER,
+                after: 'id'
+            })
+        }
     }
 }
 

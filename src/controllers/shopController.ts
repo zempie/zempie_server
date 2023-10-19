@@ -1,6 +1,6 @@
 import { dbs } from '../commons/globals';
 import { CreateError, ErrorCodes } from '../commons/errorCodes';
-import { eItemUsingType, eItemState } from '../commons/enums';
+import { eItemUsingType, eItemState, eCoinLogType } from '../commons/enums';
 import { Transaction } from 'sequelize';
 import admin from 'firebase-admin';
 import { NextFunction, Request, Response } from 'express';
@@ -10,6 +10,14 @@ import DecodedIdToken = admin.auth.DecodedIdToken;
 
 interface IShopParams {
     refitem_id: number
+}
+
+interface ILogData { 
+    user_uid: string,
+    zem?: number,
+    pie?: number,
+    type: number,
+    info?: object
 }
 class ShopController {
 
@@ -27,12 +35,21 @@ class ShopController {
         }
     }
 
-    giveItem = async ( uid: string, refitem_id: number) => {
+   
+    /**
+     * 
+     * @param uid : user_uid
+     * @param refitem_id : 아이템 id
+     * @param type : 전달된 아이템의 상태 ( 구매, 선물, 이벤트... )
+     * @returns 
+     */
+    giveItem = async ( uid: string, refitem_id: number, type: eCoinLogType, info ?: object) => {
         try{
             let update:any = {}
             const user = await dbs.User.findOne({ uid });
             const user_id = user.id;
             const refitem = await dbs.RefItem.findOne({ id: refitem_id });
+
             if ( !refitem ) {
                 throw CreateError(ErrorCodes.INVALID_ITEM_ID);
             }
@@ -52,7 +69,14 @@ class ShopController {
                             before_zem
                         }
                         
-                        // TODO: log 추가
+                        // log 추가
+                        await this.setCoinLog({
+                            user_uid: uid,
+                            zem: userCoin.zem - before_zem,
+                            pie: userCoin.pie,
+                            type,
+                            info
+                        })
     
                         return update;
                     });
@@ -114,6 +138,20 @@ class ShopController {
             if ( item.is_used ) {
                 throw CreateError(ErrorCodes.REJECT_USE_ITEM);
             }
+        })
+    }
+
+    /**
+     * 전달 혹은 받은 아이템 로그 기록 -> 결제 / 선물 / 이벤트등...
+     */
+    setCoinLog = async (logData: ILogData) => {
+        
+        return await dbs.UserCoinLog.create({
+            user_uid: logData.user_uid,
+            zem: logData.zem,
+            pie: logData.pie,
+            type: logData.type,
+            info: logData.info
         })
     }
 

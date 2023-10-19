@@ -4,7 +4,7 @@ import { IAdmin, IEvent, IRoute } from "./_interfaces";
 import { NextFunction, Request, Response } from 'express';
 import Opt from '../../config/opt';
 const { PAYMENT } = Opt;
-import { Sequelize, Transaction } from 'sequelize';
+import { Sequelize, Transaction, Op } from 'sequelize';
 import shopController from "./shopController";
 
 import admin from 'firebase-admin';
@@ -12,6 +12,8 @@ import axios from 'axios';
 
 import { Bootpay } from '@bootpay/backend-js';
 import DecodedIdToken = admin.auth.DecodedIdToken;
+import { eCoinLogType } from "../commons/enums";
+import * as _ from 'lodash';
 
 var iap = require('iap');
 
@@ -328,9 +330,9 @@ CREATE TABLE `receipt` (
           receipt: JSON.stringify({ ...ret}),
           is_consume: 1
         }
-        await dbs.UserReceipt.create(userReceiptData, transaction)
+       const receipt = await dbs.UserReceipt.create(userReceiptData, transaction)
   
-        let update = await shopController.giveItem( uid, shop.refitem_id)
+        let update = await shopController.giveItem( uid, shop.refitem_id, eCoinLogType.Payment, {receipt_id: receipt.id})
         
         return {
           message: '결제되었습니다. 영수증을 확인하세요..',
@@ -493,9 +495,9 @@ CREATE TABLE `receipt` (
           receipt: JSON.stringify({ ...ret}),
           is_consume: 1
         }
-        await dbs.UserReceipt.create(userReceiptData, transaction)
+        const receipt = await dbs.UserReceipt.create(userReceiptData, transaction)
   
-        let update = await shopController.giveItem( uid, refitem_id)
+        let update = await shopController.giveItem( uid, refitem_id, eCoinLogType.Payment, {receipt_id: receipt.id})
         
         return {
           message: '결제되었습니다. 영수증을 확인하세요.',
@@ -539,6 +541,68 @@ CREATE TABLE `receipt` (
     } catch (error) {
 
     }
+  }
+  getPaymentList = async ({limit = 10, offset = 0, sort = 'created_at', dir = 'desc', start_date , end_date} : any, user: DecodedIdToken, ) => {
+    let log: any = []
+
+    if( !end_date ){
+      end_date = new Date()
+    }
+
+    if( !start_date ){
+      start_date = new Date(new Date().setDate(end_date.getDate() - 10))
+    }
+    
+    const { count, rows } = await dbs.UserCoinLog.findAndCountAll(
+      { user_uid: user.user_id,
+        created_at : {
+          [Op.between]:[Date.parse(start_date), Date.parse(end_date)]
+        },
+        type: {
+          [Op.or]: [eCoinLogType.Payment]
+        }
+      },
+      {
+        order: [[sort, dir]],
+        limit: _.toNumber(limit),
+        offset: _.toNumber(offset),
+      })
+
+   return {
+    count,
+    list: await Promise.all(
+    rows.map(async(log: any) => {
+      let temLog
+      switch(log.type){
+        case eCoinLogType.Payment:
+          const receipt = await dbs.UserReceipt.findOne({
+              id: log.info.receipt_id
+          })
+          temLog = log.get({plain: true})
+          if( !receipt ){
+            throw CreateError(ErrorCodes.USER_PAYMENT_INVALID_RECEIPT);
+          }
+          temLog.receipt = receipt.get({plain: true})
+          
+          const receiptInfo = JSON.parse(receipt.receipt)
+
+          log = {
+            created_at: temLog.created_at,
+            payment_method: receiptInfo.method,
+            receipt_no : receiptInfo.receipt_id,
+            price: receipt.price,
+            item: receipt.product_id
+          }
+          
+          break;
+
+      }
+
+      return log
+    })
+  )}
+
+
   }
 
 }

@@ -166,4 +166,20 @@ export enum eNotificationType {
     Recomment,
     Dm
 }
+
+export enum eCoinLogType {
+    // 코인이 생긴 경우 ( + )
+    Payment = 1,
+    Donation,
+    Gift,
+    Event,
+    // 하단부터는 코인 사용 내역 ( - )
+    sendDonation = 10, 
+    sendGift,
+}
+
+export enum eDonationType{
+    User,
+    Post
+}
   

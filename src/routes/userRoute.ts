@@ -10,6 +10,8 @@ import FileManager from '../services/fileManager';
 import PublishingController from '../controllers/publishingController';
 import ShopController from '../controllers/shopController';
 import PaymentController from '../controllers/paymentController';
+import CoinController from '../controllers/coinController';
+
 
 
 const apiVer = `/api/v1`;
@@ -65,11 +67,30 @@ export default (router: Router) => {
     router.get(`${apiVer}/user/publishing`,         validateFirebaseIdToken, convert(PublishingController.getList));
     router.put(`${apiVer}/user/alarm`,              validateFirebaseIdToken, isAuthenticated, convert(UserController.updateAlarmStatus));
 
-    router.get(`${apiVer}/items`,             validateFirebaseIdToken, convert(ShopController.getRefItemsAndShopItems));
-    router.get(`${apiVer}/items/:store_type`,             validateFirebaseIdToken, convert(ShopController.getRefItemsAndShopItems));
+
+    // 결제 관련
+    router.get(`${apiVer}/items`,                   validateFirebaseIdToken, convert(ShopController.getRefItemsAndShopItems));
+    router.get(`${apiVer}/items/:store_type`,       validateFirebaseIdToken, convert(ShopController.getRefItemsAndShopItems));
     
-    router.post(`${apiVer}/payment/iap`,             validateFirebaseIdToken, convert(PaymentController.validateReceiptIAP));
-    router.post(`${apiVer}/payment/web`,             validateFirebaseIdToken, convert(PaymentController.validateReceiptBootpay));
+    router.post(`${apiVer}/payment/iap`,            validateFirebaseIdToken, convert(PaymentController.validateReceiptIAP));
+    router.post(`${apiVer}/payment/web`,            validateFirebaseIdToken, convert(PaymentController.validateReceiptBootpay));
+    router.get(`${apiVer}/payment/log`,             validateFirebaseIdToken, isAuthenticated,       convert(PaymentController.getPaymentList));
+    
+    
+    router.get(`${apiVer}/coin/usage/list`,              validateFirebaseIdToken, convert(CoinController.coinUsageList))
+    router.get(`${apiVer}/coin/profit/list`,             validateFirebaseIdToken, convert(CoinController.coinProfitList))
+
+    // 젬 도네이션
+    router.post(`${apiVer}/coin/transfer`,          validateFirebaseIdToken,  isAuthenticated,    convert(CoinController.transferCoin))
+    
+    // 유저 계좌
+    router.post(`${apiVer}/user/update/account`)
+
+    router.post(`${apiVer}/redemption`)
+    router.get(`${apiVer}/redemption/list`)
+
+
+
 
 
     // for testing

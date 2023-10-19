@@ -19,23 +19,15 @@ export const ErrorCodes = {
     INVALID_USER_UID: { code: 20001, message: '사용자 UID 오류' },
     INVALID_CHANNEL_ID: { code: 20002, message: '사용자 채널 ID 오류' },
     INVALID_FCM_TOKEN: { code: 20003, message: '사용자 FCM 토큰 오류' },
+    INVALID_USER_NICKNAME: { code: 20004, message: '사용자 닉네임 오류' },
+
+
     USER_ALREADY_VERIFIED_EMAIL: { code: 20101, message: '이미 인증된 메일' },
     USER_INVALID_VERIFIED_EMAIL: { code: 20102, message: '이메일 인증 안됨' },
     USER_DUPLICATED_CHANNEL_ID: { code: 20103, message: 'Channel ID 중복' },
+
     BANNED_USER: { code: 20201, message: '제재중인 유저' },
 
-    /*
-        User Payment , Coin,  Shop
-     */
-    USER_PAYMENT_BOOTPAY_RECEIPT_VERIFY_FAIL: { code: 20201, message: 'receipt id 검증 실패' },
-    USER_PAYMENT_RECEIPT_GOOGLE_VERIFY_FAIL: { code: 20202, message: 'google receipt id 검증 실패' },
-    USER_PAYMENT_RECEIPT_APPLE_VERIFY_FAIL: { code: 20202, message: 'apple receipt id 검증 실패' },
-
-    USER_PAYMENT_NO_ITEM_TO_BE_GIVEN: { code: 20210, message: '지급할 아이템이 없음.' },
-    USER_PAYMENT_ALREADY_USED_RECEIPT: { code: 20211, message: '이미 사용된 영수증' },
-    USER_PAYMENT_CANCELED_RECEIPT: { code: 20212, message: '지급할 아이템이 없음.' },
-
-    USER_COIN_NOT_ENOUGH_ZEM: { code: 20213, message: 'zem이 부족함.' },
 
     /*
         Game
@@ -115,6 +107,25 @@ export const ErrorCodes = {
          Report
       */
     INVALID_ACCESS_EVENT_ID : { code: 80001, message: '잘못된 이벤트 접근' },
+
+
+
+    /*
+        User Payment , Coin,  Shop
+     */
+    USER_PAYMENT_BOOTPAY_RECEIPT_VERIFY_FAIL: { code: 90001, message: 'receipt id 검증 실패' },
+    USER_PAYMENT_RECEIPT_GOOGLE_VERIFY_FAIL: { code: 90002, message: 'google receipt id 검증 실패' },
+    USER_PAYMENT_RECEIPT_APPLE_VERIFY_FAIL: { code: 90003, message: 'apple receipt id 검증 실패' },
+
+    USER_PAYMENT_NO_ITEM_TO_BE_GIVEN: { code: 91001, message: '지급할 아이템이 없음.' },
+    USER_PAYMENT_ALREADY_USED_RECEIPT: { code: 91002, message: '이미 사용된 영수증' },
+    USER_PAYMENT_CANCELED_RECEIPT: { code: 91003, message: '지급할 아이템이 없음.' },
+    USER_PAYMENT_INVALID_RECEIPT: { code: 91004, message: '일치하지않는 영수증' },
+
+    USER_COIN_NOT_ENOUGH_ZEM: { code: 92000, message: 'zem이 부족함.' },
+    INVALID_COIN_UNIT: { code: 92001, message: '코인단위를 다시 확인해주세요' },
+
+
 
     /**
      * 안쓰임

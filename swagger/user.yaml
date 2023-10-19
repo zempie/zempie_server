@@ -175,3 +175,178 @@ paths:
           $ref: '#/components/responses/Okay'
         403:
           $ref: '#/components/responses/UnauthorizedError'
+  
+  /payment/log:
+    get:
+      tags:
+        - Zempie Shop 
+      summary: 결제 내역
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: limit
+          in: query
+          description: 기본 10
+          type: number
+          required: false
+        - name: offset
+          in: query
+          description: 기본 0
+          type: number
+          required: false
+        - name: sort
+          in: query
+          description: created_at 기본 정렬
+          type: string
+          required: false
+        - name: dir
+          in: query
+          description: desc 기본 direction - desc, asc
+          type: string
+          required: false
+        - name: start_date
+          in: query
+          description: 빈값이면 현재 날짜를 기준으로 -10일 한 값이 기본값
+          type: string
+          required: false
+        - name: end_date
+          in: query
+          description: 빈값이면 현재 날짜가 기본값
+          type: string
+          required: false
+        
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  count:
+                    type: number,
+                    description: "전체 리스트 개수"
+                    example: 100,
+                  list: 
+                    type: arrary,
+                    example: [
+                        {
+                        "created_at": "2023-10-19T06:05:46.000Z",
+                        "payment_method": "카드",
+                        "receipt_no": "6530c704a575b4002250c525",
+                        "price": 1200,
+                        "item": "zem_10"
+                      }
+                    ]
+                 
+        403:
+          $ref: '#/components/responses/UnauthorizedError'
+
+  /coin/usage/list:
+    get:
+      tags:
+        - Zempie Shop 
+      summary: 코인 사용 내역
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: limit
+          in: query
+          description: 기본 10
+          type: number
+          required: false
+        - name: offset
+          in: query
+          description: 기본 0
+          type: number
+          required: false
+        - name: sort
+          in: query
+          description: created_at 기본 정렬
+          type: string
+          required: false
+        - name: dir
+          in: query
+          description: desc 기본 direction - desc, asc
+          type: string
+          required: false
+        - name: start_date
+          in: query
+          description: 빈값이면 현재 날짜를 기준으로 -10일 한 값이 기본값
+          type: string
+          required: false
+        - name: end_date
+          in: query
+          description: 빈값이면 현재 날짜가 기본값
+          type: string
+          required: false
+        
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  count:
+                    type: number,
+                    description: "전체 리스트 개수"
+                    example: 100,
+                  list: 
+                    type: arrary,
+                    example: [
+                        {
+                        "created_at": "2023-10-19T10:16:46.000Z",
+                        "coin_type": 0,
+                        "amount": 10,
+                        "info": {
+                            "uid": "meVDE3aqflYrlQXY1g5TGtHTphM2",
+                            "nickname": "local100"
+                        }
+                      }
+                    ]
+                 
+        403:
+          $ref: '#/components/responses/UnauthorizedError'
+
+  /coin/transfer:
+    post:
+      tags:
+        - Zempie Shop 
+      summary: 코인 전달 - 현재는 도네이션만 사용하나 추후 선물기능과 같은 코인 이동시스템 도입시 사용 가능
+      security:
+        - bearerAuth: [ ]
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                coin_type:
+                  type: number
+                  description: "코인 타입 ( 0 : zem, 1: pie)"
+                  example: 0
+                  required: true
+                amount:
+                  type: number
+                  description: 전달할 코인 수
+                  required: true
+                target_nickname:
+                  type: string
+                  description: 전달받을 유저 닉네임
+                  required: true
+                info: 
+                  type: object
+                  description: "전달되는 타입 ( 2: Donation, 3: gift, 4: event ) enum 파일 참고"
+                  example: { type: 2 }
+                  required: true
+              required:
+                - coin_type
+                - amount
+                - target_nickname
+                - info
+      responses:
+        200:
+          $ref: '#/components/responses/Okay'
+        403:
+          $ref: '#/components/responses/UnauthorizedError'
+  
