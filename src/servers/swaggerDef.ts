@@ -48,6 +48,10 @@ const swaggerDefinition = {
             },
             UnauthorizedError: {
                 description: 'Firebase 토큰 오류'
+            },
+            UserEx: {
+                id_verified: true
+
             }
         }
     },

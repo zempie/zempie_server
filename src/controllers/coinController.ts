@@ -1,9 +1,9 @@
-import { dbs } from '../commons/globals';
+import { dbs, caches } from '../commons/globals';
 import admin from 'firebase-admin';
 import { CreateError, ErrorCodes } from '../commons/errorCodes';
 import DecodedIdToken = admin.auth.DecodedIdToken;
 import { eCoinLogType, eDonationType, eItemUsingType } from '../commons/enums';
-import { Transaction, Op, Sequelize } from 'sequelize';
+import { Transaction, Op, Sequelize, QueryTypes } from 'sequelize';
 import shopController from './shopController';
 import * as _ from 'lodash';
 
@@ -91,6 +91,9 @@ class CoinController {
           break;
       }
 
+      await caches.user.delInfo(user.uid);
+
+
       return {
         zem: fromUserCoin.zem,
         pie: fromUserCoin.pie,
@@ -158,7 +161,11 @@ class CoinController {
         )}  
   }
 
+  /**
+   * type: 현재는 도네이션만 사용중이므로 도네이션만 필터, 추후 다른 수익이 생길 경우 필터링 구분해야함 
+   */
   coinProfitList =  async({ limit = 10, offset = 0, sort = 'created_at', dir = 'desc', start_date , end_date } : any, user: DecodedIdToken) => {
+
     if( !end_date ){
       end_date = new Date()
     }
@@ -166,8 +173,8 @@ class CoinController {
     if( !start_date ){
       start_date = new Date(new Date().setDate(end_date.getDate() - 10))
     }
-
-    const { count, rows } = await dbs.UserCoinLog.findAndCountAll(
+    
+    const profitResult = await dbs.UserCoinLog.findAll(
       { user_uid: user.uid,
         created_at : {
           [Op.between]:[Date.parse(start_date), Date.parse(end_date)]
@@ -177,19 +184,59 @@ class CoinController {
         }
       },
       {
-        attributes:[
-          [Sequelize.fn('DATE', Sequelize.col('created_at')), 'date'], // created_at 열에서 날짜 추출
-          [Sequelize.fn('SUM', Sequelize.col('zem')), 'totalZem'], // amount 열의 합계 계산
+        attributes: [
+          [Sequelize.fn('SUM', Sequelize.col('zem')), 'total_profit'],
         ],
-        group: [Sequelize.fn('DATE', Sequelize.col('created_at'))], 
         order: [[sort, dir]],
         limit: _.toNumber(limit),
         offset: _.toNumber(offset),
       }
-    
     )
 
-    return rows
+
+    const result = await dbs.UserCoinLog.getProfitByDate({limit, offset, sort, dir, start_date , end_date })
+
+    const { count, rows } = await dbs.UserCoinLog.findAndCountAll(
+      { user_uid: user.uid,
+        created_at : {
+          [Op.between]:[Date.parse(start_date), Date.parse(end_date)]
+        },
+        type: {
+          [Op.or] : [eCoinLogType.Donation, eCoinLogType.Gift]
+        }
+      },
+      {
+        group: [
+          Sequelize.fn('DATE', Sequelize.col('created_at'))
+        ], 
+      }
+    )
+
+    return {
+      count: count.length,
+      total_profit : profitResult ? _.toNumber(profitResult[0].get({plain: true}).total_profit) : 0, 
+      list: result}
+
+  }
+
+  reqRedeemCoin = async ({bank_account_id, amount} : any, user: DecodedIdToken ) => {
+    if( !bank_account_id || !amount ){
+      throw CreateError(ErrorCodes.INVALID_PARAMS);
+    }
+    
+    const userInfo = await dbs.User.findOne({ uid: user.uid })
+    const userCoin = await dbs.UserCoin.findOne({ user_id: userInfo.id })
+
+    if(userCoin.zem < amount){
+      throw CreateError(ErrorCodes.USER_COIN_NOT_ENOUGH_ZEM);
+    }
+
+    return await dbs.UserCoin.getTransaction(async (transaction: Transaction) => {
+
+    })
+
+
+
 
   }
 

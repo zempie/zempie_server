@@ -34,6 +34,8 @@ class UserModel extends Model {
             fcm_token:       { type: DataTypes.STRING },
             is_developer:    { type: DataTypes.BOOLEAN, defaultValue: false },
             last_log_in:     { type: DataTypes.DATE },
+            id_verified:     { type: DataTypes.BOOLEAN, defaultValue: false} //본인인증여부
+
 
         };
     }
@@ -62,6 +64,14 @@ class UserModel extends Model {
             this.model.sequelize.queryInterface.addColumn(this.model.tableName, 'url_banner', {
                 type: DataTypes.STRING,
                 after: 'picture'
+            })
+        }
+
+        if (!desc['id_verified']) {
+            this.model.sequelize.queryInterface.addColumn(this.model.tableName, 'id_verified', {
+                type: DataTypes.BOOLEAN,
+                defaultValue: false,
+                after: 'last_log_in'
             })
         }
     }

@@ -14,6 +14,7 @@ import { isOK_channelID } from '../../commons/utils';
 // import { ClientSession } from 'mongoose';
 import Opt from '../../../config/opt';
 import { eNotificationType } from '../../commons/enums';
+import { decode } from 'jsonwebtoken';
 const { Url, CORS } = Opt;
 const replaceExt = require('replace-ext');
 
@@ -107,6 +108,7 @@ class UserController {
 
     getInfo = async ({ registration_token }: any, _user: DecodedIdToken, { req, res }: any) => {
         const { uid } = _user;
+        
         let user = await caches.user.getInfo(uid);
         if (!user) {
             const userRecord = await dbs.User.getInfo({ uid });
@@ -272,6 +274,7 @@ class UserController {
             picture: user.picture,
             url_banner: user.url_banner,
             is_developer: user.is_developer,
+            id_verified: user.id_verified,
             following_cnt: followingCnt,
             follower_cnt: followerCnt,
             post_cnt: user.post_cnt,
@@ -356,7 +359,7 @@ class UserController {
     }
 
 
-    setInfo = async (params: any, { uid }: DecodedIdToken, { req: { files: { file, banner_file } } }: IRoute) => {
+    setInfo = async (params: any, { uid }: DecodedIdToken, { req: { files: { file, banner_file }  } }: IRoute) => {
         // 불량 단어 색출
         if (!dbs.BadWords.areOk(params)) {
             throw CreateError(ErrorCodes.FORBIDDEN_STRING);
@@ -671,6 +674,102 @@ class UserController {
             success = false;
         }
         return {success: success};
+    }
+
+    registerBankAccount = async({ bank, account_num }: { bank: string, account_num: number }, {uid}: DecodedIdToken) => {
+        //TODO: 계좌 개수 제한( 관리자 페이지랑 연동 )
+
+        if(!bank || !account_num){
+            throw CreateError(ErrorCodes.INVALID_PARAMS);
+        }
+
+        return await dbs.UserBankAccount.getTransaction(async (transaction: Transaction) => {
+
+            const user = await dbs.User.getInfo({ uid }, transaction);
+            
+            if (!user) {
+                throw CreateError(ErrorCodes.INVALID_USER_UID);
+            }
+            if( !user.id_verified ){
+                throw CreateError(ErrorCodes.USER_INVALID_VERIFIED_ID);
+            }
+
+            const userBankAccounts = await dbs.UserBankAccount.findAll({
+                user_uid: user.uid
+            })
+    
+            if(userBankAccounts){
+                userBankAccounts.forEach((account : any) => {
+                    if(account.account_num === account_num && account.bank === bank){
+                        throw CreateError(ErrorCodes.USER_DUPLICATED_BANK_ACCOUNT);
+                    }
+                })
+            }
+
+            return await dbs.UserBankAccount.create({
+                user_uid: user.uid,
+                bank,
+                account_num
+            }, transaction)
+
+        })
+
+    }
+
+    deleteBankAccount = async({ bank_account_id }: { bank_account_id: number }, user: DecodedIdToken ) => {
+        if(!bank_account_id){
+            throw CreateError(ErrorCodes.INVALID_PARAMS);
+        }
+       return await dbs.UserBankAccount.getTransaction(async (transaction: Transaction) => {
+            const account = await dbs.UserBankAccount.findOne({
+                id: bank_account_id
+            })
+            
+            if( !account ){
+                throw CreateError(ErrorCodes.INVALID_PARAMS)
+            }
+    
+            if(account.user_uid !== user.uid){
+                throw CreateError(ErrorCodes.ACCESS_DENY);
+            }
+
+           return await dbs.UserBankAccount.destroy({
+                id: bank_account_id,
+                user_uid: user.uid
+            }, transaction)
+        })
+
+
+
+    }
+
+    getBankAccounts = async( _: any, user: DecodedIdToken ) => {
+
+        return await dbs.UserBankAccount.findAll({
+            user_uid: user.uid
+        })
+    }
+
+    verifyIdentification = async({is_passed} : {is_passed: boolean}, {uid}: DecodedIdToken) => {
+        //TODO: 인증 api 붙여야됨
+
+        if( !is_passed ){
+            throw CreateError(ErrorCodes.USER_VERIFIED_ID_FAILURE);
+        }
+
+       return await dbs.User.getTransaction(async (transaction: Transaction) => {
+            const user = await dbs.User.getInfo({ uid }, transaction);
+            
+            if ( !user ) {
+                throw CreateError(ErrorCodes.INVALID_USER_UID);
+            }
+
+            await dbs.User.update({ id_verified: is_passed }, { uid }, transaction);
+            caches.user.delInfo(uid);
+
+            return user
+
+        })
     }
 
 }

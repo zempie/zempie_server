@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import convert from '../controllers/_convert';
-import { checkUserDenied, isAuthenticated, validateFirebaseIdToken } from './_common';
+import { checkUserDenied, isAuthenticated, validateFirebaseIdToken, isIdVerified } from './_common';
 import UserController from '../controllers/user/userController';
 import UserContentController from '../controllers/user/userContentController';
 import UserPlaylistController from '../controllers/user/userPlaylistController';
@@ -26,6 +26,8 @@ export default (router: Router) => {
     router.post(`${apiVer}/user/verify-channel`,     validateFirebaseIdToken, convert(UserController.verifyChannelId));
     router.post(`${apiVer}/user/has-email`,          validateFirebaseIdToken, convert(UserController.hasEmail));
     router.post(`${apiVer}/user/has-nickname`,       validateFirebaseIdToken, convert(UserController.hasNickname));
+    //본인인증
+    router.post(`${apiVer}/user/verify-id`,          validateFirebaseIdToken, convert(UserController.verifyIdentification))
 
 
     router.post(`${apiVer}/user/update/info`,       validateFirebaseIdToken, FileManager.uploadImage2(1, 2), convert(UserController.setInfo));
@@ -74,21 +76,25 @@ export default (router: Router) => {
     
     router.post(`${apiVer}/payment/iap`,            validateFirebaseIdToken, convert(PaymentController.validateReceiptIAP));
     router.post(`${apiVer}/payment/web`,            validateFirebaseIdToken, convert(PaymentController.validateReceiptBootpay));
-    router.get(`${apiVer}/payment/log`,             validateFirebaseIdToken, isAuthenticated,       convert(PaymentController.getPaymentList));
+    router.get(`${apiVer}/payment/log`,             validateFirebaseIdToken, isAuthenticated, convert(PaymentController.getPaymentList));
     
     
-    router.get(`${apiVer}/coin/usage/list`,              validateFirebaseIdToken, convert(CoinController.coinUsageList))
-    router.get(`${apiVer}/coin/profit/list`,             validateFirebaseIdToken, convert(CoinController.coinProfitList))
+    router.get(`${apiVer}/coin/usage/list`,         validateFirebaseIdToken, convert(CoinController.coinUsageList))
+    router.get(`${apiVer}/coin/profit/list`,        validateFirebaseIdToken, convert(CoinController.coinProfitList))
 
     // 젬 도네이션
-    router.post(`${apiVer}/coin/transfer`,          validateFirebaseIdToken,  isAuthenticated,    convert(CoinController.transferCoin))
+    router.post(`${apiVer}/coin/transfer`,          validateFirebaseIdToken, convert(CoinController.transferCoin))
+    // 환전
+    router.post(`${apiVer}/coin/redemption`,        validateFirebaseIdToken, isIdVerified, convert(CoinController.reqRedeemCoin) )
+    router.get(`${apiVer}/coin/redemption/list`)
+
     
     // 유저 계좌
-    router.post(`${apiVer}/user/update/account`)
+    router.post(`${apiVer}/user/bank/account`,      validateFirebaseIdToken, convert(UserController.registerBankAccount))
+    router.get(`${apiVer}/user/bank/accounts`,      validateFirebaseIdToken, convert(UserController.getBankAccounts))
+    router.delete(`${apiVer}/user/bank/account`,    validateFirebaseIdToken, convert(UserController.deleteBankAccount))
 
-    router.post(`${apiVer}/redemption`)
-    router.get(`${apiVer}/redemption/list`)
-
+    
 
 
 

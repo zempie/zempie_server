@@ -25,6 +25,9 @@ export const ErrorCodes = {
     USER_ALREADY_VERIFIED_EMAIL: { code: 20101, message: '이미 인증된 메일' },
     USER_INVALID_VERIFIED_EMAIL: { code: 20102, message: '이메일 인증 안됨' },
     USER_DUPLICATED_CHANNEL_ID: { code: 20103, message: 'Channel ID 중복' },
+    USER_DUPLICATED_BANK_ACCOUNT: { code: 20104, message: '이미 등록된 계좌번호입니다.' },
+    USER_INVALID_VERIFIED_ID: { code: 20105, message: '본인 인증 안됨' },
+    USER_VERIFIED_ID_FAILURE: { code: 20106, message: '본인 인증 실패' },
 
     BANNED_USER: { code: 20201, message: '제재중인 유저' },
 

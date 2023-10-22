@@ -1,5 +1,5 @@
 import Model from '../../../_base/model';
-import { DataTypes, Sequelize } from 'sequelize';
+import { DataTypes, QueryTypes, Sequelize } from 'sequelize';
 import { dbs } from '../../../../commons/globals';
 
 
@@ -24,6 +24,43 @@ class UserCoinLogModel extends Model {
     async afterSync(): Promise<void> {
         this.model.belongsTo(dbs.User.model, {foreignKey: 'user_uid', targetKey: 'uid'});
     }
+
+
+
+    async getProfitByDate({ limit = 10, offset = 0, sort = 'created_at', dir = 'desc', start_date , end_date } : any){
+
+        const startDateStr = start_date.toISOString().slice(0, 19).replace('T', ' ');
+        const endDateStr = end_date.toISOString().slice(0, 19).replace('T', ' ');
+
+        const query = `
+        SELECT 
+            sort,
+            GROUP_CONCAT(CONCAT(type, ': ', totalZem) ORDER BY type ASC SEPARATOR ', ') AS total_by_type
+        FROM (
+            SELECT 
+                ${sort === 'created_at' ? 'DATE(created_at)' : sort} AS sort,
+                type,
+                SUM(zem) AS totalZem
+            FROM user_coin_logs
+            WHERE ${sort} BETWEEN '${startDateStr}' AND '${endDateStr}'
+            GROUP BY sort, type
+        ) AS subquery
+        GROUP BY sort
+        ORDER BY sort ${dir}
+        LIMIT ${limit}
+        OFFSET ${offset}
+        ;`
+
+        const result = await this.db.query(query,  {
+            replacements: {
+                startDate: Date.parse(start_date),
+                endDate: Date.parse(end_date),
+            },
+            type: QueryTypes.SELECT,
+        })
+        return result
+    }
+    
 
 }
 

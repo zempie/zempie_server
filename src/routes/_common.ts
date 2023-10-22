@@ -89,6 +89,18 @@ export const isAuthenticated = (req: Request, res: Response, next: NextFunction)
     }
     next();
 }
+
+//본인 인증 여부
+export const isIdVerified = (req: Request, res: Response, next: NextFunction) => {
+    if (!req.user) {
+        return responseError(res, CreateError(ErrorCodes.UNAUTHORIZED), 401);
+    }
+    if ( !req.user.id_verified ) {
+       return responseError(res, CreateError(ErrorCodes.USER_INVALID_VERIFIED_ID), 401);
+    }
+    next();
+}
+
 export const isDeveloper = (req: Request, res: Response, next: NextFunction) => {
     // if ( !req.user.is_developer ) {
     //     return responseError(res, CreateError(ErrorCodes.IS_NOT_DEVELOPER), 401);
