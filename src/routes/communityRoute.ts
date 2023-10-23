@@ -6,6 +6,7 @@ import { validateFirebaseIdToken } from "./_common";
 import gameController from '../controllers/game/gameController';
 import FileManager from "../services/fileManager";
 import MetaController from '../controllers/metaController';
+import coinController from '../controllers/coinController';
 
 const apiVer = `/api/v1`;
 
@@ -30,8 +31,7 @@ export default (router: Router) => {
     router.get(`${apiVer}/og-tag`,      convert(CommunityController.getOgTag));
 
     //init meta
-    router.get(`${apiVer}/init`,        convert(MetaController.getInfo))
-
-
+    router.get(`${apiVer}/init`,          convert(MetaController.getInfo));
+    router.get(`${apiVer}/init/c`,        convert(coinController.getCoinMeta));
 
 }

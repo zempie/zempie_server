@@ -7,6 +7,8 @@ import * as _ from 'lodash';
 import { v4 as uuid } from 'uuid';
 import FileManager from "../../services/fileManager";
 import Opt from '../../../config/opt';
+import { ePlatformType } from '../../commons/enums';
+
 const replaceExt = require('replace-ext');
 
 class AdminController {
@@ -215,7 +217,54 @@ class AdminController {
 
     async getBucketList ({bucketName, prefix} : any) {
         await FileManager.getBucketList(bucketName, prefix)
+    }
+
+    async updateBuildVersion({ type, build_num }: { type: ePlatformType, build_num: number}, admin: IAdmin) {
+        return await dbs.UserBan.getTransaction(async (transaction: Transaction) => {
+             
+             const target_type = Number(type)
+             const build_no = Number(build_num)
+ 
+             const recentVersion = await dbs.Meta.getRecetnVersion()
+ 
+             switch(target_type){
+                 case ePlatformType.Android:
+                     recentVersion.and_build_no = build_no
+                     break
+                 case ePlatformType.Ios:
+                     recentVersion.ios_build_no = build_no
+                     break
+             }
+             
+             await recentVersion.save({transaction})
+             return recentVersion
+         })
      }
+
+    async setCoinMeta({ commission_rate }: any, admin: IAdmin) {
+        //ISSUE: admin 제한 필요하지않나?
+        if( commission_rate < 0 || commission_rate > 100 || !commission_rate ) {
+            throw CreateError(ErrorCodes.INVALID_ADMIN_PARAMS)
+        }
+
+        return await dbs.CoinMeta.getTransaction(async (transaction: Transaction) => {
+            const coinMeta = await dbs.CoinMeta.getCoinMeta()
+            
+            if( coinMeta ){
+                await dbs.CoinMeta.destroy({ id: coinMeta.id }, transaction)
+            }
+            
+            if( commission_rate ){
+                await dbs.CoinMeta.create({
+                    admin_id: admin.id,
+                    commission_rate
+                })
+            }
+
+            return await dbs.CoinMeta.getCoinMeta()
+            
+        })
+    }
 
 }
 

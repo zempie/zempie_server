@@ -235,9 +235,13 @@ class CoinController {
 
     })
 
+  }
 
-
-
+  getCoinMeta = async(_: any, __: DecodedIdToken ) => {
+    const meta = await dbs.CoinMeta.getCoinMeta()
+    return {
+      commission_rate : meta.commission_rate
+    }
   }
 
 }

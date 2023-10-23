@@ -131,3 +131,21 @@ paths:
           $ref: '#/components/responses/Okay'
         403:
           $ref: '#/components/responses/UnauthorizedError'
+  /init/c:
+    get:
+      tags:
+        - Zempie
+      summary: 젬파이 코인 초기 데이터 
+      responses:
+        200:
+         content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  commission_rate: 
+                    type: number,
+                    example: 10
+
+
+

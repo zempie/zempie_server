@@ -122,3 +122,33 @@ paths:
           $ref: '#/components/responses/Okay'
         403:
           $ref: '#/components/responses/UnauthorizedError'
+  /admin/coin-meta:
+    post:
+      tags:
+        - "Admin Coin"
+      summary: 관리자 코인관련 정보 등록
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                commission_rate:
+                  type: number
+                  description: 코인 수수료 
+              required:
+                - commission_rate
+      responses:
+        200:
+          $ref: '#/components/responses/Okay'
+        403:
+          $ref: '#/components/responses/UnauthorizedError'
+
+
+
+
+
+
+

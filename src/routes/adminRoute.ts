@@ -172,13 +172,13 @@ export default (router: Router) => {
     router.patch(`${apiVer}/users/all/nickname`,    validateAdminIdToken,   convert(AdminUserController.updateAllNickname) )
 
     // 버전 관리
-    router.post(`${apiVer}/admin/build`,      validateAdminIdToken,     convert(AdminUserController.updateBuildVersion) )
+    router.post(`${apiVer}/admin/build`,      validateAdminIdToken,     convert(AdminController.updateBuildVersion) )
 
      /**
      * 결제, 환전
      *
      */
-    router.post(`${apiVer}/admin/commission/info`)
+    router.post(`${apiVer}/admin/coin-meta`,  validateAdminIdToken,   convert(AdminController.setCoinMeta))
     
     router.get(`${apiVer}/admin/redemption/list`)
     router.post(`${apiVer}/admin/redemption/list`)
