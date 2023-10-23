@@ -182,4 +182,19 @@ export enum eDonationType{
     User,
     Post
 }
+
+export enum eRedemptionStatus { 
+    Processing,
+    Done,
+    Reject
+}
+
+export enum eMobileCompany {
+    SK = 1,
+    KT,
+    LG,
+    SK_reason = 5, //알뜰폰
+    KT_reason,
+    LG_reason
+}
   

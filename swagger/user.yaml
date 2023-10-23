@@ -435,7 +435,94 @@ paths:
           $ref: '#/components/responses/Okay'
         403:
           $ref: '#/components/responses/UnauthorizedError'
+  /coin/redemption:
+    post:
+      tags:
+        - Zempie User 
+      summary: 환전 신청
+      security:
+        - bearerAuth: [ ]
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                bank_account_id:
+                  type: number
+                  description: 은행 계좌 id
+                  example: 1
+                  required: true
+                amount:
+                  type: number
+                  description: 환전 젬 수량
+                  example: 10
+                  required: true
+              required:
+                - bank_account_id
+                - amount
+      responses:
+        200:
+         content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: object
+                    properties:
+                      req_zem: 
+                        type: number
+                        example: 10
+                      current_zem:
+                        type: number
+                        example: 990
+                      result:
+                        type: number
+                        description: '0: 환전중, 1: 완료, 2: 보류'
+                        example: 0
+        403:
+          $ref: '#/components/responses/UnauthorizedError'
+  /coin/redemptions:
+    get:
+      tags:
+        - Zempie User
+      summary: 환전 신청 내역
+      security:
+        - bearerAuth: [ ]
+      responses:
+        200:
+         content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: object
+                    properties:
+                      processing_total: 
+                        type: number
+                        example: 20
+                      count:
+                        type: number
+                        example: 10
+                      list:
+                        type: array
+                        example: [
+                         {
+                            "created_at": "2023-10-23T08:37:52.000Z",
+                            "bank_account": 123231330,
+                            "coin_amount": 100,
+                            "cash_amount": 95,
+                            "memo": null,
+                            "status": 0
+                        },
+                        ]
+                        
+        403:
+          $ref: '#/components/responses/UnauthorizedError'
 
+  
 
 
 

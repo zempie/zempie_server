@@ -175,9 +175,10 @@ export default (router: Router) => {
     router.post(`${apiVer}/admin/build`,      validateAdminIdToken,     convert(AdminController.updateBuildVersion) )
 
      /**
-     * 결제, 환전
+     * 상품, 결제, 환전
      *
      */
+    router.post(`${apiVer}/admin/item`,       validateAdminIdToken,   convert(AdminController.addStoreItem))
     router.post(`${apiVer}/admin/coin-meta`,  validateAdminIdToken,   convert(AdminController.setCoinMeta))
     
     router.get(`${apiVer}/admin/redemption/list`)

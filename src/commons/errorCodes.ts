@@ -28,6 +28,9 @@ export const ErrorCodes = {
     USER_DUPLICATED_BANK_ACCOUNT: { code: 20104, message: '이미 등록된 계좌번호입니다.' },
     USER_INVALID_VERIFIED_ID: { code: 20105, message: '본인 인증 안됨' },
     USER_VERIFIED_ID_FAILURE: { code: 20106, message: '본인 인증 실패' },
+    USER_ALREADY_VERIFIED_ID: { code: 20107, message: '이미 완료된 본인인증' },
+    USER_NOT_EXIST_BANK_ACCOUNT: { code: 20108, message: '없는 계좌입니다.' },
+
 
     BANNED_USER: { code: 20201, message: '제재중인 유저' },
 
@@ -127,6 +130,7 @@ export const ErrorCodes = {
 
     USER_COIN_NOT_ENOUGH_ZEM: { code: 92000, message: 'zem이 부족함.' },
     INVALID_COIN_UNIT: { code: 92001, message: '코인단위를 다시 확인해주세요' },
+    NOT_ENOUGH_MIN_AMOUNT: { code: 92002, message: '최소 환전 금액을 맞춰주세요' },
 
 
 

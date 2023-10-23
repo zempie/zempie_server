@@ -86,18 +86,13 @@ export default (router: Router) => {
     router.post(`${apiVer}/coin/transfer`,          validateFirebaseIdToken, convert(CoinController.transferCoin))
     // 환전
     router.post(`${apiVer}/coin/redemption`,        validateFirebaseIdToken, isIdVerified, convert(CoinController.reqRedeemCoin) )
-    router.get(`${apiVer}/coin/redemption/list`)
+    router.get(`${apiVer}/coin/redemptions`,        validateFirebaseIdToken, convert(CoinController.reqRedeemCoinList))
 
     
     // 유저 계좌
     router.post(`${apiVer}/user/bank/account`,      validateFirebaseIdToken, convert(UserController.registerBankAccount))
     router.get(`${apiVer}/user/bank/accounts`,      validateFirebaseIdToken, convert(UserController.getBankAccounts))
     router.delete(`${apiVer}/user/bank/account`,    validateFirebaseIdToken, convert(UserController.deleteBankAccount))
-
-    
-
-
-
 
     // for testing
     // router.get(`${apiVer}/test-mongo`, convert(UserController.testMongo));

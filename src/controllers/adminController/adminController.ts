@@ -241,29 +241,44 @@ class AdminController {
          })
      }
 
-    async setCoinMeta({ commission_rate }: any, admin: IAdmin) {
+    async setCoinMeta(params: any, admin: IAdmin) {
         //ISSUE: admin 제한 필요하지않나?
+        if( !params ) {
+            throw CreateError(ErrorCodes.INVALID_ADMIN_PARAMS)
+        }
+        const commission_rate = params.commission_rate
+        const coin_rate = params.coin_rate
+        const point_rate = params.point_rate
+        const min_amount = params.min_amount
+
         if( commission_rate < 0 || commission_rate > 100 || !commission_rate ) {
             throw CreateError(ErrorCodes.INVALID_ADMIN_PARAMS)
         }
 
         return await dbs.CoinMeta.getTransaction(async (transaction: Transaction) => {
-            const coinMeta = await dbs.CoinMeta.getCoinMeta()
-            
-            if( coinMeta ){
-                await dbs.CoinMeta.destroy({ id: coinMeta.id }, transaction)
+            let createParams: any = {
+                admin_id: admin.id
             }
+            const coin_meta = await dbs.CoinMeta.getCoinMeta()
             
-            if( commission_rate ){
-                await dbs.CoinMeta.create({
-                    admin_id: admin.id,
-                    commission_rate
-                })
+            createParams.commission_rate = commission_rate ? commission_rate : coin_meta.commission_rate
+            createParams.coin_rate = coin_rate ? coin_rate : coin_meta.coin_rate
+            createParams.point_rate = point_rate ? point_rate : coin_meta.point_rate
+            createParams.min_amount = min_amount ? min_amount : coin_meta.min_amount
+
+            await dbs.CoinMeta.create(createParams, transaction)
+
+            if( coin_meta ){
+                await dbs.CoinMeta.destroy({ id: coin_meta.id }, transaction)
             }
 
             return await dbs.CoinMeta.getCoinMeta()
             
         })
+    }
+
+    async addStoreItem(params: any, admin: IAdmin){
+
     }
 
 }

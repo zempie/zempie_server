@@ -676,7 +676,7 @@ class UserController {
         return {success: success};
     }
 
-    registerBankAccount = async({ bank, account_num }: { bank: string, account_num: number }, {uid}: DecodedIdToken) => {
+    registerBankAccount = async({ bank, account_num, name}: { bank: string, account_num: number, name:string }, {uid}: DecodedIdToken) => {
         //TODO: 계좌 개수 제한( 관리자 페이지랑 연동 )
 
         if(!bank || !account_num){
@@ -694,11 +694,14 @@ class UserController {
                 throw CreateError(ErrorCodes.USER_INVALID_VERIFIED_ID);
             }
 
+            const verifiedUserInfo = await dbs.VerifiedUser.findOne({ user_uid: user.uid })
+            //TODO: 등록된 정보랑 새로 인증하는 정보랑 다르면 등록 안됨 
+
             const userBankAccounts = await dbs.UserBankAccount.findAll({
                 user_uid: user.uid
             })
     
-            if(userBankAccounts){
+            if(userBankAccounts.length){
                 userBankAccounts.forEach((account : any) => {
                     if(account.account_num === account_num && account.bank === bank){
                         throw CreateError(ErrorCodes.USER_DUPLICATED_BANK_ACCOUNT);
@@ -709,6 +712,7 @@ class UserController {
             return await dbs.UserBankAccount.create({
                 user_uid: user.uid,
                 bank,
+                name,
                 account_num
             }, transaction)
 
@@ -750,24 +754,38 @@ class UserController {
         })
     }
 
-    verifyIdentification = async({is_passed} : {is_passed: boolean}, {uid}: DecodedIdToken) => {
+    verifyIdentification = async(params: any, { uid }: DecodedIdToken) => {
         //TODO: 인증 api 붙여야됨
 
-        if( !is_passed ){
+        if( !params.is_passed ){
             throw CreateError(ErrorCodes.USER_VERIFIED_ID_FAILURE);
         }
-
+        
+        
        return await dbs.User.getTransaction(async (transaction: Transaction) => {
             const user = await dbs.User.getInfo({ uid }, transaction);
-            
+                
             if ( !user ) {
                 throw CreateError(ErrorCodes.INVALID_USER_UID);
             }
+            if( user.id_verified){
+                throw CreateError(ErrorCodes.USER_ALREADY_VERIFIED_ID);
+            }
 
-            await dbs.User.update({ id_verified: is_passed }, { uid }, transaction);
+            const verifiedUserInfo = await dbs.VerifiedUser.create({
+                user_uid: uid,
+                name: params.name,
+                birth: params.birth,
+                gender: params.gender,
+                national_info: params.national_info,
+                mobile_co: params.mobile_co,
+                mobile_num: params.mobile_num
+            })
+
+            await dbs.User.update({ id_verified: true }, { uid }, transaction);
             caches.user.delInfo(uid);
 
-            return user
+            return verifiedUserInfo
 
         })
     }

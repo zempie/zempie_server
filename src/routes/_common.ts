@@ -91,11 +91,12 @@ export const isAuthenticated = (req: Request, res: Response, next: NextFunction)
 }
 
 //본인 인증 여부
-export const isIdVerified = (req: Request, res: Response, next: NextFunction) => {
+export const isIdVerified = async (req: Request, res: Response, next: NextFunction) => {
     if (!req.user) {
         return responseError(res, CreateError(ErrorCodes.UNAUTHORIZED), 401);
     }
-    if ( !req.user.id_verified ) {
+    const user = await dbs.User.findOne({uid: req.user.uid})
+    if ( !user.id_verified ) {
        return responseError(res, CreateError(ErrorCodes.USER_INVALID_VERIFIED_ID), 401);
     }
     next();
