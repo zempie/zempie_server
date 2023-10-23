@@ -30,7 +30,7 @@ export const ErrorCodes = {
     USER_VERIFIED_ID_FAILURE: { code: 20106, message: '본인 인증 실패' },
     USER_ALREADY_VERIFIED_ID: { code: 20107, message: '이미 완료된 본인인증' },
     USER_NOT_EXIST_BANK_ACCOUNT: { code: 20108, message: '없는 계좌입니다.' },
-
+    USER_VERIFIED_ID_DIFFERENT: { code: 20109, message: '본인 인증 실패' },
 
     BANNED_USER: { code: 20201, message: '제재중인 유저' },
 

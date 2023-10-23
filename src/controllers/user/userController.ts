@@ -676,7 +676,7 @@ class UserController {
         return {success: success};
     }
 
-    registerBankAccount = async({ bank, account_num, name}: { bank: string, account_num: number, name:string }, {uid}: DecodedIdToken) => {
+    registerBankAccount = async({ bank, account_num, name, ci}: { bank: string, account_num: number, name: string, ci: string }, {uid}: DecodedIdToken) => {
         //TODO: 계좌 개수 제한( 관리자 페이지랑 연동 )
 
         if(!bank || !account_num){
@@ -695,7 +695,10 @@ class UserController {
             }
 
             const verifiedUserInfo = await dbs.VerifiedUser.findOne({ user_uid: user.uid })
-            //TODO: 등록된 정보랑 새로 인증하는 정보랑 다르면 등록 안됨 
+
+            if(verifiedUserInfo.ci !== ci ){
+                throw CreateError(ErrorCodes.USER_VERIFIED_ID_DIFFERENT);
+            }
 
             const userBankAccounts = await dbs.UserBankAccount.findAll({
                 user_uid: user.uid
