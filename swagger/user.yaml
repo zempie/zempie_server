@@ -372,19 +372,19 @@ paths:
                   required: true
                 birth:
                   type: string
-                  description: 생년월일( 특수문자 제외 )
+                  description: "생년월일( 특수문자 제외 )"
                   required: true
                 gender:
                   type: string
-                  description: 성별 (0: 여자 1 남자)
+                  description:" 성별 (0: 여자 1 남자)"
                   required: true
                 national_info:
                   type: string
-                  description: 내외국인여부(0: 내국인 1 외국인)
+                  description: "내외국인여부(0: 내국인 1 외국인)"
                   required: true 
                 mobile_co:
                   type: string
-                  description: 통신사 구분(1:sk 2: kt 3: lg 5: sk 알뜰폰 6: kt 알뜰폰 7: lg 알뜰폰)
+                  description: "통신사 구분(1:sk 2: kt 3: lg 5: sk 알뜰폰 6: kt 알뜰폰 7: lg 알뜰폰)"
                   required: true 
                 mobile_num:
                   type: string
